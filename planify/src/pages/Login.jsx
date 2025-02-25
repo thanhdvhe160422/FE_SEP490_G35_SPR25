@@ -54,18 +54,36 @@ export default function Login() {
         token: credential,
       });
 
-      // Lưu token & role vào localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
 
-      // Cấu hình axios để tự động gửi token
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.token}`;
 
       alert("Đăng nhập thành công!");
 
-      navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
+      // Điều hướng theo role
+      switch (res.data.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "manager_campus":
+          navigate("/managercampus");
+          break;
+        case "event_organizer":
+          navigate("/eventorganizer");
+          break;
+        case "implementer":
+          navigate("/implementer");
+          break;
+        case "spectator":
+          navigate("/spectator");
+          break;
+        default:
+          navigate("/login");
+          break;
+      }
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       alert("Đăng nhập thất bại!");
