@@ -56,6 +56,7 @@ export default function Login() {
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
+      localStorage.setItem("campus", campus);
 
       axios.defaults.headers.common[
         "Authorization"
@@ -63,22 +64,21 @@ export default function Login() {
 
       alert("Đăng nhập thành công!");
 
-      // Điều hướng theo role
       switch (res.data.role) {
         case "admin":
-          navigate("/admin");
+          navigate(`/admin?campus=${campus}`);
           break;
         case "manager_campus":
-          navigate("/managercampus");
+          navigate(`/managercampus?campus=${campus}`);
           break;
         case "event_organizer":
-          navigate("/eventorganizer");
+          navigate(`/eventorganizer?campus=${campus}`);
           break;
         case "implementer":
-          navigate("/implementer");
+          navigate(`/implementer?campus=${campus}`);
           break;
         case "spectator":
-          navigate("/spectator");
+          navigate(`/spectator?campus=${campus}`);
           break;
         default:
           navigate("/login");
@@ -91,6 +91,10 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
+    if (!campus) {
+      alert("Vui lòng chọn campus trước khi đăng nhập!");
+      return;
+    }
     if (window.google?.accounts) {
       window.google.accounts.id.prompt();
     } else {
