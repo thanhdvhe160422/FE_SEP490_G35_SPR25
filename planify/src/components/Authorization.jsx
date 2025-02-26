@@ -6,18 +6,12 @@ export default function Authorization() {
   const navigate = useNavigate();
 
   return (
-    <div className="unauthorized-container">
-      <FaExclamationTriangle size={80} color="#ff4444" />
-      <h1 className="unauthorized-title">Bạn không có quyền truy cập</h1>
-      <p className="unauthorized-text">
-        Vui lòng kiểm tra lại tài khoản hoặc liên hệ quản trị viên.
-      </p>
-      <button
-        className="unauthorized-button"
-        onClick={() => navigate("/login")}
-      >
-        Quay lại trang chủ
-      </button>
-    </div>
+    <section class="error_area">
+      <div class="container">
+        <h1>Oops !</h1>
+        <h2>Page Not Found!</h2>
+        <p>The page you are looking for doesn't exist or has been moved.</p>
+      </div>
+    </section>
   );
 }

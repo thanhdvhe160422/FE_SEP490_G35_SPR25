@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaGoogle } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
-import { getCampuses } from "../services/campusService";
+import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
-import backgroundImage from "../assets/fpt-campus.png";
+import "../../styles/Login.css";
+import backgroundImage from "../../assets/fpt-campus.png";
 
 export default function Login() {
   const [campus, setCampus] = useState("");

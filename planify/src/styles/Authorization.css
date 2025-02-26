@@ -1,29 +1,37 @@
-.unauthorized-container {
+.error_area {
+  background: url(../assets/error-bg.png) no-repeat;
+  background-position: 50% 29%;
+  display: block;
+  overflow: hidden;
   text-align: center;
-  padding: 50px;
+  padding: 360px 0 170px;
 }
-
-.unauthorized-title {
-  font-size: 24px;
-  color: #ff4444;
-  margin: 20px 0;
+.error_area h1 {
+  color: #fff;
+  font: 700 70px/1 "Lato", sans-serif;
 }
-
-.unauthorized-text {
-  font-size: 16px;
-  color: #666;
+.error_area h2 {
+  font: 700 italic 42px/1 "Lato", sans-serif;
+  color: #3f3f3f;
+  padding-top: 190px;
 }
-
-.unauthorized-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
+.error_area p {
+  font: 400 18px/30px "Lato", sans-serif;
+  color: rgba(0, 0, 0, 0.702);
+  padding-top: 55px;
+  padding-bottom: 45px;
 }
-
-.unauthorized-button:hover {
-  background-color: #0056b3;
+.error_area a {
+  color: #fff;
+  font: 400 18px/52px "Lato", sans-serif;
+  width: 305px;
+  margin: 0 auto;
+  background-image: -moz-linear-gradient(-176deg, #3004f3 0%, #eb9926 100%);
+  background-image: -webkit-linear-gradient(-176deg, #3004f3 0%, #eb9926 100%);
+  background-image: -ms-linear-gradient(-176deg, #3004f3 0%, #eb9926 100%);
+  display: block;
+}
+.error_area a:hover,
+.error_area a:focus {
+  background: #2b00f7;
 }

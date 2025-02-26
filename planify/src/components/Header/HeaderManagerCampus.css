@@ -1,0 +1,79 @@
+/* Header Styles */
+.header {
+  display: flex; /* Sắp xếp các phần tử theo hàng ngang */
+  justify-content: space-between; /* Căn giữa và dàn đều các phần */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  padding: 10px 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo */
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Navbar */
+.navbar {
+  display: flex; /* Giữ các link trong navbar theo hàng ngang */
+}
+
+.navbar a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: black;
+}
+
+.navbar a:hover {
+  color: blue;
+}
+
+/* User Info */
+.user-info {
+  display: flex; /* Giữ notification và profile cùng trên một hàng */
+  align-items: center;
+}
+
+/* Notification */
+.notification {
+  position: relative;
+  margin-right: 20px;
+  cursor: pointer;
+  display: flex; /* Đảm bảo biểu tượng thông báo căn chỉnh ngang */
+  align-items: center;
+}
+
+.bell {
+  font-size: 1.5rem;
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 50%;
+}
+
+/* Profile */
+.profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.username {
+  font-weight: bold;
+}
