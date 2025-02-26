@@ -2,27 +2,27 @@
   "campuses": [
     {
       "id": "1",
-      "name": "FPT University Hanoi",
+      "name": "FU Hanoi",
       "value": "hanoi"
     },
     {
       "id": "2",
-      "name": "FPT University Ho Chi Minh",
+      "name": "FU Ho Chi Minh",
       "value": "hcm"
     },
     {
       "id": "3",
-      "name": "FPT University Da Nang",
+      "name": "FU Da Nang",
       "value": "danang"
     },
     {
       "id": "4",
-      "name": "FPT University Can Tho",
+      "name": "FU Can Tho",
       "value": "cantho"
     },
     {
       "id": "5",
-      "name": "FPT University Quy Nhon",
+      "name": "FU Quy Nhon",
       "value": "quynhon"
     }
   ],

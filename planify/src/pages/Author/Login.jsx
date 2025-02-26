@@ -5,7 +5,7 @@ import { MdEmail } from "react-icons/md";
 import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Login.css";
-import backgroundImage from "../../assets/fpt-campus.png";
+import backgroundImage from "../../assets/fpt-campus.jpg";
 
 export default function Login() {
   const [campus, setCampus] = useState("");
@@ -110,10 +110,10 @@ export default function Login() {
       }}
     >
       <h1 className="university-title">FPT University</h1>
-      <div className="overlay"></div>
+      {/* <div className="overlay"></div> */}
       <div className="login-box">
         <p className="login-title">
-          Students, Lecturers, University Staff - FPT
+          Students, Lecturers, University Staff of FPT
         </p>
 
         {loading ? (
@@ -134,13 +134,13 @@ export default function Login() {
         )}
 
         <button className="login-btn google" onClick={handleGoogleLogin}>
-          <FaGoogle className="icon" />
+          <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google Logo"
+            className="icon"
+            style={{ width: "20px", height: "20px", marginRight: "10px" }}
+          />
           Login with Google
-        </button>
-
-        <button className="login-btn feid">
-          <MdEmail className="icon" />
-          Login with FeID
         </button>
       </div>
     </div>
