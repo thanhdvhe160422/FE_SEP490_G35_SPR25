@@ -10,7 +10,10 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/authorization" element={<Authorization />} />
-        <Route path="/homeMC" element={<HeaderManagerCampus />}></Route>
+        <Route
+          path="/homeManagerCampus"
+          element={<HeaderManagerCampus />}
+        ></Route>
       </Routes>
     </div>
   );

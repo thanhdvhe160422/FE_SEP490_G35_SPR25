@@ -1,29 +1,46 @@
 {
   "campuses": [
     {
-      "id": 1,
+      "id": "1",
       "name": "FPT University Hanoi",
       "value": "hanoi"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "FPT University Ho Chi Minh",
       "value": "hcm"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "FPT University Da Nang",
       "value": "danang"
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "FPT University Can Tho",
       "value": "cantho"
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "FPT University Quy Nhon",
       "value": "quynhon"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "1",
+      "message": "Event A sắp diễn ra!",
+      "read": true
+    },
+    {
+      "id": "2",
+      "message": "Bạn có một lời mời tham gia sự kiện.",
+      "read": true
+    },
+    {
+      "id": "3",
+      "message": "Event B đã được cập nhật.",
+      "read": true
     }
   ]
 }
