@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaGoogle } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
 import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Login.css";
@@ -110,7 +108,6 @@ export default function Login() {
       }}
     >
       <h1 className="university-title">FPT University</h1>
-      {/* <div className="overlay"></div> */}
       <div className="login-box">
         <p className="login-title">
           Students, Lecturers, University Staff of FPT

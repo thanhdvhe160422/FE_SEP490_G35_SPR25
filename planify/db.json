@@ -1,46 +1,84 @@
 {
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "manager",
+      "campus": "FPT HCM",
+      "authToken": "abcd1234"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "role": "eventOrganizer",
+      "campus": "FPT HN",
+      "authToken": "efgh5678"
+    },
+    {
+      "id": 3,
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "role": "implementer",
+      "campus": "FPT DN",
+      "authToken": "ijkl91011"
+    },
+    {
+      "id": 4,
+      "name": "Bob Brown",
+      "email": "bob@example.com",
+      "role": "spectator",
+      "campus": "FPT CT",
+      "authToken": "mnop1213"
+    }
+  ],
   "campuses": [
     {
-      "id": "1",
-      "name": "FU Hanoi",
-      "value": "hanoi"
+      "id": 1,
+      "name": "FPT HCM",
+      "location": "Ho Chi Minh City"
     },
     {
-      "id": "2",
-      "name": "FU Ho Chi Minh",
-      "value": "hcm"
+      "id": 2,
+      "name": "FPT HN",
+      "location": "Hanoi"
     },
     {
-      "id": "3",
-      "name": "FU Da Nang",
-      "value": "danang"
+      "id": 3,
+      "name": "FPT DN",
+      "location": "Da Nang"
     },
     {
-      "id": "4",
-      "name": "FU Can Tho",
-      "value": "cantho"
-    },
-    {
-      "id": "5",
-      "name": "FU Quy Nhon",
-      "value": "quynhon"
+      "id": 4,
+      "name": "FPT CT",
+      "location": "Can Tho"
     }
   ],
   "notifications": [
     {
-      "id": "1",
-      "message": "Event A sắp diễn ra!",
-      "read": true
+      "id": 1,
+      "userId": 1,
+      "message": "New event created at FPT HCM!",
+      "read": false
     },
     {
-      "id": "2",
-      "message": "Bạn có một lời mời tham gia sự kiện.",
-      "read": true
+      "id": 2,
+      "userId": 2,
+      "message": "Your event has been approved at FPT HN.",
+      "read": false
     },
     {
-      "id": "3",
-      "message": "Event B đã được cập nhật.",
-      "read": true
+      "id": 3,
+      "userId": 3,
+      "message": "Task assigned: Set up event stage at FPT DN.",
+      "read": false
+    },
+    {
+      "id": 4,
+      "userId": 4,
+      "message": "Upcoming event: Tech Conference 2024 at FPT CT.",
+      "read": false
     }
   ]
 }

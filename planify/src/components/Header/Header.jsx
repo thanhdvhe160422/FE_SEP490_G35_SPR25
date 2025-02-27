@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import "./HeaderManagerCampus.css";
+import "./Header.css";
 import logo from "../../assets/logo-fptu.png";
 
-export default function HeaderManagerCampus() {
+export default function Header() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  localStorage.setItem("userRole", "manager");
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
     axios
-      .get("http://localhost:4000/notifications")
+      .get(`http://localhost:4000/notifications?userId=${userId}`)
       .then((response) => {
         setNotifications(response.data);
       })
@@ -23,16 +28,18 @@ export default function HeaderManagerCampus() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = async () => {
-    if (unreadCount > 0) {
-      const updatedNotifications = notifications.map((notif) => ({
-        ...notif,
-        read: true,
-      }));
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
 
+    const unreadNotifications = notifications.filter((n) => !n.read);
+    if (unreadNotifications.length > 0) {
+      const updatedNotifications = notifications.map((notif) =>
+        notif.read ? notif : { ...notif, read: true }
+      );
       setNotifications(updatedNotifications);
 
       await Promise.all(
-        updatedNotifications.map((notif) =>
+        unreadNotifications.map((notif) =>
           axios.patch(`http://localhost:4000/notifications/${notif.id}`, {
             read: true,
           })
@@ -43,8 +50,30 @@ export default function HeaderManagerCampus() {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
     navigate("/login");
   };
+
+  const navItemsByRole = {
+    manager: [
+      { label: "Home", path: "/homeManagerCampus" },
+      { label: "Create Event Organizer", path: "/create-event-organizer" },
+      { label: "Create Event", path: "/create-event" },
+    ],
+    eventOrganizer: [
+      { label: "Home", path: "/homeEventOrganizer" },
+      { label: "Create Event", path: "/create-event" },
+      { label: "History", path: "/history" },
+    ],
+    implementer: [
+      { label: "Home", path: "/homeImplementer" },
+      { label: "Assigned Tasks", path: "/assigned-tasks" },
+      { label: "History", path: "/history" },
+    ],
+    spectator: [{ label: "Home", path: "/homeSpectator" }],
+  };
+
+  const navItems = navItemsByRole[userRole] || [];
 
   return (
     <header className="header">
@@ -53,21 +82,15 @@ export default function HeaderManagerCampus() {
       </div>
 
       <nav className="navbar">
-        <span
-          onClick={() => navigate("/homeManagerCampus")}
-          className="nav-item"
-        >
-          Home
-        </span>
-        <span
-          onClick={() => navigate("/create-event-organizer")}
-          className="nav-item"
-        >
-          Create Event Organizer
-        </span>
-        <span onClick={() => navigate("/create-event")} className="nav-item">
-          Create Event
-        </span>
+        {navItems.map((item, index) => (
+          <span
+            key={index}
+            onClick={() => navigate(item.path)}
+            className="nav-item"
+          >
+            {item.label}
+          </span>
+        ))}
       </nav>
 
       <div className="user-info">
