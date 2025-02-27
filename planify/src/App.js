@@ -4,8 +4,7 @@ import Login from "./pages/Author/Login";
 import Authorization from "./components/Authorization";
 import HeaderManagerCampus from "./components/Header/HeaderManagerCampus";
 import LoginAdmin from "./pages/Author/LoginAdmin";
-import 'bootstrap/dist/css/bootstrap.min.css';
-
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
@@ -14,10 +13,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/authorization" element={<Authorization />} />
-        <Route
-          path="/homeManagerCampus"
-          element={<HeaderManagerCampus />}
-        ></Route>
+        <Route path="/homeManagerCampus" element={<HeaderManagerCampus />} />
       </Routes>
     </div>
   );

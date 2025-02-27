@@ -53,7 +53,10 @@ export default function HeaderManagerCampus() {
       </div>
 
       <nav className="navbar">
-        <span onClick={() => navigate("/")} className="nav-item">
+        <span
+          onClick={() => navigate("/homeManagerCampus")}
+          className="nav-item"
+        >
           Home
         </span>
         <span
