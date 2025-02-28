@@ -95,24 +95,29 @@
       "name": "Hà Nội"
     }
   ],
+  
+
   "campuses": [
     {
-      "id": "1",
+      "id": 1,
       "name": "FPT HCM",
       "location": "Ho Chi Minh City"
     },
     {
-      "id": "2",
+
+      "id": 2,
       "name": "FPT HN",
       "location": "Hanoi"
     },
     {
-      "id": "3",
+
+      "id": 3,
       "name": "FPT DN",
       "location": "Da Nang"
     },
     {
-      "id": "4",
+
+      "id": 4,
       "name": "FPT CT",
       "location": "Can Tho"
     }
@@ -137,28 +142,126 @@
       "read": false
     },
     {
-      "id": "1",
+
+      "id": "4",
       "userId": 1,
       "message": "New event created at FPT HCM!",
       "read": false
-    },
-    {
-      "id": "2",
-      "userId": 2,
-      "message": "Your event has been approved at FPT HN.",
-      "read": false
-    },
-    {
-      "id": "3",
-      "userId": 3,
-      "message": "Task assigned: Set up event stage at FPT DN.",
-      "read": false
-    },
-    {
-      "id": "4",
-      "userId": 4,
-      "message": "Upcoming event: Tech Conference 2024 at FPT CT.",
-      "read": false
     }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "title": "News Title 1",
+      "date": "March 1, 2024",
+      "status": "running",
+      "category": "Finance Event"
+    },
+    {
+
+      "id": 2,
+      "title": "News Title 2",
+      "date": "March 2, 2024",
+      "status": "not started yet",
+      "category": "Travel Event"
+    },
+    {
+      "id": 3,
+      "title": "News Title 3",
+      "date": "March 3, 2024",
+      "status": "running",
+      "category": "Trading Event"
+    },
+    {
+      "id": 4,
+      "title": "News Title 4",
+      "date": "March 4, 2024",
+      "status": "not started yet",
+      "category": "Tech Event"
+    },
+    {
+      "id": 5,
+      "title": "News Title 5",
+      "date": "March 5, 2024",
+      "status": "running",
+      "category": "Finance Event"
+    },
+    {
+      "id": 6,
+      "title": "News Title 6",
+      "date": "March 6, 2024",
+      "status": "not started yet",
+      "category": "Travel Event"
+    },
+    {
+      "id": 7,
+      "title": "News Title 7",
+      "date": "March 7, 2024",
+      "status": "running",
+      "category": "Trading Event"
+    },
+    {
+      "id": 8,
+      "title": "News Title 8",
+      "date": "March 8, 2024",
+      "status": "not started yet",
+      "category": "Tech Event"
+    },
+    {
+      "id": 9,
+      "title": "News Title 9",
+      "date": "March 9, 2024",
+      "status": "running",
+      "category": "Finance Event"
+    },
+    {
+      "id": 10,
+      "title": "News Title 10",
+      "date": "March 10, 2024",
+      "status": "not started yet",
+      "category": "Video Event"
+    },
+    {
+      "id": 11,
+      "title": "News Title 11",
+      "date": "March 11, 2024",
+      "status": "running",
+      "category": "Tech Event"
+    },
+    {
+      "id": 12,
+      "title": "News Title 12",
+      "date": "March 12, 2024",
+      "status": "not started yet",
+      "category": "Travel Event"
+    },
+    {
+      "id": 13,
+      "title": "News Title 13",
+      "date": "March 13, 2024",
+      "status": "running",
+      "category": "Finance Event"
+    },
+    {
+      "id": 14,
+      "title": "News Title 14",
+      "date": "March 14, 2024",
+      "status": "not started yet",
+      "category": "Trading Event"
+    },
+    {
+      "id": 15,
+      "title": "News Title 15",
+      "date": "March 15, 2024",
+      "status": "running",
+      "category": "Video Event"
+    }
+  ],
+  "categories": [
+    { "id": 1, "name": "Finance Event" },
+    { "id": 2, "name": "Travel Event" },
+    { "id": 3, "name": "Trading Event" },
+    { "id": 4, "name": "Tech Event" },
+    { "id": 5, "name": "Video Event" }
   ]
 }
