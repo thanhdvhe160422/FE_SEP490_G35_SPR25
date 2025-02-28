@@ -8,6 +8,7 @@ import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
 import EditProfile from "./pages/Author/EditProfile";
 
+
 function App() {
   return (
     <div className="App">
