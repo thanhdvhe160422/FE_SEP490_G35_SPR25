@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/categories"; // Địa chỉ API
+const API_URL = "http://localhost:4000/categories";
 
 const getCategories = async () => {
   try {

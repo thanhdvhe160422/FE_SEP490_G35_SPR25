@@ -32,7 +32,6 @@ function NewsSection() {
     fetchCategories();
   }, []);
 
-  // 🔥 Đặt `filteredPosts` trước khi dùng trong `useEffect`
   const filteredPosts = selectedCategory
     ? posts.filter((post) => post.category === selectedCategory)
     : posts;
@@ -40,7 +39,7 @@ function NewsSection() {
   useEffect(() => {
     console.log("Selected Category:", selectedCategory);
     console.log("Filtered Posts:", filteredPosts);
-  }, [selectedCategory, posts]); // ✅ Dùng `posts`, không dùng `filteredPosts`
+  }, [selectedCategory, posts]);
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
