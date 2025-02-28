@@ -1,15 +1,15 @@
-import React from "react";
+import NewsSection from "../../components/NewsSection";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import "../../styles/Home.css";
 
-function Home(props) {
+function Home() {
   return (
     <div>
       <Header></Header>
-      <h1>hehehe</h1>
-      <Footer></Footer>
+      <NewsSection />
+      <Footer />
     </div>
   );
 }
-
 export default Home;
