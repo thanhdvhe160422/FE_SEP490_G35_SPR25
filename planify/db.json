@@ -1,6 +1,120 @@
 {
   "users": [
     {
+      "id": "1",
+      "userName": "nguyenvana",
+      "email": "nguyenvana@example.com",
+      "firstName": "Nguyễn",
+      "lastName": "Văn A",
+      "password": "hashed_password_here",
+      "dateOfBirth": "1995-08-15T00:00:00Z",
+      "phoneNumber": "0987654321",
+      "wardId": 1,
+      "districtId": 1,
+      "provinceId": 1,
+      "avatar": 10,
+      "created_at": "2024-02-27T10:00:00Z",
+      "role": 1,
+      "createByAdmin": "e29b8400-e29b-41d4-a716-446655440123",
+      "createByManage": 2,
+      "campusId": 3,
+      "status": 1
+    },
+    {
+      "id": "2",
+      "userName": "dongvanthanh",
+      "email": "dongthanh112001@gmail.com",
+      "firstName": "Đồng",
+      "lastName": "Văn Thanh",
+      "password": "hashed_password_here",
+      "dateOfBirth": "1995-08-15T00:00:00Z",
+      "phoneNumber": "0987654321",
+      "wardId": 1,
+      "districtId": 1,
+      "provinceId": 1,
+      "avatar": 10,
+      "created_at": "2024-02-27T10:00:00Z",
+      "role": 1,
+      "createByAdmin": "e29b8400-e29b-41d4-a716-446655440123",
+      "createByManage": 2,
+      "campusId": 3,
+      "status": 1
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "userName": "levanc",
+      "email": "levanc@example.com",
+      "firstName": "Lê",
+      "lastName": "Văn C",
+      "password": "hashed_password_here",
+      "dateOfBirth": "2000-07-10T00:00:00Z",
+      "phoneNumber": "0965432109",
+      "wardId": 3,
+      "districtId": 3,
+      "provinceId": 3,
+      "avatar": 14,
+      "created_at": "2024-02-27T12:00:00Z",
+      "role": 3,
+      "createByAdmin": "e29b8400-e29b-41d4-a716-446655440123",
+      "createByManage": "550e8400-e29b-41d4-a716-446655440001",
+      "campusId": 2,
+      "status": 0
+    }
+  ],
+  "wards": [
+    {
+      "id": "1",
+      "name": "Phường 1",
+      "districtId": 1
+    },
+    {
+      "id": "2",
+      "name": "Phường 2",
+      "districtId": 2
+    }
+  ],
+  "districts": [
+    {
+      "id": "1",
+      "name": "Quận 1",
+      "provinceId": 1
+    },
+    {
+      "id": "2",
+      "name": "Quận 2",
+      "provinceId": 2
+    }
+  ],
+  "provinces": [
+    {
+      "id": "1",
+      "name": "TP. HCM"
+    },
+    {
+      "id": "2",
+      "name": "Hà Nội"
+    }
+  ],
+  "campuses": [
+    {
+      "id": "1",
+      "name": "FPT HCM",
+      "location": "Ho Chi Minh City"
+    },
+    {
+      "id": "2",
+      "name": "FPT HN",
+      "location": "Hanoi"
+    },
+    {
+      "id": "3",
+      "name": "FPT DN",
+      "location": "Da Nang"
+    },
+    {
+      "id": "4",
+=======
+    {
       "id": "550e8400-e29b-41d4-a716-446655440000",
       "userName": "nguyenvana",
       "email": "nguyenvana@example.com",
@@ -85,6 +199,25 @@
   ],
   "notifications": [
     {
+      "id": "1",
+      "userId": 1,
+      "message": "New event created at FPT HCM!",
+      "read": false
+    },
+    {
+      "id": "2",
+      "userId": 2,
+      "message": "Your event has been approved at FPT HN.",
+      "read": false
+    },
+    {
+      "id": "3",
+      "userId": 3,
+      "message": "Task assigned: Set up event stage at FPT DN.",
+      "read": false
+    },
+    {
+      "id": "4",
       "id": 1,
       "userId": 1,
       "message": "New event created at FPT HCM!",
