@@ -18,6 +18,8 @@ function EventSection() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const navigate = useNavigate();
+  localStorage.setItem("userRole", "manager");
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,34 +40,28 @@ function EventSection() {
   }, []);
 
   const filteredPosts = posts.filter((post) => {
-    const matchesCategory = selectedCategory
-      ? post.category === selectedCategory
-      : true;
-    const matchesSearch = searchTerm
-      ? post.title.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-    const matchesStatus = selectedStatus
-      ? post.status === selectedStatus
-      : true;
-    const matchesStart = selectedStart
-      ? new Date(post.start) >= new Date(selectedStart)
-      : true;
-    const matchesEnd = selectedEnd
-      ? new Date(post.end) <= new Date(selectedEnd)
-      : true;
-    const matchesLocation = selectedLocation
-      ? post.location.toLowerCase().includes(selectedLocation.toLowerCase())
-      : true;
-
     return (
-      matchesCategory &&
-      matchesSearch &&
-      matchesStatus &&
-      matchesStart &&
-      matchesEnd &&
-      matchesLocation
+      (!selectedCategory || post.category === selectedCategory) &&
+      (!searchTerm ||
+        post.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!selectedStatus || post.status === selectedStatus) &&
+      (!selectedStart || new Date(post.start) >= new Date(selectedStart)) &&
+      (!selectedEnd || new Date(post.end) <= new Date(selectedEnd)) &&
+      (!selectedLocation ||
+        post.location.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedCategory,
+    searchTerm,
+    selectedStatus,
+    selectedStart,
+    selectedEnd,
+    selectedLocation,
+  ]);
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
@@ -73,6 +69,17 @@ function EventSection() {
     startIndex,
     startIndex + POSTS_PER_PAGE
   );
+
+  const getProgress = (start, end) => {
+    const now = new Date();
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    if (now < startTime) return 0;
+    if (now > endTime) return 100;
+
+    return ((now - startTime) / (endTime - startTime)) * 100;
+  };
 
   return (
     <section className="post_section news_post_2">
@@ -179,6 +186,21 @@ function EventSection() {
                           ? "Running"
                           : "Not started yet"}
                       </div>
+                      {(userRole === "manager" ||
+                        userRole === "event organizer") && (
+                        <div className="progress_bar_container">
+                          <div
+                            className="progress_bar"
+                            style={{
+                              width: `${getProgress(post.start, post.end)}%`,
+                            }}
+                          >
+                            <span className="progress_text">
+                              {Math.round(getProgress(post.start, post.end))}%
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

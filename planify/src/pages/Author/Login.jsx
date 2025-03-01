@@ -62,7 +62,10 @@ export default function Login() {
         "Authorization"
       ] = `Bearer ${res.data.token}`;
 
-      alert("Đăng nhập thành công!");
+      enqueueSnackbar("Login successfully!", {
+        variant: "success",
+        autoHideDuration: 2500,
+      });
 
       switch (res.data.role) {
         case "admin":
