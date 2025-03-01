@@ -1,17 +1,24 @@
 body {
   font-family: "Poppins", sans-serif;
   background: #f2f2f2;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 .post_section {
   padding: 50px 0;
 }
 .container {
-  max-width: 1200px;
-  margin: auto;
+  padding: 0 30px;
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
 }
 
 .feature_tittle {
+  max-width: 800px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,6 +33,7 @@ body {
   padding-top: 25px;
 }
 .belarus_items {
+  max-width: 800px;
   position: relative;
   overflow: hidden;
   border-radius: 8px;
@@ -109,4 +117,71 @@ body {
 .not_started_status {
   background-color: #dc3545;
   color: #fff;
+}
+.filter_container {
+  display: flex;
+  gap: 10px;
+}
+
+.post_select {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.search_input {
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.sidebar {
+  max-width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  min-width: 250px;
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.filter_section h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.filter_section label {
+  display: block;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.filter_section select,
+.filter_section input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+.left_sidebar {
+  flex-grow: 1;
+}
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column; /* Stack sidebar & nội dung chính trên mobile */
+    align-items: center;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: relative;
+  }
+
+  .left_sidebar {
+    width: 100%;
+  }
 }
