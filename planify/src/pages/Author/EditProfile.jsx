@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../../styles/Profile.css";
+import "../../styles/Author/Profile.css";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
 import { useSnackbar } from "notistack";

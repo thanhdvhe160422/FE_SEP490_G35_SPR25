@@ -1,5 +1,5 @@
 .error_area {
-  background: url(../assets/error-bg.png) no-repeat;
+  background: url(../../assets/error-bg.png) no-repeat;
   background-position: 50% 29%;
   display: block;
   overflow: hidden;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Login.css";
+import "../../styles/Author/Login.css";
 import backgroundImage from "../../assets/fpt-campus.jpg";
 import { useSnackbar } from "notistack";
 
