@@ -146,12 +146,11 @@
   ],
   "events": [
     {
-
       "id": 1,
       "title": "Finance Summit 2024",
       "location": "New York",
-      "start": "2024-03-01",
-      "end": "2024-03-03",
+      "start": "01-02-2025",
+      "end": "03-03-2025",
       "status": "running",
       "category": "Finance Event"
     },
@@ -165,7 +164,6 @@
       "category": "Travel Event"
     },
     {
-
       "id": 3,
       "title": "Crypto Trading Workshop",
       "location": "Singapore",
@@ -184,7 +182,6 @@
       "category": "Tech Event"
     },
     {
-
       "id": 5,
       "title": "Global Finance Conference",
       "location": "Tokyo",
@@ -194,7 +191,6 @@
       "category": "Finance Event"
     },
     {
-
       "id": 6,
       "title": "Adventure Travel Summit",
       "location": "Paris",
@@ -204,7 +200,6 @@
       "category": "Travel Event"
     },
     {
-
       "id": 7,
       "title": "Forex Trading Bootcamp",
       "location": "Dubai",
@@ -214,7 +209,6 @@
       "category": "Trading Event"
     },
     {
-
       "id": 8,
       "title": "Silicon Valley Tech Week",
       "location": "California",
@@ -233,7 +227,6 @@
       "category": "Finance Event"
     },
     {
-
       "id": 10,
       "title": "Digital Marketing Conference",
       "location": "Sydney",
@@ -243,7 +236,6 @@
       "category": "Video Event"
     },
     {
-
       "id": 11,
       "title": "AI & Robotics Conference",
       "location": "Berlin",
@@ -253,7 +245,6 @@
       "category": "Tech Event"
     },
     {
-
       "id": 12,
       "title": "Eco Travel Forum",
       "location": "Bali",
@@ -263,7 +254,6 @@
       "category": "Travel Event"
     },
     {
-
       "id": 13,
       "title": "Blockchain & Crypto Summit",
       "location": "Seoul",
@@ -273,7 +263,6 @@
       "category": "Finance Event"
     },
     {
-
       "id": 14,
       "title": "Global Stock Market Conference",
       "location": "Toronto",
@@ -283,7 +272,6 @@
       "category": "Trading Event"
     },
     {
-
       "id": 15,
       "title": "YouTube Creators Summit",
       "location": "Los Angeles",
