@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../../styles/Profile.css";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
+import { useSnackbar } from "notistack";
 
 const EditProfile = () => {
   const [user, setUser] = useState(null);
@@ -14,8 +15,11 @@ const EditProfile = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -60,8 +64,8 @@ const EditProfile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]); // Reset danh sách phường khi tỉnh thay đổi
-        setSelectedDistrict(""); // Reset quận/huyện
+        setWards([]);
+        setSelectedDistrict("");
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -81,7 +85,7 @@ const EditProfile = () => {
         );
         const data = await res.json();
         setWards(data.data || []);
-        setSelectedWard(""); // Reset phường/xã khi quận thay đổi
+        setSelectedWard("");
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -98,30 +102,69 @@ const EditProfile = () => {
         provinceId: selectedProvince,
         districtId: selectedDistrict,
         wardId: selectedWard,
+        avatar: selectedAvatar || user.avatar,
       };
-
+  
       await fetch("http://localhost:4000/users/2", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
       });
-
-      alert("Profile updated!");
+  
+      enqueueSnackbar("Update successfully", { variant: "success" , autoHideDuration:1000});
+  
       navigate("/profile");
+  
     } catch (error) {
       console.error("Lỗi cập nhật hồ sơ:", error);
+    }
+  };
+  
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedAvatar(URL.createObjectURL(file));
     }
   };
 
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>No user data found</p>;
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [day, month, year] = dateStr.split("-");
+    return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
+  };
+
   return (
     <>
       <Header />
+
       <div className="profile-container">
         <div className="profile-card">
-          <img src={user.avatar} alt="Avatar" className="profile-avatar" />
+          <img
+            src={selectedAvatar || user.avatar}
+            alt="Avatar"
+            className="profile-avatar"
+          />
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => document.getElementById("fileInput").click()}
+              className="btn btn-primary"
+            >
+              Choose File
+            </button>
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              style={{ display: "none" }}
+            />
+          </div>
+
           <h2>
             {user.firstName} {user.lastName}
           </h2>
@@ -136,7 +179,7 @@ const EditProfile = () => {
                 <label>First Name</label>
                 <input
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "43px" }}
+                  style={{ width: "40%", marginLeft: "41px" }}
                   type="text"
                   value={user.firstName}
                   onChange={(e) =>
@@ -149,11 +192,30 @@ const EditProfile = () => {
                 <label>Last Name</label>
                 <input
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "43px" }}
+                  style={{ width: "40%", marginLeft: "41px" }}
                   type="text"
                   value={user.lastName}
                   onChange={(e) =>
                     setUser({ ...user, lastName: e.target.value })
+                  }
+                />
+              </div>
+
+              <div style={{ width: "100%" }}>
+                <label>Date of Birth</label>
+                <input
+                  className="input-profile"
+                  style={{ width: "40%", marginLeft: "30px" }}
+                  type="date"
+                  value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
+                  onChange={(e) =>
+                    setUser({
+                      ...user,
+                      dateOfBirth: e.target.value
+                        .split("-")
+                        .reverse()
+                        .join("-"),
+                    })
                   }
                 />
               </div>
@@ -248,6 +310,7 @@ const EditProfile = () => {
             <button
               className="btn btn-success"
               style={{ width: "20%" }}
+
               onClick={handleSave}
             >
               Save
@@ -260,4 +323,3 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
-

@@ -117,6 +117,12 @@ const EditProfile = () => {
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>No user data found</p>;
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [day, month, year] = dateStr.split("-");
+    return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
+  };
+
   return (
     <>
       <Header />
@@ -127,6 +133,17 @@ const EditProfile = () => {
             {user.firstName} {user.lastName}
           </h2>
           <p className="profile-email">{user.email}</p>
+          <button
+            className="btn btn-info"
+            style={{
+              width: "70%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => navigate("/editprofile")}
+          >
+            <FaRegEdit /> Update Profile
+          </button>
         </div>
 
         <div className="profile-form">
@@ -157,6 +174,26 @@ const EditProfile = () => {
                   value={user.lastName}
                   onChange={(e) =>
                     setUser({ ...user, lastName: e.target.value })
+                  }
+                />
+              </div>
+
+              <div style={{ width: "100%" }}>
+                <label>Date of Birth</label>
+                <input
+                  readOnly
+                  className="input-profile"
+                  style={{ width: "40%", marginLeft: "30px" }}
+                  type="date"
+                  value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
+                  onChange={(e) =>
+                    setUser({
+                      ...user,
+                      dateOfBirth: e.target.value
+                        .split("-")
+                        .reverse()
+                        .join("-"),
+                    })
                   }
                 />
               </div>
@@ -238,21 +275,7 @@ const EditProfile = () => {
               gap: "30px",
               marginTop: "30px",
             }}
-          >
-            <button
-              className="btn btn-info"
-              style={{
-                width: "15%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-              onClick={() => navigate("/editprofile")}
-            >
-              <FaRegEdit /> Edit Profile
-            </button>
-          </div>
+          ></div>
         </div>
       </div>
     </>
