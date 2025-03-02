@@ -170,18 +170,31 @@ body {
 .left_sidebar {
   flex-grow: 1;
 }
-@media (max-width: 1024px) {
-  .container {
-    flex-direction: column; /* Stack sidebar & nội dung chính trên mobile */
-    align-items: center;
-  }
+.progress_bar_container {
+  width: 100%;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+  overflow: hidden;
+  height: 20px;
+  position: relative;
+}
 
-  .sidebar {
-    width: 100%;
-    position: relative;
-  }
+.progress_bar {
+  height: 100%;
+  background: #28a745;
+  transition: width 0.5s ease-in-out;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .left_sidebar {
-    width: 100%;
-  }
+.progress_text {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  width: 100%;
+  text-align: center;
 }
