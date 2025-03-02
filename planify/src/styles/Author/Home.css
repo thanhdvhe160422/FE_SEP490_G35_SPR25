@@ -119,7 +119,9 @@ body {
   color: #fff;
 }
 .filter_container {
+  width: 800px;
   display: flex;
+  justify-content: space-between;
   gap: 10px;
 }
 
@@ -197,4 +199,18 @@ body {
   position: absolute;
   width: 100%;
   text-align: center;
+}
+.filter_button {
+  padding: 8px 16px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.filter_button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
 }
