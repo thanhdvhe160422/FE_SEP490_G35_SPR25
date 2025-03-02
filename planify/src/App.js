@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
 import EditProfile from "./pages/Author/EditProfile";
+import EventDetailSpectator from "./pages/Events/EventDetailSpectator";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/EventDetailSpectator" element={<EventDetailSpectator/>}/>
       </Routes>
     </div>
   );
