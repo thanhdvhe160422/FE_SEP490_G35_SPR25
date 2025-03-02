@@ -133,17 +133,6 @@ const EditProfile = () => {
             {user.firstName} {user.lastName}
           </h2>
           <p className="profile-email">{user.email}</p>
-          <button
-            className="btn btn-info"
-            style={{
-              width: "70%",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => navigate("/editprofile")}
-          >
-            <FaRegEdit /> Update Profile
-          </button>
         </div>
 
         <div className="profile-form">
@@ -181,7 +170,6 @@ const EditProfile = () => {
               <div style={{ width: "100%" }}>
                 <label>Date of Birth</label>
                 <input
-                  readOnly
                   className="input-profile"
                   style={{ width: "40%", marginLeft: "30px" }}
                   type="date"
@@ -275,7 +263,21 @@ const EditProfile = () => {
               gap: "30px",
               marginTop: "30px",
             }}
-          ></div>
+          >
+            <button
+              className="btn btn-info"
+              style={{
+                width: "15%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+              onClick={() => navigate("/editprofile")}
+            >
+              <FaRegEdit /> Edit Profile
+            </button>
+          </div>
         </div>
       </div>
     </>
