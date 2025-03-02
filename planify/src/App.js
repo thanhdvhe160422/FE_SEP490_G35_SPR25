@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
 import EditProfile from "./pages/Author/EditProfile";
+import CreateEvent from "./pages/Events/CreateEvent";
 
 
 function App() {
@@ -19,6 +20,8 @@ function App() {
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/create-event" element={<CreateEvent />} />
+        
       </Routes>
     </div>
   );
