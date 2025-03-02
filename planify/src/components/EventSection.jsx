@@ -17,9 +17,12 @@ function EventSection() {
   const [selectedStart, setSelectedStart] = useState("");
   const [selectedEnd, setSelectedEnd] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [eventFilter, setEventFilter] = useState("list");
   const navigate = useNavigate();
-  localStorage.setItem("userRole", "manager");
+
+  localStorage.setItem("userRole", "implementer");
   const userRole = localStorage.getItem("userRole");
+  const currentUserId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +43,12 @@ function EventSection() {
   }, []);
 
   const filteredPosts = posts.filter((post) => {
+    const isMyEvent =
+      post.organizerId === currentUserId ||
+      post.implementerId === currentUserId;
+
     return (
+      (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
       (!selectedCategory || post.category === selectedCategory) &&
       (!searchTerm ||
         post.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -61,6 +69,7 @@ function EventSection() {
     selectedStart,
     selectedEnd,
     selectedLocation,
+    eventFilter,
   ]);
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
@@ -126,8 +135,27 @@ function EventSection() {
             <div className="row feature_post_area">
               <div className="col-12">
                 <div className="feature_tittle">
-                  <h2>List Event</h2>
                   <div className="filter_container">
+                    <button
+                      className={`filter_button ${
+                        eventFilter === "list" ? "active" : ""
+                      }`}
+                      onClick={() => setEventFilter("list")}
+                    >
+                      List Event
+                    </button>
+                    {(userRole === "event organizer" ||
+                      userRole === "implementer") && (
+                      <button
+                        className={`filter_button ${
+                          eventFilter === "my" ? "active" : ""
+                        }`}
+                        onClick={() => setEventFilter("my")}
+                      >
+                        My Event
+                      </button>
+                    )}
+
                     <select
                       className="post_select"
                       value={selectedCategory}
