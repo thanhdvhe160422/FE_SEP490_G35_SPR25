@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import "../../styles/Author/UpdateProfile.css";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
-import { FaRegEdit, FaTimes } from "react-icons/fa";
 import { useSnackbar } from "notistack";
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
+  const [initialUser, setInitialUser] = useState(null); // Lưu trữ dữ liệu ban đầu
   const [loading, setLoading] = useState(true);
 
   const [provinces, setProvinces] = useState([]);
@@ -16,6 +16,8 @@ const UpdateProfile = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
+
+  const [cardIdError, setCardIdError] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -27,6 +29,7 @@ const UpdateProfile = () => {
         const userData = await userRes.json();
 
         setUser(userData);
+        setInitialUser(userData); // Lưu trữ dữ liệu ban đầu
         setSelectedProvince(userData.provinceId || "");
         setSelectedDistrict(userData.districtId || "");
         setSelectedWard(userData.wardId || "");
@@ -94,6 +97,33 @@ const UpdateProfile = () => {
     fetchWards();
   }, [selectedDistrict]);
 
+  const validateCardId = (value) => {
+    if (!/^\d*$/.test(value)) {
+      setCardIdError("Please enter your ID number");
+    } else if (value.length !== 12) {
+      setCardIdError("Please enter 12 digits");
+    } else {
+      setCardIdError("");
+    }
+  };
+
+  const hasChanges = () => {
+    if (!initialUser || !user) return false;
+
+    return (
+      user.firstName !== initialUser.firstName ||
+      user.lastName !== initialUser.lastName ||
+      user.dateOfBirth !== initialUser.dateOfBirth ||
+      user.gender !== initialUser.gender ||
+      user.idCard !== initialUser.idCard ||
+      user.address !== initialUser.address ||
+      user.phoneNumber !== initialUser.phoneNumber ||
+      selectedProvince !== initialUser.provinceId ||
+      selectedDistrict !== initialUser.districtId ||
+      selectedWard !== initialUser.wardId
+    );
+  };
+
   const handleUpdate = async () => {
     try {
       const updatedUser = {
@@ -109,36 +139,6 @@ const UpdateProfile = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
       });
-
-      // Fetch lại dữ liệu District và Ward sau khi cập nhật
-      const fetchDistricts = async () => {
-        try {
-          const res = await fetch(
-            `https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`
-          );
-          const data = await res.json();
-          setDistricts(data.data || []);
-        } catch (error) {
-          console.error("Lỗi lấy danh sách quận/huyện:", error);
-          setDistricts([]);
-        }
-      };
-
-      const fetchWards = async () => {
-        try {
-          const res = await fetch(
-            `https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`
-          );
-          const data = await res.json();
-          setWards(data.data || []);
-        } catch (error) {
-          console.error("Lỗi lấy danh sách phường/xã:", error);
-          setWards([]);
-        }
-      };
-
-      await fetchDistricts();
-      await fetchWards();
 
       enqueueSnackbar("Update profile successfully", {
         variant: "success",
@@ -172,20 +172,6 @@ const UpdateProfile = () => {
     if (!dateStr) return "";
     const [day, month, year] = dateStr.split("-");
     return `${year}-${month}-${day}`; 
-  };
-  const getProvinceName = (provinceId) => {
-    const province = provinces.find((p) => p.id === provinceId);
-    return province ? province.name : "";
-  };
-
-  const getDistrictName = (districtId) => {
-    const district = districts.find((d) => d.id === districtId);
-    return district ? district.name : "";
-  };
-
-  const getWardName = (wardId) => {
-    const ward = wards.find((w) => w.id === wardId);
-    return ward ? ward.name : "";
   };
 
   return (
@@ -265,7 +251,7 @@ const UpdateProfile = () => {
               <div className="input-field">
                 <label>Gender</label>
                 <div className="gender-radio">
-                  <label>
+                  <label style={{marginRight:'10%'}}>
                     <input
                       type="radio"
                       name="gender"
@@ -292,19 +278,20 @@ const UpdateProfile = () => {
                 </div>
               </div>
 
-              <div  className="input-field">
+              <div className="input-field">
                 <label>ID Card</label>
                 <input
-                style={{width:'49%'}}
+                  style={{width:'49%'}}
                   className="input-profile"
                   type="text"
                   value={user.idCard || ""}
-                  onChange={(e) =>
-                    setUser({ ...user, idCard: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setUser({ ...user, idCard: e.target.value });
+                    validateCardId(e.target.value);
+                  }}
                 />
+                {cardIdError && <p style={{ color: 'red', marginTop: '5px' }}>{cardIdError}</p>}
               </div>
-
             </div>
 
             <div className="address-group">
@@ -382,7 +369,11 @@ const UpdateProfile = () => {
             <button className="btn btn-danger" onClick={handleCancel}>
               Cancel
             </button>
-            <button className="btn btn-success" onClick={handleUpdate}>
+            <button
+              className="btn btn-success"
+              onClick={handleUpdate}
+              disabled={!hasChanges() || cardIdError !== ""}
+            >
               Save
             </button>
           </div>
