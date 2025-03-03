@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios"; // Import axios
+import axios from "axios";
 import {
   Form,
   Row,
@@ -9,29 +9,27 @@ import {
   ListGroup,
   Modal,
 } from "react-bootstrap";
-import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa"; 
+import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa";
 import Header from "../../components/Header/Header";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 
 export default function CreateEvent() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMember, setNewMember] = useState("");
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(null);
-  const [groups, setGroups] = useState([]); 
+  const [groups, setGroups] = useState([]);
   const [users, setUsers] = useState([]);
-  const [suggestions, setSuggestions] = useState([]); 
-  const [isValidMember, setIsValidMember] = useState(false); 
-  const [categories, setCategories] = useState([]); 
+  const [suggestions, setSuggestions] = useState([]);
+  const [isValidMember, setIsValidMember] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Lấy danh sách users từ DB
         const usersResponse = await axios.get("http://localhost:4000/users");
         setUsers(usersResponse.data);
 
-        // Lấy danh sách categories từ DB
         const categoriesResponse = await axios.get(
           "http://localhost:4000/categories"
         );
@@ -44,14 +42,12 @@ export default function CreateEvent() {
     fetchData();
   }, []);
 
-  // Handle file selection
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setSelectedImages([...selectedImages, ...files]);
-    event.target.value = null; 
+    event.target.value = null;
   };
 
-  // Toggle edit mode for group name
   const toggleEditGroup = (index) => {
     setGroups(
       groups.map((group, i) =>
@@ -60,7 +56,6 @@ export default function CreateEvent() {
     );
   };
 
-  // Handle group name change
   const handleGroupNameChange = (index, newName) => {
     setGroups(
       groups.map((group, i) =>
@@ -69,7 +64,6 @@ export default function CreateEvent() {
     );
   };
 
-  // Toggle star selection per group
   const toggleStar = (groupIndex, memberIndex) => {
     setGroups(
       groups.map((group, i) =>
@@ -98,7 +92,7 @@ export default function CreateEvent() {
     const newGroup = {
       name: `Group ${groups.length + 1}`,
       members: [],
-      isEditing: true, 
+      isEditing: true,
       selectedStar: null,
     };
     setGroups([...groups, newGroup]);
@@ -208,14 +202,14 @@ export default function CreateEvent() {
   const handleCreateEvent = () => {
     Swal.fire({
       title: "Do you want to create the event?",
-      html: "<span style='color: red;'>This event will be sent to the Campus Manager</span>", 
+      html: "<span style='color: red;'>This event will be sent to the Campus Manager</span>",
       showCancelButton: true,
       confirmButtonText: "Create",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire("Request sent successfully", "", "success");
-      } 
+      }
     });
   };
 

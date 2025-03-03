@@ -8,7 +8,7 @@ import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
 import EditProfile from "./pages/Author/EditProfile";
 import CreateEvent from "./pages/Events/CreateEvent";
-
+import EventDetailSpec from "./pages/Events/EventDetailSpec";
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />
-        
+        <Route path="/event-detail-spec" element={<EventDetailSpec />} />
       </Routes>
     </div>
   );
