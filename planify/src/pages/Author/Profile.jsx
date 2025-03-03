@@ -72,9 +72,6 @@ const Profile = () => {
     fetchDistricts();
   }, [selectedProvince]);
 
-
-  
-
   useEffect(() => {
     if (!selectedDistrict) return;
 
@@ -135,12 +132,12 @@ const Profile = () => {
     const district = districts.find((d) => d.id === districtId);
     return district ? district.name : "";
   };
-  
+
   const getWardName = (wardId) => {
     const ward = wards.find((w) => w.id === wardId);
     return ward ? ward.name : "";
   };
-  
+
   const fullAddress = () => {
     const addressParts = [
       user.address || "",
@@ -148,33 +145,36 @@ const Profile = () => {
       getDistrictName(selectedDistrict),
       getProvinceName(selectedProvince),
     ].filter(Boolean); // Loại bỏ các phần tử rỗng
-  
+
     if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
       return getProvinceName(selectedProvince); // Chỉ hiển thị tỉnh nếu chỉ có tỉnh
     }
-  
+
     return addressParts.join(", "); // Ghép các phần tử bằng dấu phẩy
   };
   return (
     <>
       <Header />
       <div className="profile-container">
-      <div className="profile-card">
-  <img src={user.avatar} alt="Avatar" className="profile-avatar" />
-  <h2>
-    {user.firstName} {user.lastName}
-  </h2>
-  <p className="profile-email">{user.email}</p>
+        <div className="profile-card">
+          <img src={user.avatar} alt="Avatar" className="profile-avatar" />
+          <h2>
+            {user.firstName} {user.lastName}
+          </h2>
+          <p className="profile-email">{user.email}</p>
 
-  <div className="edit-profile-button-container">
-    <button
-      className="btn btn-info edit-profile-button"
-      onClick={() => navigate("/update-profile")}
-    >
-      <FaRegEdit /> Edit Profile
-    </button>
-  </div>
-</div>
+          <div
+            className="edit-profile-button-container"
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <button
+              className="btn btn-info edit-profile-button"
+              onClick={() => navigate("/update-profile")}
+            >
+              <FaRegEdit /> Update Profile
+            </button>
+          </div>
+        </div>
 
         <div className="profile-form">
           <h2>Profile Information</h2>
@@ -221,9 +221,7 @@ const Profile = () => {
               gap: "30px",
               marginTop: "30px",
             }}
-          >
-            
-          </div>
+          ></div>
         </div>
       </div>
     </>
