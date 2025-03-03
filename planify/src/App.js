@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
 import CreateEvent from "./pages/Events/CreateEvent";
+import EventDetailSpec from "./pages/Events/EventDetailSpec";
 import UpdateProfile from "./pages/Author/UpdateProfile";
 
 
@@ -21,7 +22,7 @@ function App() {
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />
-        
+        <Route path="/event-detail-spec" element={<EventDetailSpec />} />
       </Routes>
     </div>
   );
