@@ -6,9 +6,10 @@ import LoginAdmin from "./pages/Author/LoginAdmin";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
-import EditProfile from "./pages/Author/EditProfile";
 import CreateEvent from "./pages/Events/CreateEvent";
 import EventDetailSpec from "./pages/Events/EventDetailSpec";
+import UpdateProfile from "./pages/Author/UpdateProfile";
+
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/update-profile" element={<UpdateProfile />} />
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
 import { FaRegEdit } from "react-icons/fa";
 
-const EditProfile = () => {
+const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -123,6 +123,35 @@ const EditProfile = () => {
     return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
   };
 
+  const getProvinceName = (provinceId) => {
+    const province = provinces.find((p) => p.id === provinceId);
+    return province ? province.name : "";
+  };
+
+  const getDistrictName = (districtId) => {
+    const district = districts.find((d) => d.id === districtId);
+    return district ? district.name : "";
+  };
+
+  const getWardName = (wardId) => {
+    const ward = wards.find((w) => w.id === wardId);
+    return ward ? ward.name : "";
+  };
+
+  const fullAddress = () => {
+    const addressParts = [
+      user.address || "",
+      getWardName(selectedWard),
+      getDistrictName(selectedDistrict),
+      getProvinceName(selectedProvince),
+    ].filter(Boolean); // Loại bỏ các phần tử rỗng
+
+    if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
+      return getProvinceName(selectedProvince); // Chỉ hiển thị tỉnh nếu chỉ có tỉnh
+    }
+
+    return addressParts.join(", "); // Ghép các phần tử bằng dấu phẩy
+  };
   return (
     <>
       <Header />
@@ -133,127 +162,56 @@ const EditProfile = () => {
             {user.firstName} {user.lastName}
           </h2>
           <p className="profile-email">{user.email}</p>
+
+          <div
+            className="edit-profile-button-container"
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <button
+              className="btn btn-info edit-profile-button"
+              onClick={() => navigate("/update-profile")}
+            >
+              <FaRegEdit /> Update Profile
+            </button>
+          </div>
         </div>
 
         <div className="profile-form">
           <h2>Profile Information</h2>
-          <form>
-            <div className="input-group">
-              <div style={{ width: "100%" }}>
-                <label>First Name</label>
-                <input
-                  readOnly
-                  className="input-profile"
-                  style={{ width: "40%", marginLeft: "43px" }}
-                  type="text"
-                  value={user.firstName}
-                  onChange={(e) =>
-                    setUser({ ...user, firstName: e.target.value })
-                  }
-                />
-              </div>
-
-              <div style={{ width: "100%" }}>
-                <label>Last Name</label>
-                <input
-                  readOnly
-                  className="input-profile"
-                  style={{ width: "40%", marginLeft: "43px" }}
-                  type="text"
-                  value={user.lastName}
-                  onChange={(e) =>
-                    setUser({ ...user, lastName: e.target.value })
-                  }
-                />
-              </div>
-
-              <div style={{ width: "100%" }}>
-                <label>Date of Birth</label>
-                <input
-                  className="input-profile"
-                  style={{ width: "40%", marginLeft: "30px" }}
-                  type="date"
-                  value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      dateOfBirth: e.target.value
-                        .split("-")
-                        .reverse()
-                        .join("-"),
-                    })
-                  }
-                />
-              </div>
-
-              <div style={{ width: "100%" }}>
-                <label>Phone Number</label>
-                <input
-                  readOnly
-                  className="input-profile"
-                  style={{ width: "40%", marginLeft: "10px" }}
-                  type="text"
-                  value={user.phoneNumber}
-                  onChange={(e) =>
-                    setUser({ ...user, phoneNumber: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            <div style={{ display: "flex" }}>
-              <div style={{ width: "30%" }}>
-                <label>Province</label>
-                <select
-                  disabled
-                  className="input-profile"
-                  style={{ margin: "20px 20px 15px 55px", width: "50%" }}
-                  value={selectedProvince}
-                  onChange={(e) => setSelectedProvince(e.target.value)}
-                >
-                  {provinces.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ width: "30%" }}>
-                <label>District</label>
-                <select
-                  disabled
-                  className="input-profile"
-                  style={{ margin: "20px 20px 15px 15px", width: "70%" }}
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                >
-                  {districts.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ width: "25%" }}>
-                <label>Ward</label>
-                <select
-                  disabled
-                  className="input-profile"
-                  style={{ margin: "20px 20px 15px 15px", width: "50%" }}
-                  value={selectedWard}
-                  onChange={(e) => setSelectedWard(e.target.value)}
-                >
-                  {wards.map((w) => (
-                    <option key={w.id} value={w.id}>
-                      {w.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </form>
+          <table className="profile-table">
+            <tbody>
+              <tr>
+                <td>Full Name</td>
+                <td>
+                  {user.firstName} {user.lastName}
+                </td>
+              </tr>
+              <tr>
+                <td>Date of Birth</td>
+                <td>{user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}</td>
+              </tr>
+              <tr>
+                <td>Gender</td>
+                <td>{user.gender || ""}</td>
+              </tr>
+              <tr>
+                <td>ID Card</td>
+                <td>{user.idCard || ""}</td>
+              </tr>
+              <tr>
+                <td>Address</td>
+                <td>{fullAddress()}</td>
+              </tr>
+              <tr>
+                <td>Phone Number</td>
+                <td>{user.phoneNumber || ""}</td>
+              </tr>
+              <tr>
+                <td>Email</td>
+                <td>{user.email || ""}</td>
+              </tr>
+            </tbody>
+          </table>
 
           <div
             className="button"
@@ -263,25 +221,11 @@ const EditProfile = () => {
               gap: "30px",
               marginTop: "30px",
             }}
-          >
-            <button
-              className="btn btn-info"
-              style={{
-                width: "15%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-              onClick={() => navigate("/editprofile")}
-            >
-              <FaRegEdit /> Edit Profile
-            </button>
-          </div>
+          ></div>
         </div>
       </div>
     </>
   );
 };
 
-export default EditProfile;
+export default Profile;
