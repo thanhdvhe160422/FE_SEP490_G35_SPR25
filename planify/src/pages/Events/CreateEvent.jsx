@@ -437,13 +437,6 @@ export default function CreateEvent() {
                   >
                     ✕
                   </Button>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleReplaceImage(e, index)}
-                    className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-                    style={{ cursor: "pointer" }}
-                  />
                 </Col>
               ))}
             </Row>

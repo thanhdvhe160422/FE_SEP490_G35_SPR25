@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import "../../styles/Author/Profile.css";
+import "../../styles/Author/UpdateProfile.css";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
+import { FaRegEdit, FaTimes } from "react-icons/fa";
 import { useSnackbar } from "notistack";
 
-const EditProfile = () => {
+const UpdateProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,11 +16,9 @@ const EditProfile = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -64,8 +63,8 @@ const EditProfile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]);
-        setSelectedDistrict("");
+        setWards([]); // Reset danh sách phường khi tỉnh thay đổi
+        setSelectedDistrict(""); // Reset quận/huyện
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -85,7 +84,7 @@ const EditProfile = () => {
         );
         const data = await res.json();
         setWards(data.data || []);
-        setSelectedWard("");
+        setSelectedWard(""); // Reset phường/xã khi quận thay đổi
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -95,36 +94,74 @@ const EditProfile = () => {
     fetchWards();
   }, [selectedDistrict]);
 
-  const handleSave = async () => {
+  const handleUpdate = async () => {
     try {
       const updatedUser = {
         ...user,
         provinceId: selectedProvince,
         districtId: selectedDistrict,
         wardId: selectedWard,
-        avatar: selectedAvatar || user.avatar,
       };
-  
+
+      // Gọi API để cập nhật thông tin người dùng
       await fetch("http://localhost:4000/users/2", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
       });
-  
-      enqueueSnackbar("Update successfully", { variant: "success" , autoHideDuration:1000});
-  
+
+      // Fetch lại dữ liệu District và Ward sau khi cập nhật
+      const fetchDistricts = async () => {
+        try {
+          const res = await fetch(
+            `https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`
+          );
+          const data = await res.json();
+          setDistricts(data.data || []);
+        } catch (error) {
+          console.error("Lỗi lấy danh sách quận/huyện:", error);
+          setDistricts([]);
+        }
+      };
+
+      const fetchWards = async () => {
+        try {
+          const res = await fetch(
+            `https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`
+          );
+          const data = await res.json();
+          setWards(data.data || []);
+        } catch (error) {
+          console.error("Lỗi lấy danh sách phường/xã:", error);
+          setWards([]);
+        }
+      };
+
+      await fetchDistricts();
+      await fetchWards();
+
+      enqueueSnackbar("Update profile successfully", {
+        variant: "success",
+        autoHideDuration: 2500,
+      });
       navigate("/profile");
-  
     } catch (error) {
       console.error("Lỗi cập nhật hồ sơ:", error);
     }
   };
-  
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
+  const handleCancel = () => {
+    navigate("/profile");
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
     if (file) {
-      setSelectedAvatar(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUser({ ...user, avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -134,37 +171,45 @@ const EditProfile = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
+    return `${year}-${month}-${day}`; 
+  };
+  const getProvinceName = (provinceId) => {
+    const province = provinces.find((p) => p.id === provinceId);
+    return province ? province.name : "";
+  };
+
+  const getDistrictName = (districtId) => {
+    const district = districts.find((d) => d.id === districtId);
+    return district ? district.name : "";
+  };
+
+  const getWardName = (wardId) => {
+    const ward = wards.find((w) => w.id === wardId);
+    return ward ? ward.name : "";
   };
 
   return (
     <>
       <Header />
-
       <div className="profile-container">
         <div className="profile-card">
-          <img
-            src={selectedAvatar || user.avatar}
-            alt="Avatar"
-            className="profile-avatar"
-          />
-          <div style={{ position: "relative" }}>
+          <img src={user.avatar} alt="Avatar" className="profile-avatar" />
+          <div className="file-input-container">
             <button
               type="button"
-              onClick={() => document.getElementById("fileInput").click()}
-              className="btn btn-primary"
+              className="file-input-button"
+              onClick={() => document.getElementById("avatar-upload").click()}
             >
               Choose File
             </button>
             <input
-              id="fileInput"
+              id="avatar-upload"
               type="file"
               accept="image/*"
-              onChange={handleAvatarChange}
               style={{ display: "none" }}
+              onChange={handleFileChange}
             />
           </div>
-
           <h2>
             {user.firstName} {user.lastName}
           </h2>
@@ -172,14 +217,13 @@ const EditProfile = () => {
         </div>
 
         <div className="profile-form">
-          <h2>Update Profile</h2>
+          <h2>Update Profile Information</h2>
           <form>
             <div className="input-group">
-              <div style={{ width: "100%" }}>
+              <div className="input-field">
                 <label>First Name</label>
                 <input
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "41px" }}
                   type="text"
                   value={user.firstName}
                   onChange={(e) =>
@@ -188,11 +232,10 @@ const EditProfile = () => {
                 />
               </div>
 
-              <div style={{ width: "100%" }}>
+              <div className="input-field">
                 <label>Last Name</label>
                 <input
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "41px" }}
                   type="text"
                   value={user.lastName}
                   onChange={(e) =>
@@ -201,11 +244,10 @@ const EditProfile = () => {
                 />
               </div>
 
-              <div style={{ width: "100%" }}>
+              <div className="input-field">
                 <label>Date of Birth</label>
                 <input
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "30px" }}
                   type="date"
                   value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
                   onChange={(e) =>
@@ -220,30 +262,59 @@ const EditProfile = () => {
                 />
               </div>
 
-              <div style={{ width: "100%" }}>
-                <label>Phone Number</label>
+              <div className="input-field">
+                <label>Gender</label>
+                <div className="gender-radio">
+                  <label>
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Male"
+                      checked={user.gender === "Male"}
+                      onChange={(e) =>
+                        setUser({ ...user, gender: e.target.value })
+                      }
+                    />
+                    Male
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Female"
+                      checked={user.gender === "Female"}
+                      onChange={(e) =>
+                        setUser({ ...user, gender: e.target.value })
+                      }
+                    />
+                    Female
+                  </label>
+                </div>
+              </div>
+
+              <div  className="input-field">
+                <label>ID Card</label>
                 <input
+                style={{width:'49%'}}
                   className="input-profile"
-                  style={{ width: "40%", marginLeft: "10px" }}
                   type="text"
-                  value={user.phoneNumber}
+                  value={user.idCard || ""}
                   onChange={(e) =>
-                    setUser({ ...user, phoneNumber: e.target.value })
+                    setUser({ ...user, idCard: e.target.value })
                   }
                 />
               </div>
+
             </div>
 
-            <div style={{ display: "flex" }}>
-              <div style={{ width: "30%" }}>
+            <div className="address-group">
+              <div className="address-field">
                 <label>Province</label>
                 <select
                   className="input-profile"
-                  style={{ margin: "20px 20px 15px 55px", width: "50%" }}
                   value={selectedProvince}
                   onChange={(e) => setSelectedProvince(e.target.value)}
                 >
-                  <option value="">Choose Province</option>
                   {provinces.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -252,16 +323,13 @@ const EditProfile = () => {
                 </select>
               </div>
 
-              <div style={{ width: "30%" }}>
+              <div className="address-field">
                 <label>District</label>
                 <select
                   className="input-profile"
-                  style={{ margin: "20px 20px 15px 15px", width: "70%" }}
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
-                  disabled={!selectedProvince}
                 >
-                  <option value="">Choose District</option>
                   {districts.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name}
@@ -270,16 +338,13 @@ const EditProfile = () => {
                 </select>
               </div>
 
-              <div style={{ width: "25%" }}>
+              <div className="address-field">
                 <label>Ward</label>
                 <select
                   className="input-profile"
-                  style={{ margin: "20px 20px 15px 15px", width: "50%" }}
                   value={selectedWard}
                   onChange={(e) => setSelectedWard(e.target.value)}
-                  disabled={!selectedDistrict}
                 >
-                  <option value="">Choose Ward</option>
                   {wards.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name}
@@ -288,31 +353,36 @@ const EditProfile = () => {
                 </select>
               </div>
             </div>
+            <div className="input-field">
+                <label>Address</label>
+                <input
+                  className="input-profile"
+                  type="text"
+                  value={user.address || ""}
+                  onChange={(e) =>
+                    setUser({ ...user, address: e.target.value })
+                  }
+                />
+              </div>
+
+            <div className="input-field">
+              <label>Phone Number</label>
+              <input
+                className="input-profile"
+                type="text"
+                value={user.phoneNumber}
+                onChange={(e) =>
+                  setUser({ ...user, phoneNumber: e.target.value })
+                }
+              />
+            </div>
           </form>
 
-          <div
-            className="button"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "30px",
-              marginTop: "30px",
-            }}
-          >
-            <button
-              className="btn btn-danger"
-              style={{ width: "20%" }}
-              onClick={() => navigate("/profile")}
-            >
+          <div className="button-group">
+            <button className="btn btn-danger" onClick={handleCancel}>
               Cancel
             </button>
-
-            <button
-              className="btn btn-success"
-              style={{ width: "20%" }}
-
-              onClick={handleSave}
-            >
+            <button className="btn btn-success" onClick={handleUpdate}>
               Save
             </button>
           </div>
@@ -322,4 +392,4 @@ const EditProfile = () => {
   );
 };
 
-export default EditProfile;
+export default UpdateProfile;
