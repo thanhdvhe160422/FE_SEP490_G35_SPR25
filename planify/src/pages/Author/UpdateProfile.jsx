@@ -17,7 +17,6 @@ const UpdateProfile = () => {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
 
-  const [cardIdError, setCardIdError] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -97,15 +96,7 @@ const UpdateProfile = () => {
     fetchWards();
   }, [selectedDistrict]);
 
-  const validateCardId = (value) => {
-    if (!/^\d*$/.test(value)) {
-      setCardIdError("Please enter your ID number");
-    } else if (value.length !== 12) {
-      setCardIdError("Please enter 12 digits");
-    } else {
-      setCardIdError("");
-    }
-  };
+
 
   const hasChanges = () => {
     if (!initialUser || !user) return false;
@@ -278,20 +269,7 @@ const UpdateProfile = () => {
                 </div>
               </div>
 
-              <div className="input-field">
-                <label>ID Card</label>
-                <input
-                  style={{width:'49%'}}
-                  className="input-profile"
-                  type="text"
-                  value={user.idCard || ""}
-                  onChange={(e) => {
-                    setUser({ ...user, idCard: e.target.value });
-                    validateCardId(e.target.value);
-                  }}
-                />
-                {cardIdError && <p style={{ color: 'red', marginTop: '5px' }}>{cardIdError}</p>}
-              </div>
+            
             </div>
 
             <div className="address-group">
@@ -372,7 +350,6 @@ const UpdateProfile = () => {
             <button
               className="btn btn-success"
               onClick={handleUpdate}
-              disabled={!hasChanges() || cardIdError !== ""}
             >
               Save
             </button>
