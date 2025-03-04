@@ -194,10 +194,7 @@ const Profile = () => {
                 <td>Gender</td>
                 <td>{user.gender || ""}</td>
               </tr>
-              <tr>
-                <td>ID Card</td>
-                <td>{user.idCard || ""}</td>
-              </tr>
+             
               <tr>
                 <td>Address</td>
                 <td>{fullAddress()}</td>
