@@ -9,7 +9,7 @@ import Profile from "./pages/Author/Profile";
 import CreateEvent from "./pages/Events/CreateEvent";
 import EventDetailSpec from "./pages/Events/EventDetailSpec";
 import UpdateProfile from "./pages/Author/UpdateProfile";
-
+import GroupDetail from "./pages/Group/GroupDetail";
 
 function App() {
   return (
@@ -23,6 +23,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/event-detail-spec" element={<EventDetailSpec />} />
+        <Route path="/group-detail" element={<GroupDetail />} />
       </Routes>
     </div>
   );
