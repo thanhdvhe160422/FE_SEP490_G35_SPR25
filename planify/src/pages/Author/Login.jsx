@@ -132,7 +132,7 @@ export default function Login() {
             <option value="">Select Campus</option>
             {campusList.map((item) => (
               <option key={item.id} value={item.value}>
-                {item.name}
+                {item.campusName}
               </option>
             ))}
           </select>

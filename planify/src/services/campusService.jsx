@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/campuses";
+const API_URL = "https://localhost:44320/api/Campus";
 
 export const getCampuses = async () => {
   try {
