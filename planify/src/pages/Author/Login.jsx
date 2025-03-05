@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Login.css";
+import "../../styles/Author/Login.css";
 import backgroundImage from "../../assets/fpt-campus.jpg";
+import { useSnackbar } from "notistack";
 
 export default function Login() {
   const [campus, setCampus] = useState("");
   const [campusList, setCampusList] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
   useEffect(() => {
@@ -60,7 +62,10 @@ export default function Login() {
         "Authorization"
       ] = `Bearer ${res.data.token}`;
 
-      alert("Đăng nhập thành công!");
+      enqueueSnackbar("Login successfully!", {
+        variant: "success",
+        autoHideDuration: 2500,
+      });
 
       switch (res.data.role) {
         case "admin":
@@ -90,7 +95,10 @@ export default function Login() {
 
   const handleGoogleLogin = () => {
     if (!campus) {
-      alert("Vui lòng chọn campus trước khi đăng nhập!");
+      enqueueSnackbar("Please select campus", {
+        variant: "error",
+        autoHideDuration: 2500,
+      });
       return;
     }
     if (window.google?.accounts) {

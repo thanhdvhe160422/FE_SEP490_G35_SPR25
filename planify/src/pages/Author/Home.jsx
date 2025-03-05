@@ -1,13 +1,13 @@
-import NewsSection from "../../components/NewsSection";
+import EventSection from "../../components/EventSection";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import "../../styles/Home.css";
+import "../../styles/Author/Home.css";
 
 function Home() {
   return (
     <div>
       <Header></Header>
-      <NewsSection />
+      <EventSection />
       <Footer />
     </div>
   );

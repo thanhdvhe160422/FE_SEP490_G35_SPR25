@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaExclamationTriangle } from "react-icons/fa";
-import "../styles/Authorization.css";
+import "../styles/Author/Authorization.css";
 
 export default function Authorization() {
   const navigate = useNavigate();

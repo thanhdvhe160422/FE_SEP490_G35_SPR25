@@ -6,9 +6,10 @@ import LoginAdmin from "./pages/Author/LoginAdmin";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
-import EditProfile from "./pages/Author/EditProfile";
-import EventDetailSpectator from "./pages/Events/EventDetailSpectator";
-
+import CreateEvent from "./pages/Events/CreateEvent";
+import EventDetailSpec from "./pages/Events/EventDetailSpec";
+import UpdateProfile from "./pages/Author/UpdateProfile";
+import GroupDetail from "./pages/Group/GroupDetail";
 
 function App() {
   return (
@@ -17,10 +18,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/update-profile" element={<UpdateProfile />} />
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/EventDetailSpectator" element={<EventDetailSpectator/>}/>
+        <Route path="/create-event" element={<CreateEvent />} />
+        <Route path="/event-detail-spec" element={<EventDetailSpec />} />
+        <Route path="/group-detail" element={<GroupDetail />} />
       </Routes>
     </div>
   );

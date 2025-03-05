@@ -1,0 +1,93 @@
+.group-detail-container {
+  display: flex;
+  padding: 20px;
+}
+
+.group-detail-member {
+  width: 30%;
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.item-member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.member-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.leader-badge {
+  font-size: 20px;
+  color: gold;
+  margin-left: auto;
+}
+.list-task {
+  margin-top: 20px;
+  margin-left: 20px;
+  width: 65%;
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.task-table th,
+.task-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.task-table th {
+  background-color: #f4f4f4;
+}
+
+.task-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.task-table tr:hover {
+  background-color: #f1f1f1;
+}
+.assignee-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.assignee-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.assignee-name {
+  font-size: 14px;
+}

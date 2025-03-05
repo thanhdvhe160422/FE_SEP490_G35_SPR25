@@ -56,21 +56,21 @@ export default function Header() {
 
   const navItemsByRole = {
     manager: [
-      { label: "Home", path: "/homeManagerCampus" },
+      { label: "Home", path: "/home" },
       { label: "Create Event Organizer", path: "/create-event-organizer" },
       { label: "Create Event", path: "/create-event" },
     ],
     eventOrganizer: [
-      { label: "Home", path: "/homeEventOrganizer" },
+      { label: "Home", path: "/home" },
       { label: "Create Event", path: "/create-event" },
       { label: "History", path: "/history" },
     ],
     implementer: [
-      { label: "Home", path: "/homeImplementer" },
+      { label: "Home", path: "/home" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
       { label: "History", path: "/history" },
     ],
-    spectator: [{ label: "Home", path: "/homeSpectator" }],
+    spectator: [{ label: "Home", path: "/home" }],
   };
 
   const navItems = navItemsByRole[userRole] || [];
