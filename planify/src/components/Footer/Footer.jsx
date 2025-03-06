@@ -1,6 +1,5 @@
 import React from "react";
-import { Facebook, Youtube, MessageCircle, Music } from "lucide-react";
-import "./Footer.css"; // Import CSS riêng
+import "./Footer.css";
 
 const locations = [
   {
@@ -56,13 +55,6 @@ export default function Footer() {
             <p>Email: {loc.email}</p>
           </div>
         ))}
-      </div>
-
-      <div className="footer__socials">
-        <Facebook className="footer__icon" />
-        <Youtube className="footer__icon" />
-        <MessageCircle className="footer__icon" />
-        <Music className="footer__icon" />
       </div>
     </footer>
   );

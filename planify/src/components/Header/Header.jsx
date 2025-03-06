@@ -8,7 +8,11 @@ export default function Header() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  localStorage.setItem("userRole", "manager");
+  const [showDropdown, setShowDropdown] = useState(false); // Thêm trạng thái dropdown
+
+  if (!localStorage.getItem("userRole")) {
+    localStorage.setItem("userRole", "manager");
+  }
   const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
@@ -77,7 +81,7 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="logo" onClick={() => navigate("/")}>
+      <div className="logo" onClick={() => navigate("/home")}>
         <img src={logo} alt="FPT Logo" />
       </div>
 
@@ -109,9 +113,9 @@ export default function Header() {
               {notifications.length === 0 ? (
                 <p>Không có thông báo</p>
               ) : (
-                notifications.map((notif, index) => (
+                notifications.map((notif) => (
                   <div
-                    key={index}
+                    key={notif.id}
                     className={`notification-item ${
                       notif.read ? "" : "unread"
                     }`}
@@ -124,18 +128,28 @@ export default function Header() {
           )}
         </div>
 
-        <div className="profile" onClick={() => navigate("/profile")}>
+        <div className="profile" onClick={() => setShowDropdown(!showDropdown)}>
           <img
             src="https://via.placeholder.com/40"
             alt="User Avatar"
             className="avatar"
           />
           <span className="username">John Doe</span>
-        </div>
 
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+          {showDropdown && (
+            <div className="dropdown-menu">
+              <div
+                className="dropdown-item"
+                onClick={() => navigate("/profile")}
+              >
+                Profile
+              </div>
+              <div className="dropdown-item-logout" onClick={handleLogout}>
+                Logout
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

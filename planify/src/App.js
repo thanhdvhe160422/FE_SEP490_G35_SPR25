@@ -23,7 +23,7 @@ function App() {
         <Route path="/authorization" element={<Authorization />} />
         <Route path="/home" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/event-detail-spec" element={<EventDetailSpec />} />
+        <Route path="/event-detail-spec/:id" element={<EventDetailSpec />} />
         <Route path="/group-detail" element={<GroupDetail />} />
         <Route path="/event-detail-EOG" element={<EventDetailEOG />} />
       </Routes>

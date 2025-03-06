@@ -2,71 +2,44 @@
   "events": [
     {
       "id": 1,
-      "EventTitle": "Tech Conference 2024",
-      "Placed": "Hanoi, Vietnam",
-      "StartTime": "2024-03-15T09:00:00",
-      "EndTime": "2024-03-17T18:00:00",
-      "status": "RUNNING"
-    },
-    {
-      "id": 2,
-      "EventTitle": "Music Festival 2024",
-      "Placed": "Ho Chi Minh City, Vietnam",
-      "StartTime": "2024-04-20T10:00:00",
-      "EndTime": "2024-04-22T22:00:00",
-      "status": "UPCOMING"
-    }
-  ],
-  "groups": [
-    {
-      "id": 1,
-      "name": "Group A",
-      "eventId": 1,
-      "members": [
-        "Nguyễn Thanh Sang",
-        "Trần Văn Bình",
-        "Lê Thị Hương",
-        "Phạm Văn Đức",
-        "Vũ Minh Anh",
-        "Hoàng Thị Lan",
-        "Nguyễn Văn Tú",
-        "Trần Thị Mai",
-        "Phạm Hồng Quân",
-        "Lý Thị Hoa"
+      "Status": "Running",
+      "EventTitle": "Sự kiện Tết",
+      "StartTime": "01-01-2020",
+      "EndTime": "03-01-2020",
+      "EventDescription": "Sự kiện diễn ra hàng năm với nhiều hoạt động thú vị.",
+      "Placed": "Phố đi bộ Nguyễn Huệ",
+      "CategoryViewModel": { "Id": "1", "Name": "Lễ hội" },
+      "EventMedias": [
+        {
+          "Id": "1",
+          "MediaDTO": {
+            "Url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFYDy0dtqY-GmpwssQR-DKlQgrvsRy47FokQ&s"
+          }
+        },
+        {
+          "Id": "2",
+          "MediaDTO": {
+            "Url": "https://blog.topcv.vn/wp-content/uploads/2021/07/sk2uEvents_Page_Header_2903ed9c-40c1-4f6c-9a69-70bb8415295b.jpg"
+          }
+        }
       ]
     },
     {
       "id": 2,
-      "name": "Group B",
-      "eventId": 1,
-      "members": [
-        "Nguyễn Văn Nam",
-        "Trần Thị Thu",
-        "Lê Văn Hùng",
-        "Phạm Thị Hằng",
-        "Vũ Thị Hồng",
-        "Hoàng Văn Sơn",
-        "Nguyễn Thị Hạnh",
-        "Trần Văn Long",
-        "Phạm Thị Thảo",
-        "Lý Văn Minh"
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Group C",
-      "eventId": 2,
-      "members": [
-        "Nguyễn Thị Lan",
-        "Trần Văn Tuấn",
-        "Lê Thị Hà",
-        "Phạm Văn Khánh",
-        "Vũ Thị Hương",
-        "Hoàng Văn Đạt",
-        "Nguyễn Thị Thuỷ",
-        "Trần Văn Hải",
-        "Phạm Thị Ngọc",
-        "Lý Văn Tùng"
+      "Status": "Upcoming",
+      "EventTitle": "Sự kiện Âm Nhạc",
+      "StartTime": "10-02-2024",
+      "EndTime": "12-02-2024",
+      "EventDescription": "Một đêm nhạc sôi động với những nghệ sĩ hàng đầu.",
+      "Placed": "Sân vận động Mỹ Đình",
+      "CategoryViewModel": { "Id": "2", "Name": "Âm nhạc" },
+      "EventMedias": [
+        {
+          "Id": "1",
+          "MediaDTO": {
+            "Url": "https://example.com/music-event-1.jpg"
+          }
+        }
       ]
     }
   ]

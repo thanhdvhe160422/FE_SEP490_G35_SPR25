@@ -5,10 +5,10 @@ import bannerImage from "../assets/banner-item-3.jpg";
 import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
 
-const POSTS_PER_PAGE = 5;
+const EVENTS_PER_PAGE = 5;
 
 function EventSection() {
-  const [posts, setPosts] = useState([]);
+  const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,10 +27,10 @@ function EventSection() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getPosts();
-      const sortedPosts = data.sort((a, b) =>
+      const sortedEvents = data.sort((a, b) =>
         a.status === "running" ? -1 : 1
       );
-      setPosts(sortedPosts);
+      setEvents(sortedEvents);
     };
 
     const fetchCategories = async () => {
@@ -42,21 +42,21 @@ function EventSection() {
     fetchCategories();
   }, []);
 
-  const filteredPosts = posts.filter((post) => {
+  const filteredEvents = events.filter((event) => {
     const isMyEvent =
-      post.organizerId === currentUserId ||
-      post.implementerId === currentUserId;
+      event.organizerId === currentUserId ||
+      event.implementerId === currentUserId;
 
     return (
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
-      (!selectedCategory || post.category === selectedCategory) &&
+      (!selectedCategory || event.category === selectedCategory) &&
       (!searchTerm ||
-        post.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedStatus || post.status === selectedStatus) &&
-      (!selectedStart || new Date(post.start) >= new Date(selectedStart)) &&
-      (!selectedEnd || new Date(post.end) <= new Date(selectedEnd)) &&
+        event.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!selectedStatus || event.status === selectedStatus) &&
+      (!selectedStart || new Date(event.start) >= new Date(selectedStart)) &&
+      (!selectedEnd || new Date(event.end) <= new Date(selectedEnd)) &&
       (!selectedLocation ||
-        post.location.toLowerCase().includes(selectedLocation.toLowerCase()))
+        event.location.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
 
@@ -72,11 +72,11 @@ function EventSection() {
     eventFilter,
   ]);
 
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const currentPosts = filteredPosts.slice(
+  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
+  const currentEvents = filteredEvents.slice(
     startIndex,
-    startIndex + POSTS_PER_PAGE
+    startIndex + EVENTS_PER_PAGE
   );
 
   const getProgress = (start, end) => {
@@ -136,81 +136,86 @@ function EventSection() {
               <div className="col-12">
                 <div className="feature_tittle">
                   <div className="filter_container">
-                    <button
-                      className={`filter_button ${
-                        eventFilter === "list" ? "active" : ""
-                      }`}
-                      onClick={() => setEventFilter("list")}
-                    >
-                      List Event
-                    </button>
-                    {(userRole === "event organizer" ||
-                      userRole === "implementer") && (
+                    <div className="filter_list">
                       <button
                         className={`filter_button ${
-                          eventFilter === "my" ? "active" : ""
+                          eventFilter === "list" ? "active" : ""
                         }`}
-                        onClick={() => setEventFilter("my")}
+                        onClick={() => setEventFilter("list")}
                       >
-                        My Event
+                        List Event
                       </button>
-                    )}
+                      {(userRole === "event organizer" ||
+                        userRole === "implementer") && (
+                        <button
+                          className={`filter_button ${
+                            eventFilter === "my" ? "active" : ""
+                          }`}
+                          onClick={() => setEventFilter("my")}
+                        >
+                          My Event
+                        </button>
+                      )}
+                    </div>
+                    <div className="filter_other">
+                      <select
+                        className="post_select"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                      >
+                        <option value="">All Categories</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.name}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
 
-                    <select
-                      className="post_select"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      <option value="">All Categories</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    <input
-                      type="text"
-                      className="search_input"
-                      placeholder="Search event..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                      <input
+                        type="text"
+                        className="search_input"
+                        placeholder="Search event..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {currentPosts.map((post) => (
-                <div key={post.id} className="col-12 belarus_fast">
+              {currentEvents.map((event) => (
+                <div key={event.id} className="col-12 belarus_fast">
                   <div className="belarus_items">
                     <img
                       src={bannerImage}
                       alt="News"
-                      onClick={() => navigate(`/news/${post.id}`)}
+                      onClick={() => navigate(`/event-detail-spec/${event.id}`)}
                       style={{ cursor: "pointer" }}
                     />
                     <div className="belarus_content">
-                      <h6>{post.location}</h6>
+                      <h6>{event.location}</h6>
                       <p className="event_time">
-                        <strong>From:</strong> {post.start}
+                        <strong>From:</strong> {event.start}
                         <br />
-                        <strong>To:</strong> {post.end}
+                        <strong>To:</strong> {event.end}
                       </p>
                       <div
                         className="heding wow fadeInUp"
-                        onClick={() => navigate(`/news/${post.id}`)}
+                        onClick={() =>
+                          navigate(`/event-detail-spec/${event.id}`)
+                        }
                         style={{ cursor: "pointer" }}
                       >
-                        {post.title}
+                        {event.title}
                       </div>
                       <div
                         className={`status_tag ${
-                          post.status === "running"
+                          event.status === "running"
                             ? "running_status"
                             : "not_started_status"
                         }`}
                       >
-                        {post.status === "running"
+                        {event.status === "running"
                           ? "Running"
                           : "Not started yet"}
                       </div>
@@ -220,11 +225,11 @@ function EventSection() {
                           <div
                             className="progress_bar"
                             style={{
-                              width: `${getProgress(post.start, post.end)}%`,
+                              width: `${getProgress(event.start, event.end)}%`,
                             }}
                           >
                             <span className="progress_text">
-                              {Math.round(getProgress(post.start, post.end))}%
+                              {Math.round(getProgress(event.start, event.end))}%
                             </span>
                           </div>
                         </div>
