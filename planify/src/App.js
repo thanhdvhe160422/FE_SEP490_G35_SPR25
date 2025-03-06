@@ -10,6 +10,7 @@ import CreateEvent from "./pages/Events/CreateEvent";
 import EventDetailSpec from "./pages/Events/EventDetailSpec";
 import UpdateProfile from "./pages/Author/UpdateProfile";
 import GroupDetail from "./pages/Group/GroupDetail";
+import EventDetailEOG from "./pages/Events/EventDetailEOG";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/event-detail-spec" element={<EventDetailSpec />} />
         <Route path="/group-detail" element={<GroupDetail />} />
+        <Route path="/event-detail-EOG" element={<EventDetailEOG />} />
       </Routes>
     </div>
   );
