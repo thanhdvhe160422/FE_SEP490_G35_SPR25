@@ -42,23 +42,26 @@ function EventSection() {
     fetchCategories();
   }, []);
 
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = (events || []).filter((event) => {
+    if (!event) return false; // Kiểm tra nếu event là undefined/null
+  
     const isMyEvent =
       event.organizerId === currentUserId ||
       event.implementerId === currentUserId;
-
+  
     return (
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
       (!selectedCategory || event.category === selectedCategory) &&
       (!searchTerm ||
-        event.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        event.title?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!selectedStatus || event.status === selectedStatus) &&
       (!selectedStart || new Date(event.start) >= new Date(selectedStart)) &&
       (!selectedEnd || new Date(event.end) <= new Date(selectedEnd)) &&
       (!selectedLocation ||
-        event.location.toLowerCase().includes(selectedLocation.toLowerCase()))
+        event.location?.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
+  
 
   useEffect(() => {
     setCurrentPage(1);
@@ -172,6 +175,7 @@ function EventSection() {
                       </select>
 
                       <input
+                      style={{width:'300px'}}
                         type="text"
                         className="search_input"
                         placeholder="Search event..."
@@ -183,7 +187,10 @@ function EventSection() {
                 </div>
               </div>
 
-              {currentEvents.map((event) => (
+              {currentEvents.length === 0 ? (
+  <p className="no-events-message">Không tìm thấy sự kiện nào hợp lệ.</p>
+) : (
+              currentEvents.map((event) => (
                 <div key={event.id} className="col-12 belarus_fast">
                   <div className="belarus_items">
                     <img
@@ -237,7 +244,7 @@ function EventSection() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )))}
             </div>
 
             <div className="pagination_area">
