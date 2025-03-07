@@ -14,7 +14,8 @@ body {
 }
 
 .feature_tittle {
-  max-width: 800px;
+  margin-left: 30px;
+  max-width: 90%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -29,7 +30,8 @@ body {
   padding-top: 25px;
 }
 .belarus_items {
-  max-width: 800px;
+margin-left: 30px;
+  max-width: 90%;
   position: relative;
   overflow: hidden;
   border-radius: 8px;
@@ -116,7 +118,7 @@ body {
 }
 .filter_container {
   margin-top: 30px;
-  width: 800px;
+  width:100% ;
   display: flex;
   justify-content: space-between;
   gap: 10px;
@@ -209,3 +211,11 @@ body {
   color: white;
   border-color: #007bff;
 }
+.no-events-message {
+  text-align: center;
+  font-size: 18px;
+  color: #ff4d4f;
+  font-weight: bold;
+  margin-top: 20px;
+}
+

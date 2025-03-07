@@ -61,8 +61,8 @@ const Profile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]); // Reset danh sách phường khi tỉnh thay đổi
-        setSelectedDistrict(""); // Reset quận/huyện
+        setWards([]); 
+        setSelectedDistrict(""); 
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -82,7 +82,7 @@ const Profile = () => {
         );
         const data = await res.json();
         setWards(data.data || []);
-        setSelectedWard(""); // Reset phường/xã khi quận thay đổi
+        setSelectedWard(""); 
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -120,7 +120,7 @@ const Profile = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`; // Chuyển sang YYYY-MM-DD
+    return `${year}-${month}-${day}`; 
   };
 
   const getProvinceName = (provinceId) => {
@@ -144,13 +144,13 @@ const Profile = () => {
       getWardName(selectedWard),
       getDistrictName(selectedDistrict),
       getProvinceName(selectedProvince),
-    ].filter(Boolean); // Loại bỏ các phần tử rỗng
+    ].filter(Boolean);
 
     if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
-      return getProvinceName(selectedProvince); // Chỉ hiển thị tỉnh nếu chỉ có tỉnh
+      return getProvinceName(selectedProvince); 
     }
 
-    return addressParts.join(", "); // Ghép các phần tử bằng dấu phẩy
+    return addressParts.join(", ");
   };
   return (
     <>
@@ -194,7 +194,7 @@ const Profile = () => {
                 <td>Gender</td>
                 <td>{user.gender || ""}</td>
               </tr>
-             
+
               <tr>
                 <td>Address</td>
                 <td>{fullAddress()}</td>

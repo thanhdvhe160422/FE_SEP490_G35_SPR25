@@ -3,37 +3,37 @@ import "./Footer.css";
 
 const locations = [
   {
-    city: "HÀ NỘI",
+    city: "HANOI",
     address:
-      "Khu Giáo dục và Đào tạo – Khu Công nghệ cao Hòa Lạc – Km29 Đại lộ Thăng Long, H. Thạch Thất, TP. Hà Nội",
+      "Education and Training Area – Hoa Lac Hi-Tech Park – Km29 Thang Long Boulevard, Thach That District, Hanoi City",
     phone: "(024) 7300 5588",
     email: "tuyensinh.hanoi@fpt.edu.vn",
   },
   {
-    city: "TP. HỒ CHÍ MINH",
+    city: "HO CHI MINH CITY",
     address:
-      "Lô E2a-7, Đường D1 Khu Công nghệ cao, P. Long Thạnh Mỹ, TP. Thủ Đức, TP. Hồ Chí Minh",
+      "Lot E2a-7, D1 Street, Hi-Tech Park, Long Thanh My Ward, Thu Duc City, Ho Chi Minh City",
     phone: "(028) 7300 5588",
     email: "daihoc.hcm@fpt.edu.vn",
   },
   {
-    city: "ĐÀ NẴNG",
+    city: "DA NANG",
     address:
-      "Khu đô thị công nghệ FPT Đà Nẵng, P. Hoà Hải, Q. Ngũ Hành Sơn, TP. Đà Nẵng",
+      "FPT Da Nang Urban Area, Hoa Hai Ward, Ngu Hanh Son District, Da Nang City",
     phone: "(0236) 730 0999",
     email: "dnuni@fe.edu.vn",
   },
   {
-    city: "CẦN THƠ",
+    city: "CAN THO",
     address:
-      "Số 600 Đường Nguyễn Văn Cừ (nối dài), P. An Bình, Q. Ninh Kiều, TP. Cần Thơ",
+      "600 Nguyen Van Cu Street (extended), An Binh Ward, Ninh Kieu District, Can Tho City",
     phone: "(0292) 730 3636",
     email: "fptu.cantho@fe.edu.vn",
   },
   {
-    city: "QUY NHƠN",
+    city: "QUY NHON",
     address:
-      "Khu đô thị mới An Phú Thịnh, Phường Nhơn Bình & Phường Đống Đa, TP. Quy Nhơn, Bình Định",
+      "An Phu Thinh New Urban Area, Nhon Binh Ward & Dong Da Ward, Quy Nhon City, Binh Dinh Province",
     phone: "(0256) 7300 999",
     email: "qnuni@fe.edu.vn",
   },
@@ -43,7 +43,7 @@ export default function Footer() {
   return (
     <footer className="footer">
       <p className="footer__copyright">
-        © 2025 Bản quyền thuộc về Trường Đại học FPT.
+        © 2025 Copyright belongs to FPT University.
       </p>
 
       <div className="footer__locations">
@@ -51,7 +51,7 @@ export default function Footer() {
           <div className="footer__location" key={index}>
             <h3 className="footer__city">{loc.city}</h3>
             <p>{loc.address}</p>
-            <p>Điện thoại: {loc.phone}</p>
+            <p>Phone: {loc.phone}</p>
             <p>Email: {loc.email}</p>
           </div>
         ))}

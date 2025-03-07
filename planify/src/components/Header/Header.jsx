@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import "./Header.css";
@@ -8,7 +8,10 @@ export default function Header() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false); // Thêm trạng thái dropdown
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const dropdownRef = useRef(null);
+  const notificationRef = useRef(null);
 
   if (!localStorage.getItem("userRole")) {
     localStorage.setItem("userRole", "manager");
@@ -21,13 +24,31 @@ export default function Header() {
 
     axios
       .get(`http://localhost:4000/notifications?userId=${userId}`)
-      .then((response) => {
-        setNotifications(response.data);
-      })
-      .catch((error) => {
-        console.error("Lỗi khi lấy thông báo:", error);
-      });
+      .then((response) => setNotifications(response.data))
+      .catch((error) => console.error("Lỗi khi lấy thông báo:", error));
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        showDropdown
+      ) {
+        setShowDropdown(false);
+      }
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target) &&
+        showPopup
+      ) {
+        setShowPopup(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDropdown, showPopup]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -37,10 +58,9 @@ export default function Header() {
 
     const unreadNotifications = notifications.filter((n) => !n.read);
     if (unreadNotifications.length > 0) {
-      const updatedNotifications = notifications.map((notif) =>
-        notif.read ? notif : { ...notif, read: true }
+      setNotifications(
+        notifications.map((notif) => (notif.read ? notif : { ...notif, read: true }))
       );
-      setNotifications(updatedNotifications);
 
       await Promise.all(
         unreadNotifications.map((notif) =>
@@ -87,11 +107,7 @@ export default function Header() {
 
       <nav className="navbar">
         {navItems.map((item, index) => (
-          <span
-            key={index}
-            onClick={() => navigate(item.path)}
-            className="nav-item"
-          >
+          <span key={index} onClick={() => navigate(item.path)} className="nav-item">
             {item.label}
           </span>
         ))}
@@ -104,6 +120,7 @@ export default function Header() {
             setShowPopup(!showPopup);
             markAsRead();
           }}
+          ref={notificationRef}
         >
           <span className="bell">🔔</span>
           {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
@@ -114,12 +131,7 @@ export default function Header() {
                 <p>Không có thông báo</p>
               ) : (
                 notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    className={`notification-item ${
-                      notif.read ? "" : "unread"
-                    }`}
-                  >
+                  <div key={notif.id} className={`notification-item ${notif.read ? "" : "unread"}`}>
                     {notif.message}
                   </div>
                 ))
@@ -128,20 +140,13 @@ export default function Header() {
           )}
         </div>
 
-        <div className="profile" onClick={() => setShowDropdown(!showDropdown)}>
-          <img
-            src="https://via.placeholder.com/40"
-            alt="User Avatar"
-            className="avatar"
-          />
+        <div className="profile" onClick={() => setShowDropdown(!showDropdown)} ref={dropdownRef}>
+          <img src="https://via.placeholder.com/40" alt="User Avatar" className="avatar" />
           <span className="username">John Doe</span>
 
           {showDropdown && (
             <div className="dropdown-menu">
-              <div
-                className="dropdown-item"
-                onClick={() => navigate("/profile")}
-              >
+              <div className="dropdown-item" onClick={() => navigate("/profile")}>
                 Profile
               </div>
               <div className="dropdown-item-logout" onClick={handleLogout}>
