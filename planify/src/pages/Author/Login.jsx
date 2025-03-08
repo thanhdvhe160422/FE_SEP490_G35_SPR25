@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getCampuses } from "../../services/campusService";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Author/Login.css";
-import backgroundImage from "../../assets/fpt-campus.jpg";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
+import backgroundImage from "../../assets/fpt-campus.jpg";
+import "../../styles/Author/Login.css";
 
 export default function Login() {
   const [campus, setCampus] = useState("");
@@ -12,7 +14,6 @@ export default function Login() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
   useEffect(() => {
     const fetchCampuses = async () => {
@@ -26,32 +27,13 @@ export default function Login() {
       }
     };
     fetchCampuses();
+  }, []);
 
-    if (!window.google) {
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.async = true;
-      script.onload = initializeGoogleLogin;
-      document.body.appendChild(script);
-    } else {
-      initializeGoogleLogin();
-    }
-  }, [CLIENT_ID]);
-
-  const initializeGoogleLogin = () => {
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleCredentialResponse,
-      });
-    }
-  };
-
-  const handleCredentialResponse = async (response) => {
+  const handleSuccess = async (response) => {
     try {
-      const { credential } = response;
+      const decoded = jwtDecode(response.credential);
       const res = await axios.post("http://localhost:4000/auth/google", {
-        token: credential,
+        token: response.credential,
       });
 
       localStorage.setItem("token", res.data.token);
@@ -89,23 +71,12 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      alert("Đăng nhập thất bại!");
+      enqueueSnackbar("Đăng nhập thất bại!", { variant: "error" });
     }
   };
 
-  const handleGoogleLogin = () => {
-    if (!campus) {
-      enqueueSnackbar("Please select campus", {
-        variant: "error",
-        autoHideDuration: 2500,
-      });
-      return;
-    }
-    if (window.google?.accounts) {
-      window.google.accounts.id.prompt();
-    } else {
-      alert("Google Login chưa sẵn sàng. Vui lòng thử lại!");
-    }
+  const handleError = () => {
+    enqueueSnackbar("Google Login thất bại!", { variant: "error" });
   };
 
   return (
@@ -138,15 +109,7 @@ export default function Login() {
           </select>
         )}
 
-        <button className="login-btn google" onClick={handleGoogleLogin}>
-          <img
-            src="https://developers.google.com/identity/images/g-logo.png"
-            alt="Google Logo"
-            className="icon"
-            style={{ width: "20px", height: "20px", marginRight: "10px" }}
-          />
-          Login with Google
-        </button>
+        <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
       </div>
     </div>
   );

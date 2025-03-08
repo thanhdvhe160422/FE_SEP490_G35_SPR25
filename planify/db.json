@@ -1,46 +1,24 @@
 {
-  "events": [
+  "campuses": [
     {
-      "id": 1,
-      "Status": "Running",
-      "EventTitle": "Sự kiện Tết",
-      "StartTime": "01-01-2020",
-      "EndTime": "03-01-2020",
-      "EventDescription": "Sự kiện diễn ra hàng năm với nhiều hoạt động thú vị.",
-      "Placed": "Phố đi bộ Nguyễn Huệ",
-      "CategoryViewModel": { "Id": "1", "Name": "Lễ hội" },
-      "EventMedias": [
-        {
-          "Id": "1",
-          "MediaDTO": {
-            "Url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFYDy0dtqY-GmpwssQR-DKlQgrvsRy47FokQ&s"
-          }
-        },
-        {
-          "Id": "2",
-          "MediaDTO": {
-            "Url": "https://blog.topcv.vn/wp-content/uploads/2021/07/sk2uEvents_Page_Header_2903ed9c-40c1-4f6c-9a69-70bb8415295b.jpg"
-          }
-        }
-      ]
+      "id": "1",
+      "name": "FPT HCM",
+      "location": "Ho Chi Minh City"
     },
     {
-      "id": 2,
-      "Status": "Upcoming",
-      "EventTitle": "Sự kiện Âm Nhạc",
-      "StartTime": "10-02-2024",
-      "EndTime": "12-02-2024",
-      "EventDescription": "Một đêm nhạc sôi động với những nghệ sĩ hàng đầu.",
-      "Placed": "Sân vận động Mỹ Đình",
-      "CategoryViewModel": { "Id": "2", "Name": "Âm nhạc" },
-      "EventMedias": [
-        {
-          "Id": "1",
-          "MediaDTO": {
-            "Url": "https://example.com/music-event-1.jpg"
-          }
-        }
-      ]
+      "id": "2",
+      "name": "FPT HN",
+      "location": "Hanoi"
+    },
+    {
+      "id": "3",
+      "name": "FPT DN",
+      "location": "Da Nang"
+    },
+    {
+      "id": "4",
+      "name": "FPT CT",
+      "location": "Can Tho"
     }
   ]
 }

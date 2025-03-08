@@ -87,7 +87,6 @@ export default function CreateEvent() {
     }
   };
 
-  // Handle add group button click
   const handleAddGroup = () => {
     const newGroup = {
       name: `Group ${groups.length + 1}`,
@@ -98,19 +97,16 @@ export default function CreateEvent() {
     setGroups([...groups, newGroup]);
   };
 
-  // Handle delete group button click
   const handleDeleteGroup = (index) => {
     const updatedGroups = groups.filter((_, i) => i !== index);
     setGroups(updatedGroups);
   };
 
-  // Handle add member button click
   const handleAddMemberClick = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
     setShowAddMemberModal(true);
   };
 
-  // Handle adding new member
   const handleAddMember = () => {
     if (newMember.trim() !== "" && isValidMember) {
       const selectedUser = users.find(
@@ -128,20 +124,17 @@ export default function CreateEvent() {
         setGroups(updatedGroups);
         setNewMember("");
         setShowAddMemberModal(false);
-        setIsValidMember(false); // Reset trạng thái hợp lệ
+        setIsValidMember(false);
       }
     }
   };
 
-  // Handle input change for new member
   const handleNewMemberChange = (e) => {
     const value = e.target.value;
     setNewMember(value);
 
-    // Lấy danh sách thành viên đã được thêm vào Group hiện tại
     const currentGroupMembers = groups[selectedGroupIndex]?.members || [];
 
-    // Tìm kiếm đề xuất từ danh sách users, loại bỏ những tên đã được thêm vào Group
     if (value.trim() !== "") {
       const filteredSuggestions = users.filter(
         (user) =>
@@ -153,8 +146,6 @@ export default function CreateEvent() {
           )
       );
       setSuggestions(filteredSuggestions);
-
-      // Kiểm tra xem tên nhập vào có tồn tại trong danh sách users và chưa được thêm vào Group không
       const isValid = users.some(
         (user) =>
           `${user.firstName} ${user.lastName}`.toLowerCase() ===
@@ -170,21 +161,18 @@ export default function CreateEvent() {
     }
   };
 
-  // Handle suggestion click
   const handleSuggestionClick = (user) => {
     setNewMember(`${user.firstName} ${user.lastName}`);
     setSuggestions([]);
-    setIsValidMember(true); // Đảm bảo nút "Add" được kích hoạt khi chọn đề xuất
+    setIsValidMember(true);
   };
 
-  // Handle delete member button click
   const handleDeleteMember = (groupIndex, memberIndex) => {
     const updatedGroups = [...groups];
-    updatedGroups[groupIndex].members.splice(memberIndex, 1); // Xóa thành viên khỏi Group
+    updatedGroups[groupIndex].members.splice(memberIndex, 1);
     setGroups(updatedGroups);
   };
 
-  // Handle save draft button click
   const handleSaveDraft = () => {
     Swal.fire({
       title: "Do you want to save the changes?",
@@ -198,7 +186,6 @@ export default function CreateEvent() {
     });
   };
 
-  // Handle create event button click
   const handleCreateEvent = () => {
     Swal.fire({
       title: "Do you want to create the event?",
@@ -216,7 +203,7 @@ export default function CreateEvent() {
   return (
     <>
       <Header />
-      <div style={{ maxWidth: "900px", padding: "20px" }}>
+      <div style={{ maxWidth: "900px", padding: "20px", paddingTop: "79px" }}>
         <h2 className="text-center">Create Event</h2>
 
         <Form>
@@ -252,7 +239,6 @@ export default function CreateEvent() {
             <Form.Label>Event Type</Form.Label>
             <Form.Select>
               <option>Choose event type</option>
-              {/* Hiển thị danh sách categories */}
               {categories.map((category) => (
                 <option key={category.id} value={category.name}>
                   {category.name}
@@ -308,7 +294,6 @@ export default function CreateEvent() {
                             {group.name}
                           </span>
                         )}
-                        {/* Nút X để xóa Group */}
                         <Button
                           variant="danger"
                           size="sm"
@@ -341,7 +326,7 @@ export default function CreateEvent() {
                                     whiteSpace: "nowrap",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    maxWidth: "150px", // Giới hạn độ rộng của email
+                                    maxWidth: "150px",
                                   }}
                                 >
                                   {member.email}
@@ -366,7 +351,6 @@ export default function CreateEvent() {
                                     <FaRegStar />
                                   )}
                                 </span>
-                                {/* Nút - để xóa member */}
                                 <Button
                                   variant="danger"
                                   size="sm"
@@ -447,7 +431,6 @@ export default function CreateEvent() {
           </div>
         </Form>
 
-        {/* Add Member Modal */}
         <Modal
           show={showAddMemberModal}
           onHide={() => setShowAddMemberModal(false)}
@@ -462,7 +445,6 @@ export default function CreateEvent() {
               value={newMember}
               onChange={handleNewMemberChange}
             />
-            {/* Hiển thị đề xuất */}
             {suggestions.length > 0 && (
               <ListGroup className="mt-2">
                 {suggestions.map((user, index) => (
