@@ -34,7 +34,7 @@ function EventDetailSpec() {
       <Header />
       <div className="event-container">
         <div className="event-header">
-          <h2 style={{color:"red"}}>{event.EventTitle}</h2>
+          <h2 style={{ color: "red" }}>{event.EventTitle}</h2>
         </div>
         <div className="event-content">
           <div className="event-info">
