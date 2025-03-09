@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://localhost:44320/api/Events";
+const API_URL = "https://localhost:44320/api/EventForSpectators";
+
 
 const getPosts = async () => {
   try {

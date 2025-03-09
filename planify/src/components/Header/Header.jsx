@@ -13,6 +13,10 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
 
+
+  const [fullname, setfullname] = useState("");
+  const [picture, setpicture] = useState("");
+
   if (!localStorage.getItem("userRole")) {
     localStorage.setItem("userRole", "manager");
   }
@@ -20,6 +24,9 @@ export default function Header() {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
+    setfullname(localStorage.getItem('fullName'));
+    setpicture(localStorage.getItem('avatar'));
+    console.log(picture);
     if (!userId) return;
 
     axios
@@ -99,6 +106,12 @@ export default function Header() {
 
   const navItems = navItemsByRole[userRole] || [];
 
+  // localStorage.setItem("fullName", res.data.result.fullName);
+  //     localStorage.setItem('avatar', decoded.picture);
+  //     localStorage.setItem("token", res.data.result.token);
+  //     localStorage.setItem("role", res.data.result.role);
+  //     localStorage.setItem("campus", campus);
+
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/home")}>
@@ -141,8 +154,8 @@ export default function Header() {
         </div>
 
         <div className="profile" onClick={() => setShowDropdown(!showDropdown)} ref={dropdownRef}>
-          <img src="https://via.placeholder.com/40" alt="User Avatar" className="avatar" />
-          <span className="username">John Doe</span>
+          <img src={picture} alt="User Avatar" className="avatar" />
+          <span className="username">{fullname}</span>
 
           {showDropdown && (
             <div className="dropdown-menu">
