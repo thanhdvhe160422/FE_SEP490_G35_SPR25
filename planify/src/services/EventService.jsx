@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/events";
+const API_URL = "https://localhost:44320/api/Events";
 
 const getPosts = async () => {
   try {
@@ -13,9 +13,11 @@ const getPosts = async () => {
 };
 
 export default getPosts;
-export const getEventById = async (id) => {
+export const getEventById = async (eventId) => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await axios.get(`https://localhost:44320/api/Events/get-event-detail`, {
+      params: { eventId }
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching event:", error);
