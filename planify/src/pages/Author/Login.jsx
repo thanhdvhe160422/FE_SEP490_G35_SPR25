@@ -32,6 +32,7 @@ export default function Login() {
   const handleSuccess = async (response) => {
     try {
       const decoded = jwtDecode(response.credential);
+
       const { credential } = response;
       console.log(decoded.picture);
       const res = await axios.post(
@@ -41,6 +42,7 @@ export default function Login() {
 
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem('avatar', decoded.picture);
+
       localStorage.setItem("token", res.data.result.token);
       localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
@@ -115,7 +117,7 @@ export default function Login() {
           </select>
         )}
 
-        <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
+        <GoogleLogin onSuccess={handleSuccess} onError={handleError}/>
       </div>
     </div>
   );
