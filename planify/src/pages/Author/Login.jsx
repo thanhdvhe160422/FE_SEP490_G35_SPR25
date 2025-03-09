@@ -33,7 +33,8 @@ export default function Login() {
     try {
       const decoded = jwtDecode(response.credential);
       const res = await axios.post("http://localhost:4000/auth/google", {
-        token: response.credential,
+        GoogleToken: response.credential,
+        CampusName: campus,
       });
 
       localStorage.setItem("token", res.data.token);
