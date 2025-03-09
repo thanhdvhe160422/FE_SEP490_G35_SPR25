@@ -21,7 +21,9 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await fetch("http://localhost:4000/users/2");
+        const thanh = localStorage.getItem('userId');
+
+        const userRes = await fetch("https://localhost:44320/api/Profiles/"+thanh);
         const userData = await userRes.json();
 
         setUser(userData);

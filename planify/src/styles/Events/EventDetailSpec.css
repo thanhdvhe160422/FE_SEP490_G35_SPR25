@@ -47,6 +47,7 @@
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+  padding-top: 79px;
 }
 .event-info {
   display: flex;

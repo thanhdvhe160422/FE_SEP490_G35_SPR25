@@ -14,6 +14,7 @@ function EventDetailSpec() {
     const fetchEventDetail = async () => {
       try {
         const data = await getEventById(id);
+        console.log(data);
         if (data) {
           setEvent(data);
         }
@@ -34,16 +35,16 @@ function EventDetailSpec() {
       <Header />
       <div className="event-container">
         <div className="event-header">
-          <h2 style={{ color: "red" }}>{event.EventTitle}</h2>
+          <h2 style={{ color: "red" }}>{event.eventTitle}</h2>
         </div>
         <div className="event-content">
           <div className="event-info">
             <div className="event-time">
               <p>
-                <strong>From:</strong> {event.StartTime}
+                <strong>From:</strong> {event.startTime}
               </p>
               <p>
-                <strong>To:</strong> {event.EndTime}
+                <strong>To:</strong> {event.endTime}
               </p>
               <div
                 className={`status_tag ${
@@ -57,13 +58,13 @@ function EventDetailSpec() {
             </div>
             <div className="event-location">
               <p>
-                <strong>Category:</strong> {event.CategoryViewModel?.Name}
+                <strong>Category:</strong> {event.categoryViewModel?.categoryEventName}
               </p>
               <p>
-                <strong>Location:</strong> {event.Placed}
+                <strong>Location:</strong> {event.placed}
               </p>
               <p>
-                <strong>Description:</strong> {event.EventDescription}
+                <strong>Description:</strong> {event.eventDescription}
               </p>
             </div>
           </div>

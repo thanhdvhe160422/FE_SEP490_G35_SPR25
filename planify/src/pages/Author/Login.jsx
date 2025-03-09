@@ -32,37 +32,43 @@ export default function Login() {
   const handleSuccess = async (response) => {
     try {
       const decoded = jwtDecode(response.credential);
-      const res = await axios.post("http://localhost:4000/auth/google", {
-        token: response.credential,
-      });
+      const { credential } = response;
+      console.log(decoded.picture);
+      const res = await axios.post(
+        "https://localhost:44320/api/Auth/google-login",
+        { CampusName: campus, GoogleToken: credential }
+      );
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("fullName", res.data.result.fullName);
+      localStorage.setItem('avatar', decoded.picture);
+      localStorage.setItem("token", res.data.result.token);
+      localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
+      localStorage.setItem("userId", res.data.result.userId);
 
       axios.defaults.headers.common[
         "Authorization"
-      ] = `Bearer ${res.data.token}`;
+      ] = `Bearer ${res.data.result.token}`;
 
       enqueueSnackbar("Login successfully!", {
         variant: "success",
         autoHideDuration: 2500,
       });
 
-      switch (res.data.role) {
-        case "admin":
+      switch (res.data.result.role) {
+        case "Admin":
           navigate(`/admin?campus=${campus}`);
           break;
-        case "manager_campus":
+        case "Campus Manager":
           navigate(`/managercampus?campus=${campus}`);
           break;
-        case "event_organizer":
-          navigate(`/eventorganizer?campus=${campus}`);
+        case "Event Organizer":
+          navigate(`/home`);
           break;
-        case "implementer":
+        case "Implementer":
           navigate(`/implementer?campus=${campus}`);
           break;
-        case "spectator":
+        case "Spectator":
           navigate(`/spectator?campus=${campus}`);
           break;
         default:
