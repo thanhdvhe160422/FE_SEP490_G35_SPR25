@@ -6,14 +6,14 @@ import Footer from "../../components/Footer/Footer";
 import { getEventById } from "../../services/EventService";
 
 function EventDetailSpec() {
-  const { id } = useParams();
+  const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
-        const data = await getEventById(id);
+        const data = await getEventById(Number(eventId));
         if (data) {
           setEvent(data);
         }
@@ -23,7 +23,7 @@ function EventDetailSpec() {
     };
 
     fetchEventDetail();
-  }, [id]);
+  }, [eventId]);
 
   if (!event) return <p>Loading event details...</p>;
 
@@ -34,7 +34,7 @@ function EventDetailSpec() {
       <Header />
       <div className="event-container">
         <div className="event-header">
-          <h2 style={{ color: "red" }}>{event.EventTitle}</h2>
+          <h2 style={{ color: "red" }}>{event.result.eventTitle}</h2>
         </div>
         <div className="event-content">
           <div className="event-info">
