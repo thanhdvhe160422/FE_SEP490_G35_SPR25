@@ -21,9 +21,11 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const thanh = localStorage.getItem('userId');
+        const thanh = localStorage.getItem("userId");
 
-        const userRes = await fetch("https://localhost:44320/api/Profiles/"+thanh);
+        const userRes = await fetch(
+          "https://localhost:44320/api/Profiles/" + thanh
+        );
         const userData = await userRes.json();
 
         setUser(userData);
@@ -63,8 +65,8 @@ const Profile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]); 
-        setSelectedDistrict(""); 
+        setWards([]);
+        setSelectedDistrict("");
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -84,7 +86,7 @@ const Profile = () => {
         );
         const data = await res.json();
         setWards(data.data || []);
-        setSelectedWard(""); 
+        setSelectedWard("");
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -103,7 +105,7 @@ const Profile = () => {
         wardId: selectedWard,
       };
 
-      await fetch("http://localhost:4000/users/2", {
+      await fetch("http://localhost:4000/users/1", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
@@ -119,10 +121,15 @@ const Profile = () => {
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>No user data found</p>;
 
+  // ✅ Sửa lại format Date of Birth thành dd/mm/yyyy
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`; 
+    const date = new Date(dateStr);
+    if (isNaN(date)) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getProvinceName = (provinceId) => {
@@ -149,15 +156,16 @@ const Profile = () => {
     ].filter(Boolean);
 
     if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
-      return getProvinceName(selectedProvince); 
+      return getProvinceName(selectedProvince);
     }
 
     return addressParts.join(", ");
   };
+
   return (
     <>
       <Header />
-      <div className="profile-container">
+      <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
           <img src={user.avatar} alt="Avatar" className="profile-avatar" />
           <h2>
@@ -190,7 +198,7 @@ const Profile = () => {
               </tr>
               <tr>
                 <td>Date of Birth</td>
-                <td>{user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}</td>
+                <td>{formatDate(user.dateOfBirth)}</td>
               </tr>
               <tr>
                 <td>Gender</td>
