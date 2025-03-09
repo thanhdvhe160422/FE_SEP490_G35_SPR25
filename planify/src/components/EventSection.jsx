@@ -257,53 +257,57 @@ function EventSection() {
               )}
             </div>
 
-            <div className="pagination_area">
-              <ul className="pagination">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-                    }
-                  >
-                    Prev
-                  </button>
-                </li>
-                {Array.from({ length: totalPages }).map((_, index) => (
+            {currentEvents.length > 0 && (
+              <div className="pagination_area">
+                <ul className="pagination">
                   <li
-                    key={index}
                     className={`page-item ${
-                      currentPage === index + 1 ? "active" : ""
+                      currentPage === 1 ? "disabled" : ""
                     }`}
                   >
                     <button
                       className="page-link"
-                      onClick={() => setCurrentPage(index + 1)}
+                      onClick={() =>
+                        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+                      }
                     >
-                      {index + 1}
+                      Prev
                     </button>
                   </li>
-                ))}
-                <li
-                  className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prevPage) =>
-                        Math.min(prevPage + 1, totalPages)
-                      )
-                    }
+                  {Array.from({ length: totalPages }).map((_, index) => (
+                    <li
+                      key={index}
+                      className={`page-item ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(index + 1)}
+                      >
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
                   >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </div>
+                    <button
+                      className="page-link"
+                      onClick={() =>
+                        setCurrentPage((prevPage) =>
+                          Math.min(prevPage + 1, totalPages)
+                        )
+                      }
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
