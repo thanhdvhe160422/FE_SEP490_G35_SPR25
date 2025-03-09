@@ -94,13 +94,13 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    if (!campus) {
-      enqueueSnackbar("Please select campus", {
-        variant: "error",
-        autoHideDuration: 2500,
-      });
-      return;
-    }
+    // if (!campus) {
+    //   enqueueSnackbar("Please select campus", {
+    //     variant: "error",
+    //     autoHideDuration: 2500,
+    //   });
+    //   return;
+    // }
     if (window.google?.accounts) {
       window.google.accounts.id.prompt();
     } else {

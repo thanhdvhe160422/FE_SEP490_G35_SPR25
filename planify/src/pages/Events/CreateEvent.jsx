@@ -12,8 +12,11 @@ import {
 import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa";
 import Header from "../../components/Header/Header";
 import Swal from "sweetalert2";
+import { useSnackbar } from "notistack";
 
 export default function CreateEvent() {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [selectedImages, setSelectedImages] = useState([]);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMember, setNewMember] = useState("");
@@ -23,6 +26,14 @@ export default function CreateEvent() {
   const [suggestions, setSuggestions] = useState([]);
   const [isValidMember, setIsValidMember] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [fromDate, setFromDate] = useState("");
+  const [fromTime, setFromTime] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [toTime, setToTime] = useState("");
+  const [amountBudget, setAmountBudget] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [eventType, setEventType] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,16 +89,6 @@ export default function CreateEvent() {
     );
   };
 
-  const handleReplaceImage = (event, index) => {
-    const file = event.target.files[0];
-    if (file) {
-      const updatedImages = [...selectedImages];
-      updatedImages[index] = file;
-      setSelectedImages(updatedImages);
-    }
-  };
-
-  // Handle add group button click
   const handleAddGroup = () => {
     const newGroup = {
       name: `Group ${groups.length + 1}`,
@@ -98,19 +99,16 @@ export default function CreateEvent() {
     setGroups([...groups, newGroup]);
   };
 
-  // Handle delete group button click
   const handleDeleteGroup = (index) => {
     const updatedGroups = groups.filter((_, i) => i !== index);
     setGroups(updatedGroups);
   };
 
-  // Handle add member button click
   const handleAddMemberClick = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
     setShowAddMemberModal(true);
   };
 
-  // Handle adding new member
   const handleAddMember = () => {
     if (newMember.trim() !== "" && isValidMember) {
       const selectedUser = users.find(
@@ -128,20 +126,17 @@ export default function CreateEvent() {
         setGroups(updatedGroups);
         setNewMember("");
         setShowAddMemberModal(false);
-        setIsValidMember(false); // Reset trạng thái hợp lệ
+        setIsValidMember(false);
       }
     }
   };
 
-  // Handle input change for new member
   const handleNewMemberChange = (e) => {
     const value = e.target.value;
     setNewMember(value);
 
-    // Lấy danh sách thành viên đã được thêm vào Group hiện tại
     const currentGroupMembers = groups[selectedGroupIndex]?.members || [];
 
-    // Tìm kiếm đề xuất từ danh sách users, loại bỏ những tên đã được thêm vào Group
     if (value.trim() !== "") {
       const filteredSuggestions = users.filter(
         (user) =>
@@ -154,7 +149,6 @@ export default function CreateEvent() {
       );
       setSuggestions(filteredSuggestions);
 
-      // Kiểm tra xem tên nhập vào có tồn tại trong danh sách users và chưa được thêm vào Group không
       const isValid = users.some(
         (user) =>
           `${user.firstName} ${user.lastName}`.toLowerCase() ===
@@ -170,21 +164,18 @@ export default function CreateEvent() {
     }
   };
 
-  // Handle suggestion click
   const handleSuggestionClick = (user) => {
     setNewMember(`${user.firstName} ${user.lastName}`);
     setSuggestions([]);
-    setIsValidMember(true); // Đảm bảo nút "Add" được kích hoạt khi chọn đề xuất
+    setIsValidMember(true);
   };
 
-  // Handle delete member button click
   const handleDeleteMember = (groupIndex, memberIndex) => {
     const updatedGroups = [...groups];
-    updatedGroups[groupIndex].members.splice(memberIndex, 1); // Xóa thành viên khỏi Group
+    updatedGroups[groupIndex].members.splice(memberIndex, 1);
     setGroups(updatedGroups);
   };
 
-  // Handle save draft button click
   const handleSaveDraft = () => {
     Swal.fire({
       title: "Do you want to save the changes?",
@@ -198,8 +189,54 @@ export default function CreateEvent() {
     });
   };
 
-  // Handle create event button click
+  const validateFields = () => {
+    const today = new Date().toISOString().split("T")[0]; // Lấy ngày hiện tại
+
+    if (
+      !eventName ||
+      !fromDate ||
+      !fromTime ||
+      !toDate ||
+      !toTime ||
+      !eventType ||
+      !description ||
+      !amountBudget ||
+      selectedImages.length === 0
+    ) {
+      enqueueSnackbar("Please enter full information", { variant: "error" });
+      return false;
+    }
+
+    // Kiểm tra ngày quá khứ
+    if (fromDate < today) {
+      enqueueSnackbar("Start Date cannot be in the past", { variant: "error" });
+      return false;
+    }
+
+    if (toDate < today) {
+      enqueueSnackbar("End Date cannot be in the past", { variant: "error" });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleCreateEvent = () => {
+    if (!validateFields()) return;
+
+    const numericAmountBudget = getNumericValue(amountBudget);
+    const eventData = {
+      eventName,
+      from: `${fromDate}T${fromTime}`,
+      to: `${toDate}T${toTime}`,
+      eventType,
+      description,
+      amountBudget: numericAmountBudget,
+      images: selectedImages,
+    };
+
+    console.log(eventData);
+
     Swal.fire({
       title: "Do you want to create the event?",
       html: "<span style='color: red;'>This event will be sent to the Campus Manager</span>",
@@ -213,46 +250,103 @@ export default function CreateEvent() {
     });
   };
 
+  const formatCurrency = (value) => {
+    return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const getNumericValue = (value) => {
+    return value.replace(/,/g, "");
+  };
+
+  const handleAmountBudgetChange = (e) => {
+    const value = e.target.value;
+    const formattedValue = formatCurrency(value);
+    setAmountBudget(formattedValue);
+  };
+
   return (
     <>
       <Header />
-      <div style={{ maxWidth: "900px", padding: "20px" }}>
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "0 auto",
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <h2 className="text-center">Create Event</h2>
 
-        <Form>
+        <Form style={{ width: "100%" }}>
           <Form.Group controlId="eventName">
-            <Form.Label>Name Event</Form.Label>
-            <Form.Control type="text" placeholder="Enter event name" />
+            <Form.Label>
+              Name Event <span style={{ color: "red" }}>*</span>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter event name"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+            />
           </Form.Group>
 
-          <Row>
-            <Col md={6}>
-              <Form.Group controlId="eventDate">
-                <Form.Label>Date & Time</Form.Label>
-                <Form.Control type="date" />
+          <Row className="d-flex justify-content-between">
+            <Col md={5}>
+              <Form.Group controlId="startTime">
+                <Form.Label>
+                  Start Time <span style={{ color: "red" }}>*</span>
+                </Form.Label>
+                <div className="d-flex gap-3">
+                  <Form.Control
+                    style={{ width: "50%" }}
+                    type="time"
+                    value={fromTime}
+                    onChange={(e) => setFromTime(e.target.value)}
+                  />
+                  <Form.Control
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    min={new Date().toISOString().split("T")[0]} // Giới hạn ngày không được chọn quá khứ
+                  />
+                </div>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group>
-                <Row>
-                  <Col>
-                    <Form.Label>From</Form.Label>
-                    <Form.Control type="time" />
-                  </Col>
-                  <Col>
-                    <Form.Label>To</Form.Label>
-                    <Form.Control type="time" />
-                  </Col>
-                </Row>
+
+            <Col md={5}>
+              <Form.Group controlId="endTime">
+                <Form.Label>
+                  End Time <span style={{ color: "red" }}>*</span>
+                </Form.Label>
+                <div className="d-flex gap-3">
+                  <Form.Control
+                    style={{ width: "50%" }}
+                    type="time"
+                    value={toTime}
+                    onChange={(e) => setToTime(e.target.value)}
+                  />
+                  <Form.Control
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    min={new Date().toISOString().split("T")[0]} // Giới hạn ngày không được chọn quá khứ
+                  />
+                </div>
               </Form.Group>
             </Col>
           </Row>
 
           <Form.Group controlId="eventType">
-            <Form.Label>Event Type</Form.Label>
-            <Form.Select>
-              <option>Choose event type</option>
-              {/* Hiển thị danh sách categories */}
+            <Form.Label>
+              Event Type <span style={{ color: "red" }}>*</span>
+            </Form.Label>
+            <Form.Select
+              value={eventType}
+              onChange={(e) => setEventType(e.target.value)}
+            >
+              <option value="">Choose event type</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.name}>
                   {category.name}
@@ -262,12 +356,31 @@ export default function CreateEvent() {
           </Form.Group>
 
           <Form.Group controlId="eventDescription">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>
+              Description <span style={{ color: "red" }}>*</span>
+            </Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               placeholder="Enter description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
+          </Form.Group>
+
+          <Form.Group controlId="amountBudget" className="mt-3">
+            <Form.Label>
+              Amount Budget <span style={{ color: "green" }}>(VNĐ)</span>{" "}
+              <span style={{ color: "red" }}>*</span>
+            </Form.Label>
+            <div className="d-flex align-items-center">
+              <Form.Control
+                type="text"
+                value={amountBudget}
+                onChange={handleAmountBudgetChange}
+                placeholder="Enter amount"
+              />
+            </div>
           </Form.Group>
 
           <Card className="mt-3">
@@ -308,7 +421,6 @@ export default function CreateEvent() {
                             {group.name}
                           </span>
                         )}
-                        {/* Nút X để xóa Group */}
                         <Button
                           variant="danger"
                           size="sm"
@@ -341,7 +453,7 @@ export default function CreateEvent() {
                                     whiteSpace: "nowrap",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    maxWidth: "150px", // Giới hạn độ rộng của email
+                                    maxWidth: "150px",
                                   }}
                                 >
                                   {member.email}
@@ -366,7 +478,6 @@ export default function CreateEvent() {
                                     <FaRegStar />
                                   )}
                                 </span>
-                                {/* Nút - để xóa member */}
                                 <Button
                                   variant="danger"
                                   size="sm"
@@ -390,7 +501,9 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
-            <Form.Label>Image</Form.Label>
+            <Form.Label>
+              Image <span style={{ color: "red" }}>*</span>
+            </Form.Label>
             <Row>
               <Col xs={3}>
                 <label
@@ -447,7 +560,6 @@ export default function CreateEvent() {
           </div>
         </Form>
 
-        {/* Add Member Modal */}
         <Modal
           show={showAddMemberModal}
           onHide={() => setShowAddMemberModal(false)}
@@ -462,7 +574,6 @@ export default function CreateEvent() {
               value={newMember}
               onChange={handleNewMemberChange}
             />
-            {/* Hiển thị đề xuất */}
             {suggestions.length > 0 && (
               <ListGroup className="mt-2">
                 {suggestions.map((user, index) => (
