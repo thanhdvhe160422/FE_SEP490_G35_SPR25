@@ -153,9 +153,10 @@ export default function Header() {
           )}
         </div>
 
-        <div className="profile" onClick={() => setShowDropdown(!showDropdown)} ref={dropdownRef}>
-          <img src={picture} alt="User Avatar" className="avatar" />
+        <div  className="profile" onClick={() => setShowDropdown(!showDropdown)} ref={dropdownRef}>
           <span className="username">{fullname}</span>
+          <img style={{width:'20%', height:'20%'}} src={picture} alt="User Avatar" className="avatar" />
+
 
           {showDropdown && (
             <div className="dropdown-menu">
