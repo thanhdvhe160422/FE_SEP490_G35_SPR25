@@ -269,6 +269,7 @@ export default function CreateEvent() {
       <Header />
       <div
         style={{
+          paddingTop: "100px",
           maxWidth: "900px",
           margin: "0 auto",
           padding: "20px",

@@ -13,21 +13,18 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
 
-  const [fullname, setfullname] = useState("");
-  const [picture, setpicture] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [picture, setPicture] = useState("");
 
-  const storedRole = localStorage.getItem("role");
-  if (!storedRole) {
-    console.warn("User role không có trong localStorage, vui lòng kiểm tra!");
-  }
-  const userRole = storedRole || "";
+  // Lấy role từ localStorage, chuẩn hóa về chữ thường
+  const userRole = localStorage.getItem("role")?.toLowerCase() || "";
   console.log("User Role từ localStorage header:", userRole);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    setfullname(localStorage.getItem("fullName"));
-    setpicture(localStorage.getItem("avatar"));
-    console.log(picture);
+    setFullname(localStorage.getItem("fullName"));
+    setPicture(localStorage.getItem("avatar"));
+
     if (!userId) return;
 
     axios
@@ -87,18 +84,19 @@ export default function Header() {
     navigate("/login");
   };
 
+  // Map role với danh sách menu
   const navItemsByRole = {
-    manager: [
+    "campus manager": [
       { label: "Home", path: "/home" },
       { label: "Create Event Organizer", path: "/create-event-organizer" },
       { label: "Create Event", path: "/create-event" },
     ],
-    eventOrganizer: [
+    "event organizer": [
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/create-event" },
       { label: "History", path: "/history" },
     ],
-    Implementer: [
+    implementer: [
       { label: "Home", path: "/home" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
       { label: "History", path: "/history" },
@@ -107,12 +105,6 @@ export default function Header() {
   };
 
   const navItems = navItemsByRole[userRole] || [];
-
-  // localStorage.setItem("fullName", res.data.result.fullName);
-  //     localStorage.setItem('avatar', decoded.picture);
-  //     localStorage.setItem("token", res.data.result.token);
-  //     localStorage.setItem("role", res.data.result.role);
-  //     localStorage.setItem("campus", campus);
 
   return (
     <header className="header">
