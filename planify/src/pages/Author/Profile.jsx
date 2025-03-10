@@ -11,25 +11,35 @@ const Profile = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-
+  const [address, setAddress] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-
+  const [image, setimage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const thanh = localStorage.getItem('userId');
-
-        const userRes = await fetch("https://localhost:44320/api/Profiles/"+thanh);
+        const thanh = localStorage.getItem("userId");
+        setimage(localStorage.getItem("avatar"));
+        const userRes = await fetch(
+          "https://localhost:44320/api/Profiles/" + thanh
+        );
         const userData = await userRes.json();
 
         setUser(userData);
-        setSelectedProvince(userData.provinceId || "");
-        setSelectedDistrict(userData.districtId || "");
-        setSelectedWard(userData.wardId || "");
+        console.log(userData);
+        setAddress(userData.addressVM.addressDetail||'');
+        setProvinces(userData.addressVM.wardVM.districtVM.provinceVM.provinceName || "");
+        setDistricts(userData.addressVM.wardVM.districtVM.districtName || "");
+        setWards(userData.addressVM.wardVM.wardName || "");
+
+        console.log("Address:", userData.addressVM.addressDetail || '');
+console.log("Province:", userData.addressVM.wardVM.districtVM.provinceVM.provinceName || '');
+console.log("District:", userData.addressVM.wardVM.districtVM.districtName || '');
+console.log("Ward:", userData.addressVM.wardVM.wardName || '');
+
 
         setLoading(false);
       } catch (error) {
@@ -40,7 +50,7 @@ const Profile = () => {
 
     const fetchProvinces = async () => {
       try {
-        const res = await fetch("https://esgoo.net/api-tinhthanh/1/0.htm");
+        const res = await fetch("https://localhost:44320/api/Address/Provinces");
         const data = await res.json();
         setProvinces(data.data || []);
       } catch (error) {
@@ -63,8 +73,8 @@ const Profile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]); 
-        setSelectedDistrict(""); 
+        setWards([]);
+        setSelectedDistrict("");
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -84,7 +94,7 @@ const Profile = () => {
         );
         const data = await res.json();
         setWards(data.data || []);
-        setSelectedWard(""); 
+        setSelectedWard("");
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -103,7 +113,7 @@ const Profile = () => {
         wardId: selectedWard,
       };
 
-      await fetch("http://localhost:4000/users/2", {
+      await fetch("http://localhost:4000/users/1", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
@@ -119,10 +129,15 @@ const Profile = () => {
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>No user data found</p>;
 
+  // ✅ Sửa lại format Date of Birth thành dd/mm/yyyy
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`; 
+    const date = new Date(dateStr);
+    if (isNaN(date)) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getProvinceName = (provinceId) => {
@@ -142,24 +157,25 @@ const Profile = () => {
 
   const fullAddress = () => {
     const addressParts = [
-      user.address || "",
-      getWardName(selectedWard),
-      getDistrictName(selectedDistrict),
-      getProvinceName(selectedProvince),
+      address, 
+      wards, 
+      districts,
+      provinces
     ].filter(Boolean);
 
     if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
-      return getProvinceName(selectedProvince); 
+      return getProvinceName(selectedProvince);
     }
 
     return addressParts.join(", ");
   };
+
   return (
     <>
       <Header />
-      <div className="profile-container">
+      <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={user.avatar} alt="Avatar" className="profile-avatar" />
+          <img src={image} alt="Avatar" className="profile-avatar" />
           <h2>
             {user.firstName} {user.lastName}
           </h2>
@@ -190,7 +206,7 @@ const Profile = () => {
               </tr>
               <tr>
                 <td>Date of Birth</td>
-                <td>{user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}</td>
+                <td>{formatDate(user.dateOfBirth)}</td>
               </tr>
               <tr>
                 <td>Gender</td>

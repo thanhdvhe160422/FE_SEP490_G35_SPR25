@@ -126,7 +126,6 @@ const UpdateProfile = () => {
         wardId: selectedWard,
       };
 
-      // Gọi API để cập nhật thông tin người dùng
       await fetch("http://localhost:4000/users/2", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -170,7 +169,7 @@ const UpdateProfile = () => {
   return (
     <>
       <Header />
-      <div className="profile-container">
+      <div style={{paddingTop:'100px'}} className="profile-container">
         <div className="profile-card">
           <img src={user.avatar} alt="Avatar" className="profile-avatar" />
           <div className="file-input-container">
