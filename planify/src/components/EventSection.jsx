@@ -20,30 +20,32 @@ function EventSection() {
   const [eventFilter, setEventFilter] = useState("list");
   const navigate = useNavigate();
 
-  localStorage.setItem("userRole", "implementer");
-  const userRole = localStorage.getItem("userRole");
+  const userRole = localStorage.getItem("role");
+  console.log("User Role từ localStorage:", userRole);
   const currentUserId = localStorage.getItem("userId");
 
   useEffect(() => {
+    console.log("Fetching events...");
     const fetchData = async () => {
-      const data = await getPosts();
+      const data = await getPosts(currentPage, EVENTS_PER_PAGE);
+      console.log("Fetched events:", data);
       const sortedEvents = data.sort((a, b) =>
         a.status === "running" ? -1 : 1
       );
       setEvents(sortedEvents);
     };
 
-    const fetchCategories = async () => {
-      const categoryData = await getCategories();
-      setCategories(categoryData);
-    };
+    // const fetchCategories = async () => {
+    //   const categoryData = await getCategories();
+    //   setCategories(categoryData);
+    // };
 
     fetchData();
-    fetchCategories();
-  }, []);
+    // fetchCategories();
+  }, [currentPage]);
 
   const filteredEvents = (events || []).filter((event) => {
-    if (!event) return false; // Kiểm tra nếu event là undefined/null
+    if (!event) return false;
 
     const isMyEvent =
       event.organizerId === currentUserId ||
@@ -53,12 +55,13 @@ function EventSection() {
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
       (!selectedCategory || event.category === selectedCategory) &&
       (!searchTerm ||
-        event.title?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedStatus || event.status === selectedStatus) &&
-      (!selectedStart || new Date(event.start) >= new Date(selectedStart)) &&
-      (!selectedEnd || new Date(event.end) <= new Date(selectedEnd)) &&
+        event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!selectedStatus || event.status === Number(selectedStatus)) &&
+      (!selectedStart ||
+        new Date(event.startTime) >= new Date(selectedStart)) &&
+      (!selectedEnd || new Date(event.endTime) <= new Date(selectedEnd)) &&
       (!selectedLocation ||
-        event.location?.toLowerCase().includes(selectedLocation.toLowerCase()))
+        event.placed?.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
 
@@ -102,13 +105,12 @@ function EventSection() {
               <label>Status</label>
               <select
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
+                onChange={(e) => setSelectedStatus(Number(e.target.value))}
               >
                 <option value="">All</option>
-                <option value="running">Running</option>
-                <option value="not started yet">Not Started Yet</option>
+                <option value={1}>Running</option>
+                <option value={2}>Not Started Yet</option>
               </select>
-
               <label>Start Time</label>
               <input
                 type="date"
@@ -147,8 +149,8 @@ function EventSection() {
                       >
                         List Event
                       </button>
-                      {(userRole === "event organizer" ||
-                        userRole === "implementer") && (
+                      {(userRole?.toLowerCase() === "event organizer" ||
+                        userRole?.toLowerCase() === "implementer") && (
                         <button
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
@@ -203,11 +205,11 @@ function EventSection() {
                         style={{ cursor: "pointer" }}
                       />
                       <div className="belarus_content">
-                        <h6>{event.location}</h6>
+                        <h6>{event.placed}</h6>
                         <p className="event_time">
-                          <strong>From:</strong> {event.start}
+                          <strong>From:</strong> {event.startTime}
                           <br />
-                          <strong>To:</strong> {event.end}
+                          <strong>To:</strong> {event.endTime}
                         </p>
                         <div
                           className="heding wow fadeInUp"
@@ -216,18 +218,16 @@ function EventSection() {
                           }
                           style={{ cursor: "pointer" }}
                         >
-                          {event.title}
+                          {event.eventTitle}
                         </div>
                         <div
                           className={`status_tag ${
-                            event.status === "running"
+                            event.status === 1
                               ? "running_status"
                               : "not_started_status"
                           }`}
                         >
-                          {event.status === "running"
-                            ? "Running"
-                            : "Not started yet"}
+                          {event.status === 1 ? "Running" : "Not started yet"}
                         </div>
                         {(userRole === "manager" ||
                           userRole === "event organizer") && (
@@ -236,14 +236,14 @@ function EventSection() {
                               className="progress_bar"
                               style={{
                                 width: `${getProgress(
-                                  event.start,
-                                  event.end
+                                  event.startTime,
+                                  event.endTime
                                 )}%`,
                               }}
                             >
                               <span className="progress_text">
                                 {Math.round(
-                                  getProgress(event.start, event.end)
+                                  getProgress(event.startTime, event.endTime)
                                 )}
                                 %
                               </span>

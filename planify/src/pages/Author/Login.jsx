@@ -40,14 +40,6 @@ export default function Login() {
         { CampusName: campus, GoogleToken: credential }
       );
 
-      localStorage.setItem("fullName", res.data.result.fullName);
-      localStorage.setItem('avatar', decoded.picture);
-
-      localStorage.setItem("token", res.data.result.token);
-      localStorage.setItem("role", res.data.result.role);
-      localStorage.setItem("campus", campus);
-      localStorage.setItem("userId", res.data.result.userId);
-
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.result.token}`;
@@ -62,21 +54,27 @@ export default function Login() {
           navigate(`/admin?campus=${campus}`);
           break;
         case "Campus Manager":
-          navigate(`/managercampus?campus=${campus}`);
+          navigate(`/home`);
           break;
         case "Event Organizer":
           navigate(`/home`);
           break;
         case "Implementer":
-          navigate(`/implementer?campus=${campus}`);
+          navigate(`/home`);
           break;
         case "Spectator":
-          navigate(`/spectator?campus=${campus}`);
+          navigate(`/home`);
           break;
         default:
           navigate("/login");
           break;
       }
+      localStorage.setItem("fullName", res.data.result.fullName);
+      localStorage.setItem("avatar", decoded.picture);
+      localStorage.setItem("token", res.data.result.token);
+      localStorage.setItem("role", res.data.result.role);
+      localStorage.setItem("campus", campus);
+      localStorage.setItem("userId", res.data.result.userId);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       enqueueSnackbar("Đăng nhập thất bại!", { variant: "error" });
@@ -117,7 +115,7 @@ export default function Login() {
           </select>
         )}
 
-        <GoogleLogin onSuccess={handleSuccess} onError={handleError}/>
+        <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
       </div>
     </div>
   );
