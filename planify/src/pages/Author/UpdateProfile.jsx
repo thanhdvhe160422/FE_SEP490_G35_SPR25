@@ -16,7 +16,7 @@ const UpdateProfile = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-
+  const [image, setimage] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -24,9 +24,12 @@ const UpdateProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const thanh = localStorage.getItem('userId');
+        const thanh = localStorage.getItem("userId");
+        setimage(localStorage.getItem("avatar"));
 
-        const userRes = await fetch("https://localhost:44320/api/Profiles/"+thanh);
+        const userRes = await fetch(
+          "https://localhost:44320/api/Profiles/" + thanh
+        );
         const userData = await userRes.json();
 
         setUser(userData);
@@ -98,8 +101,6 @@ const UpdateProfile = () => {
     fetchWards();
   }, [selectedDistrict]);
 
-
-
   const hasChanges = () => {
     if (!initialUser || !user) return false;
 
@@ -163,15 +164,15 @@ const UpdateProfile = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`; 
+    return `${year}-${month}-${day}`;
   };
 
   return (
     <>
       <Header />
-      <div style={{paddingTop:'100px'}} className="profile-container">
+      <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={user.avatar} alt="Avatar" className="profile-avatar" />
+          <img src={image} alt="Avatar" className="profile-avatar" />
           <div className="file-input-container">
             <button
               type="button"
@@ -243,7 +244,7 @@ const UpdateProfile = () => {
               <div className="input-field">
                 <label>Gender</label>
                 <div className="gender-radio">
-                  <label style={{marginRight:'10%'}}>
+                  <label style={{ marginRight: "10%" }}>
                     <input
                       type="radio"
                       name="gender"
@@ -269,8 +270,6 @@ const UpdateProfile = () => {
                   </label>
                 </div>
               </div>
-
-            
             </div>
 
             <div className="address-group">
@@ -320,16 +319,14 @@ const UpdateProfile = () => {
               </div>
             </div>
             <div className="input-field">
-                <label>Address</label>
-                <input
-                  className="input-profile"
-                  type="text"
-                  value={user.address || ""}
-                  onChange={(e) =>
-                    setUser({ ...user, address: e.target.value })
-                  }
-                />
-              </div>
+              <label>Address</label>
+              <input
+                className="input-profile"
+                type="text"
+                value={user.address || ""}
+                onChange={(e) => setUser({ ...user, address: e.target.value })}
+              />
+            </div>
 
             <div className="input-field">
               <label>Phone Number</label>
@@ -348,10 +345,7 @@ const UpdateProfile = () => {
             <button className="btn btn-danger" onClick={handleCancel}>
               Cancel
             </button>
-            <button
-              className="btn btn-success"
-              onClick={handleUpdate}
-            >
+            <button className="btn btn-success" onClick={handleUpdate}>
               Save
             </button>
           </div>
