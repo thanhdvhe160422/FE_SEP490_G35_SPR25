@@ -4,16 +4,18 @@ import "../../styles/Events/EventDetailSpec.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { getEventById } from "../../services/EventService";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 function EventDetailSpec() {
-  const { id } = useParams();
+  const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
-        const data = await getEventById(id);
+        const data = await getEventById(eventId);
         console.log(data);
         if (data) {
           setEvent(data);
@@ -24,7 +26,7 @@ function EventDetailSpec() {
     };
 
     fetchEventDetail();
-  }, [id]);
+  }, [eventId]);
 
   if (!event) return <p>Loading event details...</p>;
 
@@ -41,24 +43,36 @@ function EventDetailSpec() {
           <div className="event-info">
             <div className="event-time">
               <p>
-                <strong>From:</strong> {event.startTime}
+                <strong>From:</strong>{" "}
+                {format(
+                  new Date(event.startTime),
+                  "EEEE, dd/MM/yyyy HH:mm:ss",
+                  { locale: vi }
+                )}
               </p>
+              {/*  */}
               <p>
-                <strong>To:</strong> {event.endTime}
+                <strong>To:</strong>{" "}
+                {event?.endTime
+                  ? format(
+                      new Date(event.endTime),
+                      "EEEE, dd/MM/yyyy HH:mm:ss",
+                      { locale: vi }
+                    )
+                  : "Chưa có thời gian kết thúc"}
               </p>
               <div
                 className={`status_tag ${
-                  event.Status === "Running"
-                    ? "running_status"
-                    : "not_started_status"
+                  event.status === 1 ? "running_status" : "not_started_status"
                 }`}
               >
-                {event.Status}
+                {event.status === 1 ? "Running" : "Not Started"}
               </div>
             </div>
             <div className="event-location">
               <p>
-                <strong>Category:</strong> {event.categoryViewModel?.categoryEventName}
+                <strong>Category:</strong>{" "}
+                {event.categoryViewModel?.categoryEventName}
               </p>
               <p>
                 <strong>Location:</strong> {event.placed}
@@ -72,7 +86,7 @@ function EventDetailSpec() {
             <div className="event-slider">
               <div className="image-container">
                 <img
-                  src={images[activeIndex]}
+                  src={event.eventMedias.mediaDTO.mediaUrl}
                   alt="Event"
                   className="event-image"
                 />

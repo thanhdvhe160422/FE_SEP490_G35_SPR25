@@ -13,19 +13,20 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
 
-
   const [fullname, setfullname] = useState("");
   const [picture, setpicture] = useState("");
 
-  if (!localStorage.getItem("userRole")) {
-    localStorage.setItem("userRole", "manager");
+  const storedRole = localStorage.getItem("role");
+  if (!storedRole) {
+    console.warn("User role không có trong localStorage, vui lòng kiểm tra!");
   }
-  const userRole = localStorage.getItem("userRole");
+  const userRole = storedRole || "";
+  console.log("User Role từ localStorage header:", userRole);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    setfullname(localStorage.getItem('fullName'));
-    setpicture(localStorage.getItem('avatar'));
+    setfullname(localStorage.getItem("fullName"));
+    setpicture(localStorage.getItem("avatar"));
     console.log(picture);
     if (!userId) return;
 
@@ -66,7 +67,9 @@ export default function Header() {
     const unreadNotifications = notifications.filter((n) => !n.read);
     if (unreadNotifications.length > 0) {
       setNotifications(
-        notifications.map((notif) => (notif.read ? notif : { ...notif, read: true }))
+        notifications.map((notif) =>
+          notif.read ? notif : { ...notif, read: true }
+        )
       );
 
       await Promise.all(
@@ -80,8 +83,7 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userRole");
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -96,7 +98,7 @@ export default function Header() {
       { label: "Create Event", path: "/create-event" },
       { label: "History", path: "/history" },
     ],
-    implementer: [
+    Implementer: [
       { label: "Home", path: "/home" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
       { label: "History", path: "/history" },
@@ -120,7 +122,11 @@ export default function Header() {
 
       <nav className="navbar">
         {navItems.map((item, index) => (
-          <span key={index} onClick={() => navigate(item.path)} className="nav-item">
+          <span
+            key={index}
+            onClick={() => navigate(item.path)}
+            className="nav-item"
+          >
             {item.label}
           </span>
         ))}
@@ -144,7 +150,12 @@ export default function Header() {
                 <p>Không có thông báo</p>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} className={`notification-item ${notif.read ? "" : "unread"}`}>
+                  <div
+                    key={notif.id}
+                    className={`notification-item ${
+                      notif.read ? "" : "unread"
+                    }`}
+                  >
                     {notif.message}
                   </div>
                 ))
@@ -153,13 +164,20 @@ export default function Header() {
           )}
         </div>
 
-        <div className="profile" onClick={() => setShowDropdown(!showDropdown)} ref={dropdownRef}>
+        <div
+          className="profile"
+          onClick={() => setShowDropdown(!showDropdown)}
+          ref={dropdownRef}
+        >
           <img src={picture} alt="User Avatar" className="avatar" />
           <span className="username">{fullname}</span>
 
           {showDropdown && (
             <div className="dropdown-menu">
-              <div className="dropdown-item" onClick={() => navigate("/profile")}>
+              <div
+                className="dropdown-item"
+                onClick={() => navigate("/profile")}
+              >
                 Profile
               </div>
               <div className="dropdown-item-logout" onClick={handleLogout}>
