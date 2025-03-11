@@ -7,7 +7,6 @@ const EventDetailEOG = () => {
   const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
 
-  // Gọi API để lấy dữ liệu sự kiện
   useEffect(() => {
     fetch("http://localhost:4000/events/2")
       .then((response) => {

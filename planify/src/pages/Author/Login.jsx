@@ -39,16 +39,16 @@ export default function Login() {
         "https://localhost:44320/api/Auth/google-login",
         { CampusName: campus, GoogleToken: credential }
       );
+      console.log("API Response:", res.data);
 
       axios.defaults.headers.common[
         "Authorization"
-      ] = `Bearer ${res.data.result.token}`;
+      ] = `Bearer ${res.data.result.accessToken}`;
 
       enqueueSnackbar("Login successfully!", {
         variant: "success",
         autoHideDuration: 2500,
       });
-
       switch (res.data.result.role) {
         case "Admin":
           navigate(`/admin?campus=${campus}`);
@@ -71,10 +71,11 @@ export default function Login() {
       }
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem("avatar", decoded.picture);
-      localStorage.setItem("token", res.data.result.token);
+      localStorage.setItem("token", res.data.result.accessToken);
       localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
       localStorage.setItem("userId", res.data.result.userId);
+      sessionStorage.setItem("reToken", res.data.result.refreshToken);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       enqueueSnackbar("Đăng nhập thất bại!", { variant: "error" });
