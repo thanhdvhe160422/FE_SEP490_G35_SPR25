@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
 import {
   Form,
   Row,
@@ -13,6 +15,7 @@ import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa";
 import Header from "../../components/Header/Header";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
+import refreshAccessToken from "../../services/refreshToken";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -34,19 +37,20 @@ export default function CreateEvent() {
   const [eventName, setEventName] = useState("");
   const [eventType, setEventType] = useState("");
   const [description, setDescription] = useState("");
+  const [placed, setPlaced] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersResponse = await axios.get("http://localhost:4000/users");
+        const usersResponse = await axios.get("");
         setUsers(usersResponse.data);
 
-        const categoriesResponse = await axios.get(
-          "http://localhost:4000/categories"
-        );
+        const categoriesResponse = await axios.get("/categories");
         setCategories(categoriesResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        enqueueSnackbar("Lỗi tải dữ liệu", { variant: "error" });
       }
     };
 
@@ -88,7 +92,14 @@ export default function CreateEvent() {
       )
     );
   };
-
+  const toISOLocal = (dateStr, timeStr) => {
+    const [year, month, day] = dateStr.split("-");
+    const [hours, minutes] = timeStr.split(":");
+    const date = new Date(year, month - 1, day, hours, minutes);
+    return new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    ).toISOString();
+  };
   const handleAddGroup = () => {
     const newGroup = {
       name: `Group ${groups.length + 1}`,
@@ -120,6 +131,7 @@ export default function CreateEvent() {
       if (selectedUser) {
         const updatedGroups = [...groups];
         updatedGroups[selectedGroupIndex].members.push({
+          id: selectedUser.id,
           name: `${selectedUser.firstName} ${selectedUser.lastName}`,
           email: selectedUser.email,
         });
@@ -175,7 +187,25 @@ export default function CreateEvent() {
     updatedGroups[groupIndex].members.splice(memberIndex, 1);
     setGroups(updatedGroups);
   };
+  // const uploadImages = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     selectedImages.forEach((file) => {
+  //       formData.append("files", file);
+  //     });
 
+  //     const response = await api.post("/upload", formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     });
+
+  //     return response.data.urls; // Giả sử API trả về array URLs
+  //   } catch (error) {
+  //     console.error("Lỗi upload ảnh:", error);
+  //     throw new Error("Không thể upload ảnh");
+  //   }
+  // };
   const handleSaveDraft = () => {
     Swal.fire({
       title: "Do you want to save the changes?",
@@ -190,64 +220,98 @@ export default function CreateEvent() {
   };
 
   const validateFields = () => {
-    const today = new Date().toISOString().split("T")[0]; // Lấy ngày hiện tại
+    const errors = [];
 
-    if (
-      !eventName ||
-      !fromDate ||
-      !fromTime ||
-      !toDate ||
-      !toTime ||
-      !eventType ||
-      !description ||
-      !amountBudget ||
-      selectedImages.length === 0
-    ) {
-      enqueueSnackbar("Please enter full information", { variant: "error" });
+    if (!eventName) errors.push("Tên sự kiện");
+    if (!fromDate || !fromTime) errors.push("Thời gian bắt đầu");
+    if (!toDate || !toTime) errors.push("Thời gian kết thúc");
+    // if (!eventType) errors.push("Loại sự kiện");
+    if (!description) errors.push("Mô tả");
+    if (!amountBudget) errors.push("Ngân sách");
+    if (!placed) errors.push("Địa điểm");
+    // if (selectedImages.length === 0) errors.push("Ảnh");
+
+    if (errors.length > 0) {
+      enqueueSnackbar(`Thiếu thông tin: ${errors.join(", ")}`, {
+        variant: "error",
+      });
       return false;
     }
 
-    // Kiểm tra ngày quá khứ
-    if (fromDate < today) {
-      enqueueSnackbar("Start Date cannot be in the past", { variant: "error" });
-      return false;
-    }
-
-    if (toDate < today) {
-      enqueueSnackbar("End Date cannot be in the past", { variant: "error" });
+    // Kiểm tra ngày
+    const start = new Date(`${fromDate}T${fromTime}`);
+    const end = new Date(`${toDate}T${toTime}`);
+    if (start >= end) {
+      enqueueSnackbar("Thời gian kết thúc phải sau thời gian bắt đầu", {
+        variant: "error",
+      });
       return false;
     }
 
     return true;
   };
-
-  const handleCreateEvent = () => {
+  const handleCreateEvent = async () => {
     if (!validateFields()) return;
-
-    const numericAmountBudget = getNumericValue(amountBudget);
+    setIsLoading(true);
+    const userId = localStorage.getItem("userId");
     const eventData = {
-      eventName,
-      from: `${fromDate}T${fromTime}`,
-      to: `${toDate}T${toTime}`,
-      eventType,
-      description,
-      amountBudget: numericAmountBudget,
-      images: selectedImages,
+      eventTitle: eventName,
+      eventDescription: description,
+      startTime: toISOLocal(fromDate, fromTime),
+      endTime: toISOLocal(toDate, toTime),
+      amountBudget: parseInt(getNumericValue(amountBudget), 10),
+      categoryEventId: parseInt(eventType),
+      placed: placed,
+      createBy: userId,
+      groups: groups.map((group) => ({
+        groupName: group.name,
+        createBy: userId,
+        eventId: 0,
+        implementerIds: group.members.map((member) => member.id),
+      })),
     };
-
-    console.log(eventData);
-
-    Swal.fire({
-      title: "Do you want to create the event?",
-      html: "<span style='color: red;'>This event will be sent to the Campus Manager</span>",
-      showCancelButton: true,
-      confirmButtonText: "Create",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Request sent successfully", "", "success");
+    try {
+      if (!userId) {
+        enqueueSnackbar("Phiên đăng nhập hết hạn", { variant: "error" });
+        return;
       }
-    });
+
+      const response = await axios.post(
+        "https://localhost:44320/api/Events/create",
+        eventData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        Swal.fire("Thành công!", "Sự kiện đã được tạo", "success");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Access token hết hạn, thử refresh token
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+          const retryResponse = await axios.post(
+            "https://localhost:44320/api/Events/create",
+            eventData,
+            {
+              headers: {
+                Authorization: `Bearer ${newAccessToken}`,
+              },
+            }
+          );
+        } else {
+          enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
+            variant: "error",
+          });
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatCurrency = (value) => {
@@ -310,7 +374,7 @@ export default function CreateEvent() {
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]} // Giới hạn ngày không được chọn quá khứ
+                    min={new Date().toISOString().split("T")[0]}
                   />
                 </div>
               </Form.Group>
@@ -332,7 +396,7 @@ export default function CreateEvent() {
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]} // Giới hạn ngày không được chọn quá khứ
+                    min={fromDate}
                   />
                 </div>
               </Form.Group>
@@ -346,10 +410,11 @@ export default function CreateEvent() {
             <Form.Select
               value={eventType}
               onChange={(e) => setEventType(e.target.value)}
+              required
             >
-              <option value="">Choose event type</option>
+              <option value="">Chọn loại sự kiện</option>
               {categories.map((category) => (
-                <option key={category.id} value={category.name}>
+                <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}
@@ -366,6 +431,17 @@ export default function CreateEvent() {
               placeholder="Enter description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group controlId="eventLocation" className="mt-3">
+            <Form.Label>
+              Location <span style={{ color: "red" }}>*</span>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter event location"
+              value={placed}
+              onChange={(e) => setPlaced(e.target.value)}
             />
           </Form.Group>
 
@@ -555,8 +631,12 @@ export default function CreateEvent() {
             <Button variant="primary" onClick={handleSaveDraft}>
               Save Draft
             </Button>
-            <Button variant="success" onClick={handleCreateEvent}>
-              Create Event
+            <Button
+              variant="success"
+              onClick={handleCreateEvent}
+              disabled={isLoading}
+            >
+              {isLoading ? "Đang xử lý..." : "Tạo sự kiện"}
             </Button>
           </div>
         </Form>

@@ -1,21 +1,8 @@
-// src/services/taskService.jsx
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/tasks";
-
+export const createTaskAPI = async (taskData) => {
+  return await axios.post("https://localhost:44320/api/Tasks/create", taskData);
+};
 export const getGroupTasks = async (groupId) => {
-  try {
-    console.log("Fetching tasks from:", API_URL);
-
-    const response = await axios.get(API_URL);
-
-    console.log("Tasks fetched:", response.data);
-
-    return response.data.filter(
-      (task) => Number(task.groupId) === Number(groupId)
-    );
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    return [];
-  }
+  return await axios.get(`https://your-api-url.com/groups/${groupId}/tasks`);
 };
