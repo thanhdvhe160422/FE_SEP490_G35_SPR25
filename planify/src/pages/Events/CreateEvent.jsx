@@ -331,11 +331,10 @@ export default function CreateEvent() {
   return (
     <>
       <Header />
-      <div
+      <div className="container"
         style={{
-          paddingTop: "100px",
           maxWidth: "900px",
-          margin: "0 auto",
+          margin: "90px auto 0", 
           padding: "20px",
           display: "flex",
           flexDirection: "column",
