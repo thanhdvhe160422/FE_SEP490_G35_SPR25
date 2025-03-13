@@ -108,7 +108,7 @@ const Profile = () => {
               </tr>
               <tr>
                 <td>Gender</td>
-                <td>{user.gender}</td>
+                <td>{user.gender ? "Male" : "Female"}</td>
               </tr>
 
               <tr>
