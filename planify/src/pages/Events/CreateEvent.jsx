@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
 import {
   Form,
@@ -15,7 +14,6 @@ import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa";
 import Header from "../../components/Header/Header";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
-import refreshAccessToken from "../../services/refreshToken";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -43,10 +41,9 @@ export default function CreateEvent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersResponse = await axios.get("");
-        setUsers(usersResponse.data);
-
-        const categoriesResponse = await axios.get("/categories");
+        const categoriesResponse = await axios.get(
+          "https://localhost:44320/api/Categories/1"
+        );
         setCategories(categoriesResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -253,14 +250,29 @@ export default function CreateEvent() {
   const handleCreateEvent = async () => {
     if (!validateFields()) return;
     setIsLoading(true);
-    const userId = localStorage.getItem("userId");
+
+    const userId = localStorage.getItem("userId"); // Lấy userId từ localStorage
+    const token = localStorage.getItem("token");
+
+    if (!userId || !token) {
+      enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
+        variant: "error",
+      });
+      return;
+    }
+
+    // Xử lý danh sách ảnh (nếu có)
+    const eventMediaUrls = selectedImages.map((file) =>
+      URL.createObjectURL(file)
+    );
+
     const eventData = {
       eventTitle: eventName,
       eventDescription: description,
       startTime: toISOLocal(fromDate, fromTime),
       endTime: toISOLocal(toDate, toTime),
-      amountBudget: parseInt(getNumericValue(amountBudget), 10),
-      categoryEventId: parseInt(eventType),
+      amountBudget: parseInt(getNumericValue(amountBudget), 10) || 0, // Đảm bảo số hợp lệ
+      categoryEventId: parseInt(eventType) || 0, // Tránh lỗi NaN
       placed: placed,
       createBy: userId,
       groups: groups.map((group) => ({
@@ -269,19 +281,19 @@ export default function CreateEvent() {
         eventId: 0,
         implementerIds: group.members.map((member) => member.id),
       })),
+      eventMediaUrls, // Thêm danh sách ảnh
     };
-    try {
-      if (!userId) {
-        enqueueSnackbar("Phiên đăng nhập hết hạn", { variant: "error" });
-        return;
-      }
 
+    console.log("Dữ liệu gửi lên API:", eventData);
+
+    try {
       const response = await axios.post(
         "https://localhost:44320/api/Events/create",
         eventData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -290,25 +302,13 @@ export default function CreateEvent() {
         Swal.fire("Thành công!", "Sự kiện đã được tạo", "success");
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Access token hết hạn, thử refresh token
-        const newAccessToken = await refreshAccessToken();
-        if (newAccessToken) {
-          const retryResponse = await axios.post(
-            "https://localhost:44320/api/Events/create",
-            eventData,
-            {
-              headers: {
-                Authorization: `Bearer ${newAccessToken}`,
-              },
-            }
-          );
-        } else {
-          enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
-            variant: "error",
-          });
+      console.error("Lỗi từ API:", error.response?.data);
+      enqueueSnackbar(
+        `Lỗi từ API: ${error.response?.data?.message || "Lỗi không xác định"}`,
+        {
+          variant: "error",
         }
-      }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -331,10 +331,11 @@ export default function CreateEvent() {
   return (
     <>
       <Header />
-      <div className="container"
+      <div
+        className="container"
         style={{
           maxWidth: "900px",
-          margin: "90px auto 0", 
+          margin: "90px auto 0",
           padding: "20px",
           display: "flex",
           flexDirection: "column",

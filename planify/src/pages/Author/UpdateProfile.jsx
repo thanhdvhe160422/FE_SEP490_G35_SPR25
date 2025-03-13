@@ -70,8 +70,8 @@ const UpdateProfile = () => {
         );
         const data = await res.json();
         setDistricts(data.data || []);
-        setWards([]); // Reset danh sách phường khi tỉnh thay đổi
-        setSelectedDistrict(""); // Reset quận/huyện
+        setWards([]);
+        setSelectedDistrict("");
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
