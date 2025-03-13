@@ -30,16 +30,23 @@ const Profile = () => {
 
         setUser(userData);
         console.log(userData);
-        setAddress(userData.addressVM.addressDetail||'');
-        setProvinces(userData.addressVM.wardVM.districtVM.provinceVM.provinceName || "");
+        setAddress(userData.addressVM.addressDetail || "");
+        setProvinces(
+          userData.addressVM.wardVM.districtVM.provinceVM.provinceName || ""
+        );
         setDistricts(userData.addressVM.wardVM.districtVM.districtName || "");
         setWards(userData.addressVM.wardVM.wardName || "");
 
-        console.log("Address:", userData.addressVM.addressDetail || '');
-console.log("Province:", userData.addressVM.wardVM.districtVM.provinceVM.provinceName || '');
-console.log("District:", userData.addressVM.wardVM.districtVM.districtName || '');
-console.log("Ward:", userData.addressVM.wardVM.wardName || '');
-
+        console.log("Address:", userData.addressVM.addressDetail || "");
+        console.log(
+          "Province:",
+          userData.addressVM.wardVM.districtVM.provinceVM.provinceName || ""
+        );
+        console.log(
+          "District:",
+          userData.addressVM.wardVM.districtVM.districtName || ""
+        );
+        console.log("Ward:", userData.addressVM.wardVM.wardName || "");
 
         setLoading(false);
       } catch (error) {
@@ -50,7 +57,9 @@ console.log("Ward:", userData.addressVM.wardVM.wardName || '');
 
     const fetchProvinces = async () => {
       try {
-        const res = await fetch("https://localhost:44320/api/Address/Provinces");
+        const res = await fetch(
+          "https://localhost:44320/api/Address/Provinces"
+        );
         const data = await res.json();
         setProvinces(data.data || []);
       } catch (error) {
@@ -155,12 +164,7 @@ console.log("Ward:", userData.addressVM.wardVM.wardName || '');
   };
 
   const fullAddress = () => {
-    const addressParts = [
-      address, 
-      wards, 
-      districts,
-      provinces
-    ].filter(Boolean);
+    const addressParts = [address, wards, districts, provinces].filter(Boolean);
 
     if (addressParts.length === 1 && getProvinceName(selectedProvince)) {
       return getProvinceName(selectedProvince);
