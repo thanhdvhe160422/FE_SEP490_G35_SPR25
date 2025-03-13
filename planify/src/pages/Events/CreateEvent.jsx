@@ -45,6 +45,7 @@ export default function CreateEvent() {
           "https://localhost:44320/api/Categories/1"
         );
         setCategories(categoriesResponse.data);
+        console.log(categoriesResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         enqueueSnackbar("Lỗi tải dữ liệu", { variant: "error" });
@@ -413,9 +414,9 @@ export default function CreateEvent() {
               required
             >
               <option value="">Chọn loại sự kiện</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
+              {categories.map((categories) => (
+                <option key={categories.id} value={categories.id}>
+                  {categories.categoryEventName}
                 </option>
               ))}
             </Form.Select>
