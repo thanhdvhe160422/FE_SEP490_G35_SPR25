@@ -28,23 +28,48 @@ function EventSection() {
     console.log("Fetching events...");
     const fetchData = async () => {
       const data = await getPosts(currentPage, EVENTS_PER_PAGE);
-      console.log("Fetched events:", data);
-      const sortedEvents = data.sort((a, b) =>
-        a.status === "running" ? -1 : 1
+      const getStatusPriority = (event) => {
+        const status = statusEvent(event.startDate, event.endDate);
+        return status === "running" ? 1 : status === "not started yet" ? 2 : 3;
+      };
+      const sortedEvents = data.sort(
+        (a, b) => getStatusPriority(a) - getStatusPriority(b)
       );
       setEvents(sortedEvents);
     };
 
-    // const fetchCategories = async () => {
-    //   const categoryData = await getCategories();
-    //   setCategories(categoryData);
-    // };
+    const fetchCategories = async () => {
+      const categoryData = await getCategories();
+      setCategories(categoryData);
+    };
 
     fetchData();
-    // fetchCategories();
+    fetchCategories();
   }, [currentPage]);
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString("en", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+  const statusEvent = (start, end) => {
+    const now = new Date();
+    const startDateTime = new Date(start);
+    const endDateTime = new Date(end);
+    if (startDateTime <= now && now <= endDateTime) {
+      return "running";
+    } else if (now > endDateTime) {
+      return "closed";
+    } else {
+      return "not started yet";
+    }
+  };
 
-  const filteredEvents = (events || []).filter((event) => {
+  const filteredEvents = events.filter((event) => {
     if (!event) return false;
 
     const isMyEvent =
@@ -56,7 +81,7 @@ function EventSection() {
       (!selectedCategory || event.category === selectedCategory) &&
       (!searchTerm ||
         event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!selectedStatus || event.status === Number(selectedStatus)) &&
+      (selectedStatus === "" || event.status === Number(selectedStatus)) &&
       (!selectedStart ||
         new Date(event.startTime) >= new Date(selectedStart)) &&
       (!selectedEnd || new Date(event.endTime) <= new Date(selectedEnd)) &&
@@ -108,8 +133,9 @@ function EventSection() {
                 onChange={(e) => setSelectedStatus(Number(e.target.value))}
               >
                 <option value="">All</option>
-                <option value={1}>Running</option>
-                <option value={2}>Not Started Yet</option>
+                <option value="1">Running</option>
+                <option value="0">Not Started Yet</option>
+                <option value="2">Closed</option>
               </select>
               <label>Start Time</label>
               <input
@@ -170,7 +196,7 @@ function EventSection() {
                         <option value="">All Categories</option>
                         {categories.map((category) => (
                           <option key={category.id} value={category.name}>
-                            {category.name}
+                            {category.categoryEventName}
                           </option>
                         ))}
                       </select>
@@ -189,7 +215,7 @@ function EventSection() {
               </div>
 
               {currentEvents.length === 0 ? (
-                <p className="no-events-message">
+                <p className="col-12 no-events-message">
                   Không tìm thấy sự kiện nào hợp lệ.
                 </p>
               ) : (
@@ -207,9 +233,10 @@ function EventSection() {
                       <div className="belarus_content">
                         <h6>{event.placed}</h6>
                         <p className="event_time">
-                          <strong>From:</strong> {event.startTime}
+                          <strong>From:</strong>{" "}
+                          {formatDateTime(event.startTime)}
                           <br />
-                          <strong>To:</strong> {event.endTime}
+                          <strong>To:</strong> {formatDateTime(event.endTime)}
                         </p>
                         <div
                           className="heding wow fadeInUp"
@@ -222,15 +249,19 @@ function EventSection() {
                         </div>
                         <div
                           className={`status_tag ${
-                            event.status === 1
+                            statusEvent(event.startTime, event.endTime) ===
+                            "running"
                               ? "running_status"
-                              : "not_started_status"
+                              : statusEvent(event.startTime, event.endTime) ===
+                                "not started yet"
+                              ? "not_started_status"
+                              : "ended_status"
                           }`}
                         >
-                          {event.status === 1 ? "Running" : "Not started yet"}
+                          {statusEvent(event.startTime, event.endTime)}
                         </div>
-                        {(userRole === "manager" ||
-                          userRole === "event organizer") && (
+                        {(userRole === "Campus Manager" ||
+                          userRole === "Event Organizer") && (
                           <div className="progress_bar_container">
                             <div
                               className="progress_bar"
