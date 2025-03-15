@@ -29,7 +29,7 @@ function App() {
           element={<EventDetailSpec />}
         />
         <Route path="/group-detail" element={<GroupDetail />} />
-        <Route path="/event-detail-EOG" element={<EventDetailEOG />} />
+        <Route path="/event-detail-EOG/:eventId" element={<EventDetailEOG />} />
         <Route path="/create-task" element={<CreateTask />} />
       </Routes>
     </div>
