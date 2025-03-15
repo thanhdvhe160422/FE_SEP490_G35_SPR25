@@ -36,7 +36,6 @@ export default function CreateTask() {
       await createTaskAPI(taskData);
       enqueueSnackbar("Task đã được tạo thành công!", { variant: "success" });
 
-      // Reset form
       setTaskName("");
       setDeadlineDate("");
       setDeadlineTime("");

@@ -14,6 +14,7 @@ import { FaPlus, FaRegStar, FaStar, FaTimes, FaMinus } from "react-icons/fa";
 import Header from "../../components/Header/Header";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
+import getCategories from "../../services/CategoryService";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -41,11 +42,16 @@ export default function CreateEvent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoriesResponse = await axios.get(
-          "https://localhost:44320/api/Categories/1"
-        );
-        setCategories(categoriesResponse.data);
-        console.log(categoriesResponse.data);
+        const categoriesResponse = await getCategories();
+        if (Array.isArray(categoriesResponse)) {
+          setCategories(categoriesResponse);
+          console.log(categoriesResponse);
+        } else {
+          console.error(
+            "API trả về dữ liệu category không hợp lệ:",
+            categoriesResponse
+          );
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         enqueueSnackbar("Lỗi tải dữ liệu", { variant: "error" });
@@ -185,25 +191,6 @@ export default function CreateEvent() {
     updatedGroups[groupIndex].members.splice(memberIndex, 1);
     setGroups(updatedGroups);
   };
-  // const uploadImages = async () => {
-  //   try {
-  //     const formData = new FormData();
-  //     selectedImages.forEach((file) => {
-  //       formData.append("files", file);
-  //     });
-
-  //     const response = await api.post("/upload", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
-
-  //     return response.data.urls; // Giả sử API trả về array URLs
-  //   } catch (error) {
-  //     console.error("Lỗi upload ảnh:", error);
-  //     throw new Error("Không thể upload ảnh");
-  //   }
-  // };
   const handleSaveDraft = () => {
     Swal.fire({
       title: "Do you want to save the changes?",
@@ -223,11 +210,11 @@ export default function CreateEvent() {
     if (!eventName) errors.push("Tên sự kiện");
     if (!fromDate || !fromTime) errors.push("Thời gian bắt đầu");
     if (!toDate || !toTime) errors.push("Thời gian kết thúc");
-    // if (!eventType) errors.push("Loại sự kiện");
+    if (!eventType) errors.push("Loại sự kiện");
     if (!description) errors.push("Mô tả");
     if (!amountBudget) errors.push("Ngân sách");
     if (!placed) errors.push("Địa điểm");
-    // if (selectedImages.length === 0) errors.push("Ảnh");
+    if (selectedImages.length === 0) errors.push("Ảnh");
 
     if (errors.length > 0) {
       enqueueSnackbar(`Thiếu thông tin: ${errors.join(", ")}`, {
@@ -252,7 +239,7 @@ export default function CreateEvent() {
     if (!validateFields()) return;
     setIsLoading(true);
 
-    const userId = localStorage.getItem("userId"); // Lấy userId từ localStorage
+    const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
 
     if (!userId || !token) {
@@ -262,39 +249,26 @@ export default function CreateEvent() {
       return;
     }
 
-    // Xử lý danh sách ảnh (nếu có)
-    const eventMediaUrls = selectedImages.map((file) =>
-      URL.createObjectURL(file)
-    );
+    const formData = new FormData();
+    formData.append("EventTitle", eventName);
+    formData.append("EventDescription", description);
+    formData.append("StartTime", `${fromDate}T${fromTime}`);
+    formData.append("EndTime", `${toDate}T${toTime}`);
+    formData.append("AmountBudget", amountBudget);
+    formData.append("Placed", placed);
+    formData.append("CategoryEventId", eventType);
+    selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
 
-    const eventData = {
-      eventTitle: eventName,
-      eventDescription: description,
-      startTime: toISOLocal(fromDate, fromTime),
-      endTime: toISOLocal(toDate, toTime),
-      amountBudget: parseInt(getNumericValue(amountBudget), 10) || 0, // Đảm bảo số hợp lệ
-      categoryEventId: parseInt(eventType) || 0, // Tránh lỗi NaN
-      placed: placed,
-      createBy: userId,
-      groups: groups.map((group) => ({
-        groupName: group.name,
-        createBy: userId,
-        eventId: 0,
-        implementerIds: group.members.map((member) => member.id),
-      })),
-      eventMediaUrls, // Thêm danh sách ảnh
-    };
-
-    console.log("Dữ liệu gửi lên API:", eventData);
+    console.log("Dữ liệu gửi lên API:", formData);
 
     try {
       const response = await axios.post(
         "https://localhost:44320/api/Events/create",
-        eventData,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -317,10 +291,6 @@ export default function CreateEvent() {
 
   const formatCurrency = (value) => {
     return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  const getNumericValue = (value) => {
-    return value.replace(/,/g, "");
   };
 
   const handleAmountBudgetChange = (e) => {
