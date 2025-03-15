@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
@@ -8,7 +9,9 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaMoneyBillAlt,
+  FaTags,
 } from "react-icons/fa";
+import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -17,17 +20,17 @@ import Swal from "sweetalert2";
 const EventDetailEOG = () => {
   const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
+  const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+  const { eventId } = useParams();
 
-  const backgroundImages = [
-    "https://sukienvietsky.com/wp-content/uploads/2024/03/20cC3B4ng20ty20tE1BB9520chE1BBA9c20sE1BBB120kiE1BB87n20uy20tC3ADn20tE1BAA1i20HC3A020NE1BB99i202.jpg",
-    "https://chuyennghiep.vn/upload/news/bao-gia-dich-vu-to-chuc-tiec-tat-nien-cong-ty-doanh-nghiep-2-3141.jpeg",
-    "https://images2.thanhnien.vn/528068263637045248/2024/2/7/youtube-tv-17072736627281851838672.jpg",
-  ];
+  // const backgroundImages = [];
 
   useEffect(() => {
-    fetch("http://localhost:4000/events/1")
+    fetch(
+      `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch event data");
@@ -36,10 +39,17 @@ const EventDetailEOG = () => {
       })
       .then((data) => {
         console.log("Fetched Event Data:", data);
-        setEvent(data);
+        setEvent(data.result);
+
+        if (data.result.eventMedia && data.result.eventMedia.length > 0) {
+          const imageUrls = data.result.eventMedia.map(
+            (media) => media.mediaUrl
+          );
+          setImages(imageUrls);
+        }
       })
       .catch((error) => console.error("Error fetching event data:", error));
-  }, []);
+  }, [eventId]);
 
   useEffect(() => {
     fetch("http://localhost:4000/groups")
@@ -133,13 +143,13 @@ const EventDetailEOG = () => {
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? backgroundImages.length - 1 : prevIndex - 1
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
@@ -147,7 +157,7 @@ const EventDetailEOG = () => {
     return <div>Loading...</div>;
   }
 
-  const eventStatus = getEventStatus(event.StartTime, event.EndTime);
+  const eventStatus = getEventStatus(event.startTime, event.endTime);
 
   return (
     <>
@@ -158,7 +168,7 @@ const EventDetailEOG = () => {
             <div
               className="event-header"
               style={{
-                background: `url(${backgroundImages[currentImageIndex]}) no-repeat center/cover`,
+                background: `url(${images[currentImageIndex]}) no-repeat center/cover`,
                 padding: "30px",
                 borderRadius: "10px",
                 width: "90%",
@@ -167,25 +177,29 @@ const EventDetailEOG = () => {
                 position: "relative",
               }}
             >
-              <button
-                className="nav-button prev-button"
-                onClick={handlePrevImage}
-              >
-                <FaChevronLeft />
-              </button>
+              {images.length > 1 && (
+                <>
+                  <button
+                    className="nav-button prev-button"
+                    onClick={handlePrevImage}
+                  >
+                    <FaChevronLeft />
+                  </button>
 
-              <button
-                className="nav-button next-button"
-                onClick={handleNextImage}
-              >
-                <FaChevronRight />
-              </button>
+                  <button
+                    className="nav-button next-button"
+                    onClick={handleNextImage}
+                  >
+                    <FaChevronRight />
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="event-details">
               <div className="event-title-container">
                 <h1 style={{ color: "purple", fontWeight: "bold" }}>
-                  {event.EventTitle}
+                  {event.eventTitle}
                 </h1>
                 <div
                   className="event-status"
@@ -197,22 +211,43 @@ const EventDetailEOG = () => {
               </div>
               <div className="event-time">
                 <FaClock className="icon-time" />
-                <span>From: {formatDateTime(event.StartTime)}</span>
+                <span className="event-info-span">Start Time:</span>
+                {formatDateTime(event.startTime)}
               </div>
               <div>
                 <FaClock className="icon-time" />
-                <span>To: {formatDateTime(event.EndTime)}</span>
+                <span className="event-info-span">End Time:</span>
+                {formatDateTime(event.endTime)}
               </div>
               <div className="event-location">
                 <FaMapMarkerAlt className="icon-location" />
-                <span>Location: {event.Placed}</span>
+                <span className="event-info-span">Location:</span>
+                {event.placed}
               </div>
               <div>
                 <FaMoneyBillAlt
                   className="icon-price"
                   style={{ marginRight: "10px", color: "grey" }}
                 />
-                <span>Total Cost: {event.amountbudget} VNĐ</span>
+                <span className="event-info-span">Total Cost:</span>
+                {event.amountBudget.toLocaleString("vi-VN")} VNĐ
+              </div>
+              <div style={{ marginTop: "10px" }}>
+                <MdOutlineCategory
+                  className="icon-category"
+                  style={{ marginRight: "10px", color: "orange" }}
+                />
+                <span className="event-info-span">Category:</span>
+                {event.categoryEventName}
+              </div>
+            </div>
+
+            <div className="event-description">
+              <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+                Description:
+              </div>
+              <div className="eventDescription">
+                <span>{event.eventDescription}</span>
               </div>
             </div>
 
