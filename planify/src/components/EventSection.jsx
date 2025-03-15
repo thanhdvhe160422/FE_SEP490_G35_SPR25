@@ -27,7 +27,7 @@ function EventSection() {
   useEffect(() => {
     console.log("Fetching events...");
     const fetchData = async () => {
-      const data = await getPosts(currentPage, EVENTS_PER_PAGE);
+      const data = await getPosts();
       const getStatusPriority = (event) => {
         const status = statusEvent(event.startDate, event.endDate);
         return status === "running" ? 1 : status === "not started yet" ? 2 : 3;
@@ -81,7 +81,8 @@ function EventSection() {
       (!selectedCategory || event.category === selectedCategory) &&
       (!searchTerm ||
         event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedStatus === "" || event.status === Number(selectedStatus)) &&
+      (selectedStatus === "" ||
+        statusEvent(event.startTime, event.endTime) === selectedStatus) &&
       (!selectedStart ||
         new Date(event.startTime) >= new Date(selectedStart)) &&
       (!selectedEnd || new Date(event.endTime) <= new Date(selectedEnd)) &&
@@ -102,7 +103,11 @@ function EventSection() {
     eventFilter,
   ]);
 
-  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredEvents.length / EVENTS_PER_PAGE)
+  );
+
   const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
   const currentEvents = filteredEvents.slice(
     startIndex,
@@ -130,12 +135,12 @@ function EventSection() {
               <label>Status</label>
               <select
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(Number(e.target.value))}
+                onChange={(e) => setSelectedStatus(e.target.value)}
               >
                 <option value="">All</option>
-                <option value="1">Running</option>
-                <option value="0">Not Started Yet</option>
-                <option value="2">Closed</option>
+                <option value="running">Running</option>
+                <option value="not started yet">Not Started Yet</option>
+                <option value="closed">Closed</option>
               </select>
               <label>Start Time</label>
               <input
