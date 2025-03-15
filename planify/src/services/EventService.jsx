@@ -1,30 +1,53 @@
 import axios from "axios";
-import Cookies from "js-cookie";
+let API_URL = "";
+const role = localStorage.getItem("role");
+const token = localStorage.getItem("token");
+if (role === "Spectator") {
+  API_URL = "https://localhost:44320/api/EventForSpectators";
+} else {
+  API_URL = "https://localhost:44320/api/Events/List";
+}
 
-const API_URL = "https://localhost:44320/api/EventForSpectators";
-
-const getPosts = async (page, pageSize) => {
+const getPosts = async () => {
   try {
-    const response = await axios.get(
-      `${API_URL}?page=${page}&pageSize=${pageSize}`,
-      {
-        params: { page, pageSize },
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("reToken")}`,
-        },
+    let page = 1;
+    const pageSize = 5;
+    let hasMore = true;
+    let allEvents = [];
+
+    while (hasMore) {
+      try {
+        const response = await axios.get(
+          `${API_URL}?page=${page}&pageSize=${pageSize}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log(`📢 API response for page ${page}:`, response.data);
+
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+          hasMore = false;
+        } else {
+          allEvents = [...allEvents, ...response.data];
+          page++;
+        }
+      } catch (error) {
+        console.error("❌ Lỗi khi gọi API:", error);
+        hasMore = false;
       }
-    );
-    console.log("API response:", response.data);
-    if (Array.isArray(response.data)) {
-      return response.data;
     }
-    return [];
+
+    console.log("📌 Tổng số sự kiện nhận được:", allEvents.length);
+    return allEvents;
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("❌ Lỗi trong getPosts():", error);
     return [];
   }
 };
-
 export default getPosts;
 
 export const getEventById = async (eventId) => {

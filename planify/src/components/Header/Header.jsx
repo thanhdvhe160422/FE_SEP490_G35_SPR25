@@ -90,11 +90,12 @@ export default function Header() {
       { label: "Home", path: "/home" },
       { label: "Create Event Organizer", path: "/create-event-organizer" },
       { label: "Create Event", path: "/create-event" },
+      { label: "Manage Requests", path: "/manager-request" },
     ],
     "event organizer": [
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/create-event" },
-      { label: "History", path: "/history" },
+      { label: "My Request", path: "/my-request" },
     ],
     implementer: [
       { label: "Home", path: "/home" },
@@ -162,7 +163,12 @@ export default function Header() {
           ref={dropdownRef}
         >
           <span className="username">{fullname}</span>
-          <img style={{width:'40px', height:'40px'}} src={picture} alt="User Avatar" className="avatar" />
+          <img
+            style={{ width: "40px", height: "40px" }}
+            src={picture}
+            alt="User Avatar"
+            className="avatar"
+          />
 
           {showDropdown && (
             <div className="dropdown-menu">
