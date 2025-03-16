@@ -72,9 +72,7 @@ function EventSection() {
   const filteredEvents = events.filter((event) => {
     if (!event) return false;
 
-    const isMyEvent =
-      event.organizerId === currentUserId ||
-      event.implementerId === currentUserId;
+    const isMyEvent = event.createBy === currentUserId;
 
     return (
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
