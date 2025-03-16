@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Author/Login";
 import Authorization from "./components/Authorization";
 import LoginAdmin from "./pages/Author/LoginAdmin";
@@ -12,6 +12,7 @@ import UpdateProfile from "./pages/Author/UpdateProfile";
 import GroupDetail from "./pages/Group/GroupDetail";
 import EventDetailEOG from "./pages/Events/EventDetailEOG";
 import CreateTask from "./pages/Tasks/CreateTask";
+import ManageRequest from "./pages/Events/ManageRequest";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
         <Route path="/group-detail" element={<GroupDetail />} />
         <Route path="/event-detail-EOG/:eventId" element={<EventDetailEOG />} />
         <Route path="/create-task" element={<CreateTask />} />
+        <Route path="/manage-request" element={<ManageRequest />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
   );

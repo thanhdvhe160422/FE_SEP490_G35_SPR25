@@ -26,26 +26,46 @@ function EventSection() {
 
   useEffect(() => {
     console.log("Fetching events...");
+
     const fetchData = async () => {
-      const data = await getPosts();
-      const getStatusPriority = (event) => {
-        const status = statusEvent(event.startDate, event.endDate);
-        return status === "running" ? 1 : status === "not started yet" ? 2 : 3;
-      };
-      const sortedEvents = data.sort(
-        (a, b) => getStatusPriority(a) - getStatusPriority(b)
-      );
-      setEvents(sortedEvents);
+      try {
+        const allData = await getPosts();
+        if (!allData || allData.length === 0) return;
+        const getStatusPriority = (event) => {
+          const status = statusEvent(event.startTime, event.endTime);
+          return status === "running"
+            ? 1
+            : status === "not started yet"
+            ? 2
+            : 3;
+        };
+
+        const sortedEvents = allData
+          .map((event) => ({
+            ...event,
+            status: statusEvent(event.startTime, event.endTime),
+          }))
+          .sort((a, b) => getStatusPriority(a) - getStatusPriority(b));
+
+        setEvents(sortedEvents);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy sự kiện:", error);
+      }
     };
 
     const fetchCategories = async () => {
-      const categoryData = await getCategories();
-      setCategories(categoryData);
+      try {
+        const categoryData = await getCategories();
+        setCategories(categoryData);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy danh mục:", error);
+      }
     };
 
     fetchData();
     fetchCategories();
-  }, [currentPage]);
+  }, []);
+
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -58,15 +78,12 @@ function EventSection() {
   };
   const statusEvent = (start, end) => {
     const now = new Date();
-    const startDateTime = new Date(start);
-    const endDateTime = new Date(end);
-    if (startDateTime <= now && now <= endDateTime) {
-      return "running";
-    } else if (now > endDateTime) {
-      return "closed";
-    } else {
-      return "not started yet";
-    }
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    if (now >= startTime && now <= endTime) return "running";
+    if (now < startTime) return "not started yet";
+    return "ended";
   };
 
   const filteredEvents = events.filter((event) => {
