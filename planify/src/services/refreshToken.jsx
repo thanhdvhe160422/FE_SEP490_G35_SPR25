@@ -10,9 +10,6 @@ const refreshAccessToken = async () => {
         accessToken: accessToken,
       }
     );
-
-    console.log("Hello");
-
     const newAccessToken = response.data.accessToken;
     localStorage.setItem("token", newAccessToken);
     sessionStorage.setItem("reToken", response.data.refreshToken);

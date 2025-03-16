@@ -15,6 +15,7 @@ import Header from "../../components/Header/Header";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
 import getCategories from "../../services/CategoryService";
+import refreshAccessToken from "../../services/refreshToken";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -217,7 +218,7 @@ export default function CreateEvent() {
     if (selectedImages.length === 0) errors.push("Ảnh");
 
     if (errors.length > 0) {
-      enqueueSnackbar(`Thiếu thông tin: ${errors.join(", ")}`, {
+      enqueueSnackbar(`Missing information: ${errors.join(", ")}`, {
         variant: "error",
       });
       return false;
@@ -227,7 +228,7 @@ export default function CreateEvent() {
     const start = new Date(`${fromDate}T${fromTime}`);
     const end = new Date(`${toDate}T${toTime}`);
     if (start >= end) {
-      enqueueSnackbar("Thời gian kết thúc phải sau thời gian bắt đầu", {
+      enqueueSnackbar("The end time must be after the start time.", {
         variant: "error",
       });
       return false;
@@ -274,16 +275,74 @@ export default function CreateEvent() {
       );
 
       if (response.status === 201) {
-        Swal.fire("Thành công!", "Sự kiện đã được tạo", "success");
+        Swal.fire({
+          title: "Do you want to save the changes?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Accept",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire("Successfully!", "Event has been created", "success");
+          }
+        });
       }
     } catch (error) {
-      console.error("Lỗi từ API:", error.response?.data);
-      enqueueSnackbar(
-        `Lỗi từ API: ${error.response?.data?.message || "Lỗi không xác định"}`,
-        {
-          variant: "error",
+      if (error.response?.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          try {
+            let retryResponse = await axios.post(
+              "https://localhost:44320/api/Events/create",
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${newToken}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            if (retryResponse.status === 201) {
+              Swal.fire({
+                title:
+                  "This event will be sent to Campus Manager for approval.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Accept",
+                cancelButtonText: "Cancel",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.fire(
+                    "Successfully!",
+                    "Event has been created",
+                    "success"
+                  );
+                }
+              });
+            }
+          } catch (retryError) {
+            console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+            enqueueSnackbar(
+              `Lỗi từ API: ${
+                retryError.response?.data?.message || "Lỗi không xác định"
+              }`,
+              { variant: "error" }
+            );
+          }
+        } else {
+          enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
+            variant: "error",
+          });
         }
-      );
+      } else {
+        console.error("Lỗi từ API:", error.response?.data);
+        enqueueSnackbar(
+          `Lỗi từ API: ${
+            error.response?.data?.message || "Lỗi không xác định"
+          }`,
+          { variant: "error" }
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -607,7 +666,7 @@ export default function CreateEvent() {
               onClick={handleCreateEvent}
               disabled={isLoading}
             >
-              {isLoading ? "Đang xử lý..." : "Tạo sự kiện"}
+              {isLoading ? "Loading..." : "Create Event"}
             </Button>
           </div>
         </Form>
