@@ -12,8 +12,8 @@ const getPosts = async () => {
   try {
     let page = 1;
     const pageSize = 5;
-    let hasMore = true;
     let allEvents = [];
+    let hasMore = true;
 
     while (hasMore) {
       try {
@@ -22,7 +22,7 @@ const getPosts = async () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           }
         );
@@ -30,7 +30,7 @@ const getPosts = async () => {
         console.log(`📢 API response for page ${page}:`, response.data);
 
         if (!Array.isArray(response.data) || response.data.length === 0) {
-          hasMore = false;
+          hasMore = false; // Dừng khi hết dữ liệu
         } else {
           allEvents = [...allEvents, ...response.data];
           page++;
@@ -48,6 +48,7 @@ const getPosts = async () => {
     return [];
   }
 };
+
 export default getPosts;
 
 export const getEventById = async (eventId) => {
