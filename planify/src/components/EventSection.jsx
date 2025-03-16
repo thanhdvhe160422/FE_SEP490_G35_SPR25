@@ -245,9 +245,16 @@ function EventSection() {
                       <img
                         src={bannerImage}
                         alt="News"
-                        onClick={() =>
-                          navigate(`/event-detail-spec/${event.id}`)
-                        }
+                        onClick={() => {
+                          let targetUrl = `/event-detail-spec/${event.id}`;
+                          if (
+                            userRole === "Campus Manager" ||
+                            userRole === "Event Organizer"
+                          ) {
+                            targetUrl = `/event-detail-EOG/${event.id}`;
+                          }
+                          navigate(targetUrl);
+                        }}
                         style={{ cursor: "pointer" }}
                       />
                       <div className="belarus_content">

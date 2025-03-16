@@ -1,7 +1,8 @@
 import axios from "axios";
+import refreshAccessToken from "./refreshToken";
+
 let API_URL = "";
 const role = localStorage.getItem("role");
-const token = localStorage.getItem("token");
 if (role === "Spectator") {
   API_URL = "https://localhost:44320/api/EventForSpectators";
 } else {
@@ -17,6 +18,8 @@ const getPosts = async () => {
 
     while (hasMore) {
       try {
+        const token = localStorage.getItem("token");
+
         const response = await axios.get(
           `${API_URL}?page=${page}&pageSize=${pageSize}`,
           {
@@ -27,24 +30,55 @@ const getPosts = async () => {
           }
         );
 
-        console.log(`📢 API response for page ${page}:`, response.data);
-
         if (!Array.isArray(response.data) || response.data.length === 0) {
-          hasMore = false; // Dừng khi hết dữ liệu
+          hasMore = false;
         } else {
           allEvents = [...allEvents, ...response.data];
           page++;
         }
       } catch (error) {
-        console.error("❌ Lỗi khi gọi API:", error);
-        hasMore = false;
+        if (error.response?.status === 401) {
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            try {
+              const retryResponse = await axios.get(
+                `${API_URL}?page=${page}&pageSize=${pageSize}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${newToken}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              if (
+                !Array.isArray(retryResponse.data) ||
+                retryResponse.data.length === 0
+              ) {
+                hasMore = false;
+              } else {
+                allEvents = [...allEvents, ...retryResponse.data];
+                page++;
+              }
+            } catch (retryError) {
+              console.error(
+                "Lỗi từ API sau refresh:",
+                retryError.response?.data
+              );
+              return [];
+            }
+          } else {
+            return [];
+          }
+        } else {
+          console.error("Lỗi từ API:", error.response?.data);
+          return [];
+        }
       }
     }
 
-    console.log("📌 Tổng số sự kiện nhận được:", allEvents.length);
     return allEvents;
   } catch (error) {
-    console.error("❌ Lỗi trong getPosts():", error);
     return [];
   }
 };
