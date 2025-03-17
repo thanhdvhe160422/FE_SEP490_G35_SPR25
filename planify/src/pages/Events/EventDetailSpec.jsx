@@ -12,13 +12,27 @@ import { parseISO } from "date-fns";
 function EventDetailSpec() {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
+  const [bannerImages, setBannerImages] = useState([]);
 
+  const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
         const data = await getEventById(eventId);
+        const mediaList = data?.eventMedias ?? [];
+        if (!Array.isArray(mediaList)) {
+          console.error("eventMedias is not an array:", mediaList);
+          setBannerImages([]);
+          return;
+        }
 
-        setEvent({ ...data });
+        const imageUrls = mediaList
+          .map((media) => media?.mediaDTO?.mediaUrl)
+          .filter((url) => !!url);
+
+        setBannerImages(imageUrls);
+
+        setEvent(data);
       } catch (error) {
         console.error("Failed to fetch event details:", error);
       }
@@ -26,6 +40,13 @@ function EventDetailSpec() {
 
     fetchEventDetail();
   }, [eventId]);
+  useEffect(() => {
+    if (bannerImages.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % bannerImages.length);
+    }, 3000); // 3s đổi ảnh
+    return () => clearInterval(interval);
+  }, [bannerImages]);
   const statusEvent = (start, end) => {
     const now = new Date();
     const startDateTime = new Date(start);
@@ -47,6 +68,24 @@ function EventDetailSpec() {
     <>
       <Header />
       <div className="event-container">
+        <div className="event-banner">
+          {bannerImages.length > 0 ? (
+            <div className="banner-slider">
+              {bannerImages.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Event Banner ${index}`}
+                  className={`banner-image ${
+                    index === currentIndex ? "active" : ""
+                  }`}
+                />
+              ))}
+            </div>
+          ) : (
+            <p>No images available</p>
+          )}
+        </div>
         <div className="event-details">
           <div className="event-title-container">
             <h1 style={{ color: "purple", fontWeight: "bold" }}>
