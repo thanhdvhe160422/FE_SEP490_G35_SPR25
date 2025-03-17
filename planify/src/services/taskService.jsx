@@ -55,3 +55,10 @@ export const deleteTask = async(taskId,token) =>{
     }
   })
 }
+export const getTaskById = async(taskId,token)=>{
+  return await axios.get(`https://localhost:44320/api/Tasks/${taskId}`,{
+    headers:{
+      'Authorization':`Bearer ${token}`
+    }
+  })
+}
