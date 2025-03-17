@@ -64,73 +64,77 @@ function EventDetailSpec() {
     const date = parseISO(dateTime);
     return format(date, "HH:mm eeee, dd/MM/yyyy", { locale: vi });
   };
+  const fixDriveUrl = (url) => {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  };
+
   return (
     <>
       <Header />
       <div className="event-container">
         <div className="event-banner">
           {bannerImages.length > 0 ? (
-            <div className="banner-slider">
-              {bannerImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Event Banner ${index}`}
-                  className={`banner-image ${
-                    index === currentIndex ? "active" : ""
-                  }`}
-                />
-              ))}
-            </div>
+              <div className="banner-slider">
+                {bannerImages.map((img, index) => (
+                    <img
+                        key={index}
+                        src={fixDriveUrl(img)}
+                        alt={`Event Banner ${index}`}
+                        className={`banner-image ${index === currentIndex ? "active" : ""}`}
+                    />
+                ))}
+              </div>
           ) : (
-            <p>No images available</p>
+              <p>No images available</p>
           )}
         </div>
         <div className="event-details">
           <div className="event-title-container">
-            <h1 style={{ color: "purple", fontWeight: "bold" }}>
+            <h1 style={{color: "purple", fontWeight: "bold"}}>
               {event.eventTitle}
             </h1>
             <div
-              className={`status_tag ${
-                statusEvent(event.startTime, event.endTime) === "running"
-                  ? "running_status"
-                  : statusEvent(event.startTime, event.endTime) ===
-                    "not started yet"
-                  ? "not_started_status"
-                  : "ended_status"
-              }`}
+                className={`status_tag ${
+                    statusEvent(event.startTime, event.endTime) === "running"
+                        ? "running_status"
+                        : statusEvent(event.startTime, event.endTime) ===
+                        "not started yet"
+                            ? "not_started_status"
+                            : "ended_status"
+                }`}
             >
               {statusEvent(event.startTime, event.endTime)}
             </div>
           </div>
           <div className="event-category">
-            <FaTag className="icon-category" />
+            <FaTag className="icon-category"/>
             <span>
               <strong> Event Type:</strong> {event.category}
             </span>
           </div>
           <div className="event-time">
-            <FaClock className="icon-time" />
+            <FaClock className="icon-time"/>
             <span>
               <strong> From:</strong> {formatDateTime(event.startTime)}
             </span>
           </div>
           <div>
-            <FaClock className="icon-time" />
+            <FaClock className="icon-time"/>
             <span>
               <strong>To:</strong> {formatDateTime(event.endTime)}
             </span>
           </div>
           <div className="event-location">
-            <FaMapMarkerAlt className="icon-location" />
+            <FaMapMarkerAlt className="icon-location"/>
             <span>
               <strong> Location:</strong> {event.placed}
             </span>
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer/>
     </>
   );
 }
