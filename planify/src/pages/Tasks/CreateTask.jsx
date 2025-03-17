@@ -4,7 +4,7 @@ import { useSnackbar } from "notistack";
 import { createTaskAPI } from "../../services/taskService";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 
 export default function CreateTask() {
   const { enqueueSnackbar } = useSnackbar();
@@ -29,7 +29,7 @@ export default function CreateTask() {
       enqueueSnackbar("Vui lòng nhập đầy đủ thông tin!", { variant: "error" });
       return;
     }
-    
+
     const taskData = {
       groupId,
       taskName,
@@ -44,9 +44,9 @@ export default function CreateTask() {
     };
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       console.log(taskData.budget);
-      await createTaskAPI(taskData,token);
+      await createTaskAPI(taskData, token);
       enqueueSnackbar("Task đã được tạo thành công!", { variant: "success" });
 
       setTaskName("");
@@ -81,6 +81,7 @@ export default function CreateTask() {
               value={deadlineDate}
               onChange={(e) => setDeadlineDate(e.target.value)}
               className="task-input"
+              min={new Date().toISOString().slice(0, 16)}
             />
             <input
               style={{ marginTop: "10px" }}

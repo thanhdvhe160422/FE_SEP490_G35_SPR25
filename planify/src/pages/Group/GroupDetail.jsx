@@ -15,6 +15,7 @@ function GroupDetail() {
   const navigate = useNavigate();
   const [group, setGroup] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,19 +26,10 @@ function GroupDetail() {
           navigate("/login");
         } else if (data) {
           setGroup(data);
-        }
-        if (data) {
-          setGroup(data);
           console.log("Group Details:", data);
 
-          const tasksData = await getGroupTasks(data.id);
-          console.log("Tasks Data:", tasksData);
-
-          if (Array.isArray(tasksData)) {
-            setTasks(tasksData);
-          } else {
-            console.error("Invalid task data format", tasksData);
-          }
+          const tasksData = data.tasks || [];
+          setTasks(tasksData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -45,6 +37,10 @@ function GroupDetail() {
     };
     fetchData();
   }, [id]);
+
+  const filteredTasks = tasks.filter((task) =>
+    task.taskName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -58,11 +54,6 @@ function GroupDetail() {
                 const member = join.implementer;
                 return (
                   <div className="item-member" key={member.id}>
-                    <img
-                      src="/default-avatar.png"
-                      alt={member.firstName}
-                      className="avatar"
-                    />
                     <span className="member-name">
                       {member.firstName} {member.lastName}
                     </span>
@@ -77,6 +68,16 @@ function GroupDetail() {
 
         <div className="list-task">
           <h2>Task List</h2>
+
+          {/* Ô tìm kiếm */}
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="task-search"
+          />
+
           <table className="task-table">
             <thead>
               <tr>
@@ -85,13 +86,12 @@ function GroupDetail() {
                 <th>Status</th>
                 <th>Deadline</th>
                 <th>Progress</th>
-                <th>Assign</th>
                 <th>Budget</th>
               </tr>
             </thead>
             <tbody>
-              {group?.tasks?.length > 0 ? (
-                group.tasks.map((task, index) => (
+              {filteredTasks.length > 0 ? (
+                filteredTasks.map((task, index) => (
                   <tr
                     key={task.id}
                     onClick={() => navigate(`/task-detail/${task.id}`)}
@@ -115,7 +115,6 @@ function GroupDetail() {
                         />
                       </div>
                     </td>
-                    <td></td>
                     <td>
                       {task.amountBudget.toLocaleString("vi-VN") || "N/A"} VNĐ
                     </td>
@@ -123,11 +122,14 @@ function GroupDetail() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5">No tasks available</td>
+                  <td colSpan="6">No tasks found</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <button onClick={() => navigate(`/group/${id}/create-task`)}>
+            Create Task
+          </button>
         </div>
       </div>
       <Footer />
