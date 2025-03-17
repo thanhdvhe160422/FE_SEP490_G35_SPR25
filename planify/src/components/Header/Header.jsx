@@ -27,10 +27,10 @@ export default function Header() {
 
     if (!userId) return;
 
-    axios
-      .get(`http://localhost:4000/notifications?userId=${userId}`)
-      .then((response) => setNotifications(response.data))
-      .catch((error) => console.error("Lỗi khi lấy thông báo:", error));
+    // axios
+    //   .get(`http://localhost:4000/notifications?userId=${userId}`)
+    //   .then((response) => setNotifications(response.data))
+    //   .catch((error) => console.error("Lỗi khi lấy thông báo:", error));
   }, []);
 
   useEffect(() => {
@@ -61,22 +61,22 @@ export default function Header() {
     const userId = localStorage.getItem("userId");
     if (!userId) return;
 
-    const unreadNotifications = notifications.filter((n) => !n.read);
-    if (unreadNotifications.length > 0) {
-      setNotifications(
-        notifications.map((notif) =>
-          notif.read ? notif : { ...notif, read: true }
-        )
-      );
+    // const unreadNotifications = notifications.filter((n) => !n.read);
+    // if (unreadNotifications.length > 0) {
+    //   setNotifications(
+    //     notifications.map((notif) =>
+    //       notif.read ? notif : { ...notif, read: true }
+    //     )
+    //   );
 
-      await Promise.all(
-        unreadNotifications.map((notif) =>
-          axios.patch(`http://localhost:4000/notifications/${notif.id}`, {
-            read: true,
-          })
-        )
-      );
-    }
+    //   await Promise.all(
+    //     unreadNotifications.map((notif) =>
+    //       axios.patch(`http://localhost:4000/notifications/${notif.id}`, {
+    //         read: true,
+    //       })
+    //     )
+    //   );
+    // }
   };
 
   const handleLogout = () => {
@@ -84,8 +84,6 @@ export default function Header() {
     sessionStorage.clear();
     navigate("/login");
   };
-
-  // Map role với danh sách menu
   const navItemsByRole = {
     "campus manager": [
       { label: "Home", path: "/home" },

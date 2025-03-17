@@ -66,12 +66,10 @@ const EventDetailEOG = () => {
               throw new Error(`Failed to fetch event data after token refresh`);
             }
           } else {
-            enqueueSnackbar(
-              "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.",
-              {
-                variant: "error",
-              }
-            );
+            enqueueSnackbar("Your session has expired, please log in again.", {
+              variant: "error",
+            });
+            navigate("/login");
             return;
           }
         }
@@ -308,7 +306,7 @@ const EventDetailEOG = () => {
                   <div
                     className="event-group-card"
                     key={group.id}
-                    onClick={() => navigate(`/groups/${group.id}`)}
+                    onClick={() => navigate(`/group-detail/${group.id}`)}
                   >
                     <div className="event-group-header">
                       <span style={{ color: "black" }}>{group.groupName}</span>
