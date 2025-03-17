@@ -12,7 +12,6 @@ const CreateSubTask = () => {
   const { taskId } = useParams();
   const fixedTaskId = taskId ? parseInt(taskId) : 1;
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [subTask, setSubTask] = useState({
     subTaskName: "",
     subTaskDescription: "",
@@ -27,13 +26,40 @@ const CreateSubTask = () => {
     const { name, value } = e.target;
     setSubTask({ ...subTask, [name]: value });
   };
+  const validateTime = () => {
+    const now = new Date().toISOString().slice(0, 16);
+
+    if (subTask.startTime && subTask.startTime < now) {
+      enqueueSnackbar("Start time must be greater than current!", {
+        variant: "error",
+      });
+      return false;
+    }
+
+    if (
+      subTask.startTime &&
+      subTask.deadline &&
+      subTask.deadline <= subTask.startTime
+    ) {
+      enqueueSnackbar("Deadline must be greater than start time!", {
+        variant: "error",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     if (!subTask.subTaskName.trim()) {
-      enqueueSnackbar("Vui lòng nhập tên SubTask!", { variant: "warning" });
+      enqueueSnackbar("Please enter SubTask name!", { variant: "warning" });
+      setLoading(false);
+      return;
+    }
+    if (!validateTime()) {
       setLoading(false);
       return;
     }
@@ -56,13 +82,12 @@ const CreateSubTask = () => {
 
     try {
       await createSubTask(requestData, token);
-      enqueueSnackbar("SubTask đã được tạo thành công!", {
+      enqueueSnackbar("SubTask created successfully!", {
         variant: "success",
       });
       //   navigate(`/task/${fixedTaskId}`);
     } catch (errorResponse) {
       console.error("❌ API lỗi:", errorResponse);
-      setError(errorResponse.errors || { message: "Đã có lỗi xảy ra!" });
     } finally {
       setLoading(false);
     }
@@ -72,26 +97,11 @@ const CreateSubTask = () => {
     <>
       <Header />
       <Container className="create-subtask-container">
-        <h2 className="text-center mt-4">Tạo SubTask</h2>
-
-        {error && (
-          <Alert variant="danger">
-            <h5>Lỗi khi tạo SubTask</h5>
-            <ul>
-              {typeof error === "object"
-                ? Object.entries(error).map(([field, messages]) => (
-                    <li key={field}>
-                      <strong>{field}:</strong> {messages.join(", ")}
-                    </li>
-                  ))
-                : error.message}
-            </ul>
-          </Alert>
-        )}
+        <h2 className="text-center mt-4">Create SubTask</h2>
 
         <Form onSubmit={handleSubmit} className="subtask-form">
           <Form.Group className="mb-3">
-            <Form.Label>Tên SubTask</Form.Label>
+            <Form.Label>SubTask name</Form.Label>
             <Form.Control
               type="text"
               name="subTaskName"
@@ -102,7 +112,7 @@ const CreateSubTask = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Mô tả</Form.Label>
+            <Form.Label>Discription</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
@@ -113,12 +123,13 @@ const CreateSubTask = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Thời gian bắt đầu</Form.Label>
+            <Form.Label>Start Time</Form.Label>
             <Form.Control
               type="datetime-local"
               name="startTime"
               value={subTask.startTime}
               onChange={handleChange}
+              min={new Date().toISOString().slice(0, 16)}
               required
             />
           </Form.Group>
@@ -130,12 +141,13 @@ const CreateSubTask = () => {
               name="deadline"
               value={subTask.deadline}
               onChange={handleChange}
+              min={subTask.startTime || new Date().toISOString().slice(0, 16)}
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Ngân sách</Form.Label>
+            <Form.Label>Budget</Form.Label>
             <Form.Control
               type="number"
               name="amountBudget"
@@ -152,11 +164,11 @@ const CreateSubTask = () => {
           >
             {loading ? (
               <>
-                <Spinner animation="border" size="sm" className="me-2" /> Đang
-                tạo...
+                <Spinner animation="border" size="sm" className="me-2" />{" "}
+                Loading...
               </>
             ) : (
-              "Tạo SubTask"
+              "Create SubTask"
             )}
           </Button>
         </Form>
