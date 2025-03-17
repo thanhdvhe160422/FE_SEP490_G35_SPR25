@@ -32,7 +32,7 @@ function App() {
         />
         <Route path="/group-detail/:id" element={<GroupDetail />} />
         <Route path="/event-detail-EOG/:eventId" element={<EventDetailEOG />} />
-        <Route path="/create-task" element={<CreateTask />} />
+        <Route path="/group/:groupId/create-task" element={<CreateTask />} />
         <Route path="/manage-request" element={<ManageRequest />} />
         <Route path="/create-subtask/:taskId" element={<CreateSubTask />} />
         <Route path="/create-subtask" element={<CreateSubTask />} />
