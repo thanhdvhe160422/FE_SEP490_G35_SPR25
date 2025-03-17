@@ -4,45 +4,61 @@ import { useSnackbar } from "notistack";
 import { createTaskAPI } from "../../services/taskService";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function CreateTask() {
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [taskName, setTaskName] = useState("");
   const [deadlineDate, setDeadlineDate] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
-  const [description, setDescription] = useState("");
-  const [budget, setBudget] = useState("");
-
+  const [taskDescription, setTaskDescription] = useState("");
+  const [amountBudget, setAmountBudget] = useState("");
+  const { groupId } = useParams();
+  const currentDate = new Date();
+  const createDate = currentDate.toISOString();
+  const startTime = currentDate.toISOString();
+  const organizerId = localStorage.getItem("userId");
   const handleCreateTask = async () => {
     if (
       !taskName ||
       !deadlineDate ||
       !deadlineTime ||
-      !description ||
-      !budget
+      !taskDescription ||
+      !amountBudget
     ) {
-      enqueueSnackbar("Vui lòng nhập đầy đủ thông tin!", { variant: "error" });
+      enqueueSnackbar("Please enter complete information!", {
+        variant: "error",
+      });
       return;
     }
 
     const taskData = {
+      groupId,
       taskName,
       deadline: `${deadlineDate}T${deadlineTime}`,
-      description,
-      budget: parseFloat(budget.replace(/,/g, "")),
+      taskDescription,
+      amountBudget: parseFloat(amountBudget.replace(/,/g, "")),
+      createDate,
+      startTime,
+      organizerId,
+      status: 1,
+      progress: 0,
     };
 
     try {
-      await createTaskAPI(taskData);
-      enqueueSnackbar("Task đã được tạo thành công!", { variant: "success" });
-
+      const token = localStorage.getItem("token");
+      console.log(taskData.budget);
+      await createTaskAPI(taskData, token);
+      enqueueSnackbar("Task created successfully!", { variant: "success" });
+      navigate(`/group-detail/${groupId}`);
       setTaskName("");
       setDeadlineDate("");
       setDeadlineTime("");
-      setDescription("");
-      setBudget("");
+      setTaskDescription("");
+      setAmountBudget("");
     } catch (error) {
-      enqueueSnackbar("Lỗi khi tạo task!", { variant: "error" });
+      enqueueSnackbar("Error creating task!", { variant: "error" });
     }
   };
 
@@ -52,7 +68,7 @@ export default function CreateTask() {
       <div className="task-container">
         <h3 className="task-title">Create Task </h3>
         <div className="task-form">
-          <label>Tên Task</label>
+          <label>Task Name</label>
           <input
             type="text"
             value={taskName}
@@ -68,6 +84,7 @@ export default function CreateTask() {
               value={deadlineDate}
               onChange={(e) => setDeadlineDate(e.target.value)}
               className="task-input"
+              min={new Date().toISOString().slice(0, 16)}
             />
             <input
               style={{ marginTop: "10px" }}
@@ -78,32 +95,30 @@ export default function CreateTask() {
             />
           </div>
 
-          <label>Mô tả</label>
+          <label>Discription</label>
           <textarea
             rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={taskDescription}
+            onChange={(e) => setTaskDescription(e.target.value)}
             placeholder="Nhập mô tả task"
             className="task-textarea"
           ></textarea>
 
-          <label>Ngân sách (VNĐ)</label>
+          <label>Budget (VNĐ)</label>
           <input
             type="text"
-            value={budget}
+            value={amountBudget}
             onChange={(e) =>
-              setBudget(
+              setAmountBudget(
                 e.target.value
                   .replace(/\D/g, "")
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               )
             }
-            placeholder="Nhập ngân sách"
             className="task-input"
           />
-
           <button className="task-button" onClick={handleCreateTask}>
-            Tạo Task
+            Create Task
           </button>
         </div>
       </div>
