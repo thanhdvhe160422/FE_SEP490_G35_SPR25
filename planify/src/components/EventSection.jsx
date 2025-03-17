@@ -236,7 +236,7 @@ function EventSection() {
 
               {currentEvents.length === 0 ? (
                 <p className="col-12 no-events-message">
-                  Không tìm thấy sự kiện nào hợp lệ.
+                  No valid events found.
                 </p>
               ) : (
                 currentEvents.map((event) => (
