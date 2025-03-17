@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
 import {
   Form,
   Row,
@@ -20,7 +19,7 @@ import { useNavigate } from "react-router";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
+
   const [selectedImages, setSelectedImages] = useState([]);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMember, setNewMember] = useState("");
@@ -40,6 +39,7 @@ export default function CreateEvent() {
   const [description, setDescription] = useState("");
   const [placed, setPlaced] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,14 +98,7 @@ export default function CreateEvent() {
       )
     );
   };
-  const toISOLocal = (dateStr, timeStr) => {
-    const [year, month, day] = dateStr.split("-");
-    const [hours, minutes] = timeStr.split(":");
-    const date = new Date(year, month - 1, day, hours, minutes);
-    return new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    ).toISOString();
-  };
+
   const handleAddGroup = () => {
     const newGroup = {
       name: `Group ${groups.length + 1}`,
@@ -193,6 +186,7 @@ export default function CreateEvent() {
     updatedGroups[groupIndex].members.splice(memberIndex, 1);
     setGroups(updatedGroups);
   };
+
   const handleSaveDraft = () => {
     Swal.fire({
       title: "Do you want to save the changes?",
@@ -210,13 +204,13 @@ export default function CreateEvent() {
     const errors = [];
 
     if (!eventName) errors.push("Event name");
-    if (!fromDate || !fromTime) errors.push("Start time");
-    if (!toDate || !toTime) errors.push("End time");
-    if (!eventType) errors.push("Event type");
-    if (!description) errors.push("Describe");
-    if (!amountBudget) errors.push("Budget");
+    if (!fromDate || !fromTime) errors.push("Start Time");
+    if (!toDate || !toTime) errors.push("End Time");
+    if (!eventType) errors.push("Type EVent");
+    if (!description) errors.push("Description");
+    if (!amountBudget) errors.push("Amount Budget");
     if (!placed) errors.push("Location");
-    if (selectedImages.length === 0) errors.push("Images");
+    if (selectedImages.length === 0) errors.push("Image");
 
     if (errors.length > 0) {
       enqueueSnackbar(`Missing information: ${errors.join(", ")}`, {
@@ -236,126 +230,131 @@ export default function CreateEvent() {
 
     return true;
   };
+
   const handleCreateEvent = async () => {
     if (!validateFields()) return;
-    setIsLoading(true);
-
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
-
-    if (!userId || !token) {
-      enqueueSnackbar("Your session has expired, please log in again.s", {
-        variant: "error",
-      });
-      navigate("/login");
-      return;
-    }
-    const groupsData = groups.map((group) => ({
-      groupName: group.name,
-      createBy: userId,
-      eventId: 0,
-      implementerIds: group.members.map((member) => member.id),
-    }));
-    const formData = new FormData();
-    formData.append("EventTitle", eventName);
-    formData.append("EventDescription", description);
-    formData.append("StartTime", `${fromDate}T${fromTime}`);
-    formData.append("EndTime", `${toDate}T${toTime}`);
-    formData.append("AmountBudget", amountBudget);
-    formData.append("Placed", placed);
-    formData.append("CategoryEventId", eventType);
-    formData.append("Groups", JSON.stringify(groupsData));
-    selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
-
-    console.log("📤 Dữ liệu gửi lên API:");
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
-    try {
-      const response = await axios.post(
-        "https://localhost:44320/api/Events/create",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.status === 201) {
-        Swal.fire({
-          title: "Do you want to save the changes?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Accept",
-          cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire("Successfully!", "Event has been created", "success");
+  
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+  
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        html: '<span style="color: red;">This event will be sent to Campus Manager for approval!</span>',
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Create",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          setIsLoading(true);
+  
+          const userId = localStorage.getItem("userId");
+          const token = localStorage.getItem("token");
+  
+          if (!userId || !token) {
+            enqueueSnackbar("Your session has expired, please log in again.", {
+              variant: "error",
+            });
+            return;
           }
-        });
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        const newToken = await refreshAccessToken();
-        if (newToken) {
+  
+          const formData = new FormData();
+          formData.append("EventTitle", eventName);
+          formData.append("EventDescription", description);
+          formData.append("StartTime", `${fromDate}T${fromTime}`);
+          formData.append("EndTime", `${toDate}T${toTime}`);
+          formData.append("AmountBudget", amountBudget.replace(/\./g, "")); 
+          formData.append("Placed", placed);
+          formData.append("CategoryEventId", eventType);
+          selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
+  
           try {
-            let retryResponse = await axios.post(
+            const response = await axios.post(
               "https://localhost:44320/api/Events/create",
               formData,
               {
                 headers: {
-                  Authorization: `Bearer ${newToken}`,
+                  Authorization: `Bearer ${token}`,
                   "Content-Type": "multipart/form-data",
                 },
               }
             );
-            if (retryResponse.status === 201) {
-              Swal.fire({
-                title:
-                  "This event will be sent to Campus Manager for approval.",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Accept",
-                cancelButtonText: "Cancel",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  Swal.fire(
-                    "Successfully!",
-                    "Event has been created",
-                    "success"
-                  );
-                }
+  
+            if (response.status === 201) {
+              swalWithBootstrapButtons.fire({
+                title: "Successfully!",
+                text: "Event has been sent to Campus Manager",
+                icon: "success",
+              }).then(() => {
+                navigate("/home"); // Chuyển hướng về màn hình Home
               });
             }
-          } catch (retryError) {
-            console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-            enqueueSnackbar(
-              `Lỗi từ API: ${
-                retryError.response?.data?.message || "Lỗi không xác định"
-              }`,
-              { variant: "error" }
-            );
+          } catch (error) {
+            if (error.response?.status === 401) {
+              const newToken = await refreshAccessToken();
+              if (newToken) {
+                try {
+                  let retryResponse = await axios.post(
+                    "https://localhost:44320/api/Events/create",
+                    formData,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${newToken}`,
+                        "Content-Type": "multipart/form-data",
+                      },
+                    }
+                  );
+                  if (retryResponse.status === 201) {
+                    swalWithBootstrapButtons.fire({
+                      title: "Successfully!",
+                      text: "Event has been created",
+                      icon: "success",
+                    }).then(() => {
+                      navigate("/"); // Chuyển hướng về màn hình Home
+                    });
+                  }
+                } catch (retryError) {
+                  console.error(
+                    "Error from API after refresh:",
+                    retryError.response?.data
+                  );
+                  enqueueSnackbar(
+                    `Error from API: ${
+                      retryError.response?.data?.message || "Unknown error"
+                    }`,
+                    { variant: "error" }
+                  );
+                }
+              } else {
+                enqueueSnackbar(
+                  "Your session has expired, please log in again.",
+                  {
+                    variant: "error",
+                  }
+                );
+              }
+            } else {
+              console.error("Error from API:", error.response?.data);
+              enqueueSnackbar(
+                `Error from API: ${
+                  error.response?.data?.message || "Unknown error"
+                }`,
+                { variant: "error" }
+              );
+            }
+          } finally {
+            setIsLoading(false);
           }
-        } else {
-          enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
-            variant: "error",
-          });
         }
-      } else {
-        console.error("Lỗi từ API:", error.response?.data);
-        enqueueSnackbar(
-          `Lỗi từ API: ${
-            error.response?.data?.message || "Lỗi không xác định"
-          }`,
-          { variant: "error" }
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+      });
   };
 
   const formatCurrency = (value) => {
@@ -382,8 +381,6 @@ export default function CreateEvent() {
           alignItems: "center",
         }}
       >
-        <h2 className="text-center">Create Event</h2>
-
         <Form style={{ width: "100%" }}>
           <Form.Group controlId="eventName">
             <Form.Label>
@@ -452,7 +449,7 @@ export default function CreateEvent() {
               onChange={(e) => setEventType(e.target.value)}
               required
             >
-              <option value="">Chọn loại sự kiện</option>
+              <option value="">Choose Type Event</option>
               {categories.map((categories) => (
                 <option key={categories.id} value={categories.id}>
                   {categories.categoryEventName}
@@ -470,7 +467,15 @@ export default function CreateEvent() {
               rows={3}
               placeholder="Enter description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
+              style={{
+                overflow: "hidden",
+                minHeight: "100px",
+              }}
             />
           </Form.Group>
           <Form.Group controlId="eventLocation" className="mt-3">
