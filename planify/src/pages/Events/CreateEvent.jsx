@@ -209,14 +209,14 @@ export default function CreateEvent() {
   const validateFields = () => {
     const errors = [];
 
-    if (!eventName) errors.push("Tên sự kiện");
-    if (!fromDate || !fromTime) errors.push("Thời gian bắt đầu");
-    if (!toDate || !toTime) errors.push("Thời gian kết thúc");
-    if (!eventType) errors.push("Loại sự kiện");
-    if (!description) errors.push("Mô tả");
-    if (!amountBudget) errors.push("Ngân sách");
-    if (!placed) errors.push("Địa điểm");
-    if (selectedImages.length === 0) errors.push("Ảnh");
+    if (!eventName) errors.push("Event name");
+    if (!fromDate || !fromTime) errors.push("Start time");
+    if (!toDate || !toTime) errors.push("End time");
+    if (!eventType) errors.push("Event type");
+    if (!description) errors.push("Describe");
+    if (!amountBudget) errors.push("Budget");
+    if (!placed) errors.push("Location");
+    if (selectedImages.length === 0) errors.push("Images");
 
     if (errors.length > 0) {
       enqueueSnackbar(`Missing information: ${errors.join(", ")}`, {
@@ -244,7 +244,7 @@ export default function CreateEvent() {
     const token = localStorage.getItem("token");
 
     if (!userId || !token) {
-      enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
+      enqueueSnackbar("Your session has expired, please log in again.s", {
         variant: "error",
       });
       navigate("/login");
