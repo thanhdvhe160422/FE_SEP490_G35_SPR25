@@ -31,7 +31,7 @@ function App() {
         />
         <Route path="/group-detail" element={<GroupDetail />} />
         <Route path="/event-detail-EOG/:eventId" element={<EventDetailEOG />} />
-        <Route path="/create-task" element={<CreateTask />} />
+        <Route path="/group/:groupId/create-task" element={<CreateTask />} />
         <Route path="/manage-request" element={<ManageRequest />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

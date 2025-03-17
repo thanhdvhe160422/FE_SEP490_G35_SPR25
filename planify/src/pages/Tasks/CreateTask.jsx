@@ -4,43 +4,56 @@ import { useSnackbar } from "notistack";
 import { createTaskAPI } from "../../services/taskService";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import { useParams } from 'react-router-dom';
 
 export default function CreateTask() {
   const { enqueueSnackbar } = useSnackbar();
   const [taskName, setTaskName] = useState("");
   const [deadlineDate, setDeadlineDate] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
-  const [description, setDescription] = useState("");
-  const [budget, setBudget] = useState("");
-
+  const [taskDescription, setTaskDescription] = useState("");
+  const [amountBudget, setAmountBudget] = useState("");
+  const { groupId } = useParams();
+  const currentDate = new Date();
+  const createDate = currentDate.toISOString();
+  const startTime = currentDate.toISOString();
+  const organizerId = localStorage.getItem("userId");
   const handleCreateTask = async () => {
     if (
       !taskName ||
       !deadlineDate ||
       !deadlineTime ||
-      !description ||
-      !budget
+      !taskDescription ||
+      !amountBudget
     ) {
       enqueueSnackbar("Vui lòng nhập đầy đủ thông tin!", { variant: "error" });
       return;
     }
-
+    
     const taskData = {
+      groupId,
       taskName,
       deadline: `${deadlineDate}T${deadlineTime}`,
-      description,
-      budget: parseFloat(budget.replace(/,/g, "")),
+      taskDescription,
+      amountBudget: parseFloat(amountBudget.replace(/,/g, "")),
+      createDate,
+      startTime,
+      organizerId,
+      status: 1,
+      progress: 0,
     };
 
     try {
-      await createTaskAPI(taskData);
+      const token = localStorage.getItem('token');
+      console.log(taskData.budget);
+      await createTaskAPI(taskData,token);
       enqueueSnackbar("Task đã được tạo thành công!", { variant: "success" });
 
       setTaskName("");
       setDeadlineDate("");
       setDeadlineTime("");
-      setDescription("");
-      setBudget("");
+      setTaskDescription("");
+      setAmountBudget("");
     } catch (error) {
       enqueueSnackbar("Lỗi khi tạo task!", { variant: "error" });
     }
@@ -81,8 +94,8 @@ export default function CreateTask() {
           <label>Mô tả</label>
           <textarea
             rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={taskDescription}
+            onChange={(e) => setTaskDescription(e.target.value)}
             placeholder="Nhập mô tả task"
             className="task-textarea"
           ></textarea>
@@ -90,9 +103,9 @@ export default function CreateTask() {
           <label>Ngân sách (VNĐ)</label>
           <input
             type="text"
-            value={budget}
+            value={amountBudget}
             onChange={(e) =>
-              setBudget(
+              setAmountBudget(
                 e.target.value
                   .replace(/\D/g, "")
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
