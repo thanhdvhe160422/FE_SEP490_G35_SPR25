@@ -4,9 +4,10 @@ import { useSnackbar } from "notistack";
 import { createTaskAPI } from "../../services/taskService";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function CreateTask() {
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [taskName, setTaskName] = useState("");
   const [deadlineDate, setDeadlineDate] = useState("");
@@ -26,7 +27,9 @@ export default function CreateTask() {
       !taskDescription ||
       !amountBudget
     ) {
-      enqueueSnackbar("Vui lòng nhập đầy đủ thông tin!", { variant: "error" });
+      enqueueSnackbar("Please enter complete information!", {
+        variant: "error",
+      });
       return;
     }
 
@@ -47,15 +50,15 @@ export default function CreateTask() {
       const token = localStorage.getItem("token");
       console.log(taskData.budget);
       await createTaskAPI(taskData, token);
-      enqueueSnackbar("Task đã được tạo thành công!", { variant: "success" });
-
+      enqueueSnackbar("Task created successfully!", { variant: "success" });
+      navigate(`/group-detail/${groupId}`);
       setTaskName("");
       setDeadlineDate("");
       setDeadlineTime("");
       setTaskDescription("");
       setAmountBudget("");
     } catch (error) {
-      enqueueSnackbar("Lỗi khi tạo task!", { variant: "error" });
+      enqueueSnackbar("Error creating task!", { variant: "error" });
     }
   };
 
@@ -65,7 +68,7 @@ export default function CreateTask() {
       <div className="task-container">
         <h3 className="task-title">Create Task </h3>
         <div className="task-form">
-          <label>Tên Task</label>
+          <label>Task Name</label>
           <input
             type="text"
             value={taskName}
@@ -92,7 +95,7 @@ export default function CreateTask() {
             />
           </div>
 
-          <label>Mô tả</label>
+          <label>Discription</label>
           <textarea
             rows={3}
             value={taskDescription}
@@ -101,7 +104,7 @@ export default function CreateTask() {
             className="task-textarea"
           ></textarea>
 
-          <label>Ngân sách (VNĐ)</label>
+          <label>Budget (VNĐ)</label>
           <input
             type="text"
             value={amountBudget}
@@ -112,12 +115,10 @@ export default function CreateTask() {
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               )
             }
-            placeholder="Nhập ngân sách"
             className="task-input"
           />
-
           <button className="task-button" onClick={handleCreateTask}>
-            Tạo Task
+            Create Task
           </button>
         </div>
       </div>
