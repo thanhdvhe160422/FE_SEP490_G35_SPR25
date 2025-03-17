@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
+
+import refreshAccessToken from "../../services/refreshToken";
 import {
   FaClock,
   FaMapMarkerAlt,
@@ -13,11 +15,13 @@ import {
 } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
+import { useSnackbar } from "notistack";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import Swal from "sweetalert2";
 
 const EventDetailEOG = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
@@ -28,16 +32,55 @@ const EventDetailEOG = () => {
   // const backgroundImages = [];
 
   useEffect(() => {
-    fetch(
-      `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`
-    )
-      .then((response) => {
+    const fetchEventData = async () => {
+      const token = localStorage.getItem("token");
+      console.log(token);
+      try {
+        let response = await fetch(
+          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === 401) {
+          const newToken = await refreshAccessToken();
+
+          if (newToken) {
+            response = await fetch(
+              `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${newToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch event data after token refresh`);
+            }
+          } else {
+            enqueueSnackbar(
+              "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.",
+              {
+                variant: "error",
+              }
+            );
+            return;
+          }
+        }
+
         if (!response.ok) {
           throw new Error("Failed to fetch event data");
         }
-        return response.json();
-      })
-      .then((data) => {
+
+        const data = await response.json();
         console.log("Fetched Event Data:", data);
         setEvent(data.result);
 
@@ -47,24 +90,19 @@ const EventDetailEOG = () => {
           );
           setImages(imageUrls);
         }
-      })
-      .catch((error) => console.error("Error fetching event data:", error));
-  }, [eventId]);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+        enqueueSnackbar(
+          `Lỗi khi lấy dữ liệu sự kiện: ${
+            error.message || "Lỗi không xác định"
+          }`,
+          { variant: "error" }
+        );
+      }
+    };
 
-  useEffect(() => {
-    fetch("http://localhost:4000/groups")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch groups data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Fetched Groups Data:", data);
-        setGroups(data);
-      })
-      .catch((error) => console.error("Error fetching groups data:", error));
-  }, []);
+    fetchEventData();
+  }, [eventId]);
 
   const handleDeleteEvent = () => {
     const swalWithBootstrapButtons = Swal.mixin({
@@ -87,8 +125,8 @@ const EventDetailEOG = () => {
       })
       .then((result) => {
         if (result.isConfirmed) {
-          fetch(`http://localhost:4000/events/${event.id}`, {
-            method: "DELETE",
+          fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
+            method: "PUT",
           })
             .then((response) => {
               if (!response.ok) {
@@ -101,7 +139,7 @@ const EventDetailEOG = () => {
                   icon: "success",
                 })
                 .then(() => {
-                  navigate("/list-event");
+                  navigate("/home");
                 });
             })
             .catch((error) => {
@@ -113,11 +151,6 @@ const EventDetailEOG = () => {
               });
             });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire({
-            title: "Cancelled",
-            text: "Your event is safe :)",
-            icon: "error",
-          });
         }
       });
   };
@@ -157,6 +190,11 @@ const EventDetailEOG = () => {
     return <div>Loading...</div>;
   }
 
+  const fixDriveUrl = (url) => {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  };
   const eventStatus = getEventStatus(event.startTime, event.endTime);
 
   return (
@@ -168,7 +206,7 @@ const EventDetailEOG = () => {
             <div
               className="event-header"
               style={{
-                background: `url(${images[currentImageIndex]}) no-repeat center/cover`,
+                background: `url("${images[currentImageIndex]}") no-repeat center/cover`,
                 padding: "30px",
                 borderRadius: "10px",
                 width: "90%",
@@ -177,6 +215,18 @@ const EventDetailEOG = () => {
                 position: "relative",
               }}
             >
+              <img
+                src={fixDriveUrl(images)}
+                // src={images[currentImageIndex]}
+                alt="Event"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+                referrerPolicy="no-referrer"
+              />
               {images.length > 1 && (
                 <>
                   <button
@@ -254,25 +304,39 @@ const EventDetailEOG = () => {
             <div className="event-member-group" style={{ width: "90%" }}>
               <h3>List Group</h3>
               <div className="event-groups">
-                {groups.map((group) => (
+                {event.groups.map((group) => (
                   <div
                     className="event-group-card"
                     key={group.id}
                     onClick={() => navigate(`/groups/${group.id}`)}
                   >
                     <div className="event-group-header">
-                      <span>{group.name}</span>
-                      <span className="group-cost">
-                        Cost: {group.cost} <span>VNĐ</span>
+                      <span style={{ color: "black" }}>{group.groupName}</span>
+                      <span style={{ color: "blanchedalmond" }}>
+                        {group.amountBudget.toLocaleString("vi-VN")} VNĐ
                       </span>
                     </div>
-                    <div className="event-group-members">
-                      {group.members.map((member, index) => (
-                        <div key={index} className="member-item">
-                          <div>{member.name}</div>
-                          <div className="member-email">{member.email}</div>
-                        </div>
-                      ))}
+
+                    <div
+                      className="event-group-members"
+                      style={{ marginTop: "10px" }}
+                    >
+                      {group.joinGroups.length > 0 ? (
+                        group.joinGroups.map((joinGroup) => (
+                          <div
+                            key={joinGroup.id}
+                            className="member-item"
+                            style={{ marginTop: "5px" }}
+                          >
+                            <span>
+                              {joinGroup.implementerFirstName}{" "}
+                              {joinGroup.implementerLastName}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div>No implementers</div>
+                      )}
                     </div>
                   </div>
                 ))}
