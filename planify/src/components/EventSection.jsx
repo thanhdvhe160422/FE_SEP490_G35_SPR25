@@ -195,8 +195,8 @@ function EventSection() {
                       >
                         List Event
                       </button>
-                      {(userRole?.toLowerCase() === "event organizer" ||
-                        userRole?.toLowerCase() === "implementer") && (
+                      {(userRole?.toLowerCase() === "Event Organizer" ||
+                        userRole?.toLowerCase() === "Implementer") && (
                         <button
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
@@ -246,13 +246,24 @@ function EventSection() {
                         src={bannerImage}
                         alt="News"
                         onClick={() => {
+                          const userRole = (localStorage.getItem("role") || "")
+                            .trim()
+                            .toLowerCase();
+                          console.log(
+                            "🔍 User Role khi bấm vào sự kiện:",
+                            userRole
+                          );
+                          console.log("🔍 Event Data:", event);
+
                           let targetUrl = `/event-detail-spec/${event.id}`;
                           if (
-                            userRole === "Campus Manager" ||
-                            userRole === "Event Organizer"
+                            userRole === "campus manager" ||
+                            userRole === "event organizer"
                           ) {
                             targetUrl = `/event-detail-EOG/${event.id}`;
                           }
+
+                          console.log("🚀 Điều hướng đến:", targetUrl);
                           navigate(targetUrl);
                         }}
                         style={{ cursor: "pointer" }}
@@ -267,9 +278,29 @@ function EventSection() {
                         </p>
                         <div
                           className="heding wow fadeInUp"
-                          onClick={() =>
-                            navigate(`/event-detail-spec/${event.id}`)
-                          }
+                          onClick={() => {
+                            const userRole = (
+                              localStorage.getItem("role") || ""
+                            )
+                              .trim()
+                              .toLowerCase();
+                            console.log(
+                              "🔍 User Role khi bấm vào sự kiện:",
+                              userRole
+                            );
+                            console.log("🔍 Event Data:", event);
+
+                            let targetUrl = `/event-detail-spec/${event.id}`;
+                            if (
+                              userRole === "campus manager" ||
+                              userRole === "event organizer"
+                            ) {
+                              targetUrl = `/event-detail-EOG/${event.id}`;
+                            }
+
+                            console.log("🚀 Điều hướng đến:", targetUrl);
+                            navigate(targetUrl);
+                          }}
                           style={{ cursor: "pointer" }}
                         >
                           {event.eventTitle}
