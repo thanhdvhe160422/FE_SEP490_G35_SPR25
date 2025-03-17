@@ -16,10 +16,11 @@ import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
 import getCategories from "../../services/CategoryService";
 import refreshAccessToken from "../../services/refreshToken";
+import { useNavigate } from "react-router";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
-
+  const navigate = useNavigate();
   const [selectedImages, setSelectedImages] = useState([]);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMember, setNewMember] = useState("");
@@ -224,7 +225,6 @@ export default function CreateEvent() {
       return false;
     }
 
-    // Kiểm tra ngày
     const start = new Date(`${fromDate}T${fromTime}`);
     const end = new Date(`${toDate}T${toTime}`);
     if (start >= end) {
@@ -247,9 +247,15 @@ export default function CreateEvent() {
       enqueueSnackbar("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.", {
         variant: "error",
       });
+      navigate("/login");
       return;
     }
-
+    const groupsData = groups.map((group) => ({
+      groupName: group.name,
+      createBy: userId,
+      eventId: 0,
+      implementerIds: group.members.map((member) => member.id),
+    }));
     const formData = new FormData();
     formData.append("EventTitle", eventName);
     formData.append("EventDescription", description);
@@ -258,9 +264,13 @@ export default function CreateEvent() {
     formData.append("AmountBudget", amountBudget);
     formData.append("Placed", placed);
     formData.append("CategoryEventId", eventType);
+    formData.append("Groups", JSON.stringify(groupsData));
     selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
 
-    console.log("Dữ liệu gửi lên API:", formData);
+    console.log("📤 Dữ liệu gửi lên API:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
     try {
       const response = await axios.post(
