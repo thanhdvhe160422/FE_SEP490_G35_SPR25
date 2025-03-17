@@ -29,12 +29,6 @@ const EventDetailEOG = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
 
-  // const backgroundImages = [];
-  const fixDriveUrl = (url) => {
-    if (!url.includes("drive.google.com/uc?id=")) return url;
-    const fileId = url.split("id=")[1];
-    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-  };
   useEffect(() => {
     const fetchEventData = async () => {
       const token = localStorage.getItem("token");
@@ -198,8 +192,6 @@ const EventDetailEOG = () => {
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
-
-  const eventStatus = getEventStatus(event.startTime, event.endTime);
   const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
   return (
     <>
