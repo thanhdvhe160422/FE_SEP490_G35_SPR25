@@ -287,7 +287,6 @@ export default function CreateEvent() {
                 headers: { Authorization: `Bearer ${token}` },
               }
             );
-            console.log("Event Created Response:", createResponse.data);
             if (createResponse.status === 201) {
               const eventId = createResponse.data.result.id;
               await handleUploadImages(eventId, token);
@@ -302,11 +301,63 @@ export default function CreateEvent() {
                 });
             }
           } catch (error) {
-            console.error("Error from API:", error.response?.data);
-            enqueueSnackbar(
-              `Error: ${error.response?.data?.message || "Unknown error"}`,
-              { variant: "error" }
-            );
+            if (error.response?.status === 401) {
+              const newToken = await refreshAccessToken();
+              if (newToken) {
+                try {
+                  let retryResponse = await axios.post(
+                    "https://localhost:44320/api/Events/create",
+                    eventData,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${newToken}`,
+                        "Content-Type": "multipart/form-data",
+                      },
+                    }
+                  );
+                  if (retryResponse.status === 201) {
+                    const eventId = retryResponse.data.result.id;
+                    await handleUploadImages(eventId, token);
+                    swalWithBootstrapButtons
+                      .fire({
+                        title: "Successfully!",
+                        text: "Event has been created and images uploaded.",
+                        icon: "success",
+                      })
+                      .then(() => {
+                        navigate("/home");
+                      });
+                  }
+                } catch (retryError) {
+                  console.error(
+                    "Lỗi từ API sau refresh:",
+                    retryError.response?.data
+                  );
+                  enqueueSnackbar(
+                    `Error from API: ${
+                      retryError.response?.data?.message || "Unknown error"
+                    }`,
+                    { variant: "error" }
+                  );
+                }
+              } else {
+                enqueueSnackbar(
+                  "Your session has expired, please log in again.",
+                  {
+                    variant: "error",
+                  }
+                );
+                navigate("/login");
+              }
+            } else {
+              console.error("Error from API:", error.response?.data);
+              enqueueSnackbar(
+                `Lỗi từ API: ${
+                  error.response?.data?.message || "Unknown error"
+                }`,
+                { variant: "error" }
+              );
+            }
           } finally {
             setIsLoading(false);
           }
