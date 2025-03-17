@@ -4,15 +4,16 @@ import { getGroupTasks } from "../../services/taskService";
 import "../../styles/Group/GroupDetail.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-
+import { useParams } from "react-router-dom";
 function GroupDetail() {
+  const { id } = useParams();
   const [group, setGroup] = useState(null);
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getGroupDetails();
+        const data = await getGroupDetails(id);
         if (data && data.length > 0) {
           const selectedGroup = data[0];
           setGroup(selectedGroup);
@@ -33,22 +34,30 @@ function GroupDetail() {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   return (
     <>
       <Header />
       <div className="group-detail-container">
         <div className="group-detail-member">
-          <h1>Group: {group?.name}</h1>
+          <h1>Group: {group?.groupName}</h1>
           <div className="member-list">
-            {group?.members?.map((member) => (
-              <div className="item-member" key={member.id}>
-                <img src={member.avatar} alt={member.name} className="avatar" />
-                <span className="member-name">{member.name}</span>
-                {member.isLeader && <span className="leader-badge">⭐</span>}
-              </div>
-            ))}
+            {group?.joinGroups?.map((join) => {
+              const member = join.implementer;
+              return (
+                <div className="item-member" key={member.id}>
+                  <img
+                    src="/default-avatar.png"
+                    alt={member.firstName}
+                    className="avatar"
+                  />
+                  <span className="member-name">
+                    {member.firstName} {member.lastName}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -67,39 +76,16 @@ function GroupDetail() {
             </thead>
             <tbody>
               {tasks.length > 0 ? (
-                tasks.map((task, index) => {
-                  // Tìm danh sách người được assign dựa vào danh sách ID
-                  const assignees = group?.members?.filter((member) =>
-                    task.assignedTo?.includes(member.id)
-                  );
-
-                  return (
-                    <tr key={task.id}>
-                      <td>{index + 1}</td>
-                      <td>{task.title}</td>
-                      <td>{task.completed ? "✅ Completed" : "❌ Pending"}</td>
-                      <td>{task.deadline || "N/A"}</td>
-                      <td>
-                        {assignees.length > 0 ? (
-                          <div className="assignee-list">
-                            {assignees.map((assignee) => (
-                              <div key={assignee.id} className="assignee">
-                                <img
-                                  src={assignee.avatar}
-                                  alt={assignee.name}
-                                  className="assignee-avatar"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          "Unassigned"
-                        )}
-                      </td>
-                      <td>${task.budget || "N/A"}</td>
-                    </tr>
-                  );
-                })
+                tasks.map((task, index) => (
+                  <tr key={task.id}>
+                    <td>{index + 1}</td>
+                    <td>{task.taskName}</td>
+                    <td>{task.status === 1 ? "✅ Completed" : "❌ Pending"}</td>
+                    <td>{task.deadline || "N/A"}</td>
+                    <td>Unassigned</td>
+                    <td>${task.amountBudget || "N/A"}</td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan="6">No tasks available</td>
