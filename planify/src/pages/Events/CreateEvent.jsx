@@ -39,7 +39,7 @@ export default function CreateEvent() {
   const [description, setDescription] = useState("");
   const [placed, setPlaced] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -233,7 +233,7 @@ export default function CreateEvent() {
 
   const handleCreateEvent = async () => {
     if (!validateFields()) return;
-  
+
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: "btn btn-success",
@@ -241,7 +241,7 @@ export default function CreateEvent() {
       },
       buttonsStyling: false,
     });
-  
+
     swalWithBootstrapButtons
       .fire({
         title: "Are you sure?",
@@ -255,106 +255,89 @@ export default function CreateEvent() {
       .then(async (result) => {
         if (result.isConfirmed) {
           setIsLoading(true);
-  
           const userId = localStorage.getItem("userId");
           const token = localStorage.getItem("token");
-  
+
           if (!userId || !token) {
             enqueueSnackbar("Your session has expired, please log in again.", {
               variant: "error",
             });
             return;
           }
-  
-          const formData = new FormData();
-          formData.append("EventTitle", eventName);
-          formData.append("EventDescription", description);
-          formData.append("StartTime", `${fromDate}T${fromTime}`);
-          formData.append("EndTime", `${toDate}T${toTime}`);
-          formData.append("AmountBudget", amountBudget.replace(/\./g, "")); 
-          formData.append("Placed", placed);
-          formData.append("CategoryEventId", eventType);
-          selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
-  
+
+          const eventData = {
+            eventTitle: eventName,
+            eventDescription: description,
+            startTime: `${fromDate}T${fromTime}`,
+            endTime: `${toDate}T${toTime}`,
+            amountBudget: Number(amountBudget.replace(/\D/g, "")),
+            categoryEventId: eventType,
+            placed: placed,
+            groups: groups.map((group) => ({
+              groupName: group.name,
+              implementerIds: group.members.map((member) => member.id),
+            })),
+          };
+
           try {
-            const response = await axios.post(
+            const createResponse = await axios.post(
               "https://localhost:44320/api/Events/create",
-              formData,
+              eventData,
               {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "multipart/form-data",
-                },
+                headers: { Authorization: `Bearer ${token}` },
               }
             );
-  
-            if (response.status === 201) {
-              swalWithBootstrapButtons.fire({
-                title: "Successfully!",
-                text: "Event has been sent to Campus Manager",
-                icon: "success",
-              }).then(() => {
-                navigate("/home"); // Chuyển hướng về màn hình Home
-              });
+            console.log("Event Created Response:", createResponse.data);
+            if (createResponse.status === 201) {
+              const eventId = createResponse.data.result.id;
+              await handleUploadImages(eventId, token);
+              swalWithBootstrapButtons
+                .fire({
+                  title: "Successfully!",
+                  text: "Event has been created and images uploaded.",
+                  icon: "success",
+                })
+                .then(() => {
+                  navigate("/home");
+                });
             }
           } catch (error) {
-            if (error.response?.status === 401) {
-              const newToken = await refreshAccessToken();
-              if (newToken) {
-                try {
-                  let retryResponse = await axios.post(
-                    "https://localhost:44320/api/Events/create",
-                    formData,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${newToken}`,
-                        "Content-Type": "multipart/form-data",
-                      },
-                    }
-                  );
-                  if (retryResponse.status === 201) {
-                    swalWithBootstrapButtons.fire({
-                      title: "Successfully!",
-                      text: "Event has been created",
-                      icon: "success",
-                    }).then(() => {
-                      navigate("/"); // Chuyển hướng về màn hình Home
-                    });
-                  }
-                } catch (retryError) {
-                  console.error(
-                    "Error from API after refresh:",
-                    retryError.response?.data
-                  );
-                  enqueueSnackbar(
-                    `Error from API: ${
-                      retryError.response?.data?.message || "Unknown error"
-                    }`,
-                    { variant: "error" }
-                  );
-                }
-              } else {
-                enqueueSnackbar(
-                  "Your session has expired, please log in again.",
-                  {
-                    variant: "error",
-                  }
-                );
-              }
-            } else {
-              console.error("Error from API:", error.response?.data);
-              enqueueSnackbar(
-                `Error from API: ${
-                  error.response?.data?.message || "Unknown error"
-                }`,
-                { variant: "error" }
-              );
-            }
+            console.error("Error from API:", error.response?.data);
+            enqueueSnackbar(
+              `Error: ${error.response?.data?.message || "Unknown error"}`,
+              { variant: "error" }
+            );
           } finally {
             setIsLoading(false);
           }
         }
       });
+  };
+
+  const handleUploadImages = async (eventId, token) => {
+    if (selectedImages.length === 0) return;
+
+    const formData = new FormData();
+    selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
+    formData.append("eventId", eventId);
+    console.log([...formData.entries()]);
+    try {
+      await axios.post(
+        "https://localhost:44320/api/Events/upload-image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Image upload failed:", error.response?.data);
+      enqueueSnackbar("Image upload failed. You can try uploading manually.", {
+        variant: "warning",
+      });
+    }
   };
 
   const formatCurrency = (value) => {
