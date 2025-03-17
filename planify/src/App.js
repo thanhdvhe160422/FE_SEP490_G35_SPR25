@@ -13,6 +13,7 @@ import GroupDetail from "./pages/Group/GroupDetail";
 import EventDetailEOG from "./pages/Events/EventDetailEOG";
 import CreateTask from "./pages/Tasks/CreateTask";
 import ManageRequest from "./pages/Events/ManageRequest";
+import CreateSubTask from "./pages/Sub-tasks/CreateSubTask";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
         <Route path="/event-detail-EOG/:eventId" element={<EventDetailEOG />} />
         <Route path="/create-task" element={<CreateTask />} />
         <Route path="/manage-request" element={<ManageRequest />} />
+        <Route path="/create-subtask/:taskId" element={<CreateSubTask />} />
+        <Route path="/create-subtask" element={<CreateSubTask />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
