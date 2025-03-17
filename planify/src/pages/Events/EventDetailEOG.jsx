@@ -193,7 +193,14 @@ const EventDetailEOG = () => {
   }
 
   const eventStatus = getEventStatus(event.startTime, event.endTime);
+  const fixDriveUrl = (url) => {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  };
 
+  const eventStatus = getEventStatus(event.startTime, event.endTime);
+  const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
   return (
     <>
       <Header />
@@ -203,7 +210,7 @@ const EventDetailEOG = () => {
             <div
               className="event-header"
               style={{
-                background: `url("${images[currentImageIndex]}") no-repeat center/cover`,
+                // background: `url("${fixDriveUrl(images)}") no-repeat center/cover`,
                 padding: "30px",
                 borderRadius: "10px",
                 width: "90%",
@@ -213,8 +220,7 @@ const EventDetailEOG = () => {
               }}
             >
               <img
-                src={fixDriveUrl(images)}
-                // src={images[currentImageIndex]}
+                src={fixDriveUrl(images[currentImageIndex] || defaultImage)}
                 alt="Event"
                 style={{
                   width: "100%",
