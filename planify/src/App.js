@@ -15,7 +15,8 @@ import CreateTask from "./pages/Tasks/CreateTask";
 import ManageRequest from "./pages/Events/ManageRequest";
 import CreateSubTask from "./pages/Sub-tasks/CreateSubTask";
 import UpdateGroup from "./pages/Group/UpdateGroup";
-import DetailTask from "./pages/Tasks/DetailTask"
+import DetailTask from "./pages/Tasks/DetailTask";
+import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
         <Route path="/update-group/:id" element={<UpdateGroup />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
         <Route path="/task/:id" element={<DetailTask />} />
+        <Route path="/home-implementer" element={<HomeOfImplementer />} />
+
       </Routes>
     </div>
   );
