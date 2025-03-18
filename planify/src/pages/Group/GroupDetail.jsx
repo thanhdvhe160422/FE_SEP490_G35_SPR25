@@ -127,8 +127,17 @@ function GroupDetail() {
               )}
             </tbody>
           </table>
-          <button onClick={() => navigate(`/group/${id}/create-task`)}>
+          <button
+            className="create-task-btn"
+            onClick={() => navigate(`/group/${id}/create-task`)}
+          >
             Create Task
+          </button>
+          <button
+            className="update-group-btn"
+            onClick={() => navigate(`/update-group/${id}`)}
+          >
+            Update Group
           </button>
         </div>
       </div>
