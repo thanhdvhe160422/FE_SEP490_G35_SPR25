@@ -350,7 +350,7 @@ function EventSection() {
               )}
             </div>
 
-            {currentEvents.length > 0 && (
+            {filteredEvents.length > EVENTS_PER_PAGE && (
               <div className="pagination_area">
                 <ul className="pagination">
                   <li
