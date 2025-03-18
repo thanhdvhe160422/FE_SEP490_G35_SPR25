@@ -417,7 +417,7 @@ export default function CreateEvent() {
       >
         <Form style={{ width: "100%" }}>
           <Form.Group controlId="eventName">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Name Event <span style={{ color: "red" }}>*</span>
             </Form.Label>
             <Form.Control
@@ -431,7 +431,7 @@ export default function CreateEvent() {
           <Row className="d-flex justify-content-between">
             <Col md={5}>
               <Form.Group controlId="startTime">
-                <Form.Label>
+                <Form.Label style={{ fontWeight: "bold", color: "black" }}>
                   Start Time <span style={{ color: "red" }}>*</span>
                 </Form.Label>
                 <div className="d-flex gap-3">
@@ -453,7 +453,7 @@ export default function CreateEvent() {
 
             <Col md={5}>
               <Form.Group controlId="endTime">
-                <Form.Label>
+                <Form.Label style={{ fontWeight: "bold", color: "black" }}>
                   End Time <span style={{ color: "red" }}>*</span>
                 </Form.Label>
                 <div className="d-flex gap-3">
@@ -475,7 +475,7 @@ export default function CreateEvent() {
           </Row>
 
           <Form.Group controlId="eventType">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Event Type <span style={{ color: "red" }}>*</span>
             </Form.Label>
             <Form.Select
@@ -493,7 +493,7 @@ export default function CreateEvent() {
           </Form.Group>
 
           <Form.Group controlId="eventDescription">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Description <span style={{ color: "red" }}>*</span>
             </Form.Label>
             <Form.Control
@@ -513,7 +513,7 @@ export default function CreateEvent() {
             />
           </Form.Group>
           <Form.Group controlId="eventLocation" className="mt-3">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Location <span style={{ color: "red" }}>*</span>
             </Form.Label>
             <Form.Control
@@ -525,7 +525,7 @@ export default function CreateEvent() {
           </Form.Group>
 
           <Form.Group controlId="amountBudget" className="mt-3">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Amount Budget <span style={{ color: "green" }}>(VNĐ)</span>{" "}
               <span style={{ color: "red" }}>*</span>
             </Form.Label>
@@ -657,7 +657,7 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
-            <Form.Label>
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Image <span style={{ color: "red" }}>*</span>
             </Form.Label>
             <Row>
