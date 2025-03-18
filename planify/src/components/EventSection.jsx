@@ -30,6 +30,10 @@ function EventSection() {
     const fetchData = async () => {
       try {
         const allData = await getPosts();
+        const validStatus = [0, 1, 2];
+        const validEvent = allData.filter((post) =>
+          validStatus.includes(post.status)
+        );
         if (!allData || allData.length === 0) return;
         const getStatusPriority = (event) => {
           const status = statusEvent(event.startTime, event.endTime);
@@ -40,7 +44,7 @@ function EventSection() {
             : 3;
         };
 
-        const sortedEvents = allData
+        const sortedEvents = validEvent
           .map((event) => ({
             ...event,
             status: statusEvent(event.startTime, event.endTime),
@@ -195,8 +199,8 @@ function EventSection() {
                       >
                         List Event
                       </button>
-                      {(userRole?.toLowerCase() === "Event Organizer" ||
-                        userRole?.toLowerCase() === "Implementer") && (
+                      {(userRole?.toLowerCase() === "event organizer" ||
+                        userRole?.toLowerCase() === "implementer") && (
                         <button
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
