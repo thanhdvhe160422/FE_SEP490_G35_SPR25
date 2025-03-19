@@ -26,9 +26,13 @@ body {
   font-size: 22px;
   font-weight: bold;
 }
+.ended_status{
+  background-color: #7f7f7f;
+  color: #fff;
+}
 
 .belarus_fast {
-  padding-top: 25px;
+  margin-bottom: 25px;
 }
 .belarus_items {
   margin-left: 30px;
@@ -76,7 +80,7 @@ body {
   margin-bottom: 5px;
 }
 .belarus_content .heding {
-  font-size: 18px;
+  font-size: 30px;
   font-weight: bold;
 }
 .belarus_content .heding:hover {

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Author/Home.css";
+import {
+  FaClock,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { MdOutlineCategory } from "react-icons/md";
 import bannerImage from "../assets/banner-item-3.jpg";
 import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
@@ -87,7 +92,7 @@ function EventSection() {
 
     if (now >= startTime && now <= endTime) return "running";
     if (now < startTime) return "not started yet";
-    return "ended";
+    return "Closed";
   };
 
   const filteredEvents = events.filter((event) => {
@@ -109,9 +114,6 @@ function EventSection() {
         event.placed?.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
-  useEffect(() => {
-    console.log("Updated categories:", categories[0].id);
-  }, [categories]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -146,6 +148,12 @@ function EventSection() {
 
     return ((now - startTime) / (endTime - startTime)) * 100;
   };
+  const currentCategory = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+
+    return category ? category.categoryEventName : "Unknown";
+  };
+  console.log("cate:", currentCategory(1));
 
   return (
     <section className="post_section news_post_2">
@@ -277,14 +285,31 @@ function EventSection() {
                         }}
                         style={{ cursor: "pointer" }}
                       />
-                      <div className="belarus_content">
-                        <h6>{event.placed}</h6>
-                        <p className="event_time">
-                          <strong>From:</strong>{" "}
-                          {formatDateTime(event.startTime)}
-                          <br />
-                          <strong>To:</strong> {formatDateTime(event.endTime)}
-                        </p>
+
+                      <div
+                        className="belarus_content"
+                        onClick={() => {
+                          const userRole = (localStorage.getItem("role") || "")
+                            .trim()
+                            .toLowerCase();
+                          console.log(
+                            "🔍 User Role khi bấm vào sự kiện:",
+                            userRole
+                          );
+                          console.log("🔍 Event Data:", event);
+
+                          let targetUrl = `/event-detail-spec/${event.id}`;
+                          if (
+                            userRole === "campus manager" ||
+                            userRole === "event organizer"
+                          ) {
+                            targetUrl = `/event-detail-EOG/${event.id}`;
+                          }
+
+                          console.log("🚀 Điều hướng đến:", targetUrl);
+                          navigate(targetUrl);
+                        }}
+                      >
                         <div
                           className="heding wow fadeInUp"
                           onClick={() => {
@@ -314,6 +339,30 @@ function EventSection() {
                         >
                           {event.eventTitle}
                         </div>
+                        <h5>
+                          <FaMapMarkerAlt className="icon-location" />
+
+                          {event.placed}
+                        </h5>
+                        <h5>
+                          <MdOutlineCategory
+                            className="icon-category"
+                            style={{ marginRight: "10px", color: "orange" }}
+                          />
+                          {currentCategory(event.categoryEventId)}
+                        </h5>
+                        <p className="event_time">
+                          <FaClock className="icon-time" />
+                          <strong>From:</strong>{" "}
+                          {formatDateTime(event.startTime)}
+                          <br />
+                          <strong>
+                            <FaClock className="icon-time" />
+                            To:
+                          </strong>{" "}
+                          {formatDateTime(event.endTime)}
+                        </p>
+
                         <div
                           className={`status_tag ${
                             statusEvent(event.startTime, event.endTime) ===

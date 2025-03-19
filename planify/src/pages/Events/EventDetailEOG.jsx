@@ -11,7 +11,6 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaMoneyBillAlt,
-  FaTags,
 } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
@@ -22,7 +21,7 @@ import Swal from "sweetalert2";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [groups, setGroups] = useState([]);
+  // const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
