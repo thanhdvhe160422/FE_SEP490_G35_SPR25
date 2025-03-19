@@ -10,6 +10,11 @@ export default function Authorization() {
         <h1>Oops !</h1>
         <h2>Page Not Found!</h2>
         <p>The page you are looking for doesn't exist or has been moved.</p>
+        <div className="bt">
+          <button onClick={() => navigate("/login")} className="error_btn">
+            Go to Login
+          </button>
+        </div>
       </div>
     </section>
   );

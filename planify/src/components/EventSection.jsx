@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Author/Home.css";
-import {
-  FaClock,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import bannerImage from "../assets/banner-item-3.jpg";
 import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
+import { getCampuses } from "../services/campusService";
 
 const EVENTS_PER_PAGE = 5;
 
@@ -23,11 +21,13 @@ function EventSection() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [eventFilter, setEventFilter] = useState("list");
+  const [campuses, setCampus] = useState("");
   const navigate = useNavigate();
 
   const userRole = localStorage.getItem("role");
   console.log("User Role từ localStorage:", userRole);
   const currentUserId = localStorage.getItem("userId");
+  const campus = localStorage.getItem("campus");
 
   useEffect(() => {
     console.log("Fetching events...");
@@ -39,6 +39,9 @@ function EventSection() {
         const validEvent = allData.filter((post) =>
           validStatus.includes(post.status)
         );
+        const campusEvents = validEvent.filter(
+          (event) => currentCampus(event) === campus
+        );
         if (!allData || allData.length === 0) return;
         const getStatusPriority = (event) => {
           const status = statusEvent(event.startTime, event.endTime);
@@ -49,7 +52,7 @@ function EventSection() {
             : 3;
         };
 
-        const sortedEvents = validEvent
+        const sortedEvents = campusEvents
           .map((event) => ({
             ...event,
             status: statusEvent(event.startTime, event.endTime),
@@ -70,11 +73,18 @@ function EventSection() {
         console.error("❌ Lỗi khi lấy danh mục:", error);
       }
     };
-
+    const fetCampus = async () => {
+      try {
+        const campusData = await getCampuses();
+        setCampus(campusData);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy trường:", error);
+      }
+    };
+    fetCampus();
     fetchData();
     fetchCategories();
   }, []);
-
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -153,7 +163,10 @@ function EventSection() {
 
     return category ? category.categoryEventName : "Unknown";
   };
-  console.log("cate:", currentCategory(1));
+  const currentCampus = (event) => {
+    const campus = campuses.find((cat) => cat.id === event.campusId);
+    return campus ? campus.campusName : "Unknown";
+  };
 
   return (
     <section className="post_section news_post_2">
