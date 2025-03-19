@@ -4,19 +4,22 @@
   align-items: center;
   padding: 20px;
   padding-top: 100px;
-  background: #f4f4f9;
+  background: #fff8f0; /* Cam nhạt */
   min-height: 100vh;
 }
 
+/* Card chứa thông tin nhóm */
 .group-detail-member {
   width: 100%;
   max-width: 800px;
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
+  border-left: 5px solid #e67e22;
 }
 
+/* Danh sách thành viên */
 .member-list {
   display: flex;
   flex-direction: column;
@@ -27,37 +30,42 @@
 .item-member {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #fff;
+  gap: 12px;
+  background: #fdf2e9; /* Màu nền cam nhạt */
   padding: 12px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 2px 5px rgba(211, 84, 0, 0.2);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .item-member:hover {
   transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(211, 84, 0, 0.3);
 }
 
+/* Avatar của thành viên */
 .avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 2px solid #ddd;
+  border: 2px solid #e67e22;
 }
 
+/* Tên thành viên */
 .member-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #d35400;
 }
 
+/* Biểu tượng Leader */
 .leader-badge {
   font-size: 20px;
-  color: gold;
+  color: #f39c12; /* Vàng */
   margin-left: auto;
 }
 
+/* Danh sách nhiệm vụ */
 .list-task {
   width: 100%;
   max-width: 900px;
@@ -65,9 +73,11 @@
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
+  border-left: 5px solid #e67e22;
 }
 
+/* Bảng nhiệm vụ */
 .task-table {
   width: 100%;
   border-collapse: collapse;
@@ -76,25 +86,26 @@
 
 .task-table th,
 .task-table td {
-  border: 1px solid #ddd;
+  border: 1px solid #f5cba7;
   padding: 12px;
   text-align: left;
 }
 
 .task-table th {
-  background-color: #007bff;
+  background-color: #e67e22;
   color: white;
   font-weight: bold;
 }
 
 .task-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: #fdf2e9;
 }
 
 .task-table tr:hover {
-  background-color: #e9ecef;
+  background-color: #f5cba7;
 }
 
+/* Người được giao nhiệm vụ */
 .assignee-list {
   display: flex;
   align-items: center;
@@ -111,10 +122,80 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid #ddd;
+  border: 2px solid #e67e22;
 }
 
 .assignee-name {
   font-size: 14px;
-  color: #555;
+  color: #d35400;
+}
+.create-task-btn {
+  background-color: #ff7f50; /* Cam */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-right: 10px;
+}
+
+.create-task-btn:hover {
+  background-color: #ff4500; /* Cam đậm hơn */
+}
+
+.update-group-btn {
+  background-color: #f4f4f4; /* Xám nhạt */
+  color: #333;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.update-group-btn:hover {
+  background-color: #e0e0e0;
+}
+.total-budget {
+  color: #00ee3b;
+  font-size: large;
+  font-weight: 550;
+}
+.remaning-budget {
+  color: #eeb600;
+  font-weight: 550;
+}
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-checkbox {
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #4caf50;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-checkbox:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+/* Biểu tượng check */
+.custom-checkbox:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
 }

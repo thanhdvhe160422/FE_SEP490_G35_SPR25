@@ -11,7 +11,6 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaMoneyBillAlt,
-  FaTags,
 } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
@@ -22,14 +21,12 @@ import Swal from "sweetalert2";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [groups, setGroups] = useState([]);
+  // const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { eventId } = useParams();
-
-  // const backgroundImages = [];
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -102,7 +99,7 @@ const EventDetailEOG = () => {
     fetchEventData();
   }, [eventId]);
 
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = async () => {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: "btn btn-success",
@@ -110,48 +107,78 @@ const EventDetailEOG = () => {
       },
       buttonsStyling: false,
     });
-
-    swalWithBootstrapButtons
-      .fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
-        reverseButtons: true,
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
-            method: "PUT",
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to delete event");
-              }
-              swalWithBootstrapButtons
-                .fire({
-                  title: "Deleted!",
-                  text: "Your event has been deleted.",
-                  icon: "success",
-                })
-                .then(() => {
-                  navigate("/home");
-                });
-            })
-            .catch((error) => {
-              console.error("Error deleting event:", error);
-              swalWithBootstrapButtons.fire({
-                title: "Error!",
-                text: "Failed to delete event. Please try again!",
-                icon: "error",
-              });
+  
+    const result = await swalWithBootstrapButtons.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true,
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        let token = localStorage.getItem("token");
+  
+        // Gọi API xóa với token
+        let response = await fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+  
+        // Nếu token hết hạn (401), tự động refresh và gọi lại API
+        if (response.status === 401) {
+          const newToken = await refreshAccessToken();
+  
+          if (newToken) {
+            // Gọi lại API với token mới
+            response = await fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${newToken}`,
+                "Content-Type": "application/json",
+              },
             });
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          } else {
+            enqueueSnackbar("Your session has expired. Please log in again.", {
+              variant: "error",
+            });
+            navigate("/login");
+            return;
+          }
         }
-      });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete event");
+        }
+  
+        swalWithBootstrapButtons
+          .fire({
+            title: "Deleted!",
+            text: "Your event has been deleted.",
+            icon: "success",
+          })
+          .then(() => {
+            navigate("/home");
+          });
+  
+      } catch (error) {
+        console.error("Error deleting event:", error);
+        swalWithBootstrapButtons.fire({
+          title: "Error!",
+          text: error.message || "Failed to delete event. Please try again!",
+          icon: "error",
+        });
+      }
+    }
   };
+  
 
   const formatDateTime = (dateTime) => {
     const date = parseISO(dateTime);
@@ -188,13 +215,13 @@ const EventDetailEOG = () => {
     return <div>Loading...</div>;
   }
 
+  const eventStatus = getEventStatus(event.startTime, event.endTime);
   const fixDriveUrl = (url) => {
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
-  const eventStatus = getEventStatus(event.startTime, event.endTime);
-
+  const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
   return (
     <>
       <Header />
@@ -204,7 +231,7 @@ const EventDetailEOG = () => {
             <div
               className="event-header"
               style={{
-                background: `url("${images[currentImageIndex]}") no-repeat center/cover`,
+                // background: `url("${fixDriveUrl(images)}") no-repeat center/cover`,
                 padding: "30px",
                 borderRadius: "10px",
                 width: "90%",
@@ -214,8 +241,7 @@ const EventDetailEOG = () => {
               }}
             >
               <img
-                src={fixDriveUrl(images)}
-                // src={images[currentImageIndex]}
+                src={fixDriveUrl(images[currentImageIndex] || defaultImage)}
                 alt="Event"
                 style={{
                   width: "100%",

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Author/Home.css";
+import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { MdOutlineCategory } from "react-icons/md";
 import bannerImage from "../assets/banner-item-3.jpg";
 import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
+import { getCampuses } from "../services/campusService";
 
 const EVENTS_PER_PAGE = 5;
 
@@ -18,11 +21,13 @@ function EventSection() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [eventFilter, setEventFilter] = useState("list");
+  const [campuses, setCampus] = useState("");
   const navigate = useNavigate();
 
   const userRole = localStorage.getItem("role");
   console.log("User Role từ localStorage:", userRole);
   const currentUserId = localStorage.getItem("userId");
+  const campus = localStorage.getItem("campus");
 
   useEffect(() => {
     console.log("Fetching events...");
@@ -30,6 +35,13 @@ function EventSection() {
     const fetchData = async () => {
       try {
         const allData = await getPosts();
+        const validStatus = [0, 1, 2];
+        const validEvent = allData.filter((post) =>
+          validStatus.includes(post.status)
+        );
+        const campusEvents = validEvent.filter(
+          (event) => currentCampus(event) === campus
+        );
         if (!allData || allData.length === 0) return;
         const getStatusPriority = (event) => {
           const status = statusEvent(event.startTime, event.endTime);
@@ -40,7 +52,7 @@ function EventSection() {
             : 3;
         };
 
-        const sortedEvents = allData
+        const sortedEvents = campusEvents
           .map((event) => ({
             ...event,
             status: statusEvent(event.startTime, event.endTime),
@@ -48,6 +60,7 @@ function EventSection() {
           .sort((a, b) => getStatusPriority(a) - getStatusPriority(b));
 
         setEvents(sortedEvents);
+        console.log(sortedEvents);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
       }
@@ -61,11 +74,18 @@ function EventSection() {
         console.error("❌ Lỗi khi lấy danh mục:", error);
       }
     };
-
+    const fetCampus = async () => {
+      try {
+        const campusData = await getCampuses();
+        setCampus(campusData);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy trường:", error);
+      }
+    };
+    fetCampus();
     fetchData();
     fetchCategories();
   }, []);
-
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -83,7 +103,7 @@ function EventSection() {
 
     if (now >= startTime && now <= endTime) return "running";
     if (now < startTime) return "not started yet";
-    return "ended";
+    return "Closed";
   };
 
   const filteredEvents = events.filter((event) => {
@@ -93,7 +113,7 @@ function EventSection() {
 
     return (
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
-      (!selectedCategory || event.category === selectedCategory) &&
+      (!selectedCategory || event.categoryEventId === selectedCategory) &&
       (!searchTerm ||
         event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedStatus === "" ||
@@ -138,6 +158,15 @@ function EventSection() {
     if (now > endTime) return 100;
 
     return ((now - startTime) / (endTime - startTime)) * 100;
+  };
+  const currentCategory = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+
+    return category ? category.categoryEventName : "Unknown";
+  };
+  const currentCampus = (event) => {
+    const campus = campuses.find((cat) => cat.id === event.campusId);
+    return campus ? campus.campusName : "Unknown";
   };
 
   return (
@@ -195,8 +224,8 @@ function EventSection() {
                       >
                         List Event
                       </button>
-                      {(userRole?.toLowerCase() === "Event Organizer" ||
-                        userRole?.toLowerCase() === "Implementer") && (
+                      {(userRole?.toLowerCase() === "event organizer" ||
+                        userRole?.toLowerCase() === "implementer") && (
                         <button
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
@@ -211,11 +240,13 @@ function EventSection() {
                       <select
                         className="post_select"
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e) =>
+                          setSelectedCategory(Number(e.target.value))
+                        } // Ép kiểu về số
                       >
                         <option value="">All Categories</option>
                         {categories.map((category) => (
-                          <option key={category.id} value={category.name}>
+                          <option key={category.id} value={category.id}>
                             {category.categoryEventName}
                           </option>
                         ))}
@@ -268,14 +299,31 @@ function EventSection() {
                         }}
                         style={{ cursor: "pointer" }}
                       />
-                      <div className="belarus_content">
-                        <h6>{event.placed}</h6>
-                        <p className="event_time">
-                          <strong>From:</strong>{" "}
-                          {formatDateTime(event.startTime)}
-                          <br />
-                          <strong>To:</strong> {formatDateTime(event.endTime)}
-                        </p>
+
+                      <div
+                        className="belarus_content"
+                        onClick={() => {
+                          const userRole = (localStorage.getItem("role") || "")
+                            .trim()
+                            .toLowerCase();
+                          console.log(
+                            "🔍 User Role khi bấm vào sự kiện:",
+                            userRole
+                          );
+                          console.log("🔍 Event Data:", event);
+
+                          let targetUrl = `/event-detail-spec/${event.id}`;
+                          if (
+                            userRole === "campus manager" ||
+                            userRole === "event organizer"
+                          ) {
+                            targetUrl = `/event-detail-EOG/${event.id}`;
+                          }
+
+                          console.log("🚀 Điều hướng đến:", targetUrl);
+                          navigate(targetUrl);
+                        }}
+                      >
                         <div
                           className="heding wow fadeInUp"
                           onClick={() => {
@@ -305,6 +353,30 @@ function EventSection() {
                         >
                           {event.eventTitle}
                         </div>
+                        <h5>
+                          <FaMapMarkerAlt className="icon-location" />
+
+                          {event.placed}
+                        </h5>
+                        <h5>
+                          <MdOutlineCategory
+                            className="icon-category"
+                            style={{ marginRight: "10px", color: "orange" }}
+                          />
+                          {currentCategory(event.categoryEventId)}
+                        </h5>
+                        <p className="event_time">
+                          <FaClock className="icon-time" />
+                          <strong>From:</strong>{" "}
+                          {formatDateTime(event.startTime)}
+                          <br />
+                          <strong>
+                            <FaClock className="icon-time" />
+                            To:
+                          </strong>{" "}
+                          {formatDateTime(event.endTime)}
+                        </p>
+
                         <div
                           className={`status_tag ${
                             statusEvent(event.startTime, event.endTime) ===
@@ -346,8 +418,8 @@ function EventSection() {
               )}
             </div>
 
-            {currentEvents.length > 0 && (
-              <div className="pagination_area">
+            {filteredEvents.length > EVENTS_PER_PAGE && (
+              <div className="pagination_area" style={{ padding: "30px" }}>
                 <ul className="pagination">
                   <li
                     className={`page-item ${

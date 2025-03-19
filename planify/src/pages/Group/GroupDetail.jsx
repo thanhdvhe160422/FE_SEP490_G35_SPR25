@@ -15,6 +15,7 @@ function GroupDetail() {
   const navigate = useNavigate();
   const [group, setGroup] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,19 +26,10 @@ function GroupDetail() {
           navigate("/login");
         } else if (data) {
           setGroup(data);
-        }
-        if (data) {
-          setGroup(data);
           console.log("Group Details:", data);
 
-          const tasksData = await getGroupTasks(data.id);
-          console.log("Tasks Data:", tasksData);
-
-          if (Array.isArray(tasksData)) {
-            setTasks(tasksData);
-          } else {
-            console.error("Invalid task data format", tasksData);
-          }
+          const tasksData = data.tasks || [];
+          setTasks(tasksData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -46,23 +38,51 @@ function GroupDetail() {
     fetchData();
   }, [id]);
 
+  const filteredTasks = tasks.filter((task) =>
+    task.taskName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const remainingBudget = (tasks, group) => {
+    const totalBudget = group?.amountBudget || 0;
+    const totalSpent = tasks.reduce(
+      (acc, task) => acc + (task.amountBudget || 0),
+      0
+    );
+    return totalBudget - totalSpent;
+  };
+  const handleStatusChange = (taskId) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId
+          ? { ...task, status: task.status === 1 ? 0 : 1 }
+          : task
+      )
+    );
+  };
+
   return (
     <>
       <Header />
       <div className="group-detail-container">
         <div className="group-detail-member">
           <h1>Group: {group?.groupName || "N/A"}</h1>
+          <div className="total-budget">
+            Total Budget:{" "}
+            {group?.amountBudget ? group.amountBudget.toLocaleString() : "N/A"}{" "}
+            VNĐ
+          </div>
+          <div className="remaning-budget">
+            Remaining Budget:{" "}
+            {remainingBudget(tasks, group)
+              ? remainingBudget(tasks, group).toLocaleString()
+              : "N/A"}{" "}
+            VNĐ
+          </div>
           <div className="member-list">
             {group?.joinGroups?.length > 0 ? (
               group.joinGroups.map((join) => {
                 const member = join.implementer;
                 return (
                   <div className="item-member" key={member.id}>
-                    <img
-                      src="/default-avatar.png"
-                      alt={member.firstName}
-                      className="avatar"
-                    />
                     <span className="member-name">
                       {member.firstName} {member.lastName}
                     </span>
@@ -77,35 +97,36 @@ function GroupDetail() {
 
         <div className="list-task">
           <h2>Task List</h2>
-          <button onClick={() => {
-              navigate(`/group/${id}/create-task`);
-            }}>
-            Create Task
-          </button>
-          
+
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="task-search"
+          />
+
           <table className="task-table">
             <thead>
               <tr>
                 <th>STT</th>
                 <th>Name Task</th>
-                <th>Status</th>
                 <th>Deadline</th>
                 <th>Progress</th>
-                <th>Assign</th>
                 <th>Budget</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {group?.tasks?.length > 0 ? (
-                group.tasks.map((task, index) => (
+              {filteredTasks.length > 0 ? (
+                filteredTasks.map((task, index) => (
                   <tr
                     key={task.id}
-                    onClick={() => navigate(`/task-detail/${task.id}`)}
+                    onClick={() => navigate(`/task/${task.id}`)}
                     style={{ cursor: "pointer" }}
                   >
                     <td>{index + 1}</td>
                     <td>{task.taskName}</td>
-                    <td>{task.status === 1 ? "✅ Completed" : "❌ Pending"}</td>
                     <td>{task.deadline || "N/A"}</td>
                     <td>
                       <div style={{ width: 50, height: 50 }}>
@@ -121,19 +142,43 @@ function GroupDetail() {
                         />
                       </div>
                     </td>
-                    <td></td>
                     <td>
                       {task.amountBudget.toLocaleString("vi-VN") || "N/A"} VNĐ
+                    </td>
+                    <td>
+                      <div className="checkbox-container">
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          checked={task.status === 1}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(task.id);
+                          }}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5">No tasks available</td>
+                  <td colSpan="6">No tasks found</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <button
+            className="create-task-btn"
+            onClick={() => navigate(`/group/${id}/create-task`)}
+          >
+            Create Task
+          </button>
+          <button
+            className="update-group-btn"
+            onClick={() => navigate(`/update-group/${id}`)}
+          >
+            Update Group
+          </button>
         </div>
       </div>
       <Footer />
