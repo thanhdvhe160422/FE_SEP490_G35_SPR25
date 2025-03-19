@@ -18,17 +18,16 @@ import CreateSubTask from "./pages/Sub-tasks/CreateSubTask";
 import UpdateGroup from "./pages/Group/UpdateGroup";
 import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
+import UpdateEvent from "./pages/Events/UpdateEvent";
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        {/* Các trang không cần phân quyền */}
         <Route path="/login" element={<Login />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/authorization" element={<Authorization />} />
 
-        {/* Các trang cần phân quyền */}
         <Route
           path="/home"
           element={
@@ -176,7 +175,14 @@ function App() {
             </PrivateRoute>
           }
         />
-
+        <Route
+          path="/update-event/:id"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
+              <UpdateEvent />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/home-implementer"
           element={

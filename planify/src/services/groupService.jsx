@@ -105,6 +105,7 @@ export const addImplementer = async (data) => {
         try {
           const retryResponse = await axios.post(
             `https://localhost:44320/api/JoinGroup/add-implementer`,
+            data,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -125,6 +126,53 @@ export const addImplementer = async (data) => {
     }
     console.error("Error fetching group details:", error);
     Swal.fire("Error", "Unable to get group information.", "error");
+    return null;
+  }
+};
+
+export const addLeader = async (groupId, implementerId) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Groups/add-lead-group/${groupId}/${implementerId}`,
+      {}, // Payload trống nhưng cần có
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/Groups/add-lead-group/${groupId}/${implementerId}`,
+            {}, // Payload trống
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to assign leader after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        return { error: "expired" };
+      }
+    }
+    console.error("Error assigning leader:", error);
+    Swal.fire("Error", "Unable to assign leader.", "error");
     return null;
   }
 };

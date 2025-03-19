@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { addLeader } from "../../services/GroupService";
 import {
   Form,
   Row,
@@ -16,6 +17,8 @@ import { useSnackbar } from "notistack";
 import getCategories from "../../services/CategoryService";
 import refreshAccessToken from "../../services/refreshToken";
 import { useNavigate } from "react-router";
+import LoadingHand from "../../components/Loading";
+import "../../styles/Events/CreateEvent.css";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -40,7 +43,8 @@ export default function CreateEvent() {
   const [placed, setPlaced] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -85,18 +89,32 @@ export default function CreateEvent() {
     );
   };
 
-  const toggleStar = (groupIndex, memberIndex) => {
-    setGroups(
-      groups.map((group, i) =>
-        i === groupIndex
-          ? {
-              ...group,
-              selectedStar:
-                group.selectedStar === memberIndex ? null : memberIndex,
-            }
-          : group
-      )
-    );
+  const toggleStar = async (groupIndex, memberIndex) => {
+    const group = groups[groupIndex];
+    const member = group.members[memberIndex];
+
+    try {
+      const response = await addLeader(group.id, member.id);
+      if (response) {
+        setGroups((prevGroups) =>
+          prevGroups.map((g, i) =>
+            i === groupIndex
+              ? {
+                  ...g,
+                  selectedStar:
+                    g.selectedStar === memberIndex ? null : memberIndex,
+                }
+              : g
+          )
+        );
+        enqueueSnackbar("Leader assigned successfully!", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Error assigning leader:", error);
+      enqueueSnackbar("Failed to assign leader.", { variant: "error" });
+    }
   };
 
   const handleAddGroup = () => {
@@ -120,63 +138,106 @@ export default function CreateEvent() {
   };
 
   const handleAddMember = () => {
-    if (newMember.trim() !== "" && isValidMember) {
-      const selectedUser = users.find(
-        (user) =>
-          `${user.firstName} ${user.lastName}`.toLowerCase() ===
-          newMember.toLowerCase()
+    if (!isValidMember || !newMember) return;
+
+    const updatedGroups = [...groups];
+    updatedGroups[selectedGroupIndex] = {
+      ...updatedGroups[selectedGroupIndex],
+      members: [
+        ...updatedGroups[selectedGroupIndex].members,
+        {
+          id: newMember.id,
+          name: `${newMember.firstName} ${newMember.lastName}`,
+          email: newMember.email,
+        },
+      ],
+    };
+
+    setGroups(updatedGroups);
+    setNewMember(null);
+    setShowAddMemberModal(false);
+    setIsValidMember(false);
+  };
+
+  const handleNewMemberChange = async (e) => {
+    const value = e.target.value;
+    setNewMember(value);
+
+    if (value.trim() === "") {
+      setSuggestions([]);
+      setIsValidMember(false);
+      return;
+    }
+
+    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+    try {
+      const response = await axios.get(
+        `https://localhost:44320/api/Users/search?input=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (selectedUser) {
-        const updatedGroups = [...groups];
-        updatedGroups[selectedGroupIndex].members.push({
-          id: selectedUser.id,
-          name: `${selectedUser.firstName} ${selectedUser.lastName}`,
-          email: selectedUser.email,
-        });
-        setGroups(updatedGroups);
-        setNewMember("");
-        setShowAddMemberModal(false);
+      const filteredUsers = response.data || [];
+      const currentGroupMembers = groups[selectedGroupIndex]?.members || [];
+
+      const availableUsers = filteredUsers.filter(
+        (user) => !currentGroupMembers.some((member) => member.id === user.id)
+      );
+
+      setSuggestions(availableUsers);
+      setIsValidMember(availableUsers.length > 0);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          localStorage.setItem("token", newToken);
+          try {
+            const retryResponse = await axios.get(
+              `https://localhost:44320/api/Users/search?input=${value}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${newToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            const filteredUsers = retryResponse.data || [];
+            const currentGroupMembers =
+              groups[selectedGroupIndex]?.members || [];
+
+            const availableUsers = filteredUsers.filter(
+              (user) =>
+                !currentGroupMembers.some((member) => member.id === user.id)
+            );
+
+            setSuggestions(availableUsers);
+            setIsValidMember(availableUsers.length > 0);
+          } catch (retryError) {
+            console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+            setSuggestions([]);
+            setIsValidMember(false);
+          }
+        } else {
+          console.error("Không thể refresh token, yêu cầu đăng nhập lại.");
+          setSuggestions([]);
+          setIsValidMember(false);
+        }
+      } else {
+        console.error("Lỗi khi tìm implementer:", error.response?.data);
+        setSuggestions([]);
         setIsValidMember(false);
       }
     }
   };
 
-  const handleNewMemberChange = (e) => {
-    const value = e.target.value;
-    setNewMember(value);
-
-    const currentGroupMembers = groups[selectedGroupIndex]?.members || [];
-
-    if (value.trim() !== "") {
-      const filteredSuggestions = users.filter(
-        (user) =>
-          `${user.firstName} ${user.lastName}`
-            .toLowerCase()
-            .includes(value.toLowerCase()) &&
-          !currentGroupMembers.some(
-            (member) => member.name === `${user.firstName} ${user.lastName}`
-          )
-      );
-      setSuggestions(filteredSuggestions);
-
-      const isValid = users.some(
-        (user) =>
-          `${user.firstName} ${user.lastName}`.toLowerCase() ===
-            value.toLowerCase() &&
-          !currentGroupMembers.some(
-            (member) => member.name === `${user.firstName} ${user.lastName}`
-          )
-      );
-      setIsValidMember(isValid);
-    } else {
-      setSuggestions([]);
-      setIsValidMember(false);
-    }
-  };
-
   const handleSuggestionClick = (user) => {
-    setNewMember(`${user.firstName} ${user.lastName}`);
+    setNewMember(user);
     setSuggestions([]);
     setIsValidMember(true);
   };
@@ -255,8 +316,6 @@ export default function CreateEvent() {
       .then(async (result) => {
         if (result.isConfirmed) {
           setIsLoading(true);
-          const userId = localStorage.getItem("userId");
-          const token = localStorage.getItem("token");
 
           if (!userId || !token) {
             enqueueSnackbar("Your session has expired, please log in again.", {
@@ -634,6 +693,7 @@ export default function CreateEvent() {
                                     <FaRegStar />
                                   )}
                                 </span>
+
                                 <Button
                                   variant="danger"
                                   size="sm"
@@ -660,26 +720,31 @@ export default function CreateEvent() {
             <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Image <span style={{ color: "red" }}>*</span>
             </Form.Label>
-            <Row>
-              <Col xs={3}>
-                <label
-                  className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-                  style={{
-                    cursor: "pointer",
-                    aspectRatio: "1/1",
-                    minHeight: "100px",
-                  }}
-                >
-                  <FaPlus />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageUpload}
-                    style={{ display: "none" }}
-                  />
-                </label>
-              </Col>
+            <div
+              className="container-chosse-file"
+              onClick={() => document.getElementById("fileUpload").click()}
+            >
+              <div className="folder">
+                <div className="front-side">
+                  <div className="tip"></div>
+                  <div className="cover"></div>
+                </div>
+                <div className="back-side cover"></div>
+              </div>
+              <label className="custom-file-upload">
+                <input
+                  id="fileUpload"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                />
+                Choose a file
+              </label>
+            </div>
+
+            <Row className="mt-3">
               {selectedImages.map((file, index) => (
                 <Col xs={3} key={index} className="position-relative">
                   <img
@@ -715,7 +780,7 @@ export default function CreateEvent() {
               onClick={handleCreateEvent}
               disabled={isLoading}
             >
-              {isLoading ? "Loading..." : "Create Event"}
+              {isLoading ? <LoadingHand /> : "Create Event"}
             </Button>
           </div>
         </Form>
