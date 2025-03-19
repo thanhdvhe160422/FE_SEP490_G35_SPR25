@@ -45,6 +45,7 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const [usersName, setUsersName] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -139,7 +140,7 @@ export default function CreateEvent() {
 
   const handleAddMember = () => {
     if (!isValidMember || !newMember) return;
-
+    setUsersName("");
     const updatedGroups = [...groups];
     updatedGroups[selectedGroupIndex] = {
       ...updatedGroups[selectedGroupIndex],
@@ -161,8 +162,8 @@ export default function CreateEvent() {
 
   const handleNewMemberChange = async (e) => {
     const value = e.target.value;
-    setNewMember(value);
-
+    //setNewMember(value);
+    setUsersName(value);
     if (value.trim() === "") {
       setSuggestions([]);
       setIsValidMember(false);
@@ -238,6 +239,7 @@ export default function CreateEvent() {
 
   const handleSuggestionClick = (user) => {
     setNewMember(user);
+    setUsersName(user.firstName + " " + user.lastName);
     setSuggestions([]);
     setIsValidMember(true);
   };
@@ -718,33 +720,37 @@ export default function CreateEvent() {
 
           <Form.Group className="mt-3">
             <Form.Label style={{ fontWeight: "bold", color: "black" }}>
-              Image <span style={{ color: "red" }}>*</span>
+              Image <span style={{ color: "red" }}>*</span>{" "}
+              <span
+                style={{
+                  fontWeight: "initial",
+                  color: "red",
+                  fontStyle: "italic",
+                }}
+              >
+                (The first photo will be the background photo of the event.)
+              </span>
             </Form.Label>
-            <div
-              className="container-chosse-file"
-              onClick={() => document.getElementById("fileUpload").click()}
-            >
-              <div className="folder">
-                <div className="front-side">
-                  <div className="tip"></div>
-                  <div className="cover"></div>
-                </div>
-                <div className="back-side cover"></div>
-              </div>
-              <label className="custom-file-upload">
-                <input
-                  id="fileUpload"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
-                />
-                Choose a file
-              </label>
-            </div>
-
-            <Row className="mt-3">
+            <Row>
+              <Col xs={3}>
+                <label
+                  className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                  style={{
+                    cursor: "pointer",
+                    aspectRatio: "1/1",
+                    minHeight: "100px",
+                  }}
+                >
+                  <FaPlus />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </Col>
               {selectedImages.map((file, index) => (
                 <Col xs={3} key={index} className="position-relative">
                   <img
@@ -769,7 +775,6 @@ export default function CreateEvent() {
               ))}
             </Row>
           </Form.Group>
-
           <div className="d-flex justify-content-between mt-4">
             <Button variant="danger">Cancel</Button>
             <Button variant="primary" onClick={handleSaveDraft}>
@@ -796,7 +801,7 @@ export default function CreateEvent() {
             <Form.Control
               type="text"
               placeholder="Enter email or name"
-              value={newMember}
+              value={usersName}
               onChange={handleNewMemberChange}
             />
             {suggestions.length > 0 && (
@@ -808,6 +813,7 @@ export default function CreateEvent() {
                     onClick={() => handleSuggestionClick(user)}
                   >
                     {`${user.firstName} ${user.lastName}`}
+                    <div> {user.email}</div>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
