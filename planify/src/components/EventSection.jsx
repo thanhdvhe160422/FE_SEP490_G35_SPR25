@@ -291,9 +291,11 @@ function EventSection() {
                   <div key={event.id} className="col-12 belarus_fast">
                     <div className="belarus_items">
                       <img
-                        src={fixDriveUrl(
-                          event.eventMedias[0].mediaDTO.mediaUrl
-                        )}
+                          src={
+                            event.eventMedias?.length > 0
+                                ? fixDriveUrl(event.eventMedias[0].mediaDTO.mediaUrl)
+                                : bannerImage
+                          }
                         alt="News"
                         onClick={() => {
                           const userRole = (localStorage.getItem("role") || "")

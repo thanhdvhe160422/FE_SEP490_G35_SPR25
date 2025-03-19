@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { addLeader } from "../../services/GroupService";
+import { addLeader } from "../../services/groupService";
 import {
   Form,
   Row,
