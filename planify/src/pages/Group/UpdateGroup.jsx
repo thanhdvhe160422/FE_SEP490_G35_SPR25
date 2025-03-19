@@ -104,7 +104,7 @@ function UpdateGroup() {
   return (
     <>
       <Header></Header>
-      <div className="update-group-container">
+      <div style={{marginTop:'90px'}} className="update-group-container">
         <h2 className="update-group-title">Update Group</h2>
         <div className="form-group">
           <label className="form-label">Group Name:</label>
