@@ -45,10 +45,6 @@ export default function Login() {
         "Authorization"
       ] = `Bearer ${res.data.result.accessToken}`;
 
-      enqueueSnackbar("Login successfully!", {
-        variant: "success",
-        autoHideDuration: 2500,
-      });
       switch (res.data.result.role) {
         case "Admin":
           navigate(`/admin?campus=${campus}`);
