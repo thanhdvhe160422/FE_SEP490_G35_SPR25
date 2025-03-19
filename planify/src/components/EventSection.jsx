@@ -21,17 +21,28 @@ function EventSection() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [eventFilter, setEventFilter] = useState("list");
-  const [campuses, setCampus] = useState("");
+  const [campuses, setCampus] = useState([]);
   const navigate = useNavigate();
 
   const userRole = localStorage.getItem("role");
   console.log("User Role từ localStorage:", userRole);
   const currentUserId = localStorage.getItem("userId");
   const campus = localStorage.getItem("campus");
-
   useEffect(() => {
-    console.log("Fetching events...");
+    const fetchCampus = async () => {
+      try {
+        const campusData = await getCampuses();
+        setCampus(campusData);
+        console.log("📌 Danh sách campus:", campusData);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy danh sách campus:", error);
+        setCampus([]);
+      }
+    };
 
+    fetchCampus();
+  }, []);
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const allData = await getPosts();
@@ -39,6 +50,14 @@ function EventSection() {
         const validEvent = allData.filter((post) =>
           validStatus.includes(post.status)
         );
+        const currentCampus = (event) => {
+          if (!Array.isArray(campuses)) {
+            console.error("❌ Lỗi: campuses không phải là mảng", campuses);
+            return "Unknown";
+          }
+          const campus = campuses.find((cat) => cat.id === event.campusId);
+          return campus ? campus.campusName : "Unknown";
+        };
         const campusEvents = validEvent.filter(
           (event) => currentCampus(event) === campus
         );
@@ -60,7 +79,7 @@ function EventSection() {
           .sort((a, b) => getStatusPriority(a) - getStatusPriority(b));
 
         setEvents(sortedEvents);
-        console.log(sortedEvents);
+        console.log("....", sortedEvents);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
       }
@@ -74,18 +93,9 @@ function EventSection() {
         console.error("❌ Lỗi khi lấy danh mục:", error);
       }
     };
-    const fetCampus = async () => {
-      try {
-        const campusData = await getCampuses();
-        setCampus(campusData);
-      } catch (error) {
-        console.error("❌ Lỗi khi lấy trường:", error);
-      }
-    };
-    fetCampus();
     fetchData();
     fetchCategories();
-  }, []);
+  }, [campuses]);
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -164,10 +174,11 @@ function EventSection() {
 
     return category ? category.categoryEventName : "Unknown";
   };
-  const currentCampus = (event) => {
-    const campus = campuses.find((cat) => cat.id === event.campusId);
-    return campus ? campus.campusName : "Unknown";
-  };
+  // const fixDriveUrl = (url) => {
+  //   if (!url.includes("drive.google.com/uc?id=")) return url;
+  //   const fileId = url.split("id=")[1];
+  //   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  // };
 
   return (
     <section className="post_section news_post_2">

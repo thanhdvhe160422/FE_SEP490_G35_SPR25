@@ -21,7 +21,6 @@ import Swal from "sweetalert2";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
-  // const [groups, setGroups] = useState([]);
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -107,7 +106,7 @@ const EventDetailEOG = () => {
       },
       buttonsStyling: false,
     });
-  
+
     const result = await swalWithBootstrapButtons.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -117,33 +116,39 @@ const EventDetailEOG = () => {
       cancelButtonText: "No, cancel!",
       reverseButtons: true,
     });
-  
+
     if (result.isConfirmed) {
       try {
         let token = localStorage.getItem("token");
-  
+
         // Gọi API xóa với token
-        let response = await fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-  
+        let response = await fetch(
+          `https://localhost:44320/api/Events/delete/${eventId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
         // Nếu token hết hạn (401), tự động refresh và gọi lại API
         if (response.status === 401) {
           const newToken = await refreshAccessToken();
-  
+
           if (newToken) {
             // Gọi lại API với token mới
-            response = await fetch(`https://localhost:44320/api/Events/delete/${eventId}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${newToken}`,
-                "Content-Type": "application/json",
-              },
-            });
+            response = await fetch(
+              `https://localhost:44320/api/Events/delete/${eventId}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${newToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
           } else {
             enqueueSnackbar("Your session has expired. Please log in again.", {
               variant: "error",
@@ -152,12 +157,12 @@ const EventDetailEOG = () => {
             return;
           }
         }
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Failed to delete event");
         }
-  
+
         swalWithBootstrapButtons
           .fire({
             title: "Deleted!",
@@ -167,7 +172,6 @@ const EventDetailEOG = () => {
           .then(() => {
             navigate("/home");
           });
-  
       } catch (error) {
         console.error("Error deleting event:", error);
         swalWithBootstrapButtons.fire({
@@ -178,7 +182,6 @@ const EventDetailEOG = () => {
       }
     }
   };
-  
 
   const formatDateTime = (dateTime) => {
     const date = parseISO(dateTime);
@@ -231,7 +234,6 @@ const EventDetailEOG = () => {
             <div
               className="event-header"
               style={{
-                // background: `url("${fixDriveUrl(images)}") no-repeat center/cover`,
                 padding: "30px",
                 borderRadius: "10px",
                 width: "90%",
@@ -375,7 +377,7 @@ const EventDetailEOG = () => {
           <button
             className="update-event-btn"
             onClick={() => {
-              navigate("/update-event");
+              navigate(`/update-event/${eventId}`);
             }}
           >
             Update event

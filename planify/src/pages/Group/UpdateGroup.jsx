@@ -4,7 +4,7 @@ import {
   getGroupDetails,
   updateGroup,
   addImplementer,
-} from "../../services/groupService";
+} from "../../services/GroupService";
 import Swal from "sweetalert2";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
@@ -69,16 +69,32 @@ function UpdateGroup() {
       return;
     }
 
-    const result = await addImplementer(id, newImplementerEmail);
-    if (result && !result.error) {
-      Swal.fire("Success", "Implementer added successfully!", "success");
-      setGroup((prev) => ({
-        ...prev,
-        joinGroups: [...prev.joinGroups, result],
-      }));
-      setNewImplementerEmail("");
-    } else {
-      Swal.fire("Error", "Failed to add implementer.", "error");
+    const data = {
+      groupId: id,
+      email: newImplementerEmail,
+    };
+
+    try {
+      const result = await addImplementer(data);
+      if (result && !result.error) {
+        Swal.fire("Success", "Implementer added successfully!", "success");
+
+        // Cập nhật danh sách joinGroups
+        setGroup((prev) => ({
+          ...prev,
+          joinGroups: [...prev.joinGroups, result],
+        }));
+
+        setNewImplementerEmail("");
+      } else if (result?.error === "expired") {
+        Swal.fire("Error", "Session expired. Please login again.", "error");
+        navigate("/login");
+      } else {
+        Swal.fire("Error", "Failed to add implementer.", "error");
+      }
+    } catch (error) {
+      console.error("Error adding implementer:", error);
+      Swal.fire("Error", "An unexpected error occurred.", "error");
     }
   };
 
