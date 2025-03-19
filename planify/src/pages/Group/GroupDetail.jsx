@@ -41,6 +41,23 @@ function GroupDetail() {
   const filteredTasks = tasks.filter((task) =>
     task.taskName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const remainingBudget = (tasks, group) => {
+    const totalBudget = group?.amountBudget || 0;
+    const totalSpent = tasks.reduce(
+      (acc, task) => acc + (task.amountBudget || 0),
+      0
+    );
+    return totalBudget - totalSpent;
+  };
+  const handleStatusChange = (taskId) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId
+          ? { ...task, status: task.status === 1 ? 0 : 1 }
+          : task
+      )
+    );
+  };
 
   return (
     <>
@@ -48,6 +65,18 @@ function GroupDetail() {
       <div className="group-detail-container">
         <div className="group-detail-member">
           <h1>Group: {group?.groupName || "N/A"}</h1>
+          <div className="total-budget">
+            Total Budget:{" "}
+            {group?.amountBudget ? group.amountBudget.toLocaleString() : "N/A"}{" "}
+            VNĐ
+          </div>
+          <div className="remaning-budget">
+            Remaining Budget:{" "}
+            {remainingBudget(tasks, group)
+              ? remainingBudget(tasks, group).toLocaleString()
+              : "N/A"}{" "}
+            VNĐ
+          </div>
           <div className="member-list">
             {group?.joinGroups?.length > 0 ? (
               group.joinGroups.map((join) => {
@@ -69,7 +98,6 @@ function GroupDetail() {
         <div className="list-task">
           <h2>Task List</h2>
 
-          {/* Ô tìm kiếm */}
           <input
             type="text"
             placeholder="Search tasks..."
@@ -83,10 +111,10 @@ function GroupDetail() {
               <tr>
                 <th>STT</th>
                 <th>Name Task</th>
-                <th>Status</th>
                 <th>Deadline</th>
                 <th>Progress</th>
                 <th>Budget</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -99,7 +127,6 @@ function GroupDetail() {
                   >
                     <td>{index + 1}</td>
                     <td>{task.taskName}</td>
-                    <td>{task.status === 1 ? "✅ Completed" : "❌ Pending"}</td>
                     <td>{task.deadline || "N/A"}</td>
                     <td>
                       <div style={{ width: 50, height: 50 }}>
@@ -117,6 +144,19 @@ function GroupDetail() {
                     </td>
                     <td>
                       {task.amountBudget.toLocaleString("vi-VN") || "N/A"} VNĐ
+                    </td>
+                    <td>
+                      <div className="checkbox-container">
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          checked={task.status === 1}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(task.id);
+                          }}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))

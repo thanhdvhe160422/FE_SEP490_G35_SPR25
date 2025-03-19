@@ -97,7 +97,7 @@ function EventSection() {
 
     return (
       (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
-      (!selectedCategory || event.category === selectedCategory) &&
+      (!selectedCategory || event.categoryEventId === selectedCategory) &&
       (!searchTerm ||
         event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedStatus === "" ||
@@ -109,6 +109,9 @@ function EventSection() {
         event.placed?.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   });
+  useEffect(() => {
+    console.log("Updated categories:", categories[0].id);
+  }, [categories]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -215,11 +218,13 @@ function EventSection() {
                       <select
                         className="post_select"
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e) =>
+                          setSelectedCategory(Number(e.target.value))
+                        } // Ép kiểu về số
                       >
                         <option value="">All Categories</option>
                         {categories.map((category) => (
-                          <option key={category.id} value={category.name}>
+                          <option key={category.id} value={category.id}>
                             {category.categoryEventName}
                           </option>
                         ))}
@@ -351,7 +356,7 @@ function EventSection() {
             </div>
 
             {filteredEvents.length > EVENTS_PER_PAGE && (
-              <div className="pagination_area">
+              <div className="pagination_area" style={{ padding: "30px" }}>
                 <ul className="pagination">
                   <li
                     className={`page-item ${

@@ -157,5 +157,45 @@
 }
 
 .update-group-btn:hover {
-  background-color: #e0e0e0; /* Xám đậm hơn */
+  background-color: #e0e0e0;
+}
+.total-budget {
+  color: #00ee3b;
+  font-size: large;
+  font-weight: 550;
+}
+.remaning-budget {
+  color: #eeb600;
+  font-weight: 550;
+}
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-checkbox {
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #4caf50;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-checkbox:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+/* Biểu tượng check */
+.custom-checkbox:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
 }
