@@ -122,7 +122,7 @@ function GroupDetail() {
                 filteredTasks.map((task, index) => (
                   <tr
                     key={task.id}
-                    onClick={() => navigate(`/task-detail/${task.id}`)}
+                    onClick={() => navigate(`/task/${task.id}`)}
                     style={{ cursor: "pointer" }}
                   >
                     <td>{index + 1}</td>

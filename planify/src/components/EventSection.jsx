@@ -60,6 +60,7 @@ function EventSection() {
           .sort((a, b) => getStatusPriority(a) - getStatusPriority(b));
 
         setEvents(sortedEvents);
+        console.log(sortedEvents);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
       }
