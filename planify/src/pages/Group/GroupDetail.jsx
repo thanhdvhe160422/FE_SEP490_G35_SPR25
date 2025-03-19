@@ -77,6 +77,12 @@ function GroupDetail() {
 
         <div className="list-task">
           <h2>Task List</h2>
+          <button onClick={() => {
+              navigate(`/group/${id}/create-task`);
+            }}>
+            Create Task
+          </button>
+          
           <table className="task-table">
             <thead>
               <tr>
