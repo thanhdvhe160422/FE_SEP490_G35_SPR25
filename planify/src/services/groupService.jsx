@@ -136,7 +136,7 @@ export const addLeader = async (groupId, implementerId) => {
   try {
     const response = await axios.put(
       `https://localhost:44320/api/Groups/add-lead-group/${groupId}/${implementerId}`,
-      {}, // Payload trống nhưng cần có
+      {},
       {
         headers: { Authorization: `Bearer ${token}` },
       }

@@ -25,7 +25,6 @@ function EventSection() {
   const navigate = useNavigate();
 
   const userRole = localStorage.getItem("role");
-  console.log("User Role từ localStorage:", userRole);
   const currentUserId = localStorage.getItem("userId");
   const campus = localStorage.getItem("campus");
   useEffect(() => {
@@ -95,7 +94,7 @@ function EventSection() {
     };
     fetchData();
     fetchCategories();
-  }, [campuses]);
+  }, [campuses, campus]);
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -169,6 +168,14 @@ function EventSection() {
 
     return ((now - startTime) / (endTime - startTime)) * 100;
   };
+  useEffect(() => {
+    if (events.length > 0) {
+      const hasMyEvent = events.some(
+        (event) => event.createBy === currentUserId
+      );
+      setEventFilter(hasMyEvent ? "my" : "list");
+    }
+  }, [events, currentUserId]);
   const currentCategory = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
 
@@ -227,14 +234,6 @@ function EventSection() {
                 <div className="feature_tittle">
                   <div className="filter_container">
                     <div className="filter_list">
-                      <button
-                        className={`filter_button ${
-                          eventFilter === "list" ? "active" : ""
-                        }`}
-                        onClick={() => setEventFilter("list")}
-                      >
-                        List Event
-                      </button>
                       {(userRole?.toLowerCase() === "event organizer" ||
                         userRole?.toLowerCase() === "implementer") && (
                         <button
@@ -246,6 +245,14 @@ function EventSection() {
                           My Event
                         </button>
                       )}
+                      <button
+                        className={`filter_button ${
+                          eventFilter === "list" ? "active" : ""
+                        }`}
+                        onClick={() => setEventFilter("list")}
+                      >
+                        List Event
+                      </button>
                     </div>
                     <div className="filter_other">
                       <select

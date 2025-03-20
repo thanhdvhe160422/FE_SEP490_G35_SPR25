@@ -10,9 +10,6 @@ function Home() {
     return <Navigate to="/login" replace />;
   }
 
-  if (!["Campus Manager", "Event Organizer"].includes(userRole)) {
-    return <Navigate to="/authorization" replace />;
-  }
   return (
     <div>
       <Header></Header>
