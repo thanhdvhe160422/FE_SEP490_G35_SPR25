@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/Events/EventDetailSpec.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -12,6 +12,7 @@ import { MdOutlineCategory } from "react-icons/md";
 
 function EventDetailSpec() {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
 
@@ -20,6 +21,10 @@ function EventDetailSpec() {
     const fetchEventDetail = async () => {
       try {
         const data = await getEventById(eventId);
+        if (data.status === -2) {
+          navigate("/home");
+          return;
+        }
         const mediaList = data?.eventMedias ?? [];
         if (!Array.isArray(mediaList)) {
           console.error("eventMedias is not an array:", mediaList);

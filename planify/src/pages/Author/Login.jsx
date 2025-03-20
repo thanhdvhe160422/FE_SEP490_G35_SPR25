@@ -97,7 +97,7 @@ export default function Login() {
         </p>
 
         {loading ? (
-          LoadingHand
+          "Loading..."
         ) : (
           <select
             className="campus-select"

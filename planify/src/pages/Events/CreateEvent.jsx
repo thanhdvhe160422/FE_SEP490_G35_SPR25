@@ -93,7 +93,7 @@ export default function CreateEvent() {
   const toggleStar = async (groupIndex, memberIndex) => {
     const group = groups[groupIndex];
     const member = group.members[memberIndex];
-
+    console.log("group:", group);
     try {
       const response = await addLeader(group.id, member.id);
       if (response) {
@@ -170,7 +170,7 @@ export default function CreateEvent() {
       return;
     }
 
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
 
     try {
       const response = await axios.get(
@@ -719,6 +719,7 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
+
             <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Image <span style={{ color: "red" }}>*</span>{" "}
               <span
@@ -785,7 +786,7 @@ export default function CreateEvent() {
               onClick={handleCreateEvent}
               disabled={isLoading}
             >
-              {isLoading ? <LoadingHand /> : "Create Event"}
+              {isLoading ? "Loading..." : "Create Event"}
             </Button>
           </div>
         </Form>
