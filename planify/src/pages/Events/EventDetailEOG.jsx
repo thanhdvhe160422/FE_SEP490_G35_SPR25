@@ -42,7 +42,10 @@ const EventDetailEOG = () => {
             },
           }
         );
-
+        if (response.status === -2) {
+          navigate("/home");
+          return;
+        }
         if (response.status === 401) {
           const newToken = await refreshAccessToken();
 
@@ -121,7 +124,6 @@ const EventDetailEOG = () => {
       try {
         let token = localStorage.getItem("token");
 
-        // Gọi API xóa với token
         let response = await fetch(
           `https://localhost:44320/api/Events/delete/${eventId}`,
           {
@@ -133,12 +135,10 @@ const EventDetailEOG = () => {
           }
         );
 
-        // Nếu token hết hạn (401), tự động refresh và gọi lại API
         if (response.status === 401) {
           const newToken = await refreshAccessToken();
 
           if (newToken) {
-            // Gọi lại API với token mới
             response = await fetch(
               `https://localhost:44320/api/Events/delete/${eventId}`,
               {
@@ -371,9 +371,13 @@ const EventDetailEOG = () => {
           </>
         )}
         <div className="event-actions">
-          <button className="delete-event-btn" onClick={handleDeleteEvent}>
-            Delete event
-          </button>
+          {event &&
+            event.createdBy &&
+            localStorage.getItem("userId") === String(event.createdBy.id) && (
+              <button className="delete-event-btn" onClick={handleDeleteEvent}>
+                Delete event
+              </button>
+            )}
           <button
             className="update-event-btn"
             onClick={() => {

@@ -92,7 +92,7 @@ export default function CreateEvent() {
   const toggleStar = async (groupIndex, memberIndex) => {
     const group = groups[groupIndex];
     const member = group.members[memberIndex];
-
+    console.log("group:", group);
     try {
       const response = await addLeader(group.id, member.id);
       if (response) {
@@ -169,7 +169,7 @@ export default function CreateEvent() {
       return;
     }
 
-    let token = localStorage.getItem("token"); // Lấy token từ localStorage
+    let token = localStorage.getItem("token");
 
     try {
       const response = await axios.get(
@@ -717,34 +717,29 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
-            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+            <Form.Label>
               Image <span style={{ color: "red" }}>*</span>
             </Form.Label>
-            <div
-              className="container-chosse-file"
-              onClick={() => document.getElementById("fileUpload").click()}
-            >
-              <div className="folder">
-                <div className="front-side">
-                  <div className="tip"></div>
-                  <div className="cover"></div>
-                </div>
-                <div className="back-side cover"></div>
-              </div>
-              <label className="custom-file-upload">
-                <input
-                  id="fileUpload"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
-                />
-                Choose a file
-              </label>
-            </div>
-
-            <Row className="mt-3">
+            <Row>
+              <Col xs={3}>
+                <label
+                  className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                  style={{
+                    cursor: "pointer",
+                    aspectRatio: "1/1",
+                    minHeight: "100px",
+                  }}
+                >
+                  <FaPlus />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </Col>
               {selectedImages.map((file, index) => (
                 <Col xs={3} key={index} className="position-relative">
                   <img
@@ -780,7 +775,7 @@ export default function CreateEvent() {
               onClick={handleCreateEvent}
               disabled={isLoading}
             >
-              {isLoading ? <LoadingHand /> : "Create Event"}
+              {isLoading ? "Loading..." : "Create Event"}
             </Button>
           </div>
         </Form>
