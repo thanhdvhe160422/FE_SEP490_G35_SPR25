@@ -187,6 +187,12 @@ function EventSection() {
   //   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   // };
 
+  const fixDriveUrl = (url) => {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  };
+
   return (
     <section className="post_section news_post_2">
       <div className="container">
@@ -292,7 +298,11 @@ function EventSection() {
                   <div key={event.id} className="col-12 belarus_fast">
                     <div className="belarus_items">
                       <img
-                        src={bannerImage}
+                          src={
+                            event.eventMedias?.length > 0
+                                ? fixDriveUrl(event.eventMedias[0].mediaDTO.mediaUrl)
+                                : bannerImage
+                          }
                         alt="News"
                         onClick={() => {
                           const userRole = (localStorage.getItem("role") || "")

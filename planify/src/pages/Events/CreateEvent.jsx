@@ -45,6 +45,7 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const [usersName, setUsersName] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -139,7 +140,7 @@ export default function CreateEvent() {
 
   const handleAddMember = () => {
     if (!isValidMember || !newMember) return;
-
+    setUsersName("");
     const updatedGroups = [...groups];
     updatedGroups[selectedGroupIndex] = {
       ...updatedGroups[selectedGroupIndex],
@@ -161,8 +162,8 @@ export default function CreateEvent() {
 
   const handleNewMemberChange = async (e) => {
     const value = e.target.value;
-    setNewMember(value);
-
+    //setNewMember(value);
+    setUsersName(value);
     if (value.trim() === "") {
       setSuggestions([]);
       setIsValidMember(false);
@@ -238,6 +239,7 @@ export default function CreateEvent() {
 
   const handleSuggestionClick = (user) => {
     setNewMember(user);
+    setUsersName(user.firstName + " " + user.lastName);
     setSuggestions([]);
     setIsValidMember(true);
   };
@@ -717,8 +719,18 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
-            <Form.Label>
-              Image <span style={{ color: "red" }}>*</span>
+
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Image <span style={{ color: "red" }}>*</span>{" "}
+              <span
+                style={{
+                  fontWeight: "initial",
+                  color: "red",
+                  fontStyle: "italic",
+                }}
+              >
+                (The first photo will be the background photo of the event.)
+              </span>
             </Form.Label>
             <Row>
               <Col xs={3}>
@@ -764,7 +776,6 @@ export default function CreateEvent() {
               ))}
             </Row>
           </Form.Group>
-
           <div className="d-flex justify-content-between mt-4">
             <Button variant="danger">Cancel</Button>
             <Button variant="primary" onClick={handleSaveDraft}>
@@ -791,7 +802,7 @@ export default function CreateEvent() {
             <Form.Control
               type="text"
               placeholder="Enter email or name"
-              value={newMember}
+              value={usersName}
               onChange={handleNewMemberChange}
             />
             {suggestions.length > 0 && (
@@ -803,6 +814,7 @@ export default function CreateEvent() {
                     onClick={() => handleSuggestionClick(user)}
                   >
                     {`${user.firstName} ${user.lastName}`}
+                    <div> {user.email}</div>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
