@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getGroupDetails } from "../../services/groupService";
+import { getGroupDetails } from "../../services/GroupService";
 import { getGroupTasks } from "../../services/taskService";
 import "../../styles/Group/GroupDetail.css";
 import Header from "../../components/Header/Header";
