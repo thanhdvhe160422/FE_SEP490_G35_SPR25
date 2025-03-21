@@ -92,7 +92,7 @@ export const getEventById = async (eventId) => {
       `https://localhost:44320/api/EventForSpectators/${eventId}`,
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("reToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("reToken")}`,
         },
       }
     );
