@@ -19,6 +19,7 @@ import UpdateGroup from "./pages/Group/UpdateGroup";
 import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
+import CostDetail from "./pages/Events/CostDetail";
 
 function App() {
   return (
@@ -193,6 +194,8 @@ function App() {
         />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
+
+        <Route path="/cost-detail" element={<CostDetail/>}></Route>
       </Routes>
     </div>
   );
