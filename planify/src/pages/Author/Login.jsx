@@ -7,7 +7,6 @@ import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
 import backgroundImage from "../../assets/fpt-campus.jpg";
 import "../../styles/Author/Login.css";
-import LoadingHand from "../../components/Loading";
 
 export default function Login() {
   const [campus, setCampus] = useState("");
@@ -15,7 +14,8 @@ export default function Login() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-
+  localStorage.clear();
+  sessionStorage.clear();
   useEffect(() => {
     const fetchCampuses = async () => {
       try {
