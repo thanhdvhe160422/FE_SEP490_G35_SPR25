@@ -75,7 +75,7 @@ export default function Login() {
       sessionStorage.setItem("reToken", res.data.result.refreshToken);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      enqueueSnackbar("Đăng nhập thất bại!", { variant: "error" });
+      enqueueSnackbar("Your account is not allowed to log in to the system.", { variant: "error" });
     }
   };
 
