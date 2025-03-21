@@ -72,7 +72,7 @@ export default function Login() {
       localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
       localStorage.setItem("userId", res.data.result.userId);
-      sessionStorage.setItem("reToken", res.data.result.refreshToken);
+      localStorage.setItem("reToken", res.data.result.refreshToken);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       enqueueSnackbar("Đăng nhập thất bại!", { variant: "error" });
