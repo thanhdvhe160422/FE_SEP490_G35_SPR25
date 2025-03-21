@@ -186,7 +186,7 @@ function App() {
         <Route
           path="/home-implementer"
           element={
-            <PrivateRoute allowedRoles={["Implementer"]}>
+            <PrivateRoute allowedRoles={["Implementer", "Event Organizer"]}>
               <HomeOfImplementer />
             </PrivateRoute>
           }
