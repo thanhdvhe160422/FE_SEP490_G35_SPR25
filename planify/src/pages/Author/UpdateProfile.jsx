@@ -3,6 +3,8 @@ import "../../styles/Author/UpdateProfile.css";
 import { useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
 import { useSnackbar } from "notistack";
+import { updateProfile,updateAvatar, getProfileById } from "../../services/userService";
+import{getProvinces, getDistricts, getWards} from "../../services/addressService";
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
@@ -16,7 +18,8 @@ const UpdateProfile = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const [image, setimage] = useState("");
+  const [image, setImage] = useState("");
+  const [file, setFile] = useState(null);
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -24,19 +27,16 @@ const UpdateProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const thanh = localStorage.getItem("userId");
-        setimage(localStorage.getItem("avatar"));
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token");
+        const data = await getProfileById(userId,token);
+        setUser(data.data);
 
-        const userRes = await fetch(
-          "https://localhost:44320/api/Profiles/" + thanh
-        );
-        const userData = await userRes.json();
-
-        setUser(userData);
-        setInitialUser(userData); // Lưu trữ dữ liệu ban đầu
-        setSelectedProvince(userData.provinceId || "");
-        setSelectedDistrict(userData.districtId || "");
-        setSelectedWard(userData.wardId || "");
+        setInitialUser(user);
+        setImage(user.avatar.mediaUrl)
+        setSelectedProvince(user.addressVM.wardVM.districtVM.provinceVM.Id || "");
+        setSelectedDistrict(user.addressVM.wardVM.districtVM.Id || "");
+        setSelectedWard(user.addressVM.wardVM.wardId || "");
 
         setLoading(false);
       } catch (error) {
@@ -45,19 +45,23 @@ const UpdateProfile = () => {
       }
     };
 
+
     const fetchProvinces = async () => {
       try {
-        const res = await fetch("https://esgoo.net/api-tinhthanh/1/0.htm");
-        const data = await res.json();
-        setProvinces(data.data || []);
+        const data = await getProvinces();
+        setProvinces(data.data.result || []);
       } catch (error) {
         console.error("Lỗi lấy danh sách tỉnh:", error);
         setProvinces([]);
       }
     };
 
-    fetchUserData();
     fetchProvinces();
+    setSelectedProvince(1);
+    setSelectedDistrict(1);
+    setSelectedWard(1);
+    fetchUserData();
+    console.log("selected: "+selectedProvince+" "+selectedDistrict+" "+selectedWard)
   }, []);
 
   useEffect(() => {
@@ -65,13 +69,9 @@ const UpdateProfile = () => {
 
     const fetchDistricts = async () => {
       try {
-        const res = await fetch(
-          `https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`
-        );
-        const data = await res.json();
-        setDistricts(data.data || []);
+        const data = await getDistricts(selectedProvince);
+        setDistricts(data.data.result || []);
         setWards([]);
-        setSelectedDistrict("");
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
         setDistricts([]);
@@ -86,12 +86,8 @@ const UpdateProfile = () => {
 
     const fetchWards = async () => {
       try {
-        const res = await fetch(
-          `https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`
-        );
-        const data = await res.json();
-        setWards(data.data || []);
-        setSelectedWard(""); // Reset phường/xã khi quận thay đổi
+        const data = await getWards(selectedDistrict)
+        setWards(data.data .result|| []);
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -112,34 +108,77 @@ const UpdateProfile = () => {
       user.idCard !== initialUser.idCard ||
       user.address !== initialUser.address ||
       user.phoneNumber !== initialUser.phoneNumber ||
-      selectedProvince !== initialUser.provinceId ||
-      selectedDistrict !== initialUser.districtId ||
-      selectedWard !== initialUser.wardId
+      selectedProvince !== initialUser.addressVM.wardVM.districtVM.provinceVM.Id ||
+      selectedDistrict !== initialUser.addressVM.wardVM.districtVM.Id ||
+      selectedWard !== initialUser.addressVM.wardVM.wardId 
     );
   };
 
   const handleUpdate = async () => {
     try {
       const updatedUser = {
-        ...user,
-        provinceId: selectedProvince,
-        districtId: selectedDistrict,
-        wardId: selectedWard,
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        dateOfBirth: user.dateOfBirth,
+        phoneNumber: user.phoneNumber,
+        addressId: user.addressId,
+        avatarId: user.avatarId,
+        gender: user.gender,
+        addressVM: {
+          id: user.addressVM?.id || 0,
+          wardId: user.addressVM?.wardId || 0,
+          addressDetail: user.addressVM?.addressDetail || "string",
+          wardVM: {
+            id: selectedWard || 0,
+            wardName: "string",
+            districtVM: {
+              id: selectedDistrict || 0,
+              districtName: "string",
+              provinceVM: {
+                id: selectedProvince || 0,
+                provinceName: "string"
+              }
+            }
+          }
+        }
       };
 
-      await fetch("http://localhost:4000/users/2", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser),
-      });
-
-      enqueueSnackbar("Update profile successfully", {
-        variant: "success",
+      const parts = updatedUser.dateOfBirth.split("T")[0].split("-");
+      const day = parts[2];
+      const month = parts[1];
+      const year = parts[0];
+      const formattedDate = `${year}-${month}-${day}`;
+      updatedUser.dateOfBirth = formattedDate;
+      console.log(updatedUser);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        enqueueSnackbar("Please login again", {
+          variant: "error",
+          autoHideDuration: 2500,
+        });
+        navigate("/login");
+        return;
+      }
+      const response = await updateProfile(updatedUser,token);
+      if (response && response.status === 200) {
+        enqueueSnackbar("Update profile successfully", {
+          variant: "success",
+          autoHideDuration: 2500,
+        });
+        navigate("/profile");
+      } else {
+        enqueueSnackbar("Failed to update profile", {
+          variant: "error",
+          autoHideDuration: 2500,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      enqueueSnackbar("Error updating profile: " + (error.response?.data?.message || error.message), {
+        variant: "error",
         autoHideDuration: 2500,
       });
-      navigate("/profile");
-    } catch (error) {
-      console.error("Lỗi cập nhật hồ sơ:", error);
     }
   };
 
@@ -147,14 +186,49 @@ const UpdateProfile = () => {
     navigate("/profile");
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser({ ...user, avatar: reader.result });
-      };
-      reader.readAsDataURL(file);
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Please upload a valid image file (JPEG, PNG).");
+        return;
+      }
+  
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("File size should be less than 5MB.");
+        return;
+      }
+  
+      const imageUrl = URL.createObjectURL(file);
+      setImage(imageUrl);
+    }
+  };
+  
+  const handleSaveAvatar = async () => {
+    if (!image) return;
+  
+    try {
+      setLoading(true);
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+  
+      const formData = new FormData();
+      formData.append('image', image);
+      
+      const data = await updateAvatar(userId, image, token);
+      const url = data.data;
+  
+      console.log("Avatar updated successfully:", url);
+      setImage(url);
+  
+      localStorage.setItem("avatar", url);
+      setLoading(false); 
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+      setLoading(false); 
     }
   };
 
@@ -163,8 +237,8 @@ const UpdateProfile = () => {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    const [day, month, year] = dateStr.split("-");
-    return `${year}-${month}-${day}`;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-CA');
   };
 
   return (
@@ -179,7 +253,10 @@ const UpdateProfile = () => {
               className="file-input-button"
               onClick={() => document.getElementById("avatar-upload").click()}
             >
-              Choose File
+              Change Image
+            </button>
+            <button className="btn" onClick={handleSaveAvatar}>
+              Save Image
             </button>
             <input
               id="avatar-upload"
@@ -261,7 +338,7 @@ const UpdateProfile = () => {
                       type="radio"
                       name="gender"
                       value="Female"
-                      checked={user.gender === "Female"}
+                      checked={user.gender === true}
                       onChange={(e) =>
                         setUser({ ...user, gender: e.target.value })
                       }
@@ -282,7 +359,7 @@ const UpdateProfile = () => {
                 >
                   {provinces.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {p.provinceName}
                     </option>
                   ))}
                 </select>
@@ -297,7 +374,7 @@ const UpdateProfile = () => {
                 >
                   {districts.map((d) => (
                     <option key={d.id} value={d.id}>
-                      {d.name}
+                      {d.districtName}
                     </option>
                   ))}
                 </select>
@@ -312,7 +389,7 @@ const UpdateProfile = () => {
                 >
                   {wards.map((w) => (
                     <option key={w.id} value={w.id}>
-                      {w.name}
+                      {w.wardName}
                     </option>
                   ))}
                 </select>
@@ -323,8 +400,14 @@ const UpdateProfile = () => {
               <input
                 className="input-profile"
                 type="text"
-                value={user.address || ""}
-                onChange={(e) => setUser({ ...user, address: e.target.value })}
+                value={user.addressVM.addressDetail || ""}
+                onChange={(e) => setUser({
+                  ...user, 
+                  addressVM: { 
+                    ...user.addressVM, 
+                    addressDetail: e.target.value  
+                  }
+                })}
               />
             </div>
 
