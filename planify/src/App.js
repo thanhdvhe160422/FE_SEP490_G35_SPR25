@@ -20,6 +20,8 @@ import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
 import CostDetail from "./pages/Events/CostDetail";
+import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
+import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
 
 function App() {
   return (
@@ -191,6 +193,14 @@ function App() {
               <HomeOfImplementer />
             </PrivateRoute>
           }
+        />
+        <Route
+          path="/create-event-organizer" 
+          element={<CreateEventOrganizer/>}
+        />
+        <Route
+          path="/update-event-organizer/:userId"
+          element={<UpdateEventOrganizer/>}
         />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
