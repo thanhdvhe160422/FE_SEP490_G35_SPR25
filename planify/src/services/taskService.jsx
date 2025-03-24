@@ -44,6 +44,7 @@ export const updateAmountBudget = async(taskId, amountBudget, token) => {
   })
 }
 export const updateTask = async(taskId,data,token) =>{
+  console.log(`${API_TASK_URL}/update/${taskId}`);
   return await axios.put(`${API_TASK_URL}/update/${taskId}`,data,{
     headers:{
       'Authorization': `Bearer ${token}`

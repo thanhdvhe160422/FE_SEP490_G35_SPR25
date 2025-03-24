@@ -4,11 +4,16 @@ const API_PROFILE_URL = 'https://localhost:44320/api/Profiles';
 const API_USER_URL = 'https://localhost:44320/api/Users';
 
 export const getProfileById = async(userId,token) =>{
-    return await axios.get(`${API_PROFILE_URL}/${userId}`,{
-        Headers:{
-            'Authorization':`Bearer ${token}`
-        }
-    })
+    try{
+        return await axios.get(`${API_PROFILE_URL}/${userId}`,{
+            headers:{
+                'Authorization':`Bearer ${token}`
+            }
+        })
+    }catch(error){
+        console.error('Error get profile by id:', error.message);
+        throw error;
+    }
 }
 export const updateProfile = async(data,token) =>{
     try{
@@ -19,6 +24,7 @@ export const updateProfile = async(data,token) =>{
         })
     }catch (error) {
         console.error('Error update profile:', error.response || error);
+        throw error;
     }
 }
 export const updateAvatar = async(userId,image,token) =>{
@@ -31,6 +37,7 @@ export const updateAvatar = async(userId,image,token) =>{
     });
     } catch (error) {
         console.error('Error uploading image:', error.response || error);
+        throw error;
     }
 }
 export const createEventOrganizer = async(data,token) =>{
@@ -42,6 +49,7 @@ export const createEventOrganizer = async(data,token) =>{
     });
     } catch (error) {
         console.error('Error create event organizer:', error.response || error);
+        throw error;
     }
 }
 
@@ -53,6 +61,7 @@ export const updateEventOrganizer = async(data,token) =>{
         }
     });
     } catch (error) {
-        console.error('Error create event organizer:', error.response || error);
+        console.error('Error update event organizer:', error.response || error);
+        throw error;
     }
 }
