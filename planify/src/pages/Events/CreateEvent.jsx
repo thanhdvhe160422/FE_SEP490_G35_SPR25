@@ -28,6 +28,8 @@ export default function CreateEvent() {
   const [newMember, setNewMember] = useState("");
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(null);
   const [groups, setGroups] = useState([]);
+  const [showPopupSubTask, setShowPopupSubTask] = useState(false);
+  const [selectedSubTask, setSelectedSubTask] = useState(null);
   const [showPopupTask, setShowPopupTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
@@ -303,6 +305,21 @@ export default function CreateEvent() {
     }
 
     return true;
+  };
+  const handleAddSubTask = (groupIndex) => {
+    setSelectedGroupIndex(groupIndex);
+    setShowPopupSubTask(true);
+  };
+
+  const handleCloseSubTaskPopup = (subtask) => {
+    setShowPopupSubTask(false);
+    setSelectedSubTask(subtask);
+  };
+
+  const handleDeleteSubTask = (groupIndex, subTaskIndex) => {
+    const newGroups = [...groups];
+    newGroups[groupIndex].subTasks.splice(subTaskIndex, 1);
+    setGroups(newGroups);
   };
 
   const handleCreateEvent = async () => {
@@ -750,6 +767,104 @@ export default function CreateEvent() {
                             </Button>
                           </Modal.Footer>
                         </Modal>
+                        <Modal
+                          show={showPopupSubTask}
+                          onHide={handleCloseSubTaskPopup}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Add New Sub-Task</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <Form>
+                              <Form.Group
+                                controlId="subTaskTitle"
+                                className="mb-3"
+                              >
+                                <Form.Label>Title</Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  value={selectedSubTask?.title || ""}
+                                  onChange={(e) =>
+                                    setSelectedSubTask({
+                                      ...selectedSubTask,
+                                      title: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Enter sub-task title"
+                                />
+                              </Form.Group>
+                              <Form.Group controlId="subTaskDescription">
+                                <Form.Label>Description</Form.Label>
+                                <Form.Control
+                                  as="textarea"
+                                  rows={3}
+                                  value={selectedSubTask?.description || ""}
+                                  onChange={(e) =>
+                                    setSelectedSubTask({
+                                      ...selectedSubTask,
+                                      description: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Enter description"
+                                />
+                              </Form.Group>
+                            </Form>
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={handleCloseSubTaskPopup}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={() => {
+                                handleCloseSubTaskPopup();
+                              }}
+                            >
+                              Add Sub-Task
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="w-100 mb-2"
+                          onClick={() => handleAddSubTask(groupIndex)}
+                        >
+                          Add Sub-Task
+                        </Button>
+                        <ListGroup>
+                          {group.subTasks?.map((subTask, subTaskIndex) => (
+                            <ListGroup.Item
+                              key={subTaskIndex}
+                              className="d-flex justify-content-between align-items-center"
+                            >
+                              <div className="d-flex flex-column">
+                                <div>{subTask.title}</div>
+                                <div
+                                  style={{
+                                    fontSize: "0.875rem",
+                                    color: "#6c757d",
+                                  }}
+                                >
+                                  {subTask.description}
+                                </div>
+                              </div>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                className="ms-2"
+                                onClick={() =>
+                                  handleDeleteSubTask(groupIndex, subTaskIndex)
+                                }
+                              >
+                                <FaMinus />
+                              </Button>
+                            </ListGroup.Item>
+                          ))}
+                        </ListGroup>
                         <Button
                           variant="outline-secondary"
                           size="sm"
