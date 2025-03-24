@@ -820,6 +820,19 @@ export default function CreateEvent() {
                             <Button
                               variant="primary"
                               onClick={() => {
+                                const newGroups = [...groups];
+
+                                if (!newGroups[selectedGroupIndex].subTasks) {
+                                  newGroups[selectedGroupIndex].subTasks = [];
+                                }
+
+                                newGroups[selectedGroupIndex].subTasks.push({
+                                  title: selectedSubTask.title,
+                                  description: selectedSubTask.description,
+                                  completed: false,
+                                });
+
+                                setGroups(newGroups);
                                 handleCloseSubTaskPopup();
                               }}
                             >
