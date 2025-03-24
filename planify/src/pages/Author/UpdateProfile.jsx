@@ -31,12 +31,11 @@ const UpdateProfile = () => {
         const token = localStorage.getItem("token");
         const data = await getProfileById(userId,token);
         setUser(data.data);
-
-        setInitialUser(user);
-        setImage(user.avatar.mediaUrl)
-        setSelectedProvince(user.addressVM.wardVM.districtVM.provinceVM.Id || "");
-        setSelectedDistrict(user.addressVM.wardVM.districtVM.Id || "");
-        setSelectedWard(user.addressVM.wardVM.wardId || "");
+        setInitialUser(data.data);
+        setImage(data.data.avatar.mediaUrl)
+        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.Id || "");
+        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.Id || "");
+        setSelectedWard(data.data.addressVM.wardVM.wardId || "");
 
         setLoading(false);
       } catch (error) {
@@ -61,7 +60,6 @@ const UpdateProfile = () => {
     setSelectedDistrict(1);
     setSelectedWard(1);
     fetchUserData();
-    console.log("selected: "+selectedProvince+" "+selectedDistrict+" "+selectedWard)
   }, []);
 
   useEffect(() => {
@@ -124,10 +122,9 @@ const UpdateProfile = () => {
         phoneNumber: user.phoneNumber,
         addressId: user.addressId,
         avatarId: user.avatarId,
-        gender: user.gender,
+        gender: user.gender===1,
         addressVM: {
           id: user.addressVM?.id || 0,
-          wardId: user.addressVM?.wardId || 0,
           addressDetail: user.addressVM?.addressDetail || "string",
           wardVM: {
             id: selectedWard || 0,
@@ -204,6 +201,7 @@ const UpdateProfile = () => {
   
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
+      handleSaveAvatar();
     }
   };
   
@@ -237,7 +235,7 @@ const UpdateProfile = () => {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
+    const date = new Date(dateStr.split('T')[0]);
     return date.toLocaleDateString('en-CA');
   };
 
@@ -255,9 +253,9 @@ const UpdateProfile = () => {
             >
               Change Image
             </button>
-            <button className="btn" onClick={handleSaveAvatar}>
+            {/* <button className="btn" onClick={handleSaveAvatar}>
               Save Image
-            </button>
+            </button> */}
             <input
               id="avatar-upload"
               type="file"
@@ -310,9 +308,6 @@ const UpdateProfile = () => {
                     setUser({
                       ...user,
                       dateOfBirth: e.target.value
-                        .split("-")
-                        .reverse()
-                        .join("-"),
                     })
                   }
                 />
@@ -325,10 +320,10 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="Male"
-                      checked={user.gender === "Male"}
+                      value="0"
+                      checked={Number(user.gender) === 0}
                       onChange={(e) =>
-                        setUser({ ...user, gender: e.target.value })
+                        setUser({ ...user, gender: Number(e.target.value) })
                       }
                     />
                     Male
@@ -337,10 +332,10 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="Female"
-                      checked={user.gender === true}
+                      value="1"
+                      checked={Number(user.gender) === 1}
                       onChange={(e) =>
-                        setUser({ ...user, gender: e.target.value })
+                        setUser({ ...user, gender: Number(e.target.value) })
                       }
                     />
                     Female
