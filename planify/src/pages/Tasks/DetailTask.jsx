@@ -9,7 +9,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 export default function DetailTask(){
     const { id } = useParams();
-      const navigate = useNavigate();
+    const navigate = useNavigate();
     const [task, setTask] = useState(null);
     const [subTasks, setSubTasks] = useState([]);
     const [createBy, setCreateBy] = useState("");

@@ -28,7 +28,8 @@ export default function CreateEvent() {
   const [newMember, setNewMember] = useState("");
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(null);
   const [groups, setGroups] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [showPopupTask, setShowPopupTask] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [isValidMember, setIsValidMember] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -67,7 +68,17 @@ export default function CreateEvent() {
 
     fetchData();
   }, []);
-
+  const handleShowPopup = (task) => {
+    setSelectedTask(task);
+    setShowPopupTask(true);
+  };
+  const handleClosePopup = () => {
+    setShowPopupTask(false);
+    setSelectedTask(null);
+  };
+  const handleSaveTaskDetails = () => {
+    handleClosePopup();
+  };
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setSelectedImages([...selectedImages, ...files]);
@@ -120,7 +131,7 @@ export default function CreateEvent() {
 
   const handleAddGroup = () => {
     const newGroup = {
-      name: `Group ${groups.length + 1}`,
+      name: `Task ${groups.length + 1}`,
       members: [],
       isEditing: true,
       selectedStar: null,
@@ -453,13 +464,20 @@ export default function CreateEvent() {
   };
 
   const formatCurrency = (value) => {
-    return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (value === undefined || value === null) return "";
+    return value
+      .toString()
+      .replace(/\D/g, "")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   const handleAmountBudgetChange = (e) => {
     const value = e.target.value;
     const formattedValue = formatCurrency(value);
     setAmountBudget(formattedValue);
+  };
+  const parseNumber = (value) => {
+    return value.replace(/,/g, "");
   };
 
   return (
@@ -602,7 +620,7 @@ export default function CreateEvent() {
 
           <Card className="mt-3">
             <Card.Header className="d-flex justify-content-between">
-              <span>Member Group</span>
+              <span>List Task</span>
               <Button
                 variant="outline-primary"
                 size="sm"
@@ -638,15 +656,100 @@ export default function CreateEvent() {
                             {group.name}
                           </span>
                         )}
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleDeleteGroup(groupIndex)}
-                        >
-                          <FaTimes />
-                        </Button>
+                        <div className="action">
+                          <Button
+                            style={{ marginRight: "10px" }}
+                            variant="info"
+                            size="sm"
+                            onClick={() => handleShowPopup(group)}
+                            className="ms-2"
+                          >
+                            Details
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDeleteGroup(groupIndex)}
+                          >
+                            <FaTimes />
+                          </Button>
+                        </div>
                       </Card.Header>
                       <Card.Body>
+                        <Modal show={showPopupTask} onHide={handleClosePopup}>
+                          <Modal.Header closeButton>
+                            <Modal.Title>Task Details</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            {selectedTask && (
+                              <Form>
+                                <Form.Group controlId="taskName">
+                                  <Form.Label>Deadline</Form.Label>
+                                  <Form.Control
+                                    type="datetime-local"
+                                    value={selectedTask.deadline}
+                                    onChange={(e) =>
+                                      setSelectedTask({
+                                        ...selectedTask,
+                                        name: e.target.value,
+                                      })
+                                    }
+                                    min={new Date().toISOString().split("T")[0]}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="taskBudget">
+                                  <Form.Label>Budget</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    value={formatCurrency(selectedTask.budget)}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      if (
+                                        /^\d*[,]?\d*$/.test(value) ||
+                                        value === ""
+                                      ) {
+                                        setSelectedTask({
+                                          ...selectedTask,
+                                          budget: parseNumber(value),
+                                        });
+                                      }
+                                    }}
+                                    placeholder="Enter budget"
+                                    min="0"
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="taskDescription">
+                                  <Form.Label>Description</Form.Label>
+                                  <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    value={selectedTask.description || ""}
+                                    onChange={(e) =>
+                                      setSelectedTask({
+                                        ...selectedTask,
+                                        description: e.target.value,
+                                      })
+                                    }
+                                  />
+                                </Form.Group>
+                              </Form>
+                            )}
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={handleClosePopup}
+                            >
+                              Close
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={handleSaveTaskDetails}
+                            >
+                              Save Changes
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
                         <Button
                           variant="outline-secondary"
                           size="sm"
@@ -719,7 +822,6 @@ export default function CreateEvent() {
           </Card>
 
           <Form.Group className="mt-3">
-
             <Form.Label style={{ fontWeight: "bold", color: "black" }}>
               Image <span style={{ color: "red" }}>*</span>{" "}
               <span

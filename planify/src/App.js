@@ -19,6 +19,10 @@ import UpdateGroup from "./pages/Group/UpdateGroup";
 import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
+import CostDetail from "./pages/Events/CostDetail";
+import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
+import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
+import UpdateTask from "./pages/Tasks/UpdateTask";
 
 function App() {
   return (
@@ -191,8 +195,26 @@ function App() {
             </PrivateRoute>
           }
         />
-
+        <Route
+          path="/create-event-organizer" 
+          element={<CreateEventOrganizer/>}
+        />
+        <Route
+          path="/update-event-organizer/:userId"
+          element={<UpdateEventOrganizer/>}
+        />
+        
+        <Route
+          path="/group/:groupId/update-task/:id"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
+              <UpdateTask />
+            </PrivateRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" replace />} />
+
+        <Route path="/cost-detail" element={<CostDetail/>}></Route>
       </Routes>
     </div>
   );
