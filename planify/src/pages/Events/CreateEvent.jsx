@@ -756,7 +756,7 @@ export default function CreateEvent() {
                           className="w-100 mb-2"
                           onClick={() => handleAddMemberClick(groupIndex)}
                         >
-                          Create Sub-Task
+                          Add Member
                         </Button>
                         <ListGroup>
                           {group.members.map((member, memberIndex) => (
@@ -898,48 +898,16 @@ export default function CreateEvent() {
           onHide={() => setShowAddMemberModal(false)}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Create Sub-Task</Modal.Title>
+            <Modal.Title>Add Member</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form.Control
               type="text"
-              placeholder="Sub Task Name"
-              // value={usersName}
-              // onChange={handleNewMemberChange}
-              style={{ marginBottom: "5px" }}
+              placeholder="Enter email or name"
+              value={usersName}
+              onChange={handleNewMemberChange}
             />
-            <Form.Control
-              type="text"
-              placeholder="Sub Task Description"
-              style={{ marginBottom: "5px" }}
-              s
-              // value={usersName}
-              // onChange={handleNewMemberChange}
-            />
-            <Form.Control
-              type="text"
-              placeholder="Sub Task Name"
-              style={{ marginBottom: "5px" }}
-              // value={usersName}
-              // onChange={handleNewMemberChange}
-            />
-            <Form.Control
-              type="datetime-local"
-              placeholder="Deadline"
-              style={{ marginBottom: "5px" }}
-              // value={newSubtask.deadline}
-              // onChange={(e) =>
-              //   setNewSubtask({ ...newSubtask, deadline: e.target.value })
-              // }
-            />
-            <Form.Control
-              type="Number"
-              placeholder="Amount budget"
-              style={{ marginBottom: "5px" }}
-              // value={usersName}
-              // onChange={handleNewMemberChange}
-            />
-            {/* {suggestions.length > 0 && (
+            {suggestions.length > 0 && (
               <ListGroup className="mt-2">
                 {suggestions.map((user, index) => (
                   <ListGroup.Item
@@ -952,7 +920,7 @@ export default function CreateEvent() {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
-            )} */}
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button
@@ -964,7 +932,7 @@ export default function CreateEvent() {
             <Button
               variant="primary"
               onClick={handleAddMember}
-              // disabled={!isValidMember}
+              disabled={!isValidMember}
             >
               Add
             </Button>
