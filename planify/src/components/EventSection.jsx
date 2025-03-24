@@ -112,7 +112,7 @@ function EventSection() {
 
     if (now >= startTime && now <= endTime) return "running";
     if (now < startTime) return "not started yet";
-    return "Closed";
+    return "closed";
   };
 
   const filteredEvents = events.filter((event) => {
@@ -181,12 +181,6 @@ function EventSection() {
 
     return category ? category.categoryEventName : "Unknown";
   };
-  // const fixDriveUrl = (url) => {
-  //   if (!url.includes("drive.google.com/uc?id=")) return url;
-  //   const fileId = url.split("id=")[1];
-  //   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-  // };
-
   const fixDriveUrl = (url) => {
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
@@ -266,7 +260,7 @@ function EventSection() {
                         value={selectedCategory}
                         onChange={(e) =>
                           setSelectedCategory(Number(e.target.value))
-                        } // Ép kiểu về số
+                        }
                       >
                         <option value="">All Categories</option>
                         {categories.map((category) => (
@@ -296,7 +290,14 @@ function EventSection() {
               ) : (
                 currentEvents.map((event) => (
                   <div key={event.id} className="col-12 belarus_fast">
-                    <div className="belarus_items">
+                    <div
+                      style={{
+                        height: "500px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                      className="belarus_items"
+                    >
                       <img
                         src={
                           event.eventMedias?.length > 0
