@@ -18,6 +18,8 @@ import getCategories from "../../services/CategoryService";
 import refreshAccessToken from "../../services/refreshToken";
 import { useNavigate } from "react-router";
 import LoadingHand from "../../components/Loading";
+import { FaRobot } from "react-icons/fa";
+
 import "../../styles/Events/CreateEvent.css";
 
 export default function CreateEvent() {
@@ -52,6 +54,7 @@ export default function CreateEvent() {
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
   const [usersName, setUsersName] = useState([]);
+  const [showChatbot, setShowChatbot] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -674,6 +677,28 @@ export default function CreateEvent() {
             </div>
           </Form.Group>
 
+          <div
+            onClick={() => setShowChatbot(true)}
+            style={{
+              position: "fixed",
+              bottom: "30px",
+              right: "30px",
+              backgroundColor: "#007bff",
+              color: "white",
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              zIndex: 9999,
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+            }}
+          >
+            <FaRobot size={24} />
+          </div>
+
           <Card className="mt-3">
             <Card.Header className="d-flex justify-content-between">
               <span>List Task</span>
@@ -837,6 +862,38 @@ export default function CreateEvent() {
                             >
                               Save Changes
                             </Button>
+                          </Modal.Footer>
+                        </Modal>
+
+                        <Modal
+                          show={showChatbot}
+                          onHide={() => setShowChatbot(false)}
+                          size="lg"
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>AI Chatbot Assistant</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <div style={{ height: "300px", overflowY: "auto" }}>
+                              <p>
+                                Xin chào! Tôi là trợ lý AI, bạn cần giúp gì cho
+                                sự kiện này?
+                              </p>
+                            </div>
+                            <Form.Control
+                              type="text"
+                              placeholder="Nhập tin nhắn..."
+                              className="mt-2"
+                            />
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={() => setShowChatbot(false)}
+                            >
+                              Đóng
+                            </Button>
+                            <Button variant="primary">Gửi</Button>
                           </Modal.Footer>
                         </Modal>
 
