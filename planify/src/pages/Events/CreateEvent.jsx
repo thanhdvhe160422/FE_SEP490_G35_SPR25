@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { addLeader } from "../../services/GroupService";
+import { addLeader } from "../../services/groupService";
 import {
   Form,
   Row,
@@ -164,7 +164,7 @@ export default function CreateEvent() {
     }
   };
 
-  const handleAddGroup = () => {
+  const handleAddTask = () => {
     const newGroup = {
       name: `Task ${groups.length + 1}`,
       members: [],
@@ -679,11 +679,13 @@ export default function CreateEvent() {
 
           <Card className="mt-3">
             <Card.Header className="d-flex justify-content-between">
-              <span>List Task</span>
+              <span style={{ fontWeight: "bold", color: "black" }}>
+                List Task
+              </span>
               <Button
                 variant="outline-primary"
                 size="sm"
-                onClick={handleAddGroup}
+                onClick={handleAddTask}
               >
                 <FaPlus />
               </Button>

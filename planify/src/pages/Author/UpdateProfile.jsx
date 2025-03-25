@@ -325,8 +325,8 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="0"
-                      checked={Number(user.gender) === 0}
+                      value="1"
+                      checked={Number(user.gender) === 1}
                       onChange={(e) =>
                         setUser({ ...user, gender: Number(e.target.value) })
                       }
@@ -337,8 +337,8 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="1"
-                      checked={Number(user.gender) === 1}
+                      value="0"
+                      checked={Number(user.gender) === 0}
                       onChange={(e) =>
                         setUser({ ...user, gender: Number(e.target.value) })
                       }
