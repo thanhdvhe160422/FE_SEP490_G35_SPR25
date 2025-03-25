@@ -5,6 +5,7 @@ import Header from "../../components/Header/Header";
 import { useSnackbar } from "notistack";
 import { updateProfile,updateAvatar, getProfileById } from "../../services/userService";
 import{getProvinces, getDistricts, getWards} from "../../services/addressService";
+import "../../styles/Author/LoadingImage.css"
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ const UpdateProfile = () => {
   const [selectedWard, setSelectedWard] = useState("");
   const [image, setImage] = useState("");
   const [file, setFile] = useState(null);
+  const [name,setName] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -33,10 +35,10 @@ const UpdateProfile = () => {
         setUser(data.data);
         setInitialUser(data.data);
         setImage(data.data.avatar.mediaUrl)
-        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.Id || "");
-        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.Id || "");
-        setSelectedWard(data.data.addressVM.wardVM.wardId || "");
-
+        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || "");
+        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || "");
+        setSelectedWard(data.data.addressVM.wardVM.id || "");
+        setName(data.data.lastName+" "+data.data.firstName);
         setLoading(false);
       } catch (error) {
         console.error("Lỗi lấy dữ liệu người dùng:", error);
@@ -94,6 +96,7 @@ const UpdateProfile = () => {
 
     fetchWards();
   }, [selectedDistrict]);
+
 
   const hasChanges = () => {
     if (!initialUser || !user) return false;
@@ -201,12 +204,12 @@ const UpdateProfile = () => {
   
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
-      handleSaveAvatar();
+      handleSaveAvatar(file);
     }
   };
   
-  const handleSaveAvatar = async () => {
-    if (!image) return;
+  const handleSaveAvatar = async (file) => {
+    if (!file) return;
   
     try {
       setLoading(true);
@@ -214,9 +217,9 @@ const UpdateProfile = () => {
       const token = localStorage.getItem("token");
   
       const formData = new FormData();
-      formData.append('image', image);
+      formData.append('imageFile', file);
       
-      const data = await updateAvatar(userId, image, token);
+      const data = await updateAvatar(userId, formData, token);
       const url = data.data;
   
       console.log("Avatar updated successfully:", url);
@@ -230,21 +233,23 @@ const UpdateProfile = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div class="loader"></div>
   if (!user) return <p>No user data found</p>;
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr.split('T')[0]);
-    return date.toLocaleDateString('en-CA');
-  };
+  function convertToDirectLink(googleDriveUrl) {
+    
+    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
 
   return (
     <>
       <Header />
       <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={image} alt="Avatar" className="profile-avatar" />
+          <img src={convertToDirectLink(image)} alt="Avatar" className="profile-avatar" />
+          
           <div className="file-input-container">
             <button
               type="button"
@@ -265,7 +270,8 @@ const UpdateProfile = () => {
             />
           </div>
           <h2>
-            {user.firstName} {user.lastName}
+            {/* {user.firstName} {user.lastName} */}
+            {name}
           </h2>
           <p className="profile-email">{user.email}</p>
         </div>
@@ -301,16 +307,15 @@ const UpdateProfile = () => {
               <div className="input-field">
                 <label>Date of Birth</label>
                 <input
-                  className="input-profile"
-                  type="date"
-                  value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      dateOfBirth: e.target.value
-                    })
-                  }
-                />
+                className="input-profile"
+                type="date"
+                value={user.dateOfBirth?user.dateOfBirth.split('T')[0]:""}
+                onChange={(e)=>
+                  setUser({
+                    ...user,
+                    dateOfBirth:e.target.value
+                  })
+                }/>
               </div>
 
               <div className="input-field">
