@@ -5,6 +5,7 @@ import Header from "../../components/Header/Header";
 import { useSnackbar } from "notistack";
 import { updateProfile,updateAvatar, getProfileById } from "../../services/userService";
 import{getProvinces, getDistricts, getWards} from "../../services/addressService";
+import "../../styles/Author/LoadingImage.css"
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ const UpdateProfile = () => {
   const [selectedWard, setSelectedWard] = useState("");
   const [image, setImage] = useState("");
   const [file, setFile] = useState(null);
+  const [name,setName] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -36,6 +38,7 @@ const UpdateProfile = () => {
         setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || "");
         setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || "");
         setSelectedWard(data.data.addressVM.wardVM.id || "");
+        setName(data.data.lastName+" "+data.data.firstName);
         setLoading(false);
       } catch (error) {
         console.error("Lỗi lấy dữ liệu người dùng:", error);
@@ -230,24 +233,10 @@ const UpdateProfile = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div class="loader"></div>
   if (!user) return <p>No user data found</p>;
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr.split('T')[0]);
-    return date.toLocaleDateString('en-CA');
-  };
   function convertToDirectLink(googleDriveUrl) {
-    // const regex = /(?:drive|usercontent)\.google\.com.*(?:id=|d\/)([a-zA-Z0-9_-]+)/;
-    // const match = googleDriveUrl.match(regex);
-
-    // if (match && match[1]) {
-    //     const fileId = match[1];
-    //     return `https://drive.google.com/uc?export=view&id=${fileId}`;
-    // } else {
-    //     throw new Error('Invalid Google Drive URL');
-    // }
     
     if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
     const fileId = googleDriveUrl.split("id=")[1];
@@ -281,7 +270,8 @@ const UpdateProfile = () => {
             />
           </div>
           <h2>
-            {user.firstName} {user.lastName}
+            {/* {user.firstName} {user.lastName} */}
+            {name}
           </h2>
           <p className="profile-email">{user.email}</p>
         </div>
@@ -317,16 +307,15 @@ const UpdateProfile = () => {
               <div className="input-field">
                 <label>Date of Birth</label>
                 <input
-                  className="input-profile"
-                  type="date"
-                  value={user.dateOfBirth ? formatDate(user.dateOfBirth) : ""}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      dateOfBirth: e.target.value
-                    })
-                  }
-                />
+                className="input-profile"
+                type="date"
+                value={user.dateOfBirth?user.dateOfBirth.split('T')[0]:""}
+                onChange={(e)=>
+                  setUser({
+                    ...user,
+                    dateOfBirth:e.target.value
+                  })
+                }/>
               </div>
 
               <div className="input-field">
