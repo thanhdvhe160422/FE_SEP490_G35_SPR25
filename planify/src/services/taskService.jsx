@@ -13,8 +13,9 @@ export const createTaskAPI = async (taskData,token) => {
 export const getGroupTasks = async (groupId) => {
   return await axios.get(`https://your-api-url.com/groups/${groupId}/tasks`);
 };
-export const getListTask = async (groupId,token) => {
-  const response =  await fetch(`${API_TASK_URL}/list/${groupId}`,{
+export const getListTask = async (eventId,token) => {
+  console.log("api url: "+`${API_TASK_URL}/list/${eventId}`)
+  const response =  await fetch(`${API_TASK_URL}/list/${eventId}`,{
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -23,7 +24,7 @@ export const getListTask = async (groupId,token) => {
   });
   
   if (!response.ok) {
-    throw new Error('Failed to fetch tasks');
+    throw new Error('Failed to fetch tasks: '+ response.Error);
   }
 
   return response.json();
