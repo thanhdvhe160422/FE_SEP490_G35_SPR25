@@ -4,7 +4,7 @@ import {
   getGroupDetails,
   updateGroup,
   addImplementer,
-} from "../../services/GroupService";
+} from "../../services/groupService";
 import Swal from "sweetalert2";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";

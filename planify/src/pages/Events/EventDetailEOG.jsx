@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import refreshAccessToken from "../../services/refreshToken";
 import {
@@ -18,6 +19,7 @@ import { useSnackbar } from "notistack";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import Swal from "sweetalert2";
+import { getListTask } from "../../services/taskService";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -26,6 +28,8 @@ const EventDetailEOG = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { eventId } = useParams();
+  const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -98,10 +102,24 @@ const EventDetailEOG = () => {
         );
       }
     };
-
+    const fetchTaskData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const data = await getListTask(eventId,token);
+        if (data?.error === "expired") {
+          Swal.fire("Login session expired", "Please log in again.", "error");
+          navigate("/login");
+        } else if (data) {
+          setTasks(data);
+          console.log("Tasks:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
     fetchEventData();
+    fetchTaskData();
   }, [eventId]);
-
   const handleDeleteEvent = async () => {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
@@ -226,6 +244,20 @@ const EventDetailEOG = () => {
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
   const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
+// copy from group detail
+const handleStatusChange = (taskId) => {
+  setTasks((prevTasks) =>
+    prevTasks.map((task) =>
+      task.id === taskId
+        ? { ...task, status: task.status === 1 ? 0 : 1 }
+        : task
+    )
+  );
+};
+const filteredTasks = tasks.filter((task) =>
+  task.taskName.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
   return (
     <>
       <Header />
@@ -328,7 +360,7 @@ const EventDetailEOG = () => {
               </div>
             </div>
 
-            <div className="event-member-group" style={{ width: "90%" }}>
+            {/* <div className="event-member-group" style={{ width: "90%" }}>
               <h3>List Task</h3>
               <div className="event-groups">
                 {event.groups.map((group) => (
@@ -368,7 +400,92 @@ const EventDetailEOG = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
+            <div className="list-task">
+                      <h2>Task List</h2>
+            
+                      <input
+                        type="text"
+                        placeholder="Search tasks..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="task-search"
+                      />
+            
+                      <table className="task-table">
+                        <thead>
+                          <tr>
+                            <th>STT</th>
+                            <th>Name Task</th>
+                            <th>Deadline</th>
+                            <th>Progress</th>
+                            <th>Budget</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredTasks.length > 0 ? (
+                            filteredTasks.map((task, index) => (
+                              <tr
+                                key={task.id}
+                                onClick={() => navigate(`/task/${task.id}`)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <td>{index + 1}</td>
+                                <td>{task.taskName}</td>
+                                <td>{task.deadline || "N/A"}</td>
+                                <td>
+                                  <div style={{ width: 50, height: 50 }}>
+                                    <CircularProgressbar
+                                      value={task.progress * 100}
+                                      text={`${Math.round(task.progress * 100)}%`}
+                                      styles={buildStyles({
+                                        textSize: "30px",
+                                        pathColor: `rgba(62, 152, 199, ${task.progress})`,
+                                        textColor: "#333",
+                                        trailColor: "#d6d6d6",
+                                      })}
+                                    />
+                                  </div>
+                                </td>
+                                <td>
+                                  {task.amountBudget.toLocaleString("vi-VN") || "N/A"} VNĐ
+                                </td>
+                                <td>
+                                  <div className="checkbox-container">
+                                    <input
+                                      type="checkbox"
+                                      className="custom-checkbox"
+                                      checked={task.status === 1}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange(task.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="6">No tasks found</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                      <button
+                        className="create-task-btn"
+                        // onClick={() => navigate(`/group/${id}/create-task`)}
+                      >
+                        Create Task
+                      </button>
+                      <button
+                        className="update-group-btn"
+                        //onClick={() => navigate(`/update-group/${id}`)}
+                      >
+                        Update Group
+                      </button>
+                    </div>
           </>
         )}
         <div className="event-actions">
