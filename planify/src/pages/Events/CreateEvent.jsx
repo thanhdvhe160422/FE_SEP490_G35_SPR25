@@ -31,7 +31,10 @@ export default function CreateEvent() {
   const [showPopupSubTask, setShowPopupSubTask] = useState(false);
   const [selectedSubTask, setSelectedSubTask] = useState(null);
   const [showPopupTask, setShowPopupTask] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState({
+    index: null,
+    data: null,
+  });
   const [suggestions, setSuggestions] = useState([]);
   const [isValidMember, setIsValidMember] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -49,38 +52,63 @@ export default function CreateEvent() {
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
   const [usersName, setUsersName] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const categoriesResponse = await getCategories();
         if (Array.isArray(categoriesResponse)) {
           setCategories(categoriesResponse);
-          console.log(categoriesResponse);
         } else {
           console.error(
-            "API trả về dữ liệu category không hợp lệ:",
+            "API returned invalid category data:",
             categoriesResponse
           );
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        enqueueSnackbar("Lỗi tải dữ liệu", { variant: "error" });
+        enqueueSnackbar("Error loading data", { variant: "error" });
       }
     };
 
     fetchData();
   }, []);
-  const handleShowPopup = (task) => {
-    setSelectedTask(task);
+
+  const handleShowPopup = (group, index) => {
+    setSelectedTask({
+      index: index,
+      data: {
+        ...group,
+        deadline: group.deadline || "",
+        budget: group.budget || "",
+        description: group.description || "",
+      },
+    });
     setShowPopupTask(true);
   };
+
   const handleClosePopup = () => {
     setShowPopupTask(false);
-    setSelectedTask(null);
+    setSelectedTask({
+      index: null,
+      data: null,
+    });
   };
+
   const handleSaveTaskDetails = () => {
+    if (selectedTask.index !== null && selectedTask.data) {
+      const updatedGroups = [...groups];
+      updatedGroups[selectedTask.index] = {
+        ...updatedGroups[selectedTask.index],
+        deadline: selectedTask.data.deadline,
+        budget: selectedTask.data.budget,
+        description: selectedTask.data.description,
+      };
+      setGroups(updatedGroups);
+    }
     handleClosePopup();
   };
+
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setSelectedImages([...selectedImages, ...files]);
@@ -96,6 +124,9 @@ export default function CreateEvent() {
   };
 
   const handleGroupNameChange = (index, newName) => {
+    if (newName === null || newName === "") {
+      newName = "Enter Task name";
+    }
     setGroups(
       groups.map((group, i) =>
         i === index ? { ...group, name: newName } : group
@@ -106,7 +137,6 @@ export default function CreateEvent() {
   const toggleStar = async (groupIndex, memberIndex) => {
     const group = groups[groupIndex];
     const member = group.members[memberIndex];
-    console.log("group:", group);
     try {
       const response = await addLeader(group.id, member.id);
       if (response) {
@@ -137,6 +167,9 @@ export default function CreateEvent() {
       members: [],
       isEditing: true,
       selectedStar: null,
+      deadline: "",
+      budget: "",
+      description: "",
     };
     setGroups([...groups, newGroup]);
   };
@@ -175,7 +208,6 @@ export default function CreateEvent() {
 
   const handleNewMemberChange = async (e) => {
     const value = e.target.value;
-    //setNewMember(value);
     setUsersName(value);
     if (value.trim() === "") {
       setSuggestions([]);
@@ -233,17 +265,20 @@ export default function CreateEvent() {
             setSuggestions(availableUsers);
             setIsValidMember(availableUsers.length > 0);
           } catch (retryError) {
-            console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+            console.error(
+              "API error after refresh:",
+              retryError.response?.data
+            );
             setSuggestions([]);
             setIsValidMember(false);
           }
         } else {
-          console.error("Không thể refresh token, yêu cầu đăng nhập lại.");
+          console.error("Unable to refresh token, please login again.");
           setSuggestions([]);
           setIsValidMember(false);
         }
       } else {
-        console.error("Lỗi khi tìm implementer:", error.response?.data);
+        console.error("Error searching implementer:", error.response?.data);
         setSuggestions([]);
         setIsValidMember(false);
       }
@@ -306,6 +341,7 @@ export default function CreateEvent() {
 
     return true;
   };
+
   const handleAddSubTask = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
     setShowPopupSubTask(true);
@@ -365,6 +401,9 @@ export default function CreateEvent() {
             groups: groups.map((group) => ({
               groupName: group.name,
               implementerIds: group.members.map((member) => member.id),
+              deadline: group.deadline,
+              budget: group.budget,
+              description: group.description,
             })),
           };
 
@@ -419,11 +458,11 @@ export default function CreateEvent() {
                   }
                 } catch (retryError) {
                   console.error(
-                    "Lỗi từ API sau refresh:",
+                    "API error after refresh:",
                     retryError.response?.data
                   );
                   enqueueSnackbar(
-                    `Error from API: ${
+                    `API Error: ${
                       retryError.response?.data?.message || "Unknown error"
                     }`,
                     { variant: "error" }
@@ -439,9 +478,9 @@ export default function CreateEvent() {
                 navigate("/login");
               }
             } else {
-              console.error("Error from API:", error.response?.data);
+              console.error("API Error:", error.response?.data);
               enqueueSnackbar(
-                `Lỗi từ API: ${
+                `API Error: ${
                   error.response?.data?.message || "Unknown error"
                 }`,
                 { variant: "error" }
@@ -460,7 +499,6 @@ export default function CreateEvent() {
     const formData = new FormData();
     selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
     formData.append("eventId", eventId);
-    console.log([...formData.entries()]);
     try {
       await axios.post(
         "https://localhost:44320/api/Events/upload-image",
@@ -493,6 +531,7 @@ export default function CreateEvent() {
     const formattedValue = formatCurrency(value);
     setAmountBudget(formattedValue);
   };
+
   const parseNumber = (value) => {
     return value.replace(/,/g, "");
   };
@@ -580,9 +619,9 @@ export default function CreateEvent() {
               required
             >
               <option value="">Choose Type Event</option>
-              {categories.map((categories) => (
-                <option key={categories.id} value={categories.id}>
-                  {categories.categoryEventName}
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.categoryEventName}
                 </option>
               ))}
             </Form.Select>
@@ -655,31 +694,52 @@ export default function CreateEvent() {
                         style={{ backgroundColor: "orange" }}
                         className="d-flex justify-content-between align-items-center"
                       >
-                        {group.isEditing ? (
-                          <Form.Control
-                            type="text"
-                            value={group.name}
-                            onChange={(e) =>
-                              handleGroupNameChange(groupIndex, e.target.value)
-                            }
-                            onBlur={() => toggleEditGroup(groupIndex)}
-                            autoFocus
-                          />
-                        ) : (
-                          <span
-                            onClick={() => toggleEditGroup(groupIndex)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {group.name}
-                          </span>
-                        )}
-                        <div className="action">
+                        <div style={{ flex: 1, overflow: "hidden" }}>
+                          {group.isEditing ? (
+                            <Form.Control
+                              style={{
+                                width: "100%",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                              type="text"
+                              value={group.name}
+                              onChange={(e) =>
+                                handleGroupNameChange(
+                                  groupIndex,
+                                  e.target.value
+                                )
+                              }
+                              onBlur={() => toggleEditGroup(groupIndex)}
+                              autoFocus
+                            />
+                          ) : (
+                            <span
+                              onClick={() => toggleEditGroup(groupIndex)}
+                              style={{
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                display: "block",
+                                fontWeight: "bold",
+                                color: "white",
+                              }}
+                            >
+                              {group.name}
+                            </span>
+                          )}
+                        </div>
+
+                        <div
+                          className="action d-flex"
+                          style={{ gap: "5px", marginLeft: "10px" }}
+                        >
                           <Button
-                            style={{ marginRight: "10px" }}
                             variant="info"
                             size="sm"
-                            onClick={() => handleShowPopup(group)}
-                            className="ms-2"
+                            onClick={() => handleShowPopup(group, groupIndex)}
                           >
                             Details
                           </Button>
@@ -692,23 +752,27 @@ export default function CreateEvent() {
                           </Button>
                         </div>
                       </Card.Header>
+
                       <Card.Body>
                         <Modal show={showPopupTask} onHide={handleClosePopup}>
                           <Modal.Header closeButton>
                             <Modal.Title>Task Details</Modal.Title>
                           </Modal.Header>
                           <Modal.Body>
-                            {selectedTask && (
+                            {selectedTask.data && (
                               <Form>
-                                <Form.Group controlId="taskName">
+                                <Form.Group controlId="taskDeadline">
                                   <Form.Label>Deadline</Form.Label>
                                   <Form.Control
                                     type="datetime-local"
-                                    value={selectedTask.deadline}
+                                    value={selectedTask.data.deadline || ""}
                                     onChange={(e) =>
                                       setSelectedTask({
                                         ...selectedTask,
-                                        name: e.target.value,
+                                        data: {
+                                          ...selectedTask.data,
+                                          deadline: e.target.value,
+                                        },
                                       })
                                     }
                                     min={new Date().toISOString().split("T")[0]}
@@ -718,16 +782,21 @@ export default function CreateEvent() {
                                   <Form.Label>Budget</Form.Label>
                                   <Form.Control
                                     type="text"
-                                    value={formatCurrency(selectedTask.budget)}
+                                    value={formatCurrency(
+                                      selectedTask.data.budget || ""
+                                    )}
                                     onChange={(e) => {
                                       const value = e.target.value;
                                       if (
-                                        /^\d*[,]?\d*$/.test(value) ||
+                                        /^[\d,.]*$/.test(value) ||
                                         value === ""
                                       ) {
                                         setSelectedTask({
                                           ...selectedTask,
-                                          budget: parseNumber(value),
+                                          data: {
+                                            ...selectedTask.data,
+                                            budget: parseNumber(value),
+                                          },
                                         });
                                       }
                                     }}
@@ -740,11 +809,14 @@ export default function CreateEvent() {
                                   <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={selectedTask.description || ""}
+                                    value={selectedTask.data.description || ""}
                                     onChange={(e) =>
                                       setSelectedTask({
                                         ...selectedTask,
-                                        description: e.target.value,
+                                        data: {
+                                          ...selectedTask.data,
+                                          description: e.target.value,
+                                        },
                                       })
                                     }
                                   />
@@ -767,6 +839,7 @@ export default function CreateEvent() {
                             </Button>
                           </Modal.Footer>
                         </Modal>
+
                         <Modal
                           show={showPopupSubTask}
                           onHide={handleCloseSubTaskPopup}
@@ -780,7 +853,7 @@ export default function CreateEvent() {
                                 controlId="subTaskTitle"
                                 className="mb-3"
                               >
-                                <Form.Label>Title</Form.Label>
+                                <Form.Label>Sub-task Name</Form.Label>
                                 <Form.Control
                                   type="text"
                                   value={selectedSubTask?.title || ""}
@@ -808,6 +881,46 @@ export default function CreateEvent() {
                                   placeholder="Enter description"
                                 />
                               </Form.Group>
+                              <Form.Group controlId="subTaskDeadline">
+                                <Form.Label>Deadline</Form.Label>
+                                <Form.Control
+                                  type="datetime-local"
+                                  value={selectedSubTask?.deadline || ""}
+                                  onChange={(e) =>
+                                    setSelectedSubTask({
+                                      ...selectedSubTask,
+                                      deadline: e.target.value,
+                                    })
+                                  }
+                                  min={new Date().toISOString().split("T")[0]}
+                                />
+                              </Form.Group>
+
+                              <Form.Group controlId="subTaskAmount">
+                                <Form.Label>Amount</Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  value={
+                                    selectedSubTask?.amount
+                                      ? Number(
+                                          selectedSubTask.amount
+                                        ).toLocaleString("vi-VN")
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const rawValue = e.target.value.replace(
+                                      /\./g,
+                                      ""
+                                    );
+                                    if (!isNaN(rawValue)) {
+                                      setSelectedSubTask({
+                                        ...selectedSubTask,
+                                        amount: rawValue,
+                                      });
+                                    }
+                                  }}
+                                />
+                              </Form.Group>
                             </Form>
                           </Modal.Body>
                           <Modal.Footer>
@@ -829,6 +942,8 @@ export default function CreateEvent() {
                                 newGroups[selectedGroupIndex].subTasks.push({
                                   title: selectedSubTask.title,
                                   description: selectedSubTask.description,
+                                  amount: selectedSubTask.amount,
+                                  deadline: selectedSubTask.deadline,
                                   completed: false,
                                 });
 
@@ -854,17 +969,49 @@ export default function CreateEvent() {
                               key={subTaskIndex}
                               className="d-flex justify-content-between align-items-center"
                             >
-                              <div className="d-flex flex-column">
-                                <div>{subTask.title}</div>
+                              <div
+                                className="d-flex flex-column"
+                                style={{ width: "250px" }}
+                              >
+                                <div
+                                  style={{
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    maxWidth: "100%",
+                                  }}
+                                >
+                                  {subTask.title}
+                                </div>
+
                                 <div
                                   style={{
                                     fontSize: "0.875rem",
                                     color: "#6c757d",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    maxWidth: "100%",
                                   }}
                                 >
-                                  {subTask.description}
+                                  {subTask.deadline}
+                                </div>
+
+                                <div
+                                  style={{
+                                    fontSize: "0.875rem",
+                                    color: "#6c757d",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    maxWidth: "100%",
+                                  }}
+                                >
+                                  {formatCurrency(subTask.amount)}
+                                  <span style={{ color: "red" }}> VNĐ</span>
                                 </div>
                               </div>
+
                               <Button
                                 variant="danger"
                                 size="sm"
@@ -879,6 +1026,7 @@ export default function CreateEvent() {
                           ))}
                         </ListGroup>
                         <Button
+                          style={{ marginTop: "10px" }}
                           variant="outline-secondary"
                           size="sm"
                           className="w-100 mb-2"
@@ -889,19 +1037,22 @@ export default function CreateEvent() {
                         <ListGroup>
                           {group.members.map((member, memberIndex) => (
                             <ListGroup.Item
+                              style={{ backgroundColor: "grey" }}
                               key={memberIndex}
                               className="d-flex justify-content-between align-items-center"
                             >
                               <div className="d-flex flex-column">
-                                <div>{member.name}</div>
+                                <div style={{ color: "white" }}>
+                                  {member.name}
+                                </div>
                                 <div
                                   style={{
                                     fontSize: "0.875rem",
-                                    color: "#6c757d",
+                                    color: "white",
                                     whiteSpace: "nowrap",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    maxWidth: "150px",
+                                    maxWidth: "200px",
                                   }}
                                 >
                                   {member.email}
