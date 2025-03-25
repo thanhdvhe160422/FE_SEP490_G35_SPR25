@@ -79,6 +79,7 @@ const EventDetailEOG = () => {
 
         const data = await response.json();
         console.log("Fetched Event Data:", data);
+        data.result.groups=[];
         setEvent(data.result);
 
         if (data.result.eventMedia && data.result.eventMedia.length > 0) {
@@ -328,7 +329,7 @@ const EventDetailEOG = () => {
             </div>
 
             <div className="event-member-group" style={{ width: "90%" }}>
-              <h3>List Group</h3>
+              <h3>List Task</h3>
               <div className="event-groups">
                 {event.groups.map((group) => (
                   <div
