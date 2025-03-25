@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import "./Header.css";
 import logo from "../../assets/logo-fptu.png";
+import { getProfileById } from "../../services/userService";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Header() {
 
   const [fullname, setFullname] = useState("");
   const [picture, setPicture] = useState("");
+  const [userData, setUserData] = useState("");
 
   // Lấy role từ localStorage, chuẩn hóa về chữ thường
   const userRole = localStorage.getItem("role")?.toLowerCase() || "";
@@ -26,13 +28,21 @@ export default function Header() {
     setPicture(localStorage.getItem("avatar"));
 
     if (!userId) return;
-
-    // axios
-    //   .get(`http://localhost:4000/notifications?userId=${userId}`)
-    //   .then((response) => setNotifications(response.data))
-    //   .catch((error) => console.error("Lỗi khi lấy thông báo:", error));
+    const fetchProvinces = async () => {
+          try {
+            const userData = await getProfileById(userId);
+            setPicture(convertToDirectLink(userData.data.avatar.mediaUrl))
+          } catch (error) {
+            console.error(error);
+          }
+        };
+        fetchProvinces();
   }, []);
-
+  function convertToDirectLink(googleDriveUrl) {
+    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
