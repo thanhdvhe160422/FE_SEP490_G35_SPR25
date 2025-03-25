@@ -27,6 +27,7 @@ const Profile = () => {
 
         setUser(userData);
         console.log(userData);
+        setimage(userData.avatar.mediaUrl||"");
         setAddress(userData.addressVM.addressDetail || "");
         setProvinces(
           userData.addressVM.wardVM.districtVM.provinceVM.provinceName
@@ -68,12 +69,18 @@ const Profile = () => {
     return `${day} - ${month} - ${year}`;
   };
 
+  function convertToDirectLink(googleDriveUrl) {
+    
+    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
   return (
     <>
       <Header />
       <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={image} alt="Avatar" className="profile-avatar" />
+          <img src={convertToDirectLink(image)} alt="Avatar" className="profile-avatar" />
           <h2>
             {user.firstName} {user.lastName}
           </h2>
