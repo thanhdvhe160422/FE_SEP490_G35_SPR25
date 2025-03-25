@@ -33,10 +33,9 @@ const UpdateProfile = () => {
         setUser(data.data);
         setInitialUser(data.data);
         setImage(data.data.avatar.mediaUrl)
-        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.Id || "");
-        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.Id || "");
-        setSelectedWard(data.data.addressVM.wardVM.wardId || "");
-
+        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || "");
+        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || "");
+        setSelectedWard(data.data.addressVM.wardVM.id || "");
         setLoading(false);
       } catch (error) {
         console.error("Lỗi lấy dữ liệu người dùng:", error);
@@ -94,6 +93,7 @@ const UpdateProfile = () => {
 
     fetchWards();
   }, [selectedDistrict]);
+
 
   const hasChanges = () => {
     if (!initialUser || !user) return false;
@@ -201,12 +201,12 @@ const UpdateProfile = () => {
   
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
-      handleSaveAvatar();
+      handleSaveAvatar(file);
     }
   };
   
-  const handleSaveAvatar = async () => {
-    if (!image) return;
+  const handleSaveAvatar = async (file) => {
+    if (!file) return;
   
     try {
       setLoading(true);
@@ -214,9 +214,9 @@ const UpdateProfile = () => {
       const token = localStorage.getItem("token");
   
       const formData = new FormData();
-      formData.append('image', image);
+      formData.append('imageFile', file);
       
-      const data = await updateAvatar(userId, image, token);
+      const data = await updateAvatar(userId, formData, token);
       const url = data.data;
   
       console.log("Avatar updated successfully:", url);
@@ -238,13 +238,29 @@ const UpdateProfile = () => {
     const date = new Date(dateStr.split('T')[0]);
     return date.toLocaleDateString('en-CA');
   };
+  function convertToDirectLink(googleDriveUrl) {
+    // const regex = /(?:drive|usercontent)\.google\.com.*(?:id=|d\/)([a-zA-Z0-9_-]+)/;
+    // const match = googleDriveUrl.match(regex);
+
+    // if (match && match[1]) {
+    //     const fileId = match[1];
+    //     return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // } else {
+    //     throw new Error('Invalid Google Drive URL');
+    // }
+    
+    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
 
   return (
     <>
       <Header />
       <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={image} alt="Avatar" className="profile-avatar" />
+          <img src={convertToDirectLink(image)} alt="Avatar" className="profile-avatar" />
+          
           <div className="file-input-container">
             <button
               type="button"
