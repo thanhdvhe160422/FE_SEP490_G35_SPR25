@@ -23,6 +23,7 @@ import CostDetail from "./pages/Events/CostDetail";
 import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
 import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
 import UpdateTask from "./pages/Tasks/UpdateTask";
+import CategoryEventManager from "./pages/Events/CategoryEventManager";
 
 function App() {
   return (
@@ -205,10 +206,10 @@ function App() {
         />
         
         <Route
-          path="/group/:groupId/update-task/:id"
+          path="/category-event"
           element={
-            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
-              <UpdateTask />
+            <PrivateRoute allowedRoles={["Campus Manager"]}>
+              <CategoryEventManager />
             </PrivateRoute>
           }
         />

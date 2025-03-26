@@ -35,3 +35,46 @@ const getCategories = async () => {
 };
 
 export default getCategories;
+
+export const getCategoryByCampusId = async(campusId) =>{
+  try{
+    return axios.get(`${API_URL}/${campusId}`);
+  }catch(error){
+    console.error('Error get campus:', error.response || error);
+    return [];
+  }
+}
+export const createCategory = async(data,token) =>{
+  try{
+    return axios.post(`${API_URL}`,data,{
+      headers:{
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }catch(error){
+    console.error('Error create category:', error.response || error);
+  }
+}
+export const updateCategory = async(data,token) =>{
+  try{
+    return axios.put(`${API_URL}`,data,{
+      headers:{
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }catch(error){
+    console.error('Error update category:', error.response || error);
+  }
+}
+export const deleteCategory = async(categoryId,token) =>{
+  try{
+    return axios.post(`${API_URL}/${categoryId}`,{
+      headers:{
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }catch(error){
+    console.error('Error delete category:', error.response || error);
+    return null;
+  }
+}
