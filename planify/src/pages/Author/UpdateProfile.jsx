@@ -20,6 +20,7 @@ const UpdateProfile = () => {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
   const [image, setImage] = useState("");
+  const [isChangeImage, setIsChangeImage] = useState(false);
   const [file, setFile] = useState(null);
   const [name,setName] = useState("");
 
@@ -35,10 +36,10 @@ const UpdateProfile = () => {
         setUser(data.data);
         setInitialUser(data.data);
         setImage(data.data.avatar.mediaUrl)
-        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || "");
-        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || "");
-        setSelectedWard(data.data.addressVM.wardVM.id || "");
-        setName(data.data.lastName+" "+data.data.firstName);
+        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || 1);
+        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || 1);
+        setSelectedWard(data.data.addressVM.wardVM.id || 1);
+        setName(data.data.firstName+" "+data.data.lastName);
         setLoading(false);
       } catch (error) {
         console.error("Lỗi lấy dữ liệu người dùng:", error);
@@ -51,6 +52,7 @@ const UpdateProfile = () => {
       try {
         const data = await getProvinces();
         setProvinces(data.data.result || []);
+        await setSelectedProvince(1);
       } catch (error) {
         console.error("Lỗi lấy danh sách tỉnh:", error);
         setProvinces([]);
@@ -58,9 +60,6 @@ const UpdateProfile = () => {
     };
 
     fetchProvinces();
-    setSelectedProvince(1);
-    setSelectedDistrict(1);
-    setSelectedWard(1);
     fetchUserData();
   }, []);
 
@@ -71,6 +70,7 @@ const UpdateProfile = () => {
       try {
         const data = await getDistricts(selectedProvince);
         setDistricts(data.data.result || []);
+        await setSelectedDistrict(1);
         setWards([]);
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
@@ -88,6 +88,7 @@ const UpdateProfile = () => {
       try {
         const data = await getWards(selectedDistrict)
         setWards(data.data .result|| []);
+        await setSelectedWard(1);
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -128,7 +129,7 @@ const UpdateProfile = () => {
         gender: user.gender===1,
         addressVM: {
           id: user.addressVM?.id || 0,
-          addressDetail: user?.addressVM?.addressDetail || "string",
+          addressDetail: user?.addressVM?.addressDetail || "",
           wardVM: {
             id: selectedWard || 0,
             wardName: "string",
@@ -159,6 +160,10 @@ const UpdateProfile = () => {
         });
         navigate("/login");
         return;
+      }
+      if (isChangeImage){
+        await handleSaveAvatar(file);
+        setIsChangeImage(false);
       }
       const response = await updateProfile(updatedUser,token);
       if (response && response.status === 200) {
@@ -204,7 +209,8 @@ const UpdateProfile = () => {
   
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
-      handleSaveAvatar(file);
+      setIsChangeImage(true);
+      setFile(file)
     }
   };
   
@@ -227,13 +233,15 @@ const UpdateProfile = () => {
   
       localStorage.setItem("avatar", url);
       setLoading(false); 
+      return url;
     } catch (error) {
       console.error("Error updating avatar:", error);
       setLoading(false); 
+      throw error;
     }
   };
 
-  if (loading) return <div class="loader"></div>
+  if (loading) return <div className="loader"></div>
   if (!user) return <p>No user data found</p>;
 
   function convertToDirectLink(googleDriveUrl) {
