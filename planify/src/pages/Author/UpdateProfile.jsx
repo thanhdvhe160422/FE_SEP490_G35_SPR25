@@ -138,7 +138,7 @@ const UpdateProfile = () => {
         gender: user.gender === 1,
         addressVM: {
           id: user.addressVM?.id || 0,
-          addressDetail: user.addressVM?.addressDetail || "string",
+          addressDetail: user?.addressVM?.addressDetail || "string",
           wardVM: {
             id: selectedWard || 0,
             wardName: "string",
