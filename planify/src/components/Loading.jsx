@@ -1,4 +1,5 @@
-const LoadingHand = () => {
+import "../styles/Author/Loading.css";
+const Loading = () => {
   return (
     <div className="loader">
       <div className="dot"></div>
@@ -10,4 +11,4 @@ const LoadingHand = () => {
   );
 };
 
-export default LoadingHand;
+export default Loading;

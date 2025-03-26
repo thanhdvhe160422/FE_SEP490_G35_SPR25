@@ -1,0 +1,32 @@
+.week-calendar {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 100px;
+}
+
+.week-calendar .controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.week-calendar .year-select,
+.week-calendar .week-select {
+  margin: 0 10px;
+}
+
+.week-calendar .week-dates {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.week-calendar .week-date {
+  padding: 10px;
+  font-weight: bold;
+}
+
+.week-calendar .week-label {
+  display: flex;
+  justify-content: space-around;
+}

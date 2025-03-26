@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { addLeader } from "../../services/groupService";
+import { addLeader } from "../../services/GroupService";
 import {
   Form,
   Row,
@@ -17,10 +17,10 @@ import { useSnackbar } from "notistack";
 import getCategories from "../../services/CategoryService";
 import refreshAccessToken from "../../services/refreshToken";
 import { useNavigate } from "react-router";
-import LoadingHand from "../../components/Loading";
 import { FaRobot } from "react-icons/fa";
 
 import "../../styles/Events/CreateEvent.css";
+import Loading from "../../components/Loading";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -75,7 +75,7 @@ export default function CreateEvent() {
     };
 
     fetchData();
-  }, []);
+  }, [enqueueSnackbar]);
 
   const handleShowPopup = (group, index) => {
     setSelectedTask({
@@ -347,18 +347,38 @@ export default function CreateEvent() {
 
   const handleAddSubTask = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
+    setSelectedSubTask({
+      title: "",
+      description: "",
+      deadline: "",
+      amount: "",
+    });
+    setShowPopupSubTask(true);
+  };
+  const handleEditSubTask = (groupIndex, subTask) => {
+    setSelectedGroupIndex(groupIndex);
+    setSelectedSubTask(subTask);
     setShowPopupSubTask(true);
   };
 
   const handleCloseSubTaskPopup = (subtask) => {
     setShowPopupSubTask(false);
-    setSelectedSubTask(subtask);
+    setSelectedSubTask({
+      title: "",
+      description: "",
+      deadline: "",
+      amount: "",
+    });
   };
 
   const handleDeleteSubTask = (groupIndex, subTaskIndex) => {
     const newGroups = [...groups];
-    newGroups[groupIndex].subTasks.splice(subTaskIndex, 1);
-    setGroups(newGroups);
+    if (newGroups[groupIndex] && newGroups[groupIndex].subTasks) {
+      newGroups[groupIndex].subTasks.splice(subTaskIndex, 1);
+      setGroups(newGroups);
+    } else {
+      console.error("No subTasks found for the specified group index.");
+    }
   };
 
   const handleCreateEvent = async () => {
@@ -538,6 +558,7 @@ export default function CreateEvent() {
   const parseNumber = (value) => {
     return value.replace(/,/g, "");
   };
+  if (isLoading) return <Loading />;
 
   return (
     <>
@@ -853,13 +874,55 @@ export default function CreateEvent() {
                             <Modal.Title>Add New Sub-Task</Modal.Title>
                           </Modal.Header>
                           <Modal.Body>
-                            <Form>
+                            <Form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+
+                                if (
+                                  groupIndex === null ||
+                                  groupIndex < 0 ||
+                                  groupIndex >= groups.length
+                                ) {
+                                  console.error(
+                                    "Invalid group index:",
+                                    selectedGroupIndex
+                                  );
+                                  return;
+                                }
+
+                                const newGroups = [...groups];
+
+                                if (!newGroups[selectedGroupIndex]) {
+                                  console.error(
+                                    "Group not found at index:",
+                                    selectedGroupIndex
+                                  );
+                                  return;
+                                }
+
+                                if (!newGroups[groupIndex].subTasks) {
+                                  newGroups[groupIndex].subTasks = [];
+                                }
+                                newGroups[groupIndex].subTasks.push({
+                                  title: selectedSubTask.title || "",
+                                  description:
+                                    selectedSubTask.description || "",
+                                  amount: selectedSubTask.amount || "",
+                                  deadline: selectedSubTask.deadline || "",
+                                  completed: false,
+                                });
+
+                                setGroups(newGroups);
+                                handleCloseSubTaskPopup();
+                              }}
+                            >
                               <Form.Group
                                 controlId="subTaskTitle"
                                 className="mb-3"
                               >
                                 <Form.Label>Sub-task Name</Form.Label>
                                 <Form.Control
+                                  required
                                   type="text"
                                   value={selectedSubTask?.title || ""}
                                   onChange={(e) =>
@@ -874,6 +937,7 @@ export default function CreateEvent() {
                               <Form.Group controlId="subTaskDescription">
                                 <Form.Label>Description</Form.Label>
                                 <Form.Control
+                                  required
                                   as="textarea"
                                   rows={3}
                                   value={selectedSubTask?.description || ""}
@@ -889,6 +953,7 @@ export default function CreateEvent() {
                               <Form.Group controlId="subTaskDeadline">
                                 <Form.Label>Deadline</Form.Label>
                                 <Form.Control
+                                  required
                                   type="datetime-local"
                                   value={selectedSubTask?.deadline || ""}
                                   onChange={(e) =>
@@ -900,7 +965,6 @@ export default function CreateEvent() {
                                   min={new Date().toISOString().split("T")[0]}
                                 />
                               </Form.Group>
-
                               <Form.Group controlId="subTaskAmount">
                                 <Form.Label>Amount</Form.Label>
                                 <Form.Control
@@ -917,48 +981,33 @@ export default function CreateEvent() {
                                       /\./g,
                                       ""
                                     );
-                                    if (!isNaN(rawValue)) {
+                                    if (
+                                      !isNaN(rawValue) ||
+                                      e.target.value === ""
+                                    ) {
                                       setSelectedSubTask({
                                         ...selectedSubTask,
                                         amount: rawValue,
                                       });
                                     }
                                   }}
+                                  required
+                                  title="Vui lòng nhập số tiền"
                                 />
                               </Form.Group>
+                              <Modal.Footer>
+                                <Button
+                                  variant="secondary"
+                                  onClick={handleCloseSubTaskPopup}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button variant="primary" type="submit">
+                                  Add Sub-Task
+                                </Button>
+                              </Modal.Footer>
                             </Form>
                           </Modal.Body>
-                          <Modal.Footer>
-                            <Button
-                              variant="secondary"
-                              onClick={handleCloseSubTaskPopup}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="primary"
-                              onClick={() => {
-                                const newGroups = [...groups];
-
-                                if (!newGroups[selectedGroupIndex].subTasks) {
-                                  newGroups[selectedGroupIndex].subTasks = [];
-                                }
-
-                                newGroups[selectedGroupIndex].subTasks.push({
-                                  title: selectedSubTask.title,
-                                  description: selectedSubTask.description,
-                                  amount: selectedSubTask.amount,
-                                  deadline: selectedSubTask.deadline,
-                                  completed: false,
-                                });
-
-                                setGroups(newGroups);
-                                handleCloseSubTaskPopup();
-                              }}
-                            >
-                              Add Sub-Task
-                            </Button>
-                          </Modal.Footer>
                         </Modal>
                         <Button
                           variant="outline-primary"
@@ -973,8 +1022,12 @@ export default function CreateEvent() {
                             <ListGroup.Item
                               key={subTaskIndex}
                               className="d-flex justify-content-between align-items-center"
+                              style={{ cursor: "pointer" }}
                             >
                               <div
+                                onClick={() =>
+                                  handleEditSubTask(groupIndex, subTask)
+                                }
                                 className="d-flex flex-column"
                                 style={{ width: "250px" }}
                               >
@@ -1172,7 +1225,7 @@ export default function CreateEvent() {
               onClick={handleCreateEvent}
               disabled={isLoading}
             >
-              {isLoading ? "Loading..." : "Create Event"}
+              Create Event
             </Button>
           </div>
         </Form>
