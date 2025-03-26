@@ -1,14 +1,14 @@
-const LoadingHand = () => {
+import "../styles/Author/Loading.css";
+const Loading = () => {
   return (
-    <div className="🤚">
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="🌴"></div>
-      <div className="👍"></div>
+    <div className="loader">
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
     </div>
   );
 };
 
-export default LoadingHand;
+export default Loading;
