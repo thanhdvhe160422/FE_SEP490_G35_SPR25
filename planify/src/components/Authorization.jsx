@@ -5,15 +5,26 @@ export default function Authorization() {
   const navigate = useNavigate();
 
   return (
-    <section class="error_area">
-      <div class="container">
-        <h1>Oops !</h1>
-        <h2>Page Not Found!</h2>
-        <p>The page you are looking for doesn't exist or has been moved.</p>
-        <div className="bt">
-          <button onClick={() => navigate("/login")} className="error_btn">
-            Go to Login
-          </button>
+    <section className="page_404 full-width-container">
+      <div className="container-fluid">
+        {" "}
+        <div className="row g-0">
+          {" "}
+          <div className="col-12 no-padding">
+            <div className="col-sm-10 col-sm-offset-1 text-center centered-column">
+              <div className="four_zero_four_bg">
+                <h1 className="text-center">404</h1>
+              </div>
+
+              <div className="contant_box_404">
+                <h3 className="h2">Look like you're lost</h3>
+                <p>the page you are looking for not available!</p>
+                <button className="link_404" onClick={() => navigate("/home")}>
+                  Go to Home
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

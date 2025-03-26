@@ -1,12 +1,11 @@
 const LoadingHand = () => {
   return (
-    <div className="🤚">
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="👉"></div>
-      <div className="🌴"></div>
-      <div className="👍"></div>
+    <div className="loader">
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
     </div>
   );
 };
