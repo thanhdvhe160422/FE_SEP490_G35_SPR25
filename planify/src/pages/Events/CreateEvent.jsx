@@ -58,14 +58,13 @@ export default function CreateEvent() {
   const token = localStorage.getItem("token");
   const [usersName, setUsersName] = useState([]);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [chatMessage, setChatMessage] = useState(""); // Tin nhắn người dùng nhập
-  const [chatHistory, setChatHistory] = useState([]); // Lịch sử chat
-  const [isWaitingForCategory, setIsWaitingForCategory] = useState(false); // Trạng thái chờ người dùng chọn category
-  const [pendingPrompt, setPendingPrompt] = useState(null); // Lưu prompt tạm thời
-  const [isWaitingForApplyConfirmation, setIsWaitingForApplyConfirmation] = useState(false); // Trạng thái chờ xác nhận áp dụng
-  const [pendingEventData, setPendingEventData] = useState(null); // Lưu dữ liệu sự kiện tạm thời để áp dụng
-
-  // Lấy campusId từ token
+  const [chatMessage, setChatMessage] = useState(""); 
+  const [chatHistory, setChatHistory] = useState([]); 
+  const [isWaitingForCategory, setIsWaitingForCategory] = useState(false); 
+  const [pendingPrompt, setPendingPrompt] = useState(null); 
+  const [isWaitingForApplyConfirmation, setIsWaitingForApplyConfirmation] = useState(false); 
+  const [pendingEventData, setPendingEventData] = useState(null); 
+  const [indexGselect, setindexGselect] = useState(0);
   const getCampusIdFromToken = () => {
     try {
       const decodedToken = jwtDecode(token);
@@ -76,7 +75,6 @@ export default function CreateEvent() {
     }
   };
 
-  // Lấy danh sách category từ API dựa trên campusId
   const fetchCategories = async () => {
     const campusId = getCampusIdFromToken();
     try {
@@ -102,7 +100,6 @@ export default function CreateEvent() {
     }
   };
 
-  // Hàm gửi tin nhắn và gọi API
   const handleSendChatMessage = async () => {
     if (!chatMessage.trim()) return;
 
@@ -227,7 +224,6 @@ export default function CreateEvent() {
     setChatMessage("");
   };
 
-  // Hàm render response JSON đẹp mắt
   const renderEventSuggestion = (data) => {
     if (!data || typeof data !== "object") {
       return <p>Không có dữ liệu hợp lệ để hiển thị.</p>;
@@ -609,6 +605,8 @@ export default function CreateEvent() {
 
   const handleAddSubTask = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
+    console.log("sang: "+groupIndex);
+    setindexGselect(groupIndex);
     setSelectedSubTask({
       title: "",
       description: "",
@@ -1143,13 +1141,15 @@ export default function CreateEvent() {
                           onHide={handleCloseSubTaskPopup}
                         >
                           <Modal.Header closeButton>
-                            <Modal.Title>Add New Sub-Task</Modal.Title>
+                            <Modal.Title>Create New Sub-Task</Modal.Title>
                           </Modal.Header>
                           <Modal.Body>
                             <Form
                               onSubmit={(e) => {
                                 e.preventDefault();
-
+                                const t = indexGselect;
+                                groupIndex = t;
+                                console.log("thanh: ", groupIndex);
                                 if (
                                   groupIndex === null ||
                                   groupIndex < 0 ||
@@ -1275,7 +1275,7 @@ export default function CreateEvent() {
                                   Cancel
                                 </Button>
                                 <Button variant="primary" type="submit">
-                                  Add Sub-Task
+                                  Create
                                 </Button>
                               </Modal.Footer>
                             </Form>
@@ -1287,7 +1287,7 @@ export default function CreateEvent() {
                           className="w-100 mb-2"
                           onClick={() => handleAddSubTask(groupIndex)}
                         >
-                          Add Sub-Task
+                          Create Sub-Task
                         </Button>
                         <ListGroup>
                           {group.subTasks?.map((subTask, subTaskIndex) => (
