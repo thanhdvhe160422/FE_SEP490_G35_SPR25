@@ -68,7 +68,7 @@ export const updateCategory = async(data,token) =>{
 }
 export const deleteCategory = async(categoryId,token) =>{
   try{
-    return axios.post(`${API_URL}/${categoryId}`,{
+    return axios.delete(`${API_URL}/${categoryId}`,{
       headers:{
         Authorization: `Bearer ${token}`,
       },

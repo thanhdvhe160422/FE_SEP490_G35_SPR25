@@ -66,9 +66,35 @@ export default function CategoryEventManager(){
         setShowModal(false);
         window.location.reload();
     };
-    const handleDelete = (id) => {
-        console.log(`Deleting category with id: ${id}`);
+    const handleDelete = async (id) => {
+        try {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+            });
+    
+            if (result.isConfirmed) {
+                var token = localStorage.getItem("token");
+                const response = await deleteCategory(id,token);
+                if (response?.error) {
+                    Swal.fire("Error", response.error, "error");
+                } else {
+                    setCategories(categories.filter(category => category.id !== id));
+                    Swal.fire('Deleted!', 'Your category has been deleted.', 'success');
+                }
+            }
+        } catch (error) {
+            console.error("Error deleting category:", error);
+            Swal.fire('Error', 'There was a problem deleting the category.', 'error');
+        }
     };
+    
     return <>
         <Header/>
         <div style={{marginTop:'100px'}}>
@@ -85,14 +111,26 @@ export default function CategoryEventManager(){
             </div>
             <div>
                 {showModal && (
-                    <CategoryForm
-                    title={modalTitle}
-                    campusId={campus.id}
-                    id={categoryData.id}
-                    name={categoryData.name}
-                    onClose={handleCloseModal}
-                    onSave={handleSave}
-                    />
+                    <div className="modal fade show" style={{ display: 'block' }} id="categoryModal" tabIndex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h5 className="modal-title" id="categoryModalLabel">{modalTitle}</h5>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={handleCloseModal}></button>
+                        </div>
+                        <div className="modal-body">
+                          <CategoryForm
+                            title={modalTitle}
+                            campusId={campus.id}
+                            id={categoryData.id}
+                            name={categoryData.name}
+                            onClose={handleCloseModal}
+                            onSave={handleSave}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
             </div>
             <div id="category-list-container">

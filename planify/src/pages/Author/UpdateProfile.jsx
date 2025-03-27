@@ -15,9 +15,6 @@ import {
 } from "../../services/addressService";
 // import "../../styles/Author/LoadingImage.css"
 import Loading from "../../components/Loading";
-import { updateProfile,updateAvatar, getProfileById } from "../../services/userService";
-import{getProvinces, getDistricts, getWards} from "../../services/addressService";
-import "../../styles/Author/Loading.css"
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
@@ -64,7 +61,7 @@ const UpdateProfile = () => {
     const fetchProvinces = async () => {
       try {
         const data = await getProvinces();
-        await setProvinces(data.data.result || []);
+        setProvinces(data.data.result || []);
       } catch (error) {
         console.error("Lỗi lấy danh sách tỉnh:", error);
         setProvinces([]);
@@ -84,7 +81,7 @@ const UpdateProfile = () => {
     const fetchDistricts = async () => {
       try {
         const data = await getDistricts(selectedProvince);
-        await setDistricts(data.data.result || []);
+        setDistricts(data.data.result || []);
         setWards([]);
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
@@ -102,7 +99,7 @@ const UpdateProfile = () => {
       try {
 
         const data = await getWards(selectedDistrict)
-        await setWards(data.data .result|| []);
+        setWards(data.data .result|| []);
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -267,7 +264,7 @@ const UpdateProfile = () => {
     const fileId = googleDriveUrl.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 }
-  if (loading) return <div className="loader"></div>
+  if (loading) return <div className="loader"><Loading></Loading></div>
   if (!user) return <p>No user data found</p>;
 
   return (
