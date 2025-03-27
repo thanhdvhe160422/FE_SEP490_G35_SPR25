@@ -1,0 +1,78 @@
+/* EventPlan.css */
+
+.event-plan-container {
+    padding: 30px;
+    background-color: #f9f9f9;
+  }
+  
+  .event-plan-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  }
+  
+  .event-plan-card h5 {
+    font-weight: 600;
+    color: #1d3557;
+    margin-bottom: 15px;
+  }
+  
+  .event-plan-card label {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .event-plan-card .form-control {
+    border-radius: 6px;
+    font-size: 15px;
+  }
+  
+  .section-divider {
+    border-top: 2px dashed #ccc;
+    margin: 30px 0;
+  }
+  
+  .action-item-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .action-item-table th,
+  .action-item-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    vertical-align: top;
+    font-size: 14px;
+  }
+  
+  .action-item-table th {
+    background-color: #f0f0f0;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .action-item-table td input,
+  .action-item-table td textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 6px;
+    font-size: 14px;
+  }
+  
+  .add-action-btn {
+    background-color: #1d3557;
+    color: #fff;
+    border-radius: 6px;
+    margin-top: 20px;
+    padding: 8px 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-action-btn:hover {
+    background-color: #16324f;
+  }
+  

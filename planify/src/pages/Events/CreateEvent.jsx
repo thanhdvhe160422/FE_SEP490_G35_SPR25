@@ -22,8 +22,7 @@ import { FaRobot } from "react-icons/fa";
 import "../../styles/Events/CreateEvent.css";
 import Loading from "../../components/Loading";
 
-import {jwtDecode} from "jwt-decode";
-
+import { jwtDecode } from "jwt-decode";
 
 export default function CreateEvent() {
   const { enqueueSnackbar } = useSnackbar();
@@ -58,13 +57,19 @@ export default function CreateEvent() {
   const token = localStorage.getItem("token");
   const [usersName, setUsersName] = useState([]);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [chatMessage, setChatMessage] = useState(""); 
-  const [chatHistory, setChatHistory] = useState([]); 
-  const [isWaitingForCategory, setIsWaitingForCategory] = useState(false); 
-  const [pendingPrompt, setPendingPrompt] = useState(null); 
-  const [isWaitingForApplyConfirmation, setIsWaitingForApplyConfirmation] = useState(false); 
-  const [pendingEventData, setPendingEventData] = useState(null); 
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isWaitingForCategory, setIsWaitingForCategory] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState(null);
+  const [isWaitingForApplyConfirmation, setIsWaitingForApplyConfirmation] =
+    useState(false);
+  const [pendingEventData, setPendingEventData] = useState(null);
   const [indexGselect, setindexGselect] = useState(0);
+  const [goals, setGoals] = useState("");
+  const [monitoringProcess, setMonitoringProcess] = useState("");
+  const [measuringSuccess, setMeasuringSuccess] = useState("");
+  const [sizeParticipants, setSizeParticipants] = useState("");
+
   const getCampusIdFromToken = () => {
     try {
       const decodedToken = jwtDecode(token);
@@ -79,13 +84,13 @@ export default function CreateEvent() {
     const campusId = getCampusIdFromToken();
     try {
       const response = await axios.get(
-          `https://localhost:44320/api/Categories/${campusId}`,
-          {
-            headers: {
-              Accept: "*/*",
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        `https://localhost:44320/api/Categories/${campusId}`,
+        {
+          headers: {
+            Accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const categoryData = Array.isArray(response.data) ? response.data : [];
       setCategories(categoryData);
@@ -94,7 +99,10 @@ export default function CreateEvent() {
       console.error("Error fetching categories:", error);
       setChatHistory((prev) => [
         ...prev,
-        { sender: "bot", text: "Có lỗi khi lấy danh sách lĩnh vực. Vui lòng thử lại!" },
+        {
+          sender: "bot",
+          text: "Có lỗi khi lấy danh sách lĩnh vực. Vui lòng thử lại!",
+        },
       ]);
       return [];
     }
@@ -113,7 +121,10 @@ export default function CreateEvent() {
       if (categoryData.length > 0) {
         setChatHistory((prev) => [
           ...prev,
-          { sender: "bot", text: "Bạn muốn tạo sự kiện theo lĩnh vực nào? Dưới đây là các lựa chọn:" },
+          {
+            sender: "bot",
+            text: "Bạn muốn tạo sự kiện theo lĩnh vực nào? Dưới đây là các lựa chọn:",
+          },
           { sender: "bot", categories: categoryData },
         ]);
       } else {
@@ -125,31 +136,36 @@ export default function CreateEvent() {
       }
     } else if (isWaitingForCategory) {
       const selectedCategory = categories.find(
-          (cat) => cat.categoryEventName.toLowerCase() === chatMessage.trim().toLowerCase()
+        (cat) =>
+          cat.categoryEventName.toLowerCase() ===
+          chatMessage.trim().toLowerCase()
       );
 
       if (selectedCategory) {
         try {
           const response = await axios.post(
-              "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
-              {
-                prompt: pendingPrompt,
-                categoryEventId: selectedCategory.id,
+            "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
+            {
+              prompt: pendingPrompt,
+              categoryEventId: selectedCategory.id,
+            },
+            {
+              headers: {
+                Accept: "*/*",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
               },
-              {
-                headers: {
-                  Accept: "*/*",
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              }
+            }
           );
 
           const botResponse = response.data;
           setChatHistory((prev) => [
             ...prev,
             { sender: "bot", data: botResponse },
-            { sender: "bot", text: "Bạn có muốn áp dụng sự kiện này vào form tạo sự kiện không? (Có/Không)" },
+            {
+              sender: "bot",
+              text: "Bạn có muốn áp dụng sự kiện này vào form tạo sự kiện không? (Có/Không)",
+            },
           ]);
           setPendingEventData(botResponse);
           setIsWaitingForApplyConfirmation(true);
@@ -157,7 +173,10 @@ export default function CreateEvent() {
           console.error("Error calling API:", error);
           setChatHistory((prev) => [
             ...prev,
-            { sender: "bot", text: "Có lỗi xảy ra khi gọi API. Vui lòng thử lại!" },
+            {
+              sender: "bot",
+              text: "Có lỗi xảy ra khi gọi API. Vui lòng thử lại!",
+            },
           ]);
         }
         setIsWaitingForCategory(false);
@@ -165,7 +184,10 @@ export default function CreateEvent() {
       } else {
         setChatHistory((prev) => [
           ...prev,
-          { sender: "bot", text: "Lĩnh vực không hợp lệ. Vui lòng chọn lại từ danh sách!" },
+          {
+            sender: "bot",
+            text: "Lĩnh vực không hợp lệ. Vui lòng chọn lại từ danh sách!",
+          },
         ]);
       }
     } else if (isWaitingForApplyConfirmation) {
@@ -174,11 +196,28 @@ export default function CreateEvent() {
         if (pendingEventData) {
           setEventName(pendingEventData.EventTitle || "");
           setDescription(pendingEventData.EventDescription || "");
-          setFromDate(new Date(pendingEventData.StartTime).toISOString().split("T")[0]);
-          setFromTime(new Date(pendingEventData.StartTime).toTimeString().slice(0, 5));
-          setToDate(new Date(pendingEventData.EndTime).toISOString().split("T")[0]);
-          setToTime(new Date(pendingEventData.EndTime).toTimeString().slice(0, 5));
-          setAmountBudget(formatCurrency(pendingEventData.AmountBudget.toString()));
+          setGoals(pendingEventData.Goals || "");
+          setMonitoringProcess(pendingEventData.MonitoringProcess || "");
+          setMeasuringSuccess(pendingEventData.MeasuringSuccess || "");
+          setSizeParticipants(
+            pendingEventData.SizeParticipants?.toString() || ""
+          );
+
+          setFromDate(
+            new Date(pendingEventData.StartTime).toISOString().split("T")[0]
+          );
+          setFromTime(
+            new Date(pendingEventData.StartTime).toTimeString().slice(0, 5)
+          );
+          setToDate(
+            new Date(pendingEventData.EndTime).toISOString().split("T")[0]
+          );
+          setToTime(
+            new Date(pendingEventData.EndTime).toTimeString().slice(0, 5)
+          );
+          setAmountBudget(
+            formatCurrency(pendingEventData.AmountBudget.toString())
+          );
           setEventType(pendingEventData.CategoryEventId.toString());
           setPlaced("FPT");
           if (pendingEventData.Tasks && Array.isArray(pendingEventData.Tasks)) {
@@ -190,13 +229,16 @@ export default function CreateEvent() {
               deadline: new Date(task.Deadline).toISOString().slice(0, 16),
               budget: task.AmountBudget.toString(),
               description: task.TaskDescription || "",
-              subTasks: task.SubTasks?.map((subTask) => ({
-                title: subTask.SubTaskName,
-                description: subTask.SubTaskDescription || "",
-                amount: subTask.AmountBudget.toString(),
-                deadline: new Date(subTask.Deadline).toISOString().slice(0, 16),
-                completed: false,
-              })) || [],
+              subTasks:
+                task.SubTasks?.map((subTask) => ({
+                  title: subTask.SubTaskName,
+                  description: subTask.SubTaskDescription || "",
+                  amount: subTask.AmountBudget.toString(),
+                  deadline: new Date(subTask.Deadline)
+                    .toISOString()
+                    .slice(0, 16),
+                  completed: false,
+                })) || [],
             }));
             setGroups(newGroups);
           }
@@ -208,7 +250,10 @@ export default function CreateEvent() {
       } else if (userResponse === "không" || userResponse === "khong") {
         setChatHistory((prev) => [
           ...prev,
-          { sender: "bot", text: "Được rồi, tôi sẽ không áp dụng sự kiện này." },
+          {
+            sender: "bot",
+            text: "Được rồi, tôi sẽ không áp dụng sự kiện này.",
+          },
         ]);
       } else {
         setChatHistory((prev) => [
@@ -229,88 +274,143 @@ export default function CreateEvent() {
       return <p>Không có dữ liệu hợp lệ để hiển thị.</p>;
     }
 
-    const categoryName = categories.find(cat => cat.id === data.CategoryEventId)?.categoryEventName || `ID ${data.CategoryEventId}`;
+    const categoryName =
+      categories.find((cat) => cat.id === data.CategoryEventId)
+        ?.categoryEventName || `ID ${data.CategoryEventId}`;
 
     return (
-        <div style={{ padding: "15px", background: "#f8f9fa", borderRadius: "8px", fontSize: "14px" }}>
-          <h5 style={{ color: "#007bff", marginBottom: "15px", fontWeight: "bold" }}>
-            {data.EventTitle || "Sự kiện không có tên"}
-          </h5>
-          <div style={{ marginBottom: "20px" }}>
-            <p><strong>Mô tả:</strong> {data.EventDescription || "Không có mô tả"}</p>
-            <p>
-              <strong>Thời gian:</strong>{" "}
-              {new Date(data.StartTime).toLocaleString("vi-VN")} -{" "}
-              {new Date(data.EndTime).toLocaleString("vi-VN")}
-            </p>
-            <p><strong>Ngân sách:</strong> {Number(data.AmountBudget).toLocaleString("vi-VN")} VNĐ</p>
-            <p><strong>Loại sự kiện:</strong> {categoryName}</p>
-          </div>
-
-          {data.Tasks && Array.isArray(data.Tasks) && data.Tasks.length > 0 ? (
-              <>
-                <h6 style={{ color: "#343a40", marginBottom: "15px", fontWeight: "bold" }}>
-                  Danh sách nhiệm vụ:
-                </h6>
-                {data.Tasks.map((task, taskIndex) => (
-                    <div
-                        key={taskIndex}
-                        style={{
-                          marginBottom: "20px",
-                          padding: "15px",
-                          background: "#ffffff",
-                          border: "1px solid #e0e0e0",
-                          borderRadius: "6px",
-                          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                        }}
-                    >
-                      <h6 style={{ color: "#dc3545", marginBottom: "10px", fontWeight: "bold" }}>
-                        {task.TaskName}
-                      </h6>
-                      <div style={{ marginLeft: "10px" }}>
-                        <p><strong>Mô tả:</strong> {task.TaskDescription || "Không có mô tả"}</p>
-                        <p>
-                          <strong>Thời gian:</strong>{" "}
-                          {new Date(task.StartTime).toLocaleString("vi-VN")} -{" "}
-                          {new Date(task.Deadline).toLocaleString("vi-VN")}
-                        </p>
-                        <p><strong>Ngân sách:</strong> {Number(task.AmountBudget).toLocaleString("vi-VN")} VNĐ</p>
-                      </div>
-
-                      {task.SubTasks && Array.isArray(task.SubTasks) && task.SubTasks.length > 0 && (
-                          <div style={{ marginTop: "15px", marginLeft: "20px" }}>
-                            <strong style={{ color: "#6c757d" }}>Công việc phụ:</strong>
-                            {task.SubTasks.map((subTask, subTaskIndex) => (
-                                <div
-                                    key={subTaskIndex}
-                                    style={{
-                                      marginTop: "10px",
-                                      padding: "10px",
-                                      background: "#f1f3f5",
-                                      borderRadius: "4px",
-                                    }}
-                                >
-                                  <p style={{ color: "#495057", fontWeight: "bold" }}>{subTask.SubTaskName}</p>
-                                  <div style={{ marginLeft: "10px" }}>
-                                    <p>{subTask.SubTaskDescription || "Không có mô tả"}</p>
-                                    <p>
-                                      <strong>Thời gian:</strong>{" "}
-                                      {new Date(subTask.StartTime).toLocaleString("vi-VN")} -{" "}
-                                      {new Date(subTask.Deadline).toLocaleString("vi-VN")}
-                                    </p>
-                                    <p><strong>Ngân sách:</strong> {Number(subTask.AmountBudget).toLocaleString("vi-VN")} VNĐ</p>
-                                  </div>
-                                </div>
-                            ))}
-                          </div>
-                      )}
-                    </div>
-                ))}
-              </>
-          ) : (
-              <p style={{ color: "#6c757d" }}>Không có nhiệm vụ nào.</p>
-          )}
+      <div
+        style={{
+          padding: "15px",
+          background: "#f8f9fa",
+          borderRadius: "8px",
+          fontSize: "14px",
+        }}
+      >
+        <h5
+          style={{ color: "#007bff", marginBottom: "15px", fontWeight: "bold" }}
+        >
+          {data.EventTitle || "Sự kiện không có tên"}
+        </h5>
+        <div style={{ marginBottom: "20px" }}>
+          <p>
+            <strong>Mô tả:</strong> {data.EventDescription || "Không có mô tả"}
+          </p>
+          <p>
+            <strong>Thời gian:</strong>{" "}
+            {new Date(data.StartTime).toLocaleString("vi-VN")} -{" "}
+            {new Date(data.EndTime).toLocaleString("vi-VN")}
+          </p>
+          <p>
+            <strong>Ngân sách:</strong>{" "}
+            {Number(data.AmountBudget).toLocaleString("vi-VN")} VNĐ
+          </p>
+          <p>
+            <strong>Loại sự kiện:</strong> {categoryName}
+          </p>
         </div>
+
+        {data.Tasks && Array.isArray(data.Tasks) && data.Tasks.length > 0 ? (
+          <>
+            <h6
+              style={{
+                color: "#343a40",
+                marginBottom: "15px",
+                fontWeight: "bold",
+              }}
+            >
+              Danh sách nhiệm vụ:
+            </h6>
+            {data.Tasks.map((task, taskIndex) => (
+              <div
+                key={taskIndex}
+                style={{
+                  marginBottom: "20px",
+                  padding: "15px",
+                  background: "#ffffff",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "6px",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                }}
+              >
+                <h6
+                  style={{
+                    color: "#dc3545",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {task.TaskName}
+                </h6>
+                <div style={{ marginLeft: "10px" }}>
+                  <p>
+                    <strong>Mô tả:</strong>{" "}
+                    {task.TaskDescription || "Không có mô tả"}
+                  </p>
+                  <p>
+                    <strong>Thời gian:</strong>{" "}
+                    {new Date(task.StartTime).toLocaleString("vi-VN")} -{" "}
+                    {new Date(task.Deadline).toLocaleString("vi-VN")}
+                  </p>
+                  <p>
+                    <strong>Ngân sách:</strong>{" "}
+                    {Number(task.AmountBudget).toLocaleString("vi-VN")} VNĐ
+                  </p>
+                </div>
+
+                {task.SubTasks &&
+                  Array.isArray(task.SubTasks) &&
+                  task.SubTasks.length > 0 && (
+                    <div style={{ marginTop: "15px", marginLeft: "20px" }}>
+                      <strong style={{ color: "#6c757d" }}>
+                        Công việc phụ:
+                      </strong>
+                      {task.SubTasks.map((subTask, subTaskIndex) => (
+                        <div
+                          key={subTaskIndex}
+                          style={{
+                            marginTop: "10px",
+                            padding: "10px",
+                            background: "#f1f3f5",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          <p style={{ color: "#495057", fontWeight: "bold" }}>
+                            {subTask.SubTaskName}
+                          </p>
+                          <div style={{ marginLeft: "10px" }}>
+                            <p>
+                              {subTask.SubTaskDescription || "Không có mô tả"}
+                            </p>
+                            <p>
+                              <strong>Thời gian:</strong>{" "}
+                              {new Date(subTask.StartTime).toLocaleString(
+                                "vi-VN"
+                              )}{" "}
+                              -{" "}
+                              {new Date(subTask.Deadline).toLocaleString(
+                                "vi-VN"
+                              )}
+                            </p>
+                            <p>
+                              <strong>Ngân sách:</strong>{" "}
+                              {Number(subTask.AmountBudget).toLocaleString(
+                                "vi-VN"
+                              )}{" "}
+                              VNĐ
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+              </div>
+            ))}
+          </>
+        ) : (
+          <p style={{ color: "#6c757d" }}>Không có nhiệm vụ nào.</p>
+        )}
+      </div>
     );
   };
 
@@ -583,6 +683,10 @@ export default function CreateEvent() {
     if (!amountBudget) errors.push("Amount Budget");
     if (!placed) errors.push("Location");
     if (selectedImages.length === 0) errors.push("Image");
+    if (!goals) errors.push("Goals");
+    if (!monitoringProcess) errors.push("Monitoring Process");
+    if (!measuringSuccess) errors.push("Measuring Success");
+    if (!sizeParticipants) errors.push("Expected Participants");
 
     if (errors.length > 0) {
       enqueueSnackbar(`Missing information: ${errors.join(", ")}`, {
@@ -605,7 +709,7 @@ export default function CreateEvent() {
 
   const handleAddSubTask = (groupIndex) => {
     setSelectedGroupIndex(groupIndex);
-    console.log("sang: "+groupIndex);
+    console.log("sang: " + groupIndex);
     setindexGselect(groupIndex);
     setSelectedSubTask({
       title: "",
@@ -653,137 +757,146 @@ export default function CreateEvent() {
     });
 
     swalWithBootstrapButtons
-        .fire({
-          title: "Are you sure?",
-          html: '<span style="color: red;">This event will be sent to Campus Manager for approval!</span>',
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Create",
-          cancelButtonText: "Cancel",
-          reverseButtons: true,
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            setIsLoading(true);
+      .fire({
+        title: "Are you sure?",
+        html: '<span style="color: red;">This event will be sent to Campus Manager for approval!</span>',
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Create",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          setIsLoading(true);
 
-            if (!userId || !token) {
-              enqueueSnackbar("Your session has expired, please log in again.", {
-                variant: "error",
-              });
-              return;
-            }
+          if (!userId || !token) {
+            enqueueSnackbar("Your session has expired, please log in again.", {
+              variant: "error",
+            });
+            return;
+          }
 
-            const eventData = {
-              eventTitle: eventName,
-              eventDescription: description,
-              startTime: `${fromDate}T${fromTime}`,
-              endTime: `${toDate}T${toTime}`,
-              amountBudget: Number(amountBudget.replace(/\D/g, "")),
-              categoryEventId: Number(eventType), // Chuyển thành number để khớp với backend
-              placed: placed,
-              tasks: groups.map((group) => ({
-                taskName: group.name,
-                description: group.description,
-                startTime: group.deadline ? group.deadline : `${fromDate}T${fromTime}`, // Mặc định từ event nếu không có
-                deadline: group.deadline,
-                budget: Number(group.budget.replace(/\D/g, "") || 0),
-                subTasks: group.subTasks?.map((subTask) => ({
+          const eventData = {
+            eventTitle: eventName,
+            eventDescription: description,
+            startTime: `${fromDate}T${fromTime}`,
+            endTime: `${toDate}T${toTime}`,
+            amountBudget: Number(amountBudget.replace(/\D/g, "")),
+            categoryEventId: Number(eventType),
+            placed: placed,
+            goals: goals,
+            monitoringProcess: monitoringProcess,
+            measuringSuccess: measuringSuccess,
+            sizeParticipants: Number(sizeParticipants),
+            tasks: groups.map((group) => ({
+              taskName: group.name,
+              description: group.description,
+              startTime: group.deadline
+                ? group.deadline
+                : `${fromDate}T${fromTime}`, // Mặc định từ event nếu không có
+              deadline: group.deadline,
+              budget: Number(group.budget.replace(/\D/g, "") || 0),
+              subTasks:
+                group.subTasks?.map((subTask) => ({
                   subTaskName: subTask.title,
                   description: subTask.description,
-                  startTime: subTask.deadline ? subTask.deadline : `${fromDate}T${fromTime}`, // Mặc định từ task/event nếu không có
+                  startTime: subTask.deadline
+                    ? subTask.deadline
+                    : `${fromDate}T${fromTime}`, // Mặc định từ task/event nếu không có
                   deadline: subTask.deadline,
                   budget: Number(subTask.amount.replace(/\D/g, "") || 0),
                 })) || [],
-              })),
-            };
+            })),
+          };
 
-            try {
-              const createResponse = await axios.post(
-                  "https://localhost:44320/api/Events/create",
-                  eventData,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      "Content-Type": "application/json", // Đảm bảo gửi JSON
-                    },
-                  }
-              );
-              if (createResponse.status === 201) {
-                const eventId = createResponse.data.result.id;
-                await handleUploadImages(eventId, token);
-                swalWithBootstrapButtons
-                    .fire({
-                      title: "Successfully!",
-                      text: "Event has been created and images uploaded.",
-                      icon: "success",
-                    })
-                    .then(() => {
-                      navigate("/home");
-                    });
+          try {
+            const createResponse = await axios.post(
+              "https://localhost:44320/api/Events/create",
+              eventData,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json", // Đảm bảo gửi JSON
+                },
               }
-            } catch (error) {
-              if (error.response?.status === 401) {
-                const newToken = await refreshAccessToken();
-                if (newToken) {
-                  try {
-                    let retryResponse = await axios.post(
-                        "https://localhost:44320/api/Events/create",
-                        eventData,
-                        {
-                          headers: {
-                            Authorization: `Bearer ${newToken}`,
-                            "Content-Type": "application/json", // Đảm bảo gửi JSON
-                          },
-                        }
-                    );
-                    if (retryResponse.status === 201) {
-                      const eventId = retryResponse.data.result.id;
-                      await handleUploadImages(eventId, newToken); // Dùng newToken cho consistency
-                      swalWithBootstrapButtons
-                          .fire({
-                            title: "Successfully!",
-                            text: "Event has been created and images uploaded.",
-                            icon: "success",
-                          })
-                          .then(() => {
-                            navigate("/home");
-                          });
+            );
+            if (createResponse.status === 201) {
+              const eventId = createResponse.data.result.id;
+              await handleUploadImages(eventId, token);
+              swalWithBootstrapButtons
+                .fire({
+                  title: "Successfully!",
+                  text: "Event has been created and images uploaded.",
+                  icon: "success",
+                })
+                .then(() => {
+                  navigate("/home");
+                });
+            }
+          } catch (error) {
+            if (error.response?.status === 401) {
+              const newToken = await refreshAccessToken();
+              if (newToken) {
+                try {
+                  let retryResponse = await axios.post(
+                    "https://localhost:44320/api/Events/create",
+                    eventData,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${newToken}`,
+                        "Content-Type": "application/json", // Đảm bảo gửi JSON
+                      },
                     }
-                  } catch (retryError) {
-                    console.error(
-                        "API error after refresh:",
-                        retryError.response?.data
-                    );
-                    enqueueSnackbar(
-                        `API Error: ${
-                            retryError.response?.data?.message || "Unknown error"
-                        }`,
-                        { variant: "error" }
-                    );
-                  }
-                } else {
-                  enqueueSnackbar(
-                      "Your session has expired, please log in again.",
-                      {
-                        variant: "error",
-                      }
                   );
-                  navigate("/login");
-                }
-              } else {
-                console.error("API Error:", error.response?.data);
-                enqueueSnackbar(
+                  if (retryResponse.status === 201) {
+                    const eventId = retryResponse.data.result.id;
+                    await handleUploadImages(eventId, newToken); // Dùng newToken cho consistency
+                    swalWithBootstrapButtons
+                      .fire({
+                        title: "Successfully!",
+                        text: "Event has been created and images uploaded.",
+                        icon: "success",
+                      })
+                      .then(() => {
+                        navigate("/home");
+                      });
+                  }
+                } catch (retryError) {
+                  console.error(
+                    "API error after refresh:",
+                    retryError.response?.data
+                  );
+                  enqueueSnackbar(
                     `API Error: ${
-                        error.response?.data?.message || "Unknown error"
+                      retryError.response?.data?.message || "Unknown error"
                     }`,
                     { variant: "error" }
+                  );
+                }
+              } else {
+                enqueueSnackbar(
+                  "Your session has expired, please log in again.",
+                  {
+                    variant: "error",
+                  }
                 );
+                navigate("/login");
               }
-            } finally {
-              setIsLoading(false);
+            } else {
+              console.error("API Error:", error.response?.data);
+              enqueueSnackbar(
+                `API Error: ${
+                  error.response?.data?.message || "Unknown error"
+                }`,
+                { variant: "error" }
+              );
             }
+          } finally {
+            setIsLoading(false);
           }
-        });
+        }
+      });
   };
 
   const handleUploadImages = async (eventId, token) => {
@@ -966,6 +1079,59 @@ export default function CreateEvent() {
                 placeholder="Enter amount"
               />
             </div>
+          </Form.Group>
+
+          <Form.Group controlId="eventGoals" className="mt-3">
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Goals
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              placeholder="Enter event goals"
+              value={goals}
+              onChange={(e) => setGoals(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="monitoringProcess" className="mt-3">
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Monitoring Process
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              placeholder="Describe how the event will be monitored"
+              value={monitoringProcess}
+              onChange={(e) => setMonitoringProcess(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="measuringSuccess" className="mt-3">
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Measuring Success
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              placeholder="How will success be measured?"
+              value={measuringSuccess}
+              onChange={(e) => setMeasuringSuccess(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="sizeParticipants" className="mt-3">
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Expected Participants <span style={{ color: "red" }}>*</span>
+            </Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Enter number of participants"
+              value={sizeParticipants}
+              onChange={(e) => setSizeParticipants(e.target.value)}
+              min={1}
+              required
+            />
           </Form.Group>
 
           <Card className="mt-3">
@@ -1549,39 +1715,40 @@ export default function CreateEvent() {
         </Modal>
 
         <Modal
-            show={showChatbot}
-            onHide={() => setShowChatbot(false)}
-            size="lg"
-            animation={false}
-            backdropClassName="custom-backdrop"
+          show={showChatbot}
+          onHide={() => setShowChatbot(false)}
+          size="lg"
+          animation={false}
+          backdropClassName="custom-backdrop"
         >
           <Modal.Header closeButton>
             <Modal.Title>AI Chatbot Assistant</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div
-                style={{
-                  height: "400px",
-                  overflowY: "auto",
-                  border: "1px solid #ccc",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
+              style={{
+                height: "400px",
+                overflowY: "auto",
+                border: "1px solid #ccc",
+                padding: "10px",
+                marginBottom: "10px",
+              }}
             >
               {chatHistory.length === 0 ? (
-                  <p>Xin chào! Tôi là trợ lý AI, bạn cần hỗ trợ gì?</p>
+                <p>Xin chào! Tôi là trợ lý AI, bạn cần hỗ trợ gì?</p>
               ) : (
-                  chatHistory.map((chat, index) => (
-                      <div
-                          key={index}
-                          style={{
-                            textAlign: chat.sender === "user" ? "right" : "left",
-                            margin: "10px 0",
-                          }}
-                      >
-                  <span
+                chatHistory.map((chat, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      textAlign: chat.sender === "user" ? "right" : "left",
+                      margin: "10px 0",
+                    }}
+                  >
+                    <span
                       style={{
-                        background: chat.sender === "user" ? "#007bff" : "#f8f9fa",
+                        background:
+                          chat.sender === "user" ? "#007bff" : "#f8f9fa",
                         color: chat.sender === "user" ? "white" : "black",
                         padding: "10px",
                         borderRadius: "5px",
@@ -1589,37 +1756,37 @@ export default function CreateEvent() {
                         maxWidth: "80%",
                         wordWrap: "break-word",
                       }}
-                  >
-                    {chat.sender === "user" ? (
+                    >
+                      {chat.sender === "user" ? (
                         chat.text
-                    ) : chat.data ? (
+                      ) : chat.data ? (
                         renderEventSuggestion(chat.data)
-                    ) : chat.categories ? (
+                      ) : chat.categories ? (
                         <div>
                           {chat.categories.length > 0 ? (
-                              <ul style={{ listStyleType: "none", padding: 0 }}>
-                                {chat.categories.map((cat, idx) => (
-                                    <li key={idx}>{cat.categoryEventName}</li>
-                                ))}
-                              </ul>
+                            <ul style={{ listStyleType: "none", padding: 0 }}>
+                              {chat.categories.map((cat, idx) => (
+                                <li key={idx}>{cat.categoryEventName}</li>
+                              ))}
+                            </ul>
                           ) : (
-                              "Không có lĩnh vực nào để chọn."
+                            "Không có lĩnh vực nào để chọn."
                           )}
                         </div>
-                    ) : (
+                      ) : (
                         chat.text
-                    )}
-                  </span>
-                      </div>
-                  ))
+                      )}
+                    </span>
+                  </div>
+                ))
               )}
             </div>
             <Form.Control
-                type="text"
-                placeholder="Nhập tin nhắn..."
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendChatMessage()}
+              type="text"
+              placeholder="Nhập tin nhắn..."
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSendChatMessage()}
             />
           </Modal.Body>
           <Modal.Footer>
@@ -1634,22 +1801,22 @@ export default function CreateEvent() {
 
         {/* Nút mở chatbot */}
         <div
-            onClick={() => setShowChatbot(true)}
-            style={{
-              position: "fixed",
-              bottom: "30px",
-              right: "30px",
-              backgroundColor: "#007bff",
-              color: "white",
-              width: "60px",
-              height: "60px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              zIndex: 9999,
-            }}
+          onClick={() => setShowChatbot(true)}
+          style={{
+            position: "fixed",
+            bottom: "30px",
+            right: "30px",
+            backgroundColor: "#007bff",
+            color: "white",
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+            zIndex: 9999,
+          }}
         >
           <FaRobot size={24} />
         </div>

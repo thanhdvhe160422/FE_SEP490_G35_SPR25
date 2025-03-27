@@ -24,6 +24,7 @@ import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
 import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
 import UpdateTask from "./pages/Tasks/UpdateTask";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
+import HomeSpectator from "./pages/Author/HomeSpectator";
 
 function App() {
   return (
@@ -36,10 +37,17 @@ function App() {
         <Route
           path="/home"
           element={
-            <PrivateRoute
-              allowedRoles={["Campus Manager", "Event Organizer", "Spectator"]}
-            >
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
               <Home />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/home-spec"
+          element={
+            <PrivateRoute allowedRoles={["Spectator"]}>
+              <HomeSpectator />
             </PrivateRoute>
           }
         />
@@ -197,14 +205,14 @@ function App() {
           }
         />
         <Route
-          path="/create-event-organizer" 
-          element={<CreateEventOrganizer/>}
+          path="/create-event-organizer"
+          element={<CreateEventOrganizer />}
         />
         <Route
           path="/update-event-organizer/:userId"
-          element={<UpdateEventOrganizer/>}
+          element={<UpdateEventOrganizer />}
         />
-        
+
         <Route
           path="/category-event"
           element={
@@ -215,7 +223,7 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/login" replace />} />
 
-        <Route path="/cost-detail" element={<CostDetail/>}></Route>
+        <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
     </div>
   );
