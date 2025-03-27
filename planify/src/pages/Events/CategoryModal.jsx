@@ -58,15 +58,11 @@ export function CategoryForm({ title, campusId, id, name, onClose, onSave }) {
     setCategoryName(name);
   }, [name]);
   return (
-    <div className="d-flex">
-      <div className="col-4 bg-white">
-        <div className="form-header">
-          <h5 className="form-title">{title}</h5>
-        </div>
+    <div className="">
         <div className="form-body">
           <form id="category-form">
             <input id="categoryId" value={id} hidden />
-            <label>Category Name</label>
+            <label className="me-2">Category Name</label>
             <input
               type="text"
               value={categoryName}
@@ -98,6 +94,5 @@ export function CategoryForm({ title, campusId, id, name, onClose, onSave }) {
           )}
         </div>
       </div>
-    </div>
   );
 }

@@ -62,7 +62,6 @@ const UpdateProfile = () => {
       try {
         const data = await getProvinces();
         setProvinces(data.data.result || []);
-        await setSelectedProvince(1);
       } catch (error) {
         console.error("Lỗi lấy danh sách tỉnh:", error);
         setProvinces([]);
@@ -72,6 +71,9 @@ const UpdateProfile = () => {
     fetchProvinces();
     fetchUserData();
   }, []);
+  useEffect(() => {
+    console.log("Updated user state:", user);
+  }, [user]);
 
   useEffect(() => {
     if (!selectedProvince) return;
@@ -80,7 +82,6 @@ const UpdateProfile = () => {
       try {
         const data = await getDistricts(selectedProvince);
         setDistricts(data.data.result || []);
-        await setSelectedDistrict(1);
         setWards([]);
       } catch (error) {
         console.error("Lỗi lấy danh sách quận/huyện:", error);
@@ -99,8 +100,6 @@ const UpdateProfile = () => {
 
         const data = await getWards(selectedDistrict)
         setWards(data.data .result|| []);
-        await setSelectedWard(1);
-
       } catch (error) {
         console.error("Lỗi lấy danh sách phường/xã:", error);
         setWards([]);
@@ -138,7 +137,7 @@ const UpdateProfile = () => {
         phoneNumber: user.phoneNumber,
         addressId: user.addressId,
         avatarId: user.avatarId,
-        gender: user.gender === 1,
+        gender: user.gender+""==='true',
         addressVM: {
           id: user.addressVM?.id || 0,
           addressDetail: user?.addressVM?.addressDetail || "",
@@ -156,14 +155,12 @@ const UpdateProfile = () => {
           },
         },
       };
-
       const parts = updatedUser.dateOfBirth.split("T")[0].split("-");
       const day = parts[2];
       const month = parts[1];
       const year = parts[0];
       const formattedDate = `${year}-${month}-${day}`;
       updatedUser.dateOfBirth = formattedDate;
-      console.log(updatedUser);
       const token = localStorage.getItem("token");
       if (!token) {
         enqueueSnackbar("Please login again", {
@@ -260,16 +257,15 @@ const UpdateProfile = () => {
     }
   };
 
-  if (loading) return <div className="loader"></div>
-
-  if (!user) return <p>No user data found</p>;
 
   function convertToDirectLink(googleDriveUrl) {
     if (!googleDriveUrl.includes("drive.google.com/uc?id="))
       return googleDriveUrl;
     const fileId = googleDriveUrl.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-  }
+}
+  if (loading) return <div className="loader"><Loading></Loading></div>
+  if (!user) return <p>No user data found</p>;
 
   return (
     <>
@@ -358,10 +354,10 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="1"
-                      checked={Number(user.gender) === 1}
+                      value="true"
+                      checked={user.gender+"" === "true"}
                       onChange={(e) =>
-                        setUser({ ...user, gender: Number(e.target.value) })
+                        setUser({ ...user, gender: e.target.value })
                       }
                     />
                     Male
@@ -370,10 +366,10 @@ const UpdateProfile = () => {
                     <input
                       type="radio"
                       name="gender"
-                      value="0"
-                      checked={Number(user.gender) === 0}
+                      value="false"
+                      checked={user.gender+"" === "false"}
                       onChange={(e) =>
-                        setUser({ ...user, gender: Number(e.target.value) })
+                        setUser({ ...user, gender: e.target.value })
                       }
                     />
                     Female
