@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Header from "../../components/Header/Header";
+import "./../../styles/Author/HomeOfImplementer.css";
 
 const WeekCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -7,7 +8,6 @@ const WeekCalendar = () => {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [weeksInYear, setWeeksInYear] = useState([]);
 
-  // Lấy dữ liệu từ localStorage khi trang tải lại
   useEffect(() => {
     const savedDate = localStorage.getItem("currentDate");
     const savedYear = localStorage.getItem("selectedYear");
@@ -17,44 +17,62 @@ const WeekCalendar = () => {
       const parsedDate = new Date(savedDate);
       setCurrentDate(parsedDate);
       setSelectedYear(parseInt(savedYear, 10));
-      generateWeeksInYear(parseInt(savedYear, 10));
       setSelectedWeek(parseInt(savedWeek, 10));
+      generateWeeksInYear(parseInt(savedYear, 10));
     } else {
       generateWeeksInYear(new Date().getFullYear());
     }
   }, []);
 
-  // Cập nhật localStorage mỗi khi currentDate, selectedYear, hoặc selectedWeek thay đổi
   useEffect(() => {
     localStorage.setItem("currentDate", currentDate.toISOString());
     localStorage.setItem("selectedYear", selectedYear.toString());
     localStorage.setItem("selectedWeek", selectedWeek.toString());
   }, [currentDate, selectedYear, selectedWeek]);
 
+  const generateWeeksInYear = useCallback((year) => {
+    const weeks = [];
+    let currentDate = new Date(year, 0, 1);
+
+    while (currentDate.getDay() !== 1) {
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    while (currentDate.getFullYear() === year) {
+      const startOfWeek = new Date(currentDate);
+      const endOfWeek = new Date(currentDate);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+      weeks.push({
+        label: `${formatDayMonth(startOfWeek)} to ${formatDayMonth(endOfWeek)}`,
+        startDate: new Date(startOfWeek),
+      });
+
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+
+    setWeeksInYear(weeks);
+  }, []);
+
+  const formatDayMonth = (date) => `${date.getDate()}/${date.getMonth() + 1}`;
+
   const getWeekDates = (date) => {
     const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1));
+    startOfWeek.setDate(
+      date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)
+    );
 
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
+    return Array.from({ length: 7 }, (_, i) => {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + i);
-      weekDates.push(day);
-    }
-    return weekDates;
+      return day;
+    });
   };
 
   const nextWeek = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + 7);
     setCurrentDate(newDate);
-
-    const newYear = newDate.getFullYear();
-    if (newYear !== selectedYear) {
-      setSelectedYear(newYear);
-      generateWeeksInYear(newYear);
-    }
-
     updateSelectedWeek(newDate);
   };
 
@@ -62,25 +80,20 @@ const WeekCalendar = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() - 7);
     setCurrentDate(newDate);
-
-    const newYear = newDate.getFullYear();
-    if (newYear !== selectedYear) {
-      setSelectedYear(newYear);
-      generateWeeksInYear(newYear);
-    }
-
     updateSelectedWeek(newDate);
   };
 
-  const formatDayMonth = (date) => `${date.getDate()}/${date.getMonth() + 1}`;
-
   const updateSelectedWeek = (date) => {
     const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1));
+    startOfWeek.setDate(
+      date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)
+    );
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    const weekLabel = `${formatDayMonth(startOfWeek)} to ${formatDayMonth(endOfWeek)}`;
+    const weekLabel = `${formatDayMonth(startOfWeek)} to ${formatDayMonth(
+      endOfWeek
+    )}`;
     const weekIndex = weeksInYear.findIndex((week) => week.label === weekLabel);
 
     if (weekIndex !== -1) {
@@ -104,52 +117,32 @@ const WeekCalendar = () => {
     setCurrentDate(startOfWeek);
   };
 
-  const generateWeeksInYear = (year) => {
-    const weeks = [];
-    let currentDate = new Date(year, 0, 1);
+  const weekDates = useMemo(() => getWeekDates(currentDate), [currentDate]);
 
-    while (currentDate.getDay() !== 1) {
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    while (currentDate.getFullYear() === year) {
-      const startOfWeek = new Date(currentDate);
-      const endOfWeek = new Date(currentDate);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-      weeks.push({
-        label: `${formatDayMonth(startOfWeek)} to ${formatDayMonth(endOfWeek)}`,
-        startDate: new Date(startOfWeek),
-      });
-
-      currentDate.setDate(currentDate.getDate() + 7);
-    }
-
-    setWeeksInYear(weeks);
-  };
+  useEffect(() => {
+    updateSelectedWeek(currentDate);
+  }, [currentDate]);
 
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear();
     return Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
   };
 
-  useEffect(() => {
-    updateSelectedWeek(currentDate);
-  }, [currentDate]);
-
-  const weekDates = getWeekDates(currentDate);
-
   return (
     <>
       <Header />
-      <div style={{ fontFamily: "Arial, sans-serif", textAlign: "center", marginTop: "100px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+      <div className="week-calendar">
+        <div className="controls">
           <button onClick={previousWeek}>Previous Week</button>
           <button onClick={nextWeek}>Next Week</button>
         </div>
         <span>
           Year:{" "}
-          <select value={selectedYear} onChange={handleYearChange}>
+          <select
+            className="year-select"
+            value={selectedYear}
+            onChange={handleYearChange}
+          >
             {generateYearOptions().map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -159,7 +152,11 @@ const WeekCalendar = () => {
         </span>
         <span>
           Week:{" "}
-          <select value={selectedWeek} onChange={handleWeekChange}>
+          <select
+            className="week-select"
+            value={selectedWeek}
+            onChange={handleWeekChange}
+          >
             {weeksInYear.map((week, index) => (
               <option key={index} value={index}>
                 {week.label}
@@ -168,17 +165,17 @@ const WeekCalendar = () => {
           </select>
         </span>
 
-        <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "10px" }}>
+        <div className="week-dates">
           {weekDates.map((date, index) => (
-            <div key={index} style={{ padding: "10px", fontWeight: "bold" }}>
+            <div key={index} className="week-date">
               {date.toLocaleDateString("en-US", { weekday: "short" })}
             </div>
           ))}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <div className="week-label">
           {weekDates.map((date, index) => (
-            <div key={index} style={{  padding: "10px", borderRadius: "5px" }}>
+            <div key={index} className="week-date">
               {formatDayMonth(date)}
             </div>
           ))}
