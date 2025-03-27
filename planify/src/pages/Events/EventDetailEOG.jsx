@@ -479,12 +479,6 @@ const filteredTasks = tasks.filter((task) =>
                       >
                         Create Task
                       </button>
-                      <button
-                        className="update-group-btn"
-                        //onClick={() => navigate(`/update-group/${id}`)}
-                      >
-                        Update Group
-                      </button>
                     </div>
           </>
         )}
