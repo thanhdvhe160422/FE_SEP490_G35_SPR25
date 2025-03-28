@@ -1,4 +1,3 @@
-/* === Layout container === */
 .working-container {
   color: white;
   font-family: "Lato", sans-serif;
@@ -9,10 +8,15 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(150deg, #e6d3f9 0%, #e6d3f9 50%, #cea0f1 50%, #cea0f1 100%);
+  background: linear-gradient(
+    150deg,
+    #e6d3f9 0%,
+    #e6d3f9 50%,
+    #cea0f1 50%,
+    #cea0f1 100%
+  );
 }
 
-/* === Walkthrough Modal === */
 .walkthrough {
   display: flex;
   flex-direction: column;
@@ -26,6 +30,7 @@
   z-index: 1000;
   opacity: 0;
   transform: translateY(72px);
+  position: relative;
 }
 
 .walkthrough.show {
@@ -39,36 +44,24 @@
 
 .walkthrough-body {
   display: flex;
-  overflow-x: hidden !important; 
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
   text-align: center;
   position: relative;
-  overflow-y: auto;
-  padding: 0 30px; /* Lề trái phải 30px */
+  padding: 0 30px;
+  height: calc(100% - 100px);
+  overflow: visible;
 }
 
-.walkthrough-body::-webkit-scrollbar {
-  width: 8px;
-}
-
-.walkthrough-body::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-
-
-
-
-
-/* === Screens === */
 .screens {
   flex: 1;
   align-self: stretch;
   position: relative;
   margin: 0 -16px;
   padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .screens .screen {
@@ -79,6 +72,9 @@
   transform: translateX(-72px);
   transition: all 0.4s ease;
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 0;
 }
 
 .screens .screen.active {
@@ -88,7 +84,6 @@
   transition-delay: 0.4s;
 }
 
-/* === Navigation Arrows === */
 .prev-screen,
 .next-screen {
   position: absolute;
@@ -97,34 +92,33 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2); /* Màu nền mờ trắng */
+  background-color: rgba(255, 255, 255, 0.9);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #6027e1;
   font-size: 20px;
   cursor: pointer;
   z-index: 3000;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prev-screen {
+  left: 1px;
+}
+
+.next-screen {
+  right: 1px;
 }
 
 .prev-screen:hover,
 .next-screen:hover {
-  background-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-50%) scale(1.1);
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: white;
 }
-
-.prev-screen {
-  left: 0px; /* hoặc left: 10px nếu bạn không muốn ra ngoài quá nhiều */
-}
-
-.next-screen {
-  right: 0px;
-}
-
-
-
 
 .walkthrough-pagination {
   display: flex;
@@ -137,9 +131,10 @@
 .dot {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  height:8px;
-  width: 8px;
+  height: 10px;
+  width: 10px;
   margin: 0 6px;
+  margin-top: 20px;
   transform: scale(0.9);
   transition: all 0.3s ease;
   border: none;
@@ -155,44 +150,10 @@
 
 .table {
   width: 85%;
-  margin: 0 auto; /* Căn giữa theo chiều ngang */
-  border-collapse: collapse; /* Để viền gọn gàng hơn */
+  margin: 0 auto;
+  border-collapse: collapse;
 }
 
-
-/* === Footer Button === */
-.walkthrough-footer {
-  display: flex;
-  justify-content: space-around;
-  padding: 0 24px;
-  margin-top: 12px;
-}
-
-.walkthrough-footer .button {
-  height: 40px;
-  border: none;
-  background: #5da3f2;
-  color: white;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-size: 12px;
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  flex: 1;
-  margin: 0 8px;
-}
-
-.walkthrough-footer .button:hover {
-  background: #76b4f7;
-}
-
-.walkthrough-footer .button:active {
-  background: #5da3f2;
-}
-
-/* === Fixed Bottom Right Button === */
 .button.fixed-next {
   position: absolute;
   bottom: 20px;
@@ -224,7 +185,29 @@
   background: #218838;
 }
 
-/* === Dropdown Select Icon === */
+.button.fixed-next.save-draft {
+  position: absolute;
+  bottom: 20px;
+  right: 140px;
+  height: 44px;
+  background: #6c757d;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 13px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 2000;
+}
+
+.button.fixed-next.save-draft:hover {
+  background: #5a6268;
+}
+
 .dropdown-wrapper {
   position: relative;
   width: 100%;
@@ -244,4 +227,76 @@
   pointer-events: none;
   color: #666;
   font-size: 0.9rem;
+}
+
+.task-main-info {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.task-main-info .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.task-main-info label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.task-main-info .form-control {
+  width: 100%;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-main-info .form-control:focus {
+  border-color: #4b7bec;
+  box-shadow: 0 0 0 0.2rem rgba(75, 123, 236, 0.25);
+}
+
+.description-box {
+  max-height: calc(1.5em * 3 + 12px);
+  overflow-y: auto;
+  resize: none;
+  line-height: 1.5;
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.description-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description-box::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .task-main-info {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .prev-screen {
+    left: -12px;
+  }
+
+  .next-screen {
+    right: -12px;
+  }
+  
+  .button.fixed-next.save-draft {
+    right: 120px;
+    padding: 10px 15px;
+    font-size: 12px;
+  }
 }
