@@ -7,11 +7,14 @@ import bannerImage from "../assets/banner-item-3.jpg";
 import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
 import { getCampuses } from "../services/campusService";
+import { searchEvents } from "../services/EventService";
+import Swal from "sweetalert2";
 
 const EVENTS_PER_PAGE = 5;
 
 function EventSection() {
   const [events, setEvents] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +26,7 @@ function EventSection() {
   const [eventFilter, setEventFilter] = useState("list");
   const [campuses, setCampus] = useState([]);
   const navigate = useNavigate();
+  const [filteredEvents, setFilteredEvents] = useState([]);
 
   const userRole = localStorage.getItem("role");
   const currentUserId = localStorage.getItem("userId");
@@ -41,12 +45,52 @@ function EventSection() {
 
     fetchCampus();
   }, []);
+  const handleSearch = async () => {
+    try {
+      const params = {
+        page: currentPage,
+        pageSize: EVENTS_PER_PAGE,
+        title: searchTerm,
+        categoryId: selectedCategory,
+        status: selectedStatus,
+        startTime: selectedStart,
+        endTime: selectedEnd,
+        placed: selectedLocation,
+      };
+      const response = await searchEvents(params);
+
+      if (response) {
+        const items = Array.isArray(response.items) ? response.items : [];
+        setFilteredEvents(items);
+      } else {
+        setFilteredEvents([]);
+      }
+    } catch (error) {
+      console.error("Error searching events:", error);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  useEffect(() => {
+    handleSearch();
+  }, [
+    searchTerm,
+    currentPage,
+    selectedCategory,
+    selectedStatus,
+    selectedStart,
+    selectedEnd,
+    selectedLocation,
+  ]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const allData = await getPosts();
+        const allData = await getPosts(currentPage, EVENTS_PER_PAGE);
+        console.log("All Data from API:", allData);
         const validStatus = [0, 1, 2];
-        const validEvent = allData.filter((post) =>
+        const validEvent = allData.items.filter((post) =>
           validStatus.includes(post.status)
         );
         const currentCampus = (event) => {
@@ -60,25 +104,8 @@ function EventSection() {
         const campusEvents = validEvent.filter(
           (event) => currentCampus(event) === campus
         );
-        if (!allData || allData.length === 0) return;
-        const getStatusPriority = (event) => {
-          const status = statusEvent(event.startTime, event.endTime);
-          return status === "running"
-            ? 1
-            : status === "not started yet"
-            ? 2
-            : 3;
-        };
-
-        const sortedEvents = campusEvents
-          .map((event) => ({
-            ...event,
-            status: statusEvent(event.startTime, event.endTime),
-          }))
-          .sort((a, b) => getStatusPriority(a) - getStatusPriority(b));
-
-        setEvents(sortedEvents);
-        console.log("....", sortedEvents);
+        setEvents(campusEvents);
+        setTotalPages(allData.totalPages);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
       }
@@ -94,7 +121,7 @@ function EventSection() {
     };
     fetchData();
     fetchCategories();
-  }, [campuses, campus]);
+  }, [currentPage, campuses, campus]);
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -115,28 +142,8 @@ function EventSection() {
     return "closed";
   };
 
-  const filteredEvents = events.filter((event) => {
-    if (!event) return false;
-
-    const isMyEvent = event.createBy === currentUserId;
-
-    return (
-      (eventFilter === "list" || (eventFilter === "my" && isMyEvent)) &&
-      (!selectedCategory || event.categoryEventId === selectedCategory) &&
-      (!searchTerm ||
-        event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedStatus === "" ||
-        statusEvent(event.startTime, event.endTime) === selectedStatus) &&
-      (!selectedStart ||
-        new Date(event.startTime) >= new Date(selectedStart)) &&
-      (!selectedEnd || new Date(event.endTime) <= new Date(selectedEnd)) &&
-      (!selectedLocation ||
-        event.placed?.toLowerCase().includes(selectedLocation.toLowerCase()))
-    );
-  });
-
   useEffect(() => {
-    setCurrentPage(1);
+    setCurrentPage(currentPage);
   }, [
     selectedCategory,
     searchTerm,
@@ -146,28 +153,6 @@ function EventSection() {
     selectedLocation,
     eventFilter,
   ]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredEvents.length / EVENTS_PER_PAGE)
-  );
-
-  const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
-  const currentEvents = filteredEvents.slice(
-    startIndex,
-    startIndex + EVENTS_PER_PAGE
-  );
-
-  const getProgress = (start, end) => {
-    const now = new Date();
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-
-    if (now < startTime) return 0;
-    if (now > endTime) return 100;
-
-    return ((now - startTime) / (endTime - startTime)) * 100;
-  };
   useEffect(() => {
     if (events.length > 0) {
       const hasMyEvent = events.some(
@@ -206,14 +191,14 @@ function EventSection() {
               </select>
               <label>Start Time</label>
               <input
-                type="date"
+                type="datetime-local"
                 value={selectedStart}
                 onChange={(e) => setSelectedStart(e.target.value)}
               />
 
               <label>End Time</label>
               <input
-                type="date"
+                type="datetime-local"
                 value={selectedEnd}
                 onChange={(e) => setSelectedEnd(e.target.value)}
               />
@@ -283,12 +268,161 @@ function EventSection() {
                 </div>
               </div>
 
-              {currentEvents.length === 0 ? (
-                <p className="col-12 no-events-message">
-                  No valid events found.
-                </p>
+              {searchTerm ||
+              selectedStart ||
+              selectedEnd ||
+              selectedLocation ? (
+                filteredEvents.length > 0 ? (
+                  filteredEvents.map((event) => (
+                    <div key={event.id} className="col-12 belarus_fast">
+                      <div
+                        style={{
+                          height: "500px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                        className="belarus_items"
+                      >
+                        <img
+                          src={
+                            event.eventMedias?.length > 0
+                              ? fixDriveUrl(
+                                  event.eventMedias[0].mediaDTO.mediaUrl
+                                )
+                              : bannerImage
+                          }
+                          alt="News"
+                          onClick={() => {
+                            const userRole = (
+                              localStorage.getItem("role") || ""
+                            )
+                              .trim()
+                              .toLowerCase();
+                            console.log(
+                              "🔍 User Role khi bấm vào sự kiện:",
+                              userRole
+                            );
+                            console.log("🔍 Event Data:", event);
+
+                            let targetUrl = `/event-detail-spec/${event.id}`;
+                            if (
+                              userRole === "campus manager" ||
+                              userRole === "event organizer"
+                            ) {
+                              targetUrl = `/event-detail-EOG/${event.id}`;
+                            }
+
+                            console.log("🚀 Điều hướng đến:", targetUrl);
+                            navigate(targetUrl);
+                          }}
+                          style={{ cursor: "pointer" }}
+                        />
+
+                        <div
+                          className="belarus_content"
+                          onClick={() => {
+                            const userRole = (
+                              localStorage.getItem("role") || ""
+                            )
+                              .trim()
+                              .toLowerCase();
+                            console.log(
+                              "🔍 User Role khi bấm vào sự kiện:",
+                              userRole
+                            );
+                            console.log("🔍 Event Data:", event);
+
+                            let targetUrl = `/event-detail-spec/${event.id}`;
+                            if (
+                              userRole === "campus manager" ||
+                              userRole === "event organizer"
+                            ) {
+                              targetUrl = `/event-detail-EOG/${event.id}`;
+                            }
+
+                            console.log("🚀 Điều hướng đến:", targetUrl);
+                            navigate(targetUrl);
+                          }}
+                        >
+                          <div
+                            className="heding wow fadeInUp"
+                            onClick={() => {
+                              const userRole = (
+                                localStorage.getItem("role") || ""
+                              )
+                                .trim()
+                                .toLowerCase();
+                              console.log(
+                                "🔍 User Role khi bấm vào sự kiện:",
+                                userRole
+                              );
+                              console.log("🔍 Event Data:", event);
+
+                              let targetUrl = `/event-detail-spec/${event.id}`;
+                              if (
+                                userRole === "campus manager" ||
+                                userRole === "event organizer"
+                              ) {
+                                targetUrl = `/event-detail-EOG/${event.id}`;
+                              }
+
+                              console.log("🚀 Điều hướng đến:", targetUrl);
+                              navigate(targetUrl);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {event.eventTitle}
+                          </div>
+                          <h5>
+                            <FaMapMarkerAlt className="icon-location" />
+
+                            {event.placed}
+                          </h5>
+                          <h5>
+                            <MdOutlineCategory
+                              className="icon-category"
+                              style={{ marginRight: "10px", color: "orange" }}
+                            />
+                            {currentCategory(event.categoryEventId)}
+                          </h5>
+                          <p className="event_time">
+                            <FaClock className="icon-time" />
+                            <strong>From:</strong>{" "}
+                            {formatDateTime(event.startTime)}
+                            <br />
+                            <strong>
+                              <FaClock className="icon-time" />
+                              To:
+                            </strong>{" "}
+                            {formatDateTime(event.endTime)}
+                          </p>
+
+                          <div
+                            className={`status_tag ${
+                              statusEvent(event.startTime, event.endTime) ===
+                              "running"
+                                ? "running_status"
+                                : statusEvent(
+                                    event.startTime,
+                                    event.endTime
+                                  ) === "not started yet"
+                                ? "not_started_status"
+                                : "ended_status"
+                            }`}
+                          >
+                            {statusEvent(event.startTime, event.endTime)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="col-12 no-events-message">
+                    No valid events found.
+                  </p>
+                )
               ) : (
-                currentEvents.map((event) => (
+                events.map((event) => (
                   <div key={event.id} className="col-12 belarus_fast">
                     <div
                       style={{
@@ -421,27 +555,6 @@ function EventSection() {
                         >
                           {statusEvent(event.startTime, event.endTime)}
                         </div>
-                        {(userRole === "Campus Manager" ||
-                          userRole === "Event Organizer") && (
-                          <div className="progress_bar_container">
-                            <div
-                              className="progress_bar"
-                              style={{
-                                width: `${getProgress(
-                                  event.startTime,
-                                  event.endTime
-                                )}%`,
-                              }}
-                            >
-                              <span className="progress_text">
-                                {Math.round(
-                                  getProgress(event.startTime, event.endTime)
-                                )}
-                                %
-                              </span>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -449,7 +562,7 @@ function EventSection() {
               )}
             </div>
 
-            {filteredEvents.length > EVENTS_PER_PAGE && (
+            {totalPages > 1 && (
               <div className="pagination_area" style={{ padding: "30px" }}>
                 <ul className="pagination">
                   <li
@@ -459,9 +572,7 @@ function EventSection() {
                   >
                     <button
                       className="page-link"
-                      onClick={() =>
-                        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-                      }
+                      onClick={() => handlePageChange(currentPage - 1)}
                     >
                       Prev
                     </button>
@@ -475,7 +586,7 @@ function EventSection() {
                     >
                       <button
                         className="page-link"
-                        onClick={() => setCurrentPage(index + 1)}
+                        onClick={() => handlePageChange(index + 1)}
                       >
                         {index + 1}
                       </button>
@@ -488,11 +599,7 @@ function EventSection() {
                   >
                     <button
                       className="page-link"
-                      onClick={() =>
-                        setCurrentPage((prevPage) =>
-                          Math.min(prevPage + 1, totalPages)
-                        )
-                      }
+                      onClick={() => handlePageChange(currentPage + 1)}
                     >
                       Next
                     </button>
