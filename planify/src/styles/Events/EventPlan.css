@@ -1,78 +1,247 @@
-/* EventPlan.css */
+/* === Layout container === */
+.working-container {
+  color: white;
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(150deg, #e6d3f9 0%, #e6d3f9 50%, #cea0f1 50%, #cea0f1 100%);
+}
 
-.event-plan-container {
-    padding: 30px;
-    background-color: #f9f9f9;
-  }
-  
-  .event-plan-card {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  }
-  
-  .event-plan-card h5 {
-    font-weight: 600;
-    color: #1d3557;
-    margin-bottom: 15px;
-  }
-  
-  .event-plan-card label {
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .event-plan-card .form-control {
-    border-radius: 6px;
-    font-size: 15px;
-  }
-  
-  .section-divider {
-    border-top: 2px dashed #ccc;
-    margin: 30px 0;
-  }
-  
-  .action-item-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .action-item-table th,
-  .action-item-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    vertical-align: top;
-    font-size: 14px;
-  }
-  
-  .action-item-table th {
-    background-color: #f0f0f0;
-    text-align: center;
-    font-weight: 600;
-  }
-  
-  .action-item-table td input,
-  .action-item-table td textarea {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 6px;
-    font-size: 14px;
-  }
-  
-  .add-action-btn {
-    background-color: #1d3557;
-    color: #fff;
-    border-radius: 6px;
-    margin-top: 20px;
-    padding: 8px 16px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .add-action-btn:hover {
-    background-color: #16324f;
-  }
-  
+/* === Walkthrough Modal === */
+.walkthrough {
+  display: flex;
+  flex-direction: column;
+  width: 1500px;
+  height: 700px;
+  background: linear-gradient(to right bottom, #9e66c6, #6027e1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.23), 0 10px 40px rgba(0, 0, 0, 0.19);
+  overflow: hidden;
+  font-size: 14px;
+  transition: all 0.4s ease;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(72px);
+}
+
+.walkthrough.show {
+  display: flex;
+}
+
+.walkthrough.reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.walkthrough-body {
+  display: flex;
+  overflow-x: hidden !important; 
+  align-items: center;
+  flex: 1;
+  text-align: center;
+  position: relative;
+  overflow-y: auto;
+  padding: 0 30px; /* Lề trái phải 30px */
+}
+
+.walkthrough-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.walkthrough-body::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+
+
+
+
+
+/* === Screens === */
+.screens {
+  flex: 1;
+  align-self: stretch;
+  position: relative;
+  margin: 0 -16px;
+  padding: 0;
+}
+
+.screens .screen {
+  position: absolute;
+  list-style: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-72px);
+  transition: all 0.4s ease;
+  width: 100%;
+}
+
+.screens .screen.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  transition-delay: 0.4s;
+}
+
+/* === Navigation Arrows === */
+.prev-screen,
+.next-screen {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2); /* Màu nền mờ trắng */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 3000;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.prev-screen:hover,
+.next-screen:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.prev-screen {
+  left: 0px; /* hoặc left: 10px nếu bạn không muốn ra ngoài quá nhiều */
+}
+
+.next-screen {
+  right: 0px;
+}
+
+
+
+
+.walkthrough-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+}
+
+.dot {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  height:8px;
+  width: 8px;
+  margin: 0 6px;
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+.dot.active {
+  background: #ffffff;
+  transform: scale(1.2);
+}
+
+.table {
+  width: 85%;
+  margin: 0 auto; /* Căn giữa theo chiều ngang */
+  border-collapse: collapse; /* Để viền gọn gàng hơn */
+}
+
+
+/* === Footer Button === */
+.walkthrough-footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 24px;
+  margin-top: 12px;
+}
+
+.walkthrough-footer .button {
+  height: 40px;
+  border: none;
+  background: #5da3f2;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex: 1;
+  margin: 0 8px;
+}
+
+.walkthrough-footer .button:hover {
+  background: #76b4f7;
+}
+
+.walkthrough-footer .button:active {
+  background: #5da3f2;
+}
+
+/* === Fixed Bottom Right Button === */
+.button.fixed-next {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  height: 44px;
+  background: #5da3f2;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 13px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 2000;
+}
+
+.button.fixed-next:hover {
+  background: #76b4f7;
+}
+
+.button.fixed-next.finish {
+  background: #28a745;
+}
+
+.button.fixed-next.finish:hover {
+  background: #218838;
+}
+
+/* === Dropdown Select Icon === */
+.dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-with-icon {
+  appearance: none;
+  width: 100%;
+  padding-right: 2rem;
+}
+
+.dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #666;
+  font-size: 0.9rem;
+}
