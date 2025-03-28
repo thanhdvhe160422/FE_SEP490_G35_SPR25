@@ -16,33 +16,27 @@ export default function Header() {
 
   const [fullname, setFullname] = useState("");
   const [picture, setPicture] = useState("");
-  const [userData, setUserData] = useState("");
-
-  // Lấy role từ localStorage, chuẩn hóa về chữ thường
   const userRole = localStorage.getItem("role")?.toLowerCase() || "";
   console.log("User Role từ localStorage header:", userRole);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    setFullname(localStorage.getItem("fullName"));
-    setPicture(localStorage.getItem("avatar"));
 
     if (!userId) return;
     const fetchProvinces = async () => {
-          try {
-            const userData = await getProfileById(userId);
-            setPicture(convertToDirectLink(userData.data.avatar.mediaUrl))
-          } catch (error) {
-            console.error(error);
-          }
-        };
-        fetchProvinces();
+      try {
+        const userData = await getProfileById(userId);
+        setFullname(userData.data.firstName + " " + userData.data.lastName);
+        setPicture(localStorage.getItem("avatar"));
+        // setPicture(convertToDirectLink(userData.data.avatar.mediaUrl));
+        console.log("Header", userData.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProvinces();
   }, []);
-  function convertToDirectLink(googleDriveUrl) {
-    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
-    const fileId = googleDriveUrl.split("id=")[1];
-    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-}
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -70,23 +64,6 @@ export default function Header() {
   const markAsRead = async () => {
     const userId = localStorage.getItem("userId");
     if (!userId) return;
-
-    // const unreadNotifications = notifications.filter((n) => !n.read);
-    // if (unreadNotifications.length > 0) {
-    //   setNotifications(
-    //     notifications.map((notif) =>
-    //       notif.read ? notif : { ...notif, read: true }
-    //     )
-    //   );
-
-    //   await Promise.all(
-    //     unreadNotifications.map((notif) =>
-    //       axios.patch(`http://localhost:4000/notifications/${notif.id}`, {
-    //         read: true,
-    //       })
-    //     )
-    //   );
-    // }
   };
 
   const handleLogout = () => {
@@ -99,7 +76,7 @@ export default function Header() {
       { label: "Home", path: "/home" },
       { label: "Create Event Organizer", path: "/create-event-organizer" },
       { label: "Create Event", path: "/create-event" },
-      { label: "Manage Requests", path: "/manager-request" },
+      { label: "Manage Requests", path: "/manage-request" },
     ],
     "event organizer": [
       { label: "Home", path: "/home" },

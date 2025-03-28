@@ -1,4 +1,6 @@
 import axios from "axios";
+import refreshAccessToken from "./refreshToken";
+import Swal from "sweetalert2";
 
 const API_TASK_URL = "https://localhost:44320/api/Tasks";
 
@@ -74,4 +76,47 @@ export const getTaskById = async (taskId, token) => {
       Authorization: `Bearer ${token}`,
     },
   });
+};
+export const getTaskListByImplementer = async (idImplementer, start, end) => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to get group information after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        return { error: "expired" };
+      }
+    }
+    console.error("Error fetching group details:", error);
+    Swal.fire("Error", "Unable to get group information.", "error");
+    return null;
+  }
 };

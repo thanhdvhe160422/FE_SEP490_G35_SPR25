@@ -196,14 +196,14 @@ function App() {
           }
         />
         <Route
-          path="/create-event-organizer" 
-          element={<CreateEventOrganizer/>}
+          path="/create-event-organizer"
+          element={<CreateEventOrganizer />}
         />
         <Route
           path="/update-event-organizer/:userId"
-          element={<UpdateEventOrganizer/>}
+          element={<UpdateEventOrganizer />}
         />
-        
+
         <Route
           path="/group/:groupId/update-task/:id"
           element={
@@ -214,7 +214,7 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/login" replace />} />
 
-        <Route path="/cost-detail" element={<CostDetail/>}></Route>
+        <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
     </div>
   );

@@ -419,7 +419,7 @@ const UpdateProfile = () => {
               <input
                 className="input-profile"
                 type="text"
-                value={user.addressVM.addressDetail || ""}
+                value={user?.addressVM?.addressDetail || ""}
                 onChange={(e) =>
                   setUser({
                     ...user,

@@ -1,49 +1,81 @@
 import React, { useEffect, useState } from "react";
-import getPosts from "../../services/EventService";
 import "../../styles/Events/ManageRequest.css";
 import {
   approveRequest,
   rejectRequest,
+  getRequest,
 } from "../../services/EventRequestService";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
+import Footer from "../../components/Footer/Footer";
+import Header from "../../components/Header/Header";
 
 function ManageRequest() {
   const [requests, setRequests] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopupReject, setShowPopupReject] = useState(false);
+  const [showPopupApprove, setShowPopupApprove] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
-
-  const managerId = localStorage.getItem("userId");
+  const [approveReason, setApproveReason] = useState("");
 
   useEffect(() => {
     const fetchRequests = async () => {
-      const data = await getPosts();
-      setRequests(data);
+      try {
+        const data = await getRequest();
+        console.log("Fetched Requests: ", data);
+        setRequests(data.result);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+        Swal.fire("Error", "Unable to fetch requests.", "error");
+      }
     };
     fetchRequests();
   }, []);
-
-  const handleApprove = async (id) => {
-    await approveRequest(id, managerId);
-    updateRequestStatus(id, 1);
+  const handleApprove = (request) => {
+    setSelectedRequest(request);
+    setShowPopupApprove(true);
   };
 
-  const handleReject = (id) => {
-    setSelectedRequest(id);
-    setShowPopup(true);
+  const handleReject = (request) => {
+    setSelectedRequest(request);
+    setShowPopupReject(true);
   };
 
   const submitReject = async () => {
     if (!rejectReason.trim()) return;
-    await rejectRequest(selectedRequest, rejectReason);
-    updateRequestStatus(selectedRequest, -1);
-    setShowPopup(false);
-    setRejectReason("");
+    try {
+      await rejectRequest(selectedRequest.eventId, rejectReason);
+      setRequests((prev) =>
+        prev.filter((req) => req.eventId !== selectedRequest.eventId)
+      );
+      setShowPopupReject(false);
+      setRejectReason("");
+    } catch (error) {
+      Swal.fire("Error", "Unable to reject request.", "error");
+    }
   };
 
-  const updateRequestStatus = (id, status) => {
-    setRequests((prevRequests) =>
-      prevRequests.map((req) => (req.id === id ? { ...req, status } : req))
-    );
+  const submitApprove = async () => {
+    if (!approveReason || !approveReason.trim() === "") {
+      Swal.fire("Error", "Please enter a reason for approval.", "error");
+      return;
+    }
+    console.log("Approve Reason:", approveReason);
+    try {
+      console.log("Submitting approve request with payload:", {
+        eventId: selectedRequest.eventId,
+        reason: approveReason,
+      });
+      await approveRequest(selectedRequest.eventId, approveReason);
+      setRequests((prev) =>
+        prev.filter((req) => req.eventId !== selectedRequest.eventId)
+      );
+      setShowPopupApprove(false);
+      setApproveReason("");
+    } catch (error) {
+      console.error("Error approving request:", error);
+      Swal.fire("Error", "Unable to approve request.", "error");
+    }
   };
 
   const pendingRequests = requests.filter((req) => req.status === 0);
@@ -51,54 +83,88 @@ function ManageRequest() {
   const rejectedRequests = requests.filter((req) => req.status === -1);
 
   return (
-    <div className="manager-container">
-      <h2>List Event Request</h2>
-      <div className="requests-grid">
-        <RequestColumn title="Not Approved Yet" requests={pendingRequests}>
-          {(req) => (
-            <>
-              <button
-                className="btn approve"
-                onClick={() => handleApprove(req.id)}
-              >
-                Approve
-              </button>
-              <button
-                className="btn reject"
-                onClick={() => handleReject(req.id)}
-              >
-                Reject
-              </button>
-            </>
-          )}
-        </RequestColumn>
+    <>
+      <Header></Header>
+      <div className="manager-container">
+        <h2>List Event Request</h2>
+        <div className="requests-grid">
+          <RequestColumn title="Not Approved Yet" requests={pendingRequests}>
+            {(req) => (
+              <>
+                <button
+                  className="btn approve"
+                  onClick={() => handleApprove(req)}
+                >
+                  Approve
+                </button>
+                <button
+                  className="btn reject"
+                  onClick={() => handleReject(req)}
+                >
+                  Reject
+                </button>
+              </>
+            )}
+          </RequestColumn>
 
-        <RequestColumn title="Approved" requests={approvedRequests} />
-        <RequestColumn title="Rejected" requests={rejectedRequests} />
-      </div>
-
-      {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Reject Request</h3>
-            <textarea
-              placeholder="Enter rejection reason..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-            />
-            <button className="btn cancel" onClick={() => setShowPopup(false)}>
-              Cancel
-            </button>
-            <button className="btn submit" onClick={submitReject}>
-              Submit
-            </button>
-          </div>
+          <RequestColumn title="Approved" requests={approvedRequests} />
+          <RequestColumn title="Rejected" requests={rejectedRequests} />
         </div>
-      )}
-    </div>
+
+        {showPopupReject && (
+          <div className="popup">
+            <div className="popup-content">
+              <h3>Reject Request</h3>
+              <textarea
+                placeholder="Enter rejection reason..."
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+              />
+              <button
+                className="btn cancel"
+                onClick={() => setShowPopupReject(false)}
+              >
+                Cancel
+              </button>
+              <button className="btn submit" onClick={submitReject}>
+                Submit
+              </button>
+            </div>
+          </div>
+        )}
+        {showPopupApprove && (
+          <div className="popup">
+            <div className="popup-content">
+              <h3 style={{ color: "green" }}>Approve Request</h3>
+              <textarea
+                placeholder="Enter reason..."
+                value={approveReason}
+                onChange={(e) => setApproveReason(e.target.value)}
+              />
+              <button
+                className="btn cancel"
+                onClick={() => setShowPopupApprove(false)}
+              >
+                Cancel
+              </button>
+              <button
+                style={{ backgroundColor: "green" }}
+                className="btn submit"
+                onClick={submitApprove}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      <Footer></Footer>
+    </>
   );
 }
+
 function RequestColumn({ title, requests, children }) {
+  const navigate = useNavigate();
   return (
     <div className="request-column">
       <h3>{title}</h3>
@@ -107,18 +173,19 @@ function RequestColumn({ title, requests, children }) {
       ) : (
         requests.map((req) => (
           <div key={req.id} className="request-card">
-            <h4>{req.eventTitle}</h4>
+            <h4
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                navigate(`/event-detail-EOG/${req.eventId}`);
+              }}
+            >
+              {req.eventId}
+            </h4>
             <p>
-              <strong>From:</strong> {formatDateTime(req.startTime)}
+              <strong>From:</strong> {}
             </p>
             <p>
-              <strong>To:</strong> {formatDateTime(req.endTime)}
-            </p>
-            <p>
-              <strong>Place:</strong> {req.placed}
-            </p>
-            <p>
-              <strong>Description:</strong> {req.eventDescription}
+              <strong>To:</strong> {}
             </p>
             {children && children(req)}
           </div>
@@ -127,6 +194,7 @@ function RequestColumn({ title, requests, children }) {
     </div>
   );
 }
+
 const formatDateTime = (dateTime) => {
   return new Date(dateTime).toLocaleString("en", {
     year: "numeric",

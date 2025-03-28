@@ -6,7 +6,14 @@ import Footer from "../../components/Footer/Footer";
 import { getEventById } from "../../services/EventService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { FaClock, FaMapMarkerAlt, FaTag } from "react-icons/fa";
+import {
+  FaClock,
+  FaMapMarkerAlt,
+  FaChartLine,
+  FaFlag,
+  FaChartBar,
+  FaUsers,
+} from "react-icons/fa";
 import { parseISO } from "date-fns";
 import { MdOutlineCategory } from "react-icons/md";
 
