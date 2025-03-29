@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { addLeader } from "../../services/GroupService";
 import {
   Form,
   Row,
@@ -495,32 +494,32 @@ export default function CreateEvent() {
     );
   };
 
-  const toggleStar = async (groupIndex, memberIndex) => {
-    const group = groups[groupIndex];
-    const member = group.members[memberIndex];
-    try {
-      const response = await addLeader(group.id, member.id);
-      if (response) {
-        setGroups((prevGroups) =>
-          prevGroups.map((g, i) =>
-            i === groupIndex
-              ? {
-                  ...g,
-                  selectedStar:
-                    g.selectedStar === memberIndex ? null : memberIndex,
-                }
-              : g
-          )
-        );
-        enqueueSnackbar("Leader assigned successfully!", {
-          variant: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Error assigning leader:", error);
-      enqueueSnackbar("Failed to assign leader.", { variant: "error" });
-    }
-  };
+  // const toggleStar = async (groupIndex, memberIndex) => {
+  //   const group = groups[groupIndex];
+  //   const member = group.members[memberIndex];
+  //   try {
+  //     const response = await addLeader(group.id, member.id);
+  //     if (response) {
+  //       setGroups((prevGroups) =>
+  //         prevGroups.map((g, i) =>
+  //           i === groupIndex
+  //             ? {
+  //                 ...g,
+  //                 selectedStar:
+  //                   g.selectedStar === memberIndex ? null : memberIndex,
+  //               }
+  //             : g
+  //         )
+  //       );
+  //       enqueueSnackbar("Leader assigned successfully!", {
+  //         variant: "success",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error assigning leader:", error);
+  //     enqueueSnackbar("Failed to assign leader.", { variant: "error" });
+  //   }
+  // };
 
   const handleAddTask = () => {
     const newGroup = {
@@ -1556,9 +1555,7 @@ export default function CreateEvent() {
                               </div>
                               <div className="d-flex align-items-center">
                                 <span
-                                  onClick={() =>
-                                    toggleStar(groupIndex, memberIndex)
-                                  }
+                                 
                                   style={{
                                     cursor: "pointer",
                                     color:
