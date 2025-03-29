@@ -10,12 +10,10 @@ import Profile from "./pages/Author/Profile";
 import CreateEvent from "./pages/Events/CreateEvent";
 import EventDetailSpec from "./pages/Events/EventDetailSpec";
 import UpdateProfile from "./pages/Author/UpdateProfile";
-import GroupDetail from "./pages/Group/GroupDetail";
 import EventDetailEOG from "./pages/Events/EventDetailEOG";
 import CreateTask from "./pages/Tasks/CreateTask";
 import ManageRequest from "./pages/Events/ManageRequest";
 import CreateSubTask from "./pages/Sub-tasks/CreateSubTask";
-import UpdateGroup from "./pages/Group/UpdateGroup";
 import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
@@ -113,20 +111,7 @@ function App() {
                     }
                 />
 
-                <Route
-                    path="/group-detail/:id"
-                    element={
-                        <PrivateRoute
-                            allowedRoles={[
-                                "Implementer",
-                                "Campus Manager",
-                                "Event Organizer",
-                            ]}
-                        >
-                            <GroupDetail />
-                        </PrivateRoute>
-                    }
-                />
+                
 
                 <Route
                     path="/event-detail-EOG/:eventId"
@@ -176,14 +161,6 @@ function App() {
                     }
                 />
 
-                <Route
-                    path="/update-group/:id"
-                    element={
-                        <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
-                            <UpdateGroup />
-                        </PrivateRoute>
-                    }
-                />
 
                 <Route
                     path="/task/:id"

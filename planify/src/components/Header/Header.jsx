@@ -93,6 +93,12 @@ export default function Header() {
 
   const navItems = navItemsByRole[userRole] || [];
 
+  function convertToDirectLink(googleDriveUrl) {
+    
+    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/home")}>
@@ -151,7 +157,7 @@ export default function Header() {
           <span className="username">{fullname}</span>
           <img
             style={{ width: "40px", height: "40px" }}
-            src={picture}
+            src={convertToDirectLink(picture)}
             alt="User Avatar"
             className="avatar"
           />

@@ -41,11 +41,11 @@ const UpdateProfile = () => {
       try {
         const userId = localStorage.getItem("userId");
         const token = localStorage.getItem("token");
+        setImage(localStorage.getItem("avatar"));
         const data = await getProfileById(userId, token);
         setUser(data.data);
         setInitialUser(data.data);
-
-        setImage(data.data.avatar.mediaUrl)
+        if(data.data.avatar) {setImage(data.data.avatar.mediaUrl)}
         setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || 1);
         setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || 1);
         setSelectedWard(data.data.addressVM.wardVM.id || 1);
