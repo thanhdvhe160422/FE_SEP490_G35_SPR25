@@ -110,8 +110,21 @@ function App() {
                         </PrivateRoute>
                     }
                 />
-
-                
+{/* 
+                <Route
+                    path="/group-detail/:id"
+                    element={
+                        <PrivateRoute
+                            allowedRoles={[
+                                "Implementer",
+                                "Campus Manager",
+                                "Event Organizer",
+                            ]}
+                        >
+                            <GroupDetail />
+                        </PrivateRoute>
+                    }
+                /> */}
 
                 <Route
                     path="/event-detail-EOG/:eventId"
@@ -161,6 +174,14 @@ function App() {
                     }
                 />
 
+                {/* <Route
+                    path="/update-group/:id"
+                    element={
+                        <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
+                            <UpdateGroup />
+                        </PrivateRoute>
+                    }
+                /> */}
 
                 <Route
                     path="/task/:id"
