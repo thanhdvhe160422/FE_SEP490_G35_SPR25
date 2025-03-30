@@ -6,6 +6,8 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 // Custom hook để lấy campusId và danh sách categories
+
+// -----------------------------------------------?
 const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
@@ -379,32 +381,62 @@ export default function EventPlan() {
         promotionalPlan: JSON.stringify(formData.promotionalPlan),
         targetAudience: formData.targetAudience,
         sloganEvent: formData.sloganEvent,
-        tasks: formData.tasks.map((task) => ({
-          taskName: task.taskName,
-          description: task.description,
-          startTime: null,
-          deadline: task.deadline
-            ? new Date(task.deadline).toISOString()
-            : null,
-          budget: task.budget,
-          subTasks: task.subtasks.map((subtask) => ({
-            subTaskName: subtask.subtaskName,
-            description: subtask.description,
+        tasks: formData.tasks
+          .filter(
+            (task) =>
+              task.taskName.trim() ||
+              task.deadline ||
+              task.budget > 0 ||
+              task.description.trim() ||
+              task.subtasks.some(
+                (sub) =>
+                  sub.subtaskName ||
+                  sub.deadline ||
+                  sub.amount > 0 ||
+                  sub.description
+              )
+          )
+          .map((task) => ({
+            taskName: task.taskName,
+            description: task.description,
             startTime: null,
-            deadline: subtask.deadline
-              ? new Date(subtask.deadline).toISOString()
+            deadline: task.deadline
+              ? new Date(task.deadline).toISOString()
               : null,
-            budget: subtask.amount,
+            budget: task.budget,
+            subTasks: task.subtasks
+              .filter(
+                (sub) =>
+                  sub.subtaskName.trim() ||
+                  sub.deadline ||
+                  sub.amount > 0 ||
+                  sub.description.trim()
+              )
+              .map((subtask) => ({
+                subTaskName: subtask.subtaskName,
+                description: subtask.description,
+                startTime: null,
+                deadline: subtask.deadline
+                  ? new Date(subtask.deadline).toISOString()
+                  : null,
+                budget: subtask.amount,
+              })),
           })),
-        })),
-        risks: formData.risks.map((risk, index) => ({
-          name: `Risk ${index + 1}`,
-          reason: risk.reason,
-          solution: risk.solution,
-          description: risk.description,
-        })),
+        risks: formData.risks
+          .filter(
+            (risk) =>
+              risk.reason.trim() ||
+              risk.description.trim() ||
+              risk.solution.trim()
+          )
+          .map((risk, index) => ({
+            name: `Risk ${index + 1}`,
+            reason: risk.reason,
+            solution: risk.solution,
+            description: risk.description,
+          })),
         costBreakdowns: formData.budgetRows
-          .filter((row) => row.name && row.quantity > 0 && row.price > 0)
+          .filter((row) => row.name.trim() && row.quantity > 0 && row.price > 0)
           .map((row) => ({
             name: row.name,
             quantity: row.quantity,
@@ -428,8 +460,9 @@ export default function EventPlan() {
       closeModal();
     } catch (error) {
       console.error("Error creating event:", error);
+      console.log(localStorage.getItem("token"));
       alert(
-        error.response?.data?.message ||
+        "thanh " + error.response?.data?.message ||
           "Failed to create event. Unable to connect to the server."
       );
     } finally {
@@ -443,6 +476,12 @@ export default function EventPlan() {
       alert(error);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (screens.current.length > 0 && dots.current.length > 0) {
+      updateScreen(index);
+    }
+  }, [index, updateScreen]);
 
   return (
     <div className="working-container">
@@ -579,34 +618,40 @@ export default function EventPlan() {
               <div className="media books"></div>
               <h3>MỤC TIÊU SỰ KIỆN</h3>
               <Form className="w-75 mx-auto text-start">
-              <Form.Group controlId="formGoals" className="mb-3">
-  <Form.Label>Mục tiêu của sự kiện</Form.Label>
-  <Form.Control
-    as="textarea"
-    placeholder="Nhập mục tiêu"
-    value={formData.goals}
-    onChange={(e) => handleFormChange("goals", e.target.value)}
-    style={{
-      resize: "vertical",       
-      overflowY: "auto",         
-      maxHeight: "4.5em",        
-      minHeight: "4.5em",
-      lineHeight: "1.5"
-    }}
-    rows={3}
-  />
-</Form.Group>
-
+                <Form.Group controlId="formGoals" className="mb-3">
+                  <Form.Label>Mục tiêu của sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    placeholder="Nhập mục tiêu"
+                    value={formData.goals}
+                    onChange={(e) => handleFormChange("goals", e.target.value)}
+                    style={{
+                      resize: "vertical",
+                      overflowY: "auto",
+                      maxHeight: "4.5em",
+                      minHeight: "4.5em",
+                      lineHeight: "1.5",
+                    }}
+                    rows={3}
+                  />
+                </Form.Group>
 
                 <Form.Group controlId="formTargetAudience" className="mb-3">
-                  <Form.Label>Ai là người tham gia</Form.Label>
+                  <Form.Label>Target Audience</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea"
+                    rows={3}
                     placeholder="Nhập đối tượng tham gia"
                     value={formData.targetAudience}
                     onChange={(e) =>
                       handleFormChange("targetAudience", e.target.value)
                     }
+                    style={{
+                      resize: "none",
+                      overflowY: "auto",
+                      maxHeight: "6.5em",
+                      lineHeight: "1.5",
+                    }}
                   />
                 </Form.Group>
 
@@ -634,16 +679,14 @@ export default function EventPlan() {
                   )}
                 </Form.Group>
 
-
                 <Form.Group controlId="formMeansureSuccess" className="mb-3">
                   <Form.Label>Measuring Success</Form.Label>
                   <Form.Control
                     type="text"
-                    value={formData.targetAudience}
-                    onChange={(e) =>
-                      handleFormChange("targetAudience", e.target.value)
-                    }
-                    
+                    // value={formData.targetAudience}
+                    // onChange={(e) =>
+                    //   handleFormChange("targetAudience", e.target.value)
+                    // }
                   />
                 </Form.Group>
               </Form>
@@ -959,15 +1002,39 @@ export default function EventPlan() {
               </div>
             </li>
 
-            {/* Màn hình 5: Kế Hoạch Truyền Thông */}
             <li className="screen">
               <div className="media comm"></div>
-              <h3>KẾ HOẠCH TRUYỀN THÔNG</h3>
+              <h3>KẾ HOẠCH </h3>
               <Form className="w-75 mx-auto text-start">
+                <Form.Group controlId="formMonitoringProcess" className="mb-3">
+                  <Form.Label>Monitoring Process</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    style={{
+                      resize: "none",
+                      overflow: "auto",
+                      maxHeight: "5.4em",
+                      lineHeight: "1.8em",
+                    }}
+                    // value={formData.promotionalPlan.after}
+                    // onChange={(e) =>
+                    //   handlePromotionalPlanChange("after", e.target.value)
+                    // }
+                  />
+                </Form.Group>
+
                 <Form.Group controlId="formPromotionalBefore" className="mb-3">
                   <Form.Label>Kế hoạch trước sự kiện</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea"
+                    rows={3}
+                    style={{
+                      resize: "none",
+                      overflow: "auto",
+                      maxHeight: "5.4em",
+                      lineHeight: "1.8em",
+                    }}
                     placeholder="Nhập kế hoạch trước sự kiện"
                     value={formData.promotionalPlan.before}
                     onChange={(e) =>
@@ -979,7 +1046,14 @@ export default function EventPlan() {
                 <Form.Group controlId="formPromotionalDuring" className="mb-3">
                   <Form.Label>Kế hoạch trong sự kiện</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea"
+                    rows={3}
+                    style={{
+                      resize: "none",
+                      overflow: "auto",
+                      maxHeight: "5.4em",
+                      lineHeight: "1.8em",
+                    }}
                     placeholder="Nhập kế hoạch trong sự kiện"
                     value={formData.promotionalPlan.during}
                     onChange={(e) =>
@@ -991,7 +1065,14 @@ export default function EventPlan() {
                 <Form.Group controlId="formPromotionalAfter" className="mb-3">
                   <Form.Label>Kế hoạch sau sự kiện</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea"
+                    rows={3}
+                    style={{
+                      resize: "none",
+                      overflow: "auto",
+                      maxHeight: "5.4em",
+                      lineHeight: "1.8em",
+                    }}
                     placeholder="Nhập kế hoạch sau sự kiện"
                     value={formData.promotionalPlan.after}
                     onChange={(e) =>
@@ -1098,9 +1179,8 @@ export default function EventPlan() {
           <button
             className="prev-screen"
             onClick={() => {
-              const newIndex = index - 1;
+              const newIndex = Math.max(0, index - 1); // 🔒 đảm bảo không nhỏ hơn 0
               setIndex(newIndex);
-              updateScreen(newIndex);
             }}
             style={{ visibility: index === 0 ? "hidden" : "visible" }}
           >
@@ -1110,9 +1190,8 @@ export default function EventPlan() {
           <button
             className="next-screen"
             onClick={() => {
-              const newIndex = index + 1;
+              const newIndex = Math.min(index + 1, indexMax()); // 🔒 đảm bảo không vượt quá số slide
               setIndex(newIndex);
-              updateScreen(newIndex);
             }}
             style={{ visibility: index === indexMax() ? "hidden" : "visible" }}
           >
@@ -1128,7 +1207,7 @@ export default function EventPlan() {
               className={`dot ${i === index ? "active" : ""}`}
               onClick={() => {
                 setIndex(i);
-                updateScreen(i);
+                // updateScreen(i);
               }}
               aria-label={`Go to screen ${i + 1}`}
             />
@@ -1150,9 +1229,8 @@ export default function EventPlan() {
             if (index === indexMax()) {
               handleSubmit();
             } else {
-              const newIndex = index + 1;
+              const newIndex = Math.min(index + 1, indexMax());
               setIndex(newIndex);
-              updateScreen(newIndex);
             }
           }}
           disabled={isLoading}
