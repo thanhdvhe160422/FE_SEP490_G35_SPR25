@@ -153,7 +153,7 @@ function App() {
                 <Route
                     path="/manage-request"
                     element={
-                        <PrivateRoute allowedRoles={["Campus Manager"]}>
+                        <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
                             <ManageRequest />
                         </PrivateRoute>
                     }
