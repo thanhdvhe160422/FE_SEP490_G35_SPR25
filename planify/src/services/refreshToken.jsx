@@ -12,7 +12,7 @@ const refreshAccessToken = async () => {
     );
     const newAccessToken = response.data.accessToken;
     localStorage.setItem("token", newAccessToken);
-    sessionStorage.setItem("reToken", response.data.refreshToken);
+    localStorage.setItem("reToken", response.data.refreshToken);
     console.log(newAccessToken);
     return newAccessToken;
   } catch (error) {

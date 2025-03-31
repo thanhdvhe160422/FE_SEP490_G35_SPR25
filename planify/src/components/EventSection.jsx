@@ -8,11 +8,13 @@ import getPosts from "../services/EventService";
 import getCategories from "../services/CategoryService";
 import { getCampuses } from "../services/campusService";
 import { searchEvents } from "../services/EventService";
-import Swal from "sweetalert2";
 
 const EVENTS_PER_PAGE = 5;
 
 function EventSection() {
+  const [myEventPages, setMyEventPages] = useState(1);
+  const [filteredTotalPages, setFilteredTotalPages] = useState(1);
+  const [isFiltered, setIsFiltered] = useState(false);
   const [events, setEvents] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [categories, setCategories] = useState([]);
@@ -47,6 +49,7 @@ function EventSection() {
   }, []);
   const handleSearch = async () => {
     try {
+      setIsFiltered(true);
       const params = {
         page: currentPage,
         pageSize: EVENTS_PER_PAGE,
@@ -62,28 +65,36 @@ function EventSection() {
       if (response) {
         const items = Array.isArray(response.items) ? response.items : [];
         setFilteredEvents(items);
+        setFilteredTotalPages(response.totalPages || 1);
       } else {
         setFilteredEvents([]);
+        setFilteredTotalPages(1);
       }
     } catch (error) {
       console.error("Error searching events:", error);
+      setFilteredTotalPages(1);
     }
+  };
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("");
+    setSelectedStatus("");
+    setSelectedStart("");
+    setSelectedEnd("");
+    setSelectedLocation("");
+    setIsFiltered(false);
+    setCurrentPage(1);
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+    if (isFiltered) {
+      setTimeout(() => {
+        handleSearch();
+      }, 0);
+    }
   };
-  useEffect(() => {
-    handleSearch();
-  }, [
-    searchTerm,
-    currentPage,
-    selectedCategory,
-    selectedStatus,
-    selectedStart,
-    selectedEnd,
-    selectedLocation,
-  ]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,9 +116,11 @@ function EventSection() {
           (event) => currentCampus(event) === campus
         );
         setEvents(campusEvents);
-        setTotalPages(allData.totalPages);
+        setTotalPages(allData.totalPages || 1);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
+        setEvents([]);
+        setTotalPages(1);
       }
     };
 
@@ -155,10 +168,12 @@ function EventSection() {
   ]);
   useEffect(() => {
     if (events.length > 0) {
-      const hasMyEvent = events.some(
-        (event) => event.createBy === currentUserId
+      const myEvents = events.filter(
+        (event) => String(event.createBy) === String(currentUserId)
       );
-      setEventFilter(hasMyEvent ? "my" : "list");
+
+      const pages = Math.ceil(myEvents.length / EVENTS_PER_PAGE);
+      setMyEventPages(pages || 1);
     }
   }, [events, currentUserId]);
   const currentCategory = (categoryId) => {
@@ -210,6 +225,28 @@ function EventSection() {
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
               />
+              <div
+                className="filter-buttons"
+                style={{ marginTop: "20px", display: "flex", gap: "10px" }}
+              >
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSearch}
+                  style={{ flex: 1 }}
+                >
+                  Apply Filters
+                </button>
+
+                {isFiltered && (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={clearFilters}
+                    style={{ flex: 1 }}
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -225,11 +262,29 @@ function EventSection() {
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
                           }`}
-                          onClick={() => setEventFilter("my")}
+                          onClick={() => {
+                            console.log("📊 CLICK MY EVENT");
+                            console.log(
+                              "currentUserId:",
+                              currentUserId,
+                              "kiểu dữ liệu:",
+                              typeof currentUserId
+                            );
+                            console.log(
+                              "Số lượng sự kiện của tôi:",
+                              events.filter(
+                                (event) =>
+                                  String(event.createBy) ===
+                                  String(currentUserId)
+                              ).length
+                            );
+                            setEventFilter("my");
+                          }}
                         >
                           My Event
                         </button>
                       )}
+
                       <button
                         className={`filter_button ${
                           eventFilter === "list" ? "active" : ""
@@ -254,7 +309,6 @@ function EventSection() {
                           </option>
                         ))}
                       </select>
-
                       <input
                         style={{ width: "300px" }}
                         type="text"
@@ -263,15 +317,31 @@ function EventSection() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          if (
+                            searchTerm.trim() === "" &&
+                            !selectedCategory &&
+                            !selectedStatus &&
+                            !selectedStart &&
+                            !selectedEnd &&
+                            !selectedLocation
+                          ) {
+                            setIsFiltered(false);
+                          } else {
+                            handleSearch();
+                          }
+                        }}
+                      >
+                        Search
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {searchTerm ||
-              selectedStart ||
-              selectedEnd ||
-              selectedLocation ? (
+              {isFiltered ? (
                 filteredEvents.length > 0 ? (
                   filteredEvents.map((event) => (
                     <div key={event.id} className="col-12 belarus_fast">
@@ -417,92 +487,210 @@ function EventSection() {
                     </div>
                   ))
                 ) : (
-                  <p className="col-12 no-events-message">
-                    No valid events found.
-                  </p>
+                  <div
+                    className="col-12"
+                    style={{
+                      minHeight: "500px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      margin: "20px 0",
+                      background: "#f9f9f9",
+                      borderRadius: "8px",
+                      border: "1px solid #e0e0e0",
+                    }}
+                  >
+                    <div className="text-center">
+                      <h3 style={{ color: "#555", fontWeight: "500" }}>
+                        Không tìm thấy sự kiện nào
+                      </h3>
+                      <p style={{ color: "#777" }}>
+                        Vui lòng thử lại với các tiêu chí tìm kiếm khác
+                      </p>
+                    </div>
+                  </div>
                 )
               ) : (
-                events.map((event) => (
-                  <div key={event.id} className="col-12 belarus_fast">
-                    <div
-                      style={{
-                        height: "500px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                      }}
-                      className="belarus_items"
-                    >
-                      <img
-                        src={
-                          event.eventMedias?.length > 0
-                            ? fixDriveUrl(
-                                event.eventMedias[0].mediaDTO.mediaUrl
-                              )
-                            : bannerImage
-                        }
-                        alt="News"
-                        onClick={() => {
-                          const userRole = (localStorage.getItem("role") || "")
-                            .trim()
-                            .toLowerCase();
-                          console.log(
-                            "🔍 User Role khi bấm vào sự kiện:",
-                            userRole
-                          );
-                          console.log("🔍 Event Data:", event);
+                (() => {
+                  if (eventFilter === "my") {
+                    const myEvents = events.filter(
+                      (event) =>
+                        String(event.createBy) === String(currentUserId)
+                    );
 
-                          let targetUrl = `/event-detail-spec/${event.id}`;
-                          if (
-                            userRole === "campus manager" ||
-                            userRole === "event organizer"
-                          ) {
-                            targetUrl = `/event-detail-EOG/${event.id}`;
-                          }
-
-                          console.log("🚀 Điều hướng đến:", targetUrl);
-                          navigate(targetUrl);
-                        }}
-                        style={{ cursor: "pointer" }}
-                      />
-
-                      <div
-                        className="belarus_content"
-                        onClick={() => {
-                          const userRole = (localStorage.getItem("role") || "")
-                            .trim()
-                            .toLowerCase();
-                          console.log(
-                            "🔍 User Role khi bấm vào sự kiện:",
-                            userRole
-                          );
-                          console.log("🔍 Event Data:", event);
-
-                          let targetUrl = `/event-detail-spec/${event.id}`;
-                          if (
-                            userRole === "campus manager" ||
-                            userRole === "event organizer"
-                          ) {
-                            targetUrl = `/event-detail-EOG/${event.id}`;
-                          }
-
-                          console.log("🚀 Điều hướng đến:", targetUrl);
-                          navigate(targetUrl);
-                        }}
-                      >
+                    if (myEvents.length === 0) {
+                      return (
                         <div
-                          className="heding wow fadeInUp"
+                          className="col-12"
+                          style={{
+                            minHeight: "500px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "100%",
+                            margin: "20px 0",
+                            background: "#f9f9f9",
+                            borderRadius: "8px",
+                            border: "1px solid #e0e0e0",
+                          }}
+                        >
+                          <div className="text-center">
+                            <h3 style={{ color: "#555", fontWeight: "500" }}>
+                              Bạn chưa có sự kiện nào
+                            </h3>
+                            <p style={{ color: "#777" }}>
+                              Các sự kiện bạn tạo sẽ hiển thị ở đây
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return myEvents.map((event) => (
+                      <div key={event.id} className="col-12 belarus_fast">
+                        <div
+                          style={{
+                            height: "500px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                          }}
+                          className="belarus_items"
+                        >
+                          <img
+                            src={
+                              event.eventMedias?.length > 0
+                                ? fixDriveUrl(
+                                    event.eventMedias[0].mediaDTO.mediaUrl
+                                  )
+                                : bannerImage
+                            }
+                            alt="News"
+                            onClick={() => {
+                              const userRole = (
+                                localStorage.getItem("role") || ""
+                              )
+                                .trim()
+                                .toLowerCase();
+                              let targetUrl = `/event-detail-spec/${event.id}`;
+                              if (
+                                userRole === "campus manager" ||
+                                userRole === "event organizer"
+                              ) {
+                                targetUrl = `/event-detail-EOG/${event.id}`;
+                              }
+                              navigate(targetUrl);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          />
+
+                          <div
+                            className="belarus_content"
+                            onClick={() => {
+                              const userRole = (
+                                localStorage.getItem("role") || ""
+                              )
+                                .trim()
+                                .toLowerCase();
+                              let targetUrl = `/event-detail-spec/${event.id}`;
+                              if (
+                                userRole === "campus manager" ||
+                                userRole === "event organizer"
+                              ) {
+                                targetUrl = `/event-detail-EOG/${event.id}`;
+                              }
+                              navigate(targetUrl);
+                            }}
+                          >
+                            <div
+                              className="heding wow fadeInUp"
+                              onClick={() => {
+                                const userRole = (
+                                  localStorage.getItem("role") || ""
+                                )
+                                  .trim()
+                                  .toLowerCase();
+                                let targetUrl = `/event-detail-spec/${event.id}`;
+                                if (
+                                  userRole === "campus manager" ||
+                                  userRole === "event organizer"
+                                ) {
+                                  targetUrl = `/event-detail-EOG/${event.id}`;
+                                }
+                                navigate(targetUrl);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >
+                              {event.eventTitle}
+                            </div>
+                            <h5>
+                              <FaMapMarkerAlt className="icon-location" />
+                              {event.placed}
+                            </h5>
+                            <h5>
+                              <MdOutlineCategory
+                                className="icon-category"
+                                style={{ marginRight: "10px", color: "orange" }}
+                              />
+                              {currentCategory(event.categoryEventId)}
+                            </h5>
+                            <p className="event_time">
+                              <FaClock className="icon-time" />
+                              <strong>From:</strong>{" "}
+                              {formatDateTime(event.startTime)}
+                              <br />
+                              <strong>
+                                <FaClock className="icon-time" />
+                                To:
+                              </strong>{" "}
+                              {formatDateTime(event.endTime)}
+                            </p>
+                            <div
+                              className={`status_tag ${
+                                statusEvent(event.startTime, event.endTime) ===
+                                "running"
+                                  ? "running_status"
+                                  : statusEvent(
+                                      event.startTime,
+                                      event.endTime
+                                    ) === "not started yet"
+                                  ? "not_started_status"
+                                  : "ended_status"
+                              }`}
+                            >
+                              {statusEvent(event.startTime, event.endTime)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ));
+                  }
+
+                  return events.map((event) => (
+                    <div key={event.id} className="col-12 belarus_fast">
+                      <div
+                        style={{
+                          height: "500px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                        className="belarus_items"
+                      >
+                        <img
+                          src={
+                            event.eventMedias?.length > 0
+                              ? fixDriveUrl(
+                                  event.eventMedias[0].mediaDTO.mediaUrl
+                                )
+                              : bannerImage
+                          }
+                          alt="News"
                           onClick={() => {
                             const userRole = (
                               localStorage.getItem("role") || ""
                             )
                               .trim()
                               .toLowerCase();
-                            console.log(
-                              "🔍 User Role khi bấm vào sự kiện:",
-                              userRole
-                            );
-                            console.log("🔍 Event Data:", event);
-
                             let targetUrl = `/event-detail-spec/${event.id}`;
                             if (
                               userRole === "campus manager" ||
@@ -510,59 +698,99 @@ function EventSection() {
                             ) {
                               targetUrl = `/event-detail-EOG/${event.id}`;
                             }
-
-                            console.log("🚀 Điều hướng đến:", targetUrl);
                             navigate(targetUrl);
                           }}
                           style={{ cursor: "pointer" }}
-                        >
-                          {event.eventTitle}
-                        </div>
-                        <h5>
-                          <FaMapMarkerAlt className="icon-location" />
-
-                          {event.placed}
-                        </h5>
-                        <h5>
-                          <MdOutlineCategory
-                            className="icon-category"
-                            style={{ marginRight: "10px", color: "orange" }}
-                          />
-                          {currentCategory(event.categoryEventId)}
-                        </h5>
-                        <p className="event_time">
-                          <FaClock className="icon-time" />
-                          <strong>From:</strong>{" "}
-                          {formatDateTime(event.startTime)}
-                          <br />
-                          <strong>
-                            <FaClock className="icon-time" />
-                            To:
-                          </strong>{" "}
-                          {formatDateTime(event.endTime)}
-                        </p>
-
+                        />
                         <div
-                          className={`status_tag ${
-                            statusEvent(event.startTime, event.endTime) ===
-                            "running"
-                              ? "running_status"
-                              : statusEvent(event.startTime, event.endTime) ===
-                                "not started yet"
-                              ? "not_started_status"
-                              : "ended_status"
-                          }`}
+                          className="belarus_content"
+                          onClick={() => {
+                            const userRole = (
+                              localStorage.getItem("role") || ""
+                            )
+                              .trim()
+                              .toLowerCase();
+                            let targetUrl = `/event-detail-spec/${event.id}`;
+                            if (
+                              userRole === "campus manager" ||
+                              userRole === "event organizer"
+                            ) {
+                              targetUrl = `/event-detail-EOG/${event.id}`;
+                            }
+                            navigate(targetUrl);
+                          }}
                         >
-                          {statusEvent(event.startTime, event.endTime)}
+                          <div
+                            className="heding wow fadeInUp"
+                            onClick={() => {
+                              const userRole = (
+                                localStorage.getItem("role") || ""
+                              )
+                                .trim()
+                                .toLowerCase();
+                              let targetUrl = `/event-detail-spec/${event.id}`;
+                              if (
+                                userRole === "campus manager" ||
+                                userRole === "event organizer"
+                              ) {
+                                targetUrl = `/event-detail-EOG/${event.id}`;
+                              }
+                              navigate(targetUrl);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {event.eventTitle}
+                          </div>
+                          <h5>
+                            <FaMapMarkerAlt className="icon-location" />
+                            {event.placed}
+                          </h5>
+                          <h5>
+                            <MdOutlineCategory
+                              className="icon-category"
+                              style={{ marginRight: "10px", color: "orange" }}
+                            />
+                            {currentCategory(event.categoryEventId)}
+                          </h5>
+                          <p className="event_time">
+                            <FaClock className="icon-time" />
+                            <strong>From:</strong>{" "}
+                            {formatDateTime(event.startTime)}
+                            <br />
+                            <strong>
+                              <FaClock className="icon-time" />
+                              To:
+                            </strong>{" "}
+                            {formatDateTime(event.endTime)}
+                          </p>
+                          <div
+                            className={`status_tag ${
+                              statusEvent(event.startTime, event.endTime) ===
+                              "running"
+                                ? "running_status"
+                                : statusEvent(
+                                    event.startTime,
+                                    event.endTime
+                                  ) === "not started yet"
+                                ? "not_started_status"
+                                : "ended_status"
+                            }`}
+                          >
+                            {statusEvent(event.startTime, event.endTime)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ));
+                })()
               )}
             </div>
 
-            {totalPages > 1 && (
+            {(isFiltered
+              ? filteredTotalPages
+              : eventFilter === "my"
+              ? myEventPages
+              : totalPages) > 1 && (
               <div className="pagination_area" style={{ padding: "30px" }}>
                 <ul className="pagination">
                   <li
@@ -577,7 +805,10 @@ function EventSection() {
                       Prev
                     </button>
                   </li>
-                  {Array.from({ length: totalPages }).map((_, index) => (
+                  {/* This is the key part that needs to be fixed */}
+                  {Array.from({
+                    length: isFiltered ? filteredTotalPages : totalPages,
+                  }).map((_, index) => (
                     <li
                       key={index}
                       className={`page-item ${
@@ -594,7 +825,10 @@ function EventSection() {
                   ))}
                   <li
                     className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
+                      currentPage ===
+                      (isFiltered ? filteredTotalPages : totalPages)
+                        ? "disabled"
+                        : ""
                     }`}
                   >
                     <button

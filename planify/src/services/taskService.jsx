@@ -4,32 +4,94 @@ import Swal from "sweetalert2";
 
 const API_TASK_URL = "https://localhost:44320/api/Tasks";
 
-export const createTaskAPI = async (taskData, token) => {
-  return await axios.post(`${API_TASK_URL}/create`, taskData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
-export const getGroupTasks = async (groupId) => {
-  return await axios.get(`https://your-api-url.com/groups/${groupId}/tasks`);
-};
-export const getListTask = async (eventId, token) => {
-  console.log("api url: " + `${API_TASK_URL}/list/${eventId}`);
-  const response = await fetch(`${API_TASK_URL}/list/${eventId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const createTaskAPI = async (taskData) => {
+  let token = localStorage.getItem("token");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch tasks: " + response.Error);
+  try {
+    const response = await axios.post(
+      `https://localhost:44320/api/Tasks/create`,
+      taskData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.post(
+            `https://localhost:44320/api/Tasks/create`,
+            taskData,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire("Error", "Not found any tasks.", "error");
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Not found any tasks.", "error");
+    return null;
   }
-
-  return response.json();
 };
+const getListTask = async (eventId, page, pageSize) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Tasks/list/${eventId}?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Tasks/list/${eventId}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire("Error", "Not found any tasks.", "error");
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Not found any tasks.", "error");
+    return null;
+  }
+};
+export default getListTask;
+
 export const getSeachListTasks = async (
   page,
   pageSize,
@@ -55,20 +117,91 @@ export const updateAmountBudget = async (taskId, amountBudget, token) => {
     },
   });
 };
-export const updateTask = async (taskId, data, token) => {
-  console.log(`${API_TASK_URL}/update/${taskId}`);
-  return await axios.put(`${API_TASK_URL}/update/${taskId}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const updateTask = async (taskId, data) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Tasks/update/${taskId}`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/Tasks/update/${taskId}`,
+            data,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire("Error", "Not found any tasks.", "error");
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Not found any tasks.", "error");
+    return null;
+  }
 };
-export const deleteTask = async (taskId, token) => {
-  return await axios.put(`${API_TASK_URL}/delete/${taskId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const deleteTask = async (taskId, status) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Tasks/${taskId}/status/${status}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/Tasks/${taskId}/status/${status}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire("Error", "Not found any tasks.", "error");
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Not found any tasks.", "error");
+    return null;
+  }
 };
 export const getTaskById = async (taskId, token) => {
   return await axios.get(`${API_TASK_URL}/${taskId}`, {
