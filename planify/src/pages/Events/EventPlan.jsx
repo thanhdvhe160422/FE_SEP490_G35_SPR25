@@ -1,24 +1,34 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "../../styles/Events/EventPlan.css";
-import { FaChevronLeft, FaChevronRight, FaChevronDown } from "react-icons/fa";
-import { Form, Button, FormLabel } from "react-bootstrap";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaChevronDown,
+  FaPlus,
+} from "react-icons/fa";
+import { Form, Button, FormLabel, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router";
+import { useSnackbar } from "notistack";
+import Swal from "sweetalert2";
+import Header from "../../components/Header/Header";
 
 // Custom hook để lấy campusId và danh sách categories
 const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
-
   const getCampusIdFromToken = useCallback(() => {
     const token = localStorage.getItem("token");
     if (!token) return null;
-
     try {
       const decoded = jwtDecode(token);
-      return decoded.campusId; // Điều chỉnh key nếu cần
+      return decoded.campusId;
     } catch (err) {
-      console.error("Error decoding token:", err);
+      console.error("Lỗi giải mã token:", err);
       return null;
     }
   }, []);
@@ -27,30 +37,23 @@ const useCategories = () => {
     const fetchCategories = async () => {
       const campusId = getCampusIdFromToken();
       if (!campusId) {
-        setError("Cannot retrieve campusId from token. Please log in again.");
+        setError("Không thể lấy campusId từ token. Vui lòng đăng nhập lại.");
         return;
       }
-
       try {
         const response = await axios.get(
-            `https://localhost:44320/api/Categories/${campusId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
+          `https://localhost:44320/api/Categories/${campusId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         setCategories(response.data);
       } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError(
-            err.response?.data?.message ||
-            "Failed to fetch categories. Unable to connect to the server."
-        );
+        setError(err.response?.data?.message || "Lỗi khi lấy danh mục.");
       }
     };
-
     fetchCategories();
   }, [getCampusIdFromToken]);
 
@@ -58,14 +61,14 @@ const useCategories = () => {
 };
 
 export default function EventPlan() {
-  // State cho navigation
   const [index, setIndex] = useState(0);
   const screens = useRef([]);
   const dots = useRef([]);
   const modalRef = useRef(null);
   const shadeRef = useRef(null);
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
-  // State cho form
   const [formData, setFormData] = useState({
     eventTitle: "",
     categoryEventId: 0,
@@ -76,11 +79,10 @@ export default function EventPlan() {
     goals: "",
     targetAudience: "",
     sizeParticipants: 0,
-    promotionalPlan: {
-      before: "",
-      during: "",
-      after: "",
-    },
+    description: "",
+    measuringSuccess: "",
+    monitoringProcess: "",
+    promotionalPlan: { before: "", during: "", after: "" },
     tasks: [
       {
         taskName: "",
@@ -91,38 +93,29 @@ export default function EventPlan() {
         subtasks: [],
       },
     ],
-    budgetRows: Array.from({ length: 5 }, () => ({
-      name: "",
-      quantity: 0,
-      price: 0,
-      total: 0,
-    })),
+    budgetRows: Array(5)
+      .fill()
+      .map(() => ({ name: "", quantity: 0, price: 0, total: 0 })),
     risks: [{ reason: "", description: "", solution: "" }],
   });
 
-  // State phụ trợ
   const [minDateTime, setMinDateTime] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [customValue, setCustomValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // Sử dụng custom hook để lấy categories
   const { categories, error } = useCategories();
+  const [selectedImages, setSelectedImages] = useState([]);
 
-  // Thiết lập thời gian tối thiểu cho datetime input
   useEffect(() => {
     const now = new Date();
-    const offset = now.getTimezoneOffset();
-    const localTime = new Date(now.getTime() - offset * 60 * 1000);
-    setMinDateTime(localTime.toISOString().slice(0, 16));
+    setMinDateTime(now.toISOString().slice(0, 16));
   }, []);
 
-  // Xử lý thay đổi dữ liệu form
+  // Xử lý form
   const handleFormChange = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // Xử lý thay đổi kế hoạch truyền thông
   const handlePromotionalPlanChange = useCallback((subField, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -177,14 +170,17 @@ export default function EventPlan() {
     });
   }, []);
 
-  const handleSubtaskChange = useCallback((taskIndex, subIndex, field, value) => {
-    setFormData((prev) => {
-      const updated = [...prev.tasks];
-      updated[taskIndex].subtasks[subIndex][field] =
+  const handleSubtaskChange = useCallback(
+    (taskIndex, subIndex, field, value) => {
+      setFormData((prev) => {
+        const updated = [...prev.tasks];
+        updated[taskIndex].subtasks[subIndex][field] =
           field === "amount" ? Number(value) : value;
-      return { ...prev, tasks: updated };
-    });
-  }, []);
+        return { ...prev, tasks: updated };
+      });
+    },
+    []
+  );
 
   const handleRemoveTask = useCallback((index) => {
     setFormData((prev) => {
@@ -215,30 +211,35 @@ export default function EventPlan() {
   const updateQuantity = useCallback((index, delta) => {
     setFormData((prev) => {
       const updated = [...prev.budgetRows];
-      const newQuantity = Math.max(0, updated[index].quantity + delta);
-      updated[index].quantity = newQuantity;
-      updated[index].total = newQuantity * updated[index].price;
+      updated[index].quantity = Math.max(0, updated[index].quantity + delta);
+      updated[index].total = updated[index].quantity * updated[index].price;
       return { ...prev, budgetRows: updated };
     });
   }, []);
 
   // Xử lý size participants
-  const handleSelectChange = useCallback((e) => {
-    const value = e.target.value;
-    setSelectedOption(value);
-    if (value !== "other") {
-      setCustomValue("");
-      handleFormChange("sizeParticipants", Number(value));
-    } else {
-      handleFormChange("sizeParticipants", 0);
-    }
-  }, [handleFormChange]);
+  const handleSelectChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSelectedOption(value);
+      if (value !== "other") {
+        setCustomValue("");
+        handleFormChange("sizeParticipants", Number(value));
+      } else {
+        handleFormChange("sizeParticipants", 0);
+      }
+    },
+    [handleFormChange]
+  );
 
-  const handleCustomValueChange = useCallback((e) => {
-    const value = e.target.value;
-    setCustomValue(value);
-    handleFormChange("sizeParticipants", Number(value));
-  }, [handleFormChange]);
+  const handleCustomValueChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setCustomValue(value);
+      handleFormChange("sizeParticipants", Number(value));
+    },
+    [handleFormChange]
+  );
 
   // Xử lý risks
   const handleRiskChange = useCallback((index, field, value) => {
@@ -264,7 +265,7 @@ export default function EventPlan() {
     });
   }, []);
 
-  // Navigation logic
+  // Navigation
   const indexMax = () => screens.current.length - 1;
 
   const goTo = useCallback((i) => {
@@ -274,9 +275,7 @@ export default function EventPlan() {
     dots.current[i]?.classList.add("active");
   }, []);
 
-  const updateScreen = useCallback((i) => {
-    goTo(i);
-  }, [goTo]);
+  const updateScreen = useCallback((i) => goTo(i), [goTo]);
 
   const closeModal = useCallback(() => {
     modalRef.current?.classList.remove("reveal");
@@ -300,26 +299,15 @@ export default function EventPlan() {
   }, [index, updateScreen]);
 
   const handleKeyDown = useCallback(
-      (e) => {
-        if (e.key === "ArrowLeft" && index > 0) {
-          setIndex((i) => {
-            const newIndex = i - 1;
-            updateScreen(newIndex);
-            return newIndex;
-          });
-        } else if (e.key === "ArrowRight" && index < indexMax()) {
-          setIndex((i) => {
-            const newIndex = i + 1;
-            updateScreen(newIndex);
-            return newIndex;
-          });
-        } else if (e.key === "ArrowUp") {
-          openModal();
-        } else if (e.key === "ArrowDown") {
-          closeModal();
-        }
-      },
-      [index, updateScreen, openModal, closeModal]
+    (e) => {
+      if (e.key === "ArrowLeft" && index > 0)
+        setIndex((i) => Math.max(0, i - 1));
+      else if (e.key === "ArrowRight" && index < indexMax())
+        setIndex((i) => Math.min(i + 1, indexMax()));
+      else if (e.key === "ArrowUp") openModal();
+      else if (e.key === "ArrowDown") closeModal();
+    },
+    [index, openModal, closeModal]
   );
 
   useEffect(() => {
@@ -330,569 +318,813 @@ export default function EventPlan() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [openModal, handleKeyDown]);
 
-  // Gửi dữ liệu lên server
+  useEffect(() => {
+    if (screens.current.length > 0 && dots.current.length > 0)
+      updateScreen(index);
+  }, [index, updateScreen]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  // Chuẩn bị dữ liệu gửi lên server
+  const prepareEventData = useCallback(() => {
+    const currentTime = new Date().toISOString();
+    const promotionalPlanString = [
+      formData.promotionalPlan.before,
+      formData.promotionalPlan.during,
+      formData.promotionalPlan.after,
+    ]
+      .filter(Boolean)
+      .join(" - ");
+
+    return {
+      EventTitle: formData.eventTitle,
+      EventDescription: formData.description,
+      StartTime: formData.startTime
+        ? new Date(formData.startTime).toISOString()
+        : null,
+      EndTime: formData.endTime
+        ? new Date(formData.endTime).toISOString()
+        : null,
+      CategoryEventId: formData.categoryEventId,
+      Placed: formData.placed,
+      MeasuringSuccess: formData.measuringSuccess,
+      Goals: formData.goals,
+      MonitoringProcess: formData.monitoringProcess,
+      SizeParticipants: formData.sizeParticipants,
+      PromotionalPlan: promotionalPlanString,
+      TargetAudience: formData.targetAudience,
+      SloganEvent: formData.sloganEvent,
+      Tasks: formData.tasks
+        .filter((task) => task.taskName.trim())
+        .map((task) => ({
+          TaskName: task.taskName,
+          Description: task.description,
+          StartTime: currentTime,
+          Deadline: task.deadline
+            ? new Date(task.deadline).toISOString()
+            : null,
+          Budget: task.budget,
+          SubTasks: task.subtasks
+            .filter((sub) => sub.subtaskName.trim())
+            .map((subtask) => ({
+              SubTaskName: subtask.subtaskName,
+              Description: subtask.description,
+              StartTime: currentTime,
+              Deadline: subtask.deadline
+                ? new Date(subtask.deadline).toISOString()
+                : null,
+              Budget: subtask.amount,
+            })),
+        })),
+      Risks: formData.risks
+        .filter(
+          (risk) =>
+            risk.reason.trim() ||
+            risk.description.trim() ||
+            risk.solution.trim()
+        )
+        .map((risk, index) => ({
+          Name: `Risk ${index + 1}`,
+          Reason: risk.reason,
+          Solution: risk.solution,
+          Description: risk.description,
+        })),
+      CostBreakdowns: formData.budgetRows
+        .filter((row) => row.name.trim() && row.quantity > 0 && row.price > 0)
+        .map((row) => ({
+          Name: row.name,
+          Quantity: row.quantity,
+          PriceByOne: row.price,
+        })),
+    };
+  }, [formData]);
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setSelectedImages([...selectedImages, ...files]);
+    event.target.value = null;
+  };
+
+  const handleUploadImages = async (eventId, token) => {
+    if (selectedImages.length === 0) return;
+
+    const formData = new FormData();
+    selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
+    formData.append("eventId", eventId);
+    try {
+      await axios.post(
+        "https://localhost:44320/api/Events/upload-image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Image upload failed:", error.response?.data);
+      enqueueSnackbar("Image upload failed. You can try uploading manually.", {
+        variant: "warning",
+      });
+    }
+  };
+
+  // Validation chung
+  const validateForm = useCallback(() => {
+    if (!formData.eventTitle) return "Tên sự kiện là bắt buộc!";
+    if (!formData.startTime || !formData.endTime)
+      return "Thời gian bắt đầu và kết thúc là bắt buộc!";
+    if (new Date(formData.startTime) >= new Date(formData.endTime))
+      return "Thời gian bắt đầu phải sớm hơn thời gian kết thúc!";
+    if (!formData.categoryEventId) return "Loại hình sự kiện là bắt buộc!";
+    if (!formData.placed) return "Địa điểm tổ chức là bắt buộc!";
+    if (!formData.tasks.some((task) => task.taskName.trim()))
+      return "Phải có ít nhất một task!";
+    return null;
+  }, [formData]);
+
+  // Gửi yêu cầu tạo sự kiện
   const handleSubmit = useCallback(async () => {
-    // Validation
-    if (!formData.eventTitle) {
-      alert("Event title is required!");
+    const validationError = validateForm();
+    if (validationError) {
+      enqueueSnackbar(validationError, { variant: "error" });
       return;
     }
-    if (!formData.startTime || !formData.endTime) {
-      alert("Start time and end time are required!");
-      return;
-    }
-    if (new Date(formData.startTime) >= new Date(formData.endTime)) {
-      alert("Start time must be earlier than end time!");
-      return;
-    }
-    if (!formData.categoryEventId) {
-      alert("Event category is required!");
-      return;
-    }
+
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This event will be sent to the Campus Manager for approval.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, create it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     setIsLoading(true);
     try {
-      const eventData = {
-        eventTitle: formData.eventTitle,
-        eventDescription: "",
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        categoryEventId: formData.categoryEventId,
-        placed: formData.placed,
-        measuringSuccess: "",
-        goals: formData.goals,
-        monitoringProcess: "",
-        sizeParticipants: formData.sizeParticipants,
-        promotionalPlan: JSON.stringify(formData.promotionalPlan),
-        targetAudience: formData.targetAudience,
-        sloganEvent: formData.sloganEvent,
-        tasks: formData.tasks.map((task) => ({
-          taskName: task.taskName,
-          description: task.description,
-          startTime: null,
-          deadline: task.deadline ? new Date(task.deadline).toISOString() : null,
-          budget: task.budget,
-          subTasks: task.subtasks.map((subtask) => ({
-            subTaskName: subtask.subtaskName,
-            description: subtask.description,
-            startTime: null,
-            deadline: subtask.deadline ? new Date(subtask.deadline).toISOString() : null,
-            budget: subtask.amount,
-          })),
-        })),
-        risks: formData.risks.map((risk, index) => ({
-          name: `Risk ${index + 1}`,
-          reason: risk.reason,
-          solution: risk.solution,
-          description: risk.description,
-        })),
-        costBreakdowns: formData.budgetRows
-            .filter((row) => row.name && row.quantity > 0 && row.price > 0)
-            .map((row) => ({
-              name: row.name,
-              quantity: row.quantity,
-              priceByOne: row.price,
-            })),
-      };
-
+      const eventData = prepareEventData();
       const response = await axios.post(
-          "https://localhost:44320/api/Events/create",
-          eventData,
+        "https://localhost:44320/api/Events/create",
+        eventData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const eventId = response.data.result?.id || 0;
+      await handleUploadImages(eventId, localStorage.getItem("token"));
+
+      if (response.status === 201) {
+        await axios.post(
+          "https://localhost:44320/api/SendRequest",
+          { eventId },
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
-      );
+        );
 
-      alert("Event created successfully!");
-      console.log(response.data);
-      closeModal();
+        await Swal.fire({
+          title: "Created!",
+          text: "Your event has been successfully submitted.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        closeModal();
+        navigate("/home");
+      } else {
+        enqueueSnackbar(
+          `Tạo sự kiện thất bại với mã trạng thái: ${response.status}`,
+          { variant: "error" }
+        );
+      }
     } catch (error) {
-      console.error("Error creating event:", error);
-      alert(
-          error.response?.data?.message ||
-          "Failed to create event. Unable to connect to the server."
-      );
+      enqueueSnackbar(error.response?.data?.message || "Lỗi khi tạo sự kiện!", {
+        variant: "error",
+      });
+      console.error("Lỗi chi tiết:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [formData, closeModal]);
+  }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
-  // Hiển thị lỗi từ API nếu có
-  useEffect(() => {
-    if (error) {
-      alert(error);
-    }
-  }, [error]);
+  // Gửi yêu cầu lưu bản nháp
+  const handleSaveDraft = useCallback(() => {
+    Swal.fire({
+      title: "Do you want to save the changes?",
+      showDenyButton: true,
+      confirmButtonText: "Save",
+      denyButtonText: `Don't save`,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const validationError = validateForm();
+        if (validationError) {
+          enqueueSnackbar(validationError, { variant: "error" });
+          return;
+        }
+
+        setIsLoading(true);
+        try {
+          const eventData = prepareEventData();
+          const response = await axios.post(
+            "https://localhost:44320/api/Events/create",
+            eventData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+
+          await handleUploadImages(
+            response.data.result?.id,
+            localStorage.getItem("token")
+          );
+
+          Swal.fire({
+            title: "Saved!",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+            willClose: () => {
+              closeModal();
+              navigate("/home");
+            },
+          });
+        } catch (error) {
+          enqueueSnackbar(
+            error.response?.data?.message || "Lỗi khi lưu bản nháp!",
+            { variant: "error" }
+          );
+          console.error("Lỗi chi tiết:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (result.isDenied) {
+        Swal.fire({
+          title: "Changes are not saved",
+          icon: "info",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    });
+  }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
   return (
-      <div className="working-container">
-        <div className="walkthrough show reveal">
-          <div className="walkthrough-body">
-            <ul style={{ marginTop: "30px" }} className="screens animate">
-              {/* Màn hình 1: Thông Tin Chung */}
-              <li className="screen active">
-                <h3>Thông Tin Chung</h3>
-                <Form className="w-75 mx-auto text-start">
-                  <Form.Group controlId="formEventTitle" className="mb-3">
-                    <Form.Label>Tên sự kiện</Form.Label>
+   <>
+    <Header/>
+    <div className="working-container">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="walkthrough show reveal" ref={modalRef}>
+        <div className="walkthrough-body">
+          <ul style={{ marginTop: "30px" }} className="screens animate">
+            {/* Màn hình 1: Thông Tin Chung */}
+            <li className="screen active">
+              <h3 className="text-primary">Thông Tin Chung</h3>
+              <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Tên sự kiện <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nhập tên sự kiện"
+                    value={formData.eventTitle}
+                    onChange={(e) =>
+                      handleFormChange("eventTitle", e.target.value)
+                    }
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3 position-relative">
+                  <Form.Label>
+                    Loại hình sự kiện <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={formData.categoryEventId}
+                    onChange={(e) =>
+                      handleFormChange(
+                        "categoryEventId",
+                        Number(e.target.value)
+                      )
+                    }
+                  >
+                    <option value={0} disabled>
+                      Chọn loại hình
+                    </option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.categoryEventName}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Thời gian bắt đầu <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="datetime-local"
+                    min={minDateTime}
+                    value={formData.startTime}
+                    onChange={(e) =>
+                      handleFormChange("startTime", e.target.value)
+                    }
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Thời gian kết thúc <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="datetime-local"
+                    min={formData.startTime || minDateTime}
+                    value={formData.endTime}
+                    onChange={(e) =>
+                      handleFormChange("endTime", e.target.value)
+                    }
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    Địa điểm tổ chức <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nhập địa điểm"
+                    value={formData.placed}
+                    onChange={(e) => handleFormChange("placed", e.target.value)}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Thông điệp sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    placeholder="Nhập thông điệp"
+                    value={formData.sloganEvent}
+                    onChange={(e) =>
+                      handleFormChange("sloganEvent", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "80px" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Mô tả sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Nhập mô tả"
+                    value={formData.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
+              </Form>
+            </li>
+
+            {/* Màn hình 2: Mục Tiêu Sự Kiện */}
+            <li className="screen">
+              <h3 className="text-primary">Mục Tiêu Sự Kiện</h3>
+              <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+                <Form.Group className="mb-3">
+                  <Form.Label>Mục tiêu</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Nhập mục tiêu"
+                    value={formData.goals}
+                    onChange={(e) => handleFormChange("goals", e.target.value)}
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Đối tượng tham gia</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Nhập đối tượng"
+                    value={formData.targetAudience}
+                    onChange={(e) =>
+                      handleFormChange("targetAudience", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Số lượng người tham gia</Form.Label>
+                  <Form.Select
+                    value={selectedOption}
+                    onChange={handleSelectChange}
+                  >
+                    <option value="">Chọn số lượng</option>
+                    <option value="50">50 người</option>
+                    <option value="100">100 người</option>
+                    <option value="200">200 người</option>
+                    <option value="other">Khác</option>
+                  </Form.Select>
+                  {selectedOption === "other" && (
                     <Form.Control
-                        type="text"
-                        placeholder="Nhập tên sự kiện"
-                        value={formData.eventTitle}
-                        onChange={(e) => handleFormChange("eventTitle", e.target.value)}
+                      className="mt-2"
+                      type="number"
+                      placeholder="Nhập số lượng"
+                      value={customValue}
+                      onChange={handleCustomValueChange}
                     />
-                  </Form.Group>
+                  )}
+                </Form.Group>
 
-                  <Form.Group controlId="formCategory" className="mb-3 position-relative">
-                    <Form.Label>Loại hình sự kiện</Form.Label>
-                    <div className="dropdown-wrapper">
-                      <Form.Control
-                          as="select"
-                          value={formData.categoryEventId}
-                          onChange={(e) =>
-                              handleFormChange("categoryEventId", Number(e.target.value))
-                          }
-                          className="custom-select-with-icon"
-                      >
-                        <option value={0} disabled>
-                          Chọn loại hình sự kiện
-                        </option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.categoryEventName}
-                            </option>
-                        ))}
-                      </Form.Control>
-                      <FaChevronDown className="dropdown-icon" />
-                    </div>
-                  </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Đo lường thành công</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nhập cách đo lường"
+                    value={formData.measuringSuccess}
+                    onChange={(e) =>
+                      handleFormChange("measuringSuccess", e.target.value)
+                    }
+                  />
+                </Form.Group>
+              </Form>
+            </li>
 
-                  <Form.Group controlId="formStartTime" className="mb-3">
-                    <Form.Label>Thời gian bắt đầu</Form.Label>
-                    <Form.Control
-                        type="datetime-local"
-                        min={minDateTime}
-                        value={formData.startTime}
-                        onChange={(e) => handleFormChange("startTime", e.target.value)}
-                        required
-                    />
-                  </Form.Group>
-
-                  <Form.Group controlId="formEndTime" className="mb-3">
-                    <Form.Label>Thời gian kết thúc</Form.Label>
-                    <Form.Control
-                        type="datetime-local"
-                        min={minDateTime}
-                        value={formData.endTime}
-                        onChange={(e) => handleFormChange("endTime", e.target.value)}
-                        required
-                    />
-                  </Form.Group>
-
-                  <Form.Group controlId="formPlaced" className="mb-3">
-                    <Form.Label>Địa điểm tổ chức</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập địa điểm"
-                        value={formData.placed}
-                        onChange={(e) => handleFormChange("placed", e.target.value)}
-                    />
-                  </Form.Group>
-
-                  <Form.Group controlId="formSlogan" className="mb-3">
-                    <Form.Label>Thông điệp của sự kiện</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={1}
-                        placeholder="Nhập thông điệp của sự kiện"
-                        value={formData.sloganEvent}
-                        onChange={(e) => handleFormChange("sloganEvent", e.target.value)}
-                        onInput={(e) => {
-                          e.target.style.height = "auto";
-                          e.target.style.height = `${e.target.scrollHeight}px`;
-                        }}
-                        style={{
-                          overflow: "hidden",
-                          resize: "none",
-                          minHeight: "60px",
-                          lineHeight: "1.5",
-                          transition: "height 0.2s ease",
-                        }}
-                    />
-                  </Form.Group>
-                </Form>
-              </li>
-
-              {/* Màn hình 2: Mục Tiêu Sự Kiện */}
-              <li className="screen">
-                <div className="media books"></div>
-                <h3>MỤC TIÊU SỰ KIỆN</h3>
-                <Form className="w-75 mx-auto text-start">
-                  <Form.Group controlId="formGoals" className="mb-3">
-                    <Form.Label>Mục tiêu của sự kiện</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập mục tiêu"
-                        value={formData.goals}
-                        onChange={(e) => handleFormChange("goals", e.target.value)}
-                    />
-                  </Form.Group>
-
-                  <Form.Group controlId="formTargetAudience" className="mb-3">
-                    <Form.Label>Ai là người tham gia</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập đối tượng tham gia"
-                        value={formData.targetAudience}
-                        onChange={(e) => handleFormChange("targetAudience", e.target.value)}
-                    />
-                  </Form.Group>
-
-                  <Form.Group controlId="formSizeParticipants" className="mb-3">
-                    <Form.Label>Dự kiến bao nhiêu người</Form.Label>
-                    <Form.Select value={selectedOption} onChange={handleSelectChange}>
-                      <option value="">Chọn số lượng</option>
-                      <option value="50">50 người</option>
-                      <option value="100">100 người</option>
-                      <option value="200">200 người</option>
-                      <option value="other">Khác</option>
-                    </Form.Select>
-
-                    {selectedOption === "other" && (
+            {/* Màn hình 3: Task & Sub-task */}
+            <li className="screen">
+              <h3 className="text-primary">Task & Sub-task</h3>
+              <Button variant="outline-primary mb-3" onClick={handleAddTask}>
+                + Thêm Công Việc
+              </Button>
+              <div className="w-100 mt-3">
+                {formData.tasks.map((task, i) => (
+                  <div
+                    key={i}
+                    className="mb-4 p-4 border rounded bg-light shadow"
+                  >
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <div className="d-flex align-items-center gap-2">
+                        <Button
+                          variant="link"
+                          className="p-0"
+                          onClick={() => toggleExpand(i)}
+                        >
+                          {task.expanded ? (
+                            <FaChevronDown />
+                          ) : (
+                            <FaChevronRight />
+                          )}
+                        </Button>
                         <Form.Control
-                            className="mt-2"
-                            type="number"
-                            placeholder="Nhập số lượng người"
-                            value={customValue}
-                            onChange={handleCustomValueChange}
+                          type="text"
+                          value={task.taskName}
+                          onChange={(e) =>
+                            handleTaskChange(i, "taskName", e.target.value)
+                          }
+                          placeholder="Tên Task"
+                          className="fw-bold"
                         />
-                    )}
-                  </Form.Group>
-                </Form>
-              </li>
+                      </div>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleRemoveTask(i)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
 
-              {/* Màn hình 3: Task & Sub-task */}
-              <li className="screen">
-                <h3>Task & Sub-task</h3>
-                <Button variant="light" onClick={handleAddTask}>
-                  Create Work
-                </Button>
-                <div className="w-100 mt-3">
-                  {formData.tasks.map((task, i) => (
-                      <div key={i} className="mb-4 p-3 border rounded bg-light">
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div className="d-flex align-items-center gap-2">
-                            <Button
-                                variant="link"
-                                className="p-0 text-dark"
-                                onClick={() => toggleExpand(i)}
-                            >
-                              {task.expanded ? <FaChevronDown /> : <FaChevronRight />}
-                            </Button>
-                            <Form.Control
-                                type="text"
-                                value={task.taskName}
-                                onChange={(e) => handleTaskChange(i, "taskName", e.target.value)}
-                                placeholder="Task Name"
-                                className="fw-semibold"
-                            />
+                    <div className="row">
+                      <Form.Group className="col-md-4 mb-3">
+                        <Form.Label>
+                          Hạn chót <span className="text-danger">*</span>
+                        </Form.Label>
+                        <Form.Control
+                          type="datetime-local"
+                          value={task.deadline}
+                          min={minDateTime}
+                          onChange={(e) =>
+                            handleTaskChange(i, "deadline", e.target.value)
+                          }
+                        />
+                      </Form.Group>
+                      <Form.Group className="col-md-4 mb-3">
+                        <Form.Label>Ngân sách</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={task.budget.toLocaleString("vi-VN")}
+                          onChange={(e) =>
+                            handleTaskChange(
+                              i,
+                              "budget",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                        />
+                      </Form.Group>
+                      <Form.Group className="col-md-4 mb-3">
+                        <Form.Label>Mô tả</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={2}
+                          value={task.description}
+                          onChange={(e) =>
+                            handleTaskChange(i, "description", e.target.value)
+                          }
+                          style={{ resize: "vertical", minHeight: "80px" }}
+                        />
+                      </Form.Group>
+                    </div>
+
+                    {task.expanded && (
+                      <div className="mt-3 border-top pt-3">
+                        <h6 className="text-danger">Subtasks</h6>
+                        {task.subtasks.map((sub, j) => (
+                          <div key={j} className="row mb-3 align-items-start">
+                            <Form.Group className="col-md-3">
+                              <Form.Label>Tên Subtask</Form.Label>
+                              <Form.Control
+                                value={sub.subtaskName}
+                                onChange={(e) =>
+                                  handleSubtaskChange(
+                                    i,
+                                    j,
+                                    "subtaskName",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Tên Subtask"
+                              />
+                            </Form.Group>
+                            <Form.Group className="col-md-3">
+                              <Form.Label>Hạn chót</Form.Label>
+                              <Form.Control
+                                type="datetime-local"
+                                value={sub.deadline}
+                                min={minDateTime}
+                                onChange={(e) =>
+                                  handleSubtaskChange(
+                                    i,
+                                    j,
+                                    "deadline",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </Form.Group>
+                            <Form.Group className="col-md-2">
+                              <Form.Label>Số tiền</Form.Label>
+                              <Form.Control
+                                value={sub.amount.toLocaleString("vi-VN")}
+                                onChange={(e) =>
+                                  handleSubtaskChange(
+                                    i,
+                                    j,
+                                    "amount",
+                                    e.target.value.replace(/\D/g, "")
+                                  )
+                                }
+                              />
+                            </Form.Group>
+                            <Form.Group className="col-md-3">
+                              <Form.Label>Mô tả</Form.Label>
+                              <Form.Control
+                                as="textarea"
+                                rows={2}
+                                value={sub.description}
+                                onChange={(e) =>
+                                  handleSubtaskChange(
+                                    i,
+                                    j,
+                                    "description",
+                                    e.target.value
+                                  )
+                                }
+                                style={{
+                                  resize: "vertical",
+                                  minHeight: "80px",
+                                }}
+                              />
+                            </Form.Group>
+                            <div className="col-md-1 text-end">
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleRemoveSubtask(i, j)}
+                              >
+                                ✕
+                              </Button>
+                            </div>
                           </div>
+                        ))}
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => handleAddSubtask(i)}
+                        >
+                          + Thêm Subtask
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </li>
+
+            {/* Màn hình 4: Dự Trù Kinh Phí */}
+            <li className="screen">
+              <h3 className="text-primary">Dự Trù Kinh Phí</h3>
+              <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
+                <table className="table table-bordered table-hover">
+                  <thead className="table-primary">
+                    <tr>
+                      <th>STT</th>
+                      <th>Tên</th>
+                      <th>Đơn giá (VNĐ)</th>
+                      <th>Số lượng</th>
+                      <th>Tổng (VNĐ)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.budgetRows.map((row, i) => (
+                      <tr key={i}>
+                        <td>{i + 1}</td>
+                        <td>
+                          <Form.Control
+                            value={row.name}
+                            onChange={(e) =>
+                              handleBudgetChange(i, "name", e.target.value)
+                            }
+                            placeholder="Nhập tên"
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            value={row.price.toLocaleString("vi-VN")}
+                            onChange={(e) =>
+                              handleBudgetChange(
+                                i,
+                                "price",
+                                e.target.value.replace(/\D/g, "")
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="d-flex align-items-center gap-2">
                           <Button
-                              className="btn btn-sm btn-danger"
-                              onClick={() => handleRemoveTask(i)}
+                            variant="outline-secondary"
+                            size="sm"
+                            onClick={() => updateQuantity(i, -1)}
+                          >
+                            -
+                          </Button>
+                          <Form.Control
+                            type="number"
+                            value={row.quantity}
+                            onChange={(e) =>
+                              handleBudgetChange(i, "quantity", e.target.value)
+                            }
+                            style={{ width: "60px", textAlign: "center" }}
+                          />
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            onClick={() => updateQuantity(i, 1)}
+                          >
+                            +
+                          </Button>
+                        </td>
+                        <td>{row.total.toLocaleString("vi-VN")}</td>
+                        <td>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => {
+                              const updated = [...formData.budgetRows];
+                              updated.splice(i, 1);
+                              setFormData((prev) => ({
+                                ...prev,
+                                budgetRows: updated,
+                              }));
+                            }}
                           >
                             ✕
                           </Button>
-                        </div>
-
-                        <div className="task-main-info">
-                          <div className="form-group">
-                            <Form.Label>Deadline</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={task.deadline}
-                                onChange={(e) => handleTaskChange(i, "deadline", e.target.value)}
-                            />
-                          </div>
-                          <div className="form-group">
-                            <Form.Label>Budget</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={task.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                                onChange={(e) =>
-                                    handleTaskChange(i, "budget", e.target.value.replace(/\D/g, ""))
-                                }
-                            />
-                          </div>
-                          <div className="form-group">
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control
-                                style={{ marginBottom: "0" }}
-                                as="textarea"
-                                rows={3}
-                                className="description-box"
-                                value={task.description}
-                                onChange={(e) =>
-                                    handleTaskChange(i, "description", e.target.value)
-                                }
-                            />
-                          </div>
-                        </div>
-
-                        {task.expanded && (
-                            <div className="mt-3 border-top pt-3">
-                              <h6
-                                  style={{
-                                    color: "red",
-                                    marginBottom: "50px",
-                                    marginRight: "100%",
-                                    marginTop: "20px",
-                                  }}
-                              >
-                                Subtasks
-                              </h6>
-                              {task.subtasks.map((sub, j) => (
-                                  <div key={j} className="row mb-2 align-items-start">
-                                    <div className="col-md-3">
-                                      <FormLabel>Sub-task Name</FormLabel>
-                                      <Form.Control
-                                          placeholder="Subtask Name"
-                                          value={sub.subtaskName}
-                                          onChange={(e) =>
-                                              handleSubtaskChange(i, j, "subtaskName", e.target.value)
-                                          }
-                                      />
-                                    </div>
-                                    <div className="col-md-2">
-                                      <FormLabel>Deadline</FormLabel>
-                                      <Form.Control
-                                          type="date"
-                                          value={sub.deadline}
-                                          onChange={(e) =>
-                                              handleSubtaskChange(i, j, "deadline", e.target.value)
-                                          }
-                                      />
-                                    </div>
-                                    <div className="col-md-2">
-                                      <FormLabel>Amount</FormLabel>
-                                      <Form.Control
-                                          type="text"
-                                          placeholder="Số tiền"
-                                          value={sub.amount
-                                              .toString()
-                                              .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                                          onChange={(e) =>
-                                              handleSubtaskChange(
-                                                  i,
-                                                  j,
-                                                  "amount",
-                                                  e.target.value.replace(/\D/g, "")
-                                              )
-                                          }
-                                      />
-                                    </div>
-                                    <div className="col-md-4">
-                                      <FormLabel>Description</FormLabel>
-                                      <Form.Control
-                                          as="textarea"
-                                          rows={3}
-                                          className="description-box"
-                                          placeholder="Description"
-                                          value={sub.description}
-                                          onChange={(e) =>
-                                              handleSubtaskChange(i, j, "description", e.target.value)
-                                          }
-                                      />
-                                    </div>
-                                    <div className="col-md-1 text-end">
-                                      <Button
-                                          variant="danger"
-                                          size="sm"
-                                          onClick={() => handleRemoveSubtask(i, j)}
-                                      >
-                                        ✕
-                                      </Button>
-                                    </div>
-                                  </div>
-                              ))}
-                              <Button
-                                  size="sm"
-                                  variant="outline-primary"
-                                  onClick={() => handleAddSubtask(i)}
-                              >
-                                Create subtask
-                              </Button>
-                            </div>
-                        )}
-                      </div>
-                  ))}
-                </div>
-              </li>
-
-              {/* Màn hình 4: Dự Trù Kinh Phí */}
-              <li className="screen">
-                <div className="media comm"></div>
-                <h3>DỰ TRÙ KINH PHÍ</h3>
-                <div className="w-100 mx-auto text-start">
-                  <table className="table table-bordered">
-                    <thead>
-                    <tr>
-                      <th>STT</th>
-                      <th>Name</th>
-                      <th>PriceByOne</th>
-                      <th>Quantity</th>
-                      <th>Total</th>
-                      <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {formData.budgetRows.map((row, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={row.name}
-                                onChange={(e) =>
-                                    handleBudgetChange(index, "name", e.target.value)
-                                }
-                                placeholder="Nhập tên"
-                            />
-                          </td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={row.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                                onChange={(e) =>
-                                    handleBudgetChange(
-                                        index,
-                                        "price",
-                                        e.target.value.replace(/\D/g, "")
-                                    )
-                                }
-                            />
-                          </td>
-                          <td className="d-flex align-items-center gap-2">
-                            <button
-                                className="btn btn-sm btn-outline-secondary"
-                                onClick={() => updateQuantity(index, -1)}
-                            >
-                              -
-                            </button>
-                            <input
-                                type="number"
-                                className="form-control text-center"
-                                style={{ width: "60px" }}
-                                min="0"
-                                value={row.quantity}
-                                onChange={(e) =>
-                                    handleBudgetChange(index, "quantity", e.target.value)
-                                }
-                            />
-                            <button
-                                className="btn btn-sm btn-outline-secondary"
-                                onClick={() => updateQuantity(index, 1)}
-                            >
-                              +
-                            </button>
-                          </td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={row.total.toLocaleString("vi-VN")}
-                                readOnly
-                            />
-                          </td>
-                          <td className="text-center">
-                            <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() => {
-                                  const updated = [...formData.budgetRows];
-                                  updated.splice(index, 1);
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    budgetRows: updated,
-                                  }));
-                                }}
-                            >
-                              ✕
-                            </button>
-                          </td>
-                        </tr>
+                        </td>
+                      </tr>
                     ))}
                     <tr>
                       <td colSpan="6" className="text-center">
-                        <button
-                            className="btn btn-outline-primary"
-                            onClick={() =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  budgetRows: [
-                                    ...prev.budgetRows,
-                                    { name: "", quantity: 0, price: 0, total: 0 },
-                                  ],
-                                }))
-                            }
+                        <Button
+                          variant="outline-primary"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              budgetRows: [
+                                ...prev.budgetRows,
+                                { name: "", quantity: 0, price: 0, total: 0 },
+                              ],
+                            }))
+                          }
                         >
                           + Thêm Chi Phí
-                        </button>
+                        </Button>
                       </td>
                     </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </li>
+                  </tbody>
+                </table>
+              </div>
+            </li>
 
-              {/* Màn hình 5: Kế Hoạch Truyền Thông */}
-              <li className="screen">
-                <div className="media comm"></div>
-                <h3>KẾ HOẠCH TRUYỀN THÔNG</h3>
-                <Form className="w-75 mx-auto text-start">
-                  <Form.Group controlId="formPromotionalBefore" className="mb-3">
-                    <Form.Label>Kế hoạch trước sự kiện</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập kế hoạch trước sự kiện"
-                        value={formData.promotionalPlan.before}
-                        onChange={(e) => handlePromotionalPlanChange("before", e.target.value)}
-                    />
-                  </Form.Group>
+            {/* Màn hình 5: Kế Hoạch */}
+            <li className="screen">
+              <h3 className="text-primary">Kế Hoạch</h3>
+              <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+                <Form.Group className="mb-3">
+                  <Form.Label>Quy trình giám sát</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={formData.monitoringProcess}
+                    onChange={(e) =>
+                      handleFormChange("monitoringProcess", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
 
-                  <Form.Group controlId="formPromotionalDuring" className="mb-3">
-                    <Form.Label>Kế hoạch trong sự kiện</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập kế hoạch trong sự kiện"
-                        value={formData.promotionalPlan.during}
-                        onChange={(e) => handlePromotionalPlanChange("during", e.target.value)}
-                    />
-                  </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Kế hoạch trước sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={formData.promotionalPlan.before}
+                    onChange={(e) =>
+                      handlePromotionalPlanChange("before", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
 
-                  <Form.Group controlId="formPromotionalAfter" className="mb-3">
-                    <Form.Label>Kế hoạch sau sự kiện</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Nhập kế hoạch sau sự kiện"
-                        value={formData.promotionalPlan.after}
-                        onChange={(e) => handlePromotionalPlanChange("after", e.target.value)}
-                    />
-                  </Form.Group>
-                </Form>
-              </li>
+                <Form.Group className="mb-3">
+                  <Form.Label>Kế hoạch trong sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={formData.promotionalPlan.during}
+                    onChange={(e) =>
+                      handlePromotionalPlanChange("during", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
 
-              {/* Màn hình 6: Rủi Ro */}
-              <li className="screen">
-                <div className="media comm"></div>
-                <h3>RỦI RO</h3>
-                <div className="w-100 mx-auto text-start">
-                  <table className="table table-bordered">
-                    <thead>
+                <Form.Group className="mb-3">
+                  <Form.Label>Kế hoạch sau sự kiện</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={formData.promotionalPlan.after}
+                    onChange={(e) =>
+                      handlePromotionalPlanChange("after", e.target.value)
+                    }
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                  />
+                </Form.Group>
+              </Form>
+            </li>
+
+            {/* Màn hình 6: Rủi Ro */}
+            <li className="screen">
+              <h3 className="text-primary">Rủi Ro</h3>
+              <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
+                <table className="table table-bordered table-hover">
+                  <thead className="table-primary">
                     <tr>
                       <th>Rủi ro</th>
                       <th>Lý do</th>
@@ -900,140 +1132,176 @@ export default function EventPlan() {
                       <th>Giải pháp</th>
                       <th></th>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {formData.risks.map((risk, index) => (
-                        <tr key={index}>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={`Risk ${index + 1}`}
-                                readOnly
-                            />
-                          </td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={risk.reason}
-                                onChange={(e) =>
-                                    handleRiskChange(index, "reason", e.target.value)
-                                }
-                                placeholder="Lý do"
-                            />
-                          </td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={risk.description}
-                                onChange={(e) =>
-                                    handleRiskChange(index, "description", e.target.value)
-                                }
-                                placeholder="Mô tả"
-                            />
-                          </td>
-                          <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={risk.solution}
-                                onChange={(e) =>
-                                    handleRiskChange(index, "solution", e.target.value)
-                                }
-                                placeholder="Giải pháp"
-                            />
-                          </td>
-                          <td className="text-center">
-                            <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() => handleRemoveRisk(index)}
-                            >
-                              ✕
-                            </button>
-                          </td>
-                        </tr>
+                  </thead>
+                  <tbody>
+                    {formData.risks.map((risk, i) => (
+                      <tr key={i}>
+                        <td>{`Risk ${i + 1}`}</td>
+                        <td>
+                          <Form.Control
+                            value={risk.reason}
+                            onChange={(e) =>
+                              handleRiskChange(i, "reason", e.target.value)
+                            }
+                            placeholder="Lý do"
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            value={risk.description}
+                            onChange={(e) =>
+                              handleRiskChange(i, "description", e.target.value)
+                            }
+                            placeholder="Mô tả"
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            value={risk.solution}
+                            onChange={(e) =>
+                              handleRiskChange(i, "solution", e.target.value)
+                            }
+                            placeholder="Giải pháp"
+                          />
+                        </td>
+                        <td>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleRemoveRisk(i)}
+                          >
+                            ✕
+                          </Button>
+                        </td>
+                      </tr>
                     ))}
                     <tr>
                       <td colSpan="5" className="text-center">
-                        <button
-                            className="btn btn-outline-primary"
-                            onClick={handleAddRisk}
+                        <Button
+                          variant="outline-primary"
+                          onClick={handleAddRisk}
                         >
-                          + Thêm rủi ro
-                        </button>
+                          + Thêm Rủi Ro
+                        </Button>
                       </td>
                     </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </li>
-            </ul>
+                  </tbody>
+                </table>
+              </div>
+            </li>
 
-            <button
-                className="prev-screen"
-                onClick={() => {
-                  const newIndex = index - 1;
-                  setIndex(newIndex);
-                  updateScreen(newIndex);
-                }}
-                style={{ visibility: index === 0 ? "hidden" : "visible" }}
-            >
-              <FaChevronLeft />
-            </button>
+            <li className="screen">
+              <h3 className="text-primary">Image</h3>
+              <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
+                <Form.Group className="mt-3">
+                  <Row>
+                    <Col xs={3}>
+                      <label
+                        className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                        style={{
+                          cursor: "pointer",
+                          aspectRatio: "1/1",
+                          minHeight: "100px",
+                        }}
+                      >
+                        <FaPlus />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageUpload}
+                          style={{ display: "none" }}
+                        />
+                      </label>
+                    </Col>
+                    {selectedImages.map((file, index) => (
+                      <Col xs={3} key={index} className="position-relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="uploaded"
+                          className="img-fluid rounded w-100 h-100 object-fit-cover"
+                          style={{ aspectRatio: "1/1", minHeight: "100px" }}
+                        />
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="position-absolute top-0 end-0 p-1"
+                          onClick={() =>
+                            setSelectedImages(
+                              selectedImages.filter((_, i) => i !== index)
+                            )
+                          }
+                        >
+                          ✕
+                        </Button>
+                      </Col>
+                    ))}
+                  </Row>
+                </Form.Group>
+              </div>
+            </li>
+          </ul>
 
-            <button
-                className="next-screen"
-                onClick={() => {
-                  const newIndex = index + 1;
-                  setIndex(newIndex);
-                  updateScreen(newIndex);
-                }}
-                style={{ visibility: index === indexMax() ? "hidden" : "visible" }}
-            >
-              <FaChevronRight />
-            </button>
-          </div>
-
-          <div className="walkthrough-pagination">
-            {[...Array(6)].map((_, i) => (
-                <button
-                    key={i}
-                    type="button"
-                    className={`dot ${i === index ? "active" : ""}`}
-                    onClick={() => {
-                      setIndex(i);
-                      updateScreen(i);
-                    }}
-                    aria-label={`Go to screen ${i + 1}`}
-                />
-            ))}
-          </div>
-
-          <button
-              className="button fixed-next save-draft"
-              onClick={() => alert("Draft saved!")}
+          <Button
+            variant="outline-primary"
+            className="prev-screen"
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+            style={{ visibility: index === 0 ? "hidden" : "visible" }}
           >
-            Save Draft
-          </button>
+            <FaChevronLeft />
+          </Button>
 
-          <button
-              className={`button fixed-next ${index === indexMax() ? "finish" : ""}`}
-              onClick={() => {
-                if (index === indexMax()) {
-                  handleSubmit();
-                } else {
-                  const newIndex = index + 1;
-                  setIndex(newIndex);
-                  updateScreen(newIndex);
-                }
-              }}
-              disabled={isLoading}
+          <Button
+            variant="outline-primary"
+            className="next-screen"
+            onClick={() => setIndex((i) => Math.min(i + 1, indexMax()))}
+            style={{ visibility: index === indexMax() ? "hidden" : "visible" }}
           >
-            {isLoading ? "Submitting..." : index === indexMax() ? "Finish" : "Next"}
-          </button>
+            <FaChevronRight />
+          </Button>
         </div>
+
+        <div className="walkthrough-pagination">
+          {Array(7)
+            .fill()
+            .map((_, i) => (
+              <Button
+                key={i}
+                variant={i === index ? "primary" : "outline-secondary"}
+                className="dot"
+                onClick={() => setIndex(i)}
+              />
+            ))}
+        </div>
+
+        <Button style={
+          {marginTop:'30px'}
+        }
+          variant="outline-success"
+          className="button fixed-next save-draft"
+          onClick={handleSaveDraft}
+          disabled={isLoading}
+        >
+          {isLoading ? "Đang lưu..." : "Lưu Bản Nháp"}
+        </Button>
+
+        <Button
+          variant={index === indexMax() ? "success" : "primary"}
+          className="button fixed-next"
+          onClick={() =>
+            index === indexMax() ? handleSubmit() : setIndex((i) => i + 1)
+          }
+          disabled={isLoading}
+        >
+          {isLoading
+            ? "Đang xử lý..."
+            : index === indexMax()
+            ? "Tạo Sự Kiện"
+            : "Tiếp Theo"}
+        </Button>
       </div>
+      <div className="shade" ref={shadeRef} onClick={closeModal}></div>
+    </div>
+   </>
   );
 }
