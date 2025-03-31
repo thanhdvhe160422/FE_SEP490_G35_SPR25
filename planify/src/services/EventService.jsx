@@ -127,8 +127,8 @@ export const updateEvent = async (id, data) => {
       }
     }
 
-    console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    console.error("Error updating event:", error);
+    Swal.fire("Error", "Unable to update event.", "error");
     return null;
   }
 };

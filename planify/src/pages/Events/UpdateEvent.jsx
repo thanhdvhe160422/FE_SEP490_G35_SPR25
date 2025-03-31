@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { useSnackbar } from "notistack";
 import "../../styles/Events/UpdateEvent.css";
 import Swal from "sweetalert2";
 import Header from "../../components/Header/Header";
-import axios from "axios";
-
+import { getEventEOGById,updateEvent } from "../../services/EventService";
+import { getCategoryByCampusId } from "../../services/CategoryService";
+import { getCampusIdByName } from "../../services/campusService";
 const UpdateEventForm = () => {
   const { enqueueSnackbar } = useSnackbar();
-
+  const {id} = useParams();
+  const [categories,setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(1);
   const [event, setEvent] = useState({
     EventTitle: "Annual Tech Meetup",
     EventDescription: "An exciting gathering of tech enthusiasts...",
@@ -33,7 +37,30 @@ const UpdateEventForm = () => {
     TargetAudience: "University students and alumni",
     SloganEvent: "Innovate. Connect. Grow.",
   });
-
+  useEffect(()=>{
+    
+    const fetchCategoryData = async()=>{
+      try{
+        const campustName = localStorage.getItem("campus");
+        const campusId = await getCampusIdByName(campustName);
+        const response = await getCategoryByCampusId(campusId.id);
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching category data:", error);
+      }
+    }
+    const fetchEventData = async ()=>{
+      try {
+        const response = await getEventEOGById(id);
+        setEvent(response.result);
+        setSelectedCategory(response.result.categoryEventId);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+      }
+    }
+    fetchCategoryData();
+    fetchEventData();
+  },[id])
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEvent((prev) => ({
@@ -42,22 +69,67 @@ const UpdateEventForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Event:", event);
+    console.log(selectedCategory)
+    const eventData = {
+      id: event.id,
+      eventTitle: event.eventTitle,
+      eventDescription: event.eventDescription,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      amountBudget: event.amountBudget,
+      isPublic: event.isPublic ? 1 : 0, 
+      timePublic: event.timePublic,
+      status: event.status,
+      managerId: event?.manager.id||"",
+      campusId: 1,
+      categoryEventId: selectedCategory,
+      placed: event.placed,
+      createdAt: event.createdAt,
+      createBy: event?.createdBy.id||"",
+      measuringSuccess: event?.measuringSuccess||"",
+      goals: event?.goals||"",
+      monitoringProcess: event?.monitoringProcess||"",
+      sizeParticipants: event?.sizeParticipants||0,
+      promotionalPlan: event?.promotionalPlan||"",
+      targetAudience: event?.targetAudience||"",
+      sloganEvent: event?.sloganEvent||"",
+    };
 
-    Swal.fire({
-      title: "Event Updated Successfully",
-      icon: "success",
-      confirmButtonText: "OK",
-      allowOutsideClick: true,
-      allowEscapeKey: true,
-      showCloseButton: true,
-      didOpen: () => {
-        Swal.getPopup().setAttribute("draggable", true);
-      },
-    });
-  };
+    console.log("Updated Event:", eventData);
+
+    try {
+      const response = await updateEvent(event.id,eventData);
+      if (response.status===200) {
+        Swal.fire({
+          title: "Event Updated Successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+          allowOutsideClick: true,
+          allowEscapeKey: true,
+          showCloseButton: true,
+          didOpen: () => {
+            Swal.getPopup().setAttribute("draggable", true);
+          },
+        });
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: response.message || "There was an error updating the event.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
+      Swal.fire({
+        title: "Error",
+        text: "There was an error updating the event.",
+        icon: "error",
+      });
+    }
+};
+
 
   return (
     <>
@@ -73,7 +145,7 @@ const UpdateEventForm = () => {
               name="EventTitle"
               id="EventTitle"
               className="floating-input"
-              value={event.EventTitle}
+              value={event?.eventTitle}
               onChange={handleChange}
               placeholder="Event Title"
             />
@@ -85,7 +157,7 @@ const UpdateEventForm = () => {
               name="EventDescription"
               id="EventDescription"
               className="floating-input"
-              value={event.EventDescription}
+              value={event?.eventDescription}
               onChange={handleChange}
               placeholder="Event Description"
               rows={3}
@@ -99,7 +171,7 @@ const UpdateEventForm = () => {
               name="StartTime"
               id="StartTime"
               className="floating-input"
-              value={event.StartTime}
+              value={event?.startTime}
               onChange={handleChange}
               placeholder="Start Time"
             />
@@ -112,7 +184,7 @@ const UpdateEventForm = () => {
               name="EndTime"
               id="EndTime"
               className="floating-input"
-              value={event.EndTime}
+              value={event?.endTime}
               onChange={handleChange}
               placeholder="End Time"
             />
@@ -125,7 +197,7 @@ const UpdateEventForm = () => {
               name="AmountBudget"
               id="AmountBudget"
               className="floating-input"
-              value={event.AmountBudget}
+              value={event?.amountBudget}
               onChange={handleChange}
               placeholder="Budget Amount"
             />
@@ -171,28 +243,40 @@ const UpdateEventForm = () => {
           <label className="floating-label">Manager ID</label>
         </div> */}
 
-          <div className="form-floating-group">
+          {/* <div className="form-floating-group">
             <input
               name="Campus"
               id="Campus"
               className="floating-input"
-              value={event.Campus}
+              value={event?.Campus}
               onChange={handleChange}
               placeholder="Campus"
             />
             <label className="floating-label">Campus</label>
-          </div>
+          </div> */}
 
           <div className="form-floating-group">
-            <input
+            {/* <input
               type="number"
               name="CategoryEventId"
               id="CategoryEventId"
               className="floating-input"
-              value={event.CategoryEventId}
+              value={event?.CategoryEventId}
               onChange={handleChange}
               placeholder="Category Event ID"
-            />
+            /> */}
+            
+            <select
+                  className="input-category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.categoryEventName}
+                    </option>
+                  ))}
+                </select>
             <label className="floating-label">Category Event</label>
           </div>
 
@@ -202,7 +286,7 @@ const UpdateEventForm = () => {
               name="Placed"
               id="Placed"
               className="floating-input"
-              value={event.Placed}
+              value={event?.placed}
               onChange={handleChange}
               placeholder="Location"
             />
@@ -216,7 +300,7 @@ const UpdateEventForm = () => {
               name="IsPublic"
               id="IsPublic"
               className="form-check-input"
-              checked={event.IsPublic}
+              checked={event?.isPublic}
               onChange={handleChange}
             />
           </div>
@@ -226,7 +310,7 @@ const UpdateEventForm = () => {
               name="MeasuringSuccess"
               id="MeasuringSuccess"
               className="floating-input"
-              value={event.MeasuringSuccess}
+              value={event?.measuringSuccess}
               onChange={handleChange}
               placeholder="Measuring Success"
               rows={2}
@@ -239,7 +323,7 @@ const UpdateEventForm = () => {
               name="Goals"
               id="Goals"
               className="floating-input"
-              value={event.Goals}
+              value={event?.goals}
               onChange={handleChange}
               placeholder="Event Goals"
               rows={2}
@@ -252,7 +336,7 @@ const UpdateEventForm = () => {
               name="MonitoringProcess"
               id="MonitoringProcess"
               className="floating-input"
-              value={event.MonitoringProcess}
+              value={event?.monitoringProcess}
               onChange={handleChange}
               placeholder="Monitoring Process"
               rows={2}
@@ -266,7 +350,7 @@ const UpdateEventForm = () => {
               name="SizeParticipants"
               id="SizeParticipants"
               className="floating-input"
-              value={event.SizeParticipants}
+              value={event?.sizeParticipants}
               onChange={handleChange}
               placeholder="Number of Participants"
             />
@@ -278,7 +362,7 @@ const UpdateEventForm = () => {
               name="PromotionalPlan"
               id="PromotionalPlan"
               className="floating-input"
-              value={event.PromotionalPlan}
+              value={event?.promotionalPlan}
               onChange={handleChange}
               placeholder="Promotional Plan"
               rows={2}
@@ -292,7 +376,7 @@ const UpdateEventForm = () => {
               name="TargetAudience"
               id="TargetAudience"
               className="floating-input"
-              value={event.TargetAudience}
+              value={event?.targetAudience}
               onChange={handleChange}
               placeholder="Target Audience"
             />
@@ -305,7 +389,7 @@ const UpdateEventForm = () => {
               name="SloganEvent"
               id="SloganEvent"
               className="floating-input"
-              value={event.SloganEvent}
+              value={event?.sloganEvent}
               onChange={handleChange}
               placeholder="Event Slogan"
             />
