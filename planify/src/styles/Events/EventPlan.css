@@ -1,4 +1,5 @@
 .working-container {
+  background: linear-gradient(150deg, #fff);
   color: white;
   font-family: "Lato", sans-serif;
   font-weight: 300;
@@ -8,13 +9,6 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(
-    150deg,
-    #e6d3f9 0%,
-    #e6d3f9 50%,
-    #cea0f1 50%,
-    #cea0f1 100%
-  );
 }
 
 .walkthrough {
@@ -22,7 +16,7 @@
   flex-direction: column;
   width: 1500px;
   height: 700px;
-  background: linear-gradient(to right bottom, #9e66c6, #6027e1);
+  background: linear-gradient(to right bottom, #f68b1f, #ed6c00); /* FPT orange */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.23), 0 10px 40px rgba(0, 0, 0, 0.19);
   overflow: hidden;
   font-size: 14px;
@@ -156,10 +150,10 @@
 
 .button.fixed-next {
   position: absolute;
-  bottom: 20px;
+  bottom: 5px;
   right: 20px;
   height: 44px;
-  background: #5da3f2;
+  background: #1d9101;
   color: white;
   font-weight: bold;
   text-transform: uppercase;
@@ -174,7 +168,7 @@
 }
 
 .button.fixed-next:hover {
-  background: #76b4f7;
+  background: #03b453;
 }
 
 .button.fixed-next.finish {
@@ -187,8 +181,8 @@
 
 .button.fixed-next.save-draft {
   position: absolute;
-  bottom: 20px;
-  right: 140px;
+  bottom: 5px;
+  right: 170px;
   height: 44px;
   background: #6c757d;
   color: white;
