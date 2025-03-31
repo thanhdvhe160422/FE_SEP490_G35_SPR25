@@ -1,17 +1,25 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "../../styles/Events/EventPlan.css";
-import { FaChevronLeft, FaChevronRight, FaChevronDown } from "react-icons/fa";
-import { Form, Button, FormLabel } from "react-bootstrap";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaChevronDown,
+  FaPlus,
+} from "react-icons/fa";
+import { Form, Button, FormLabel, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router";
+import { useSnackbar } from "notistack";
+import Swal from "sweetalert2";
 
 // Custom hook để lấy campusId và danh sách categories
 const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
-
   const getCampusIdFromToken = useCallback(() => {
     const token = localStorage.getItem("token");
     if (!token) return null;
@@ -57,6 +65,8 @@ export default function EventPlan() {
   const dots = useRef([]);
   const modalRef = useRef(null);
   const shadeRef = useRef(null);
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     eventTitle: "",
@@ -93,6 +103,7 @@ export default function EventPlan() {
   const [customValue, setCustomValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { categories, error } = useCategories();
+  const [selectedImages, setSelectedImages] = useState([]);
 
   useEffect(() => {
     const now = new Date();
@@ -389,6 +400,37 @@ export default function EventPlan() {
     };
   }, [formData]);
 
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setSelectedImages([...selectedImages, ...files]);
+    event.target.value = null;
+  };
+
+  const handleUploadImages = async (eventId, token) => {
+    if (selectedImages.length === 0) return;
+
+    const formData = new FormData();
+    selectedImages.forEach((file) => formData.append("EventMediaFiles", file));
+    formData.append("eventId", eventId);
+    try {
+      await axios.post(
+        "https://localhost:44320/api/Events/upload-image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Image upload failed:", error.response?.data);
+      enqueueSnackbar("Image upload failed. You can try uploading manually.", {
+        variant: "warning",
+      });
+    }
+  };
+
   // Validation chung
   const validateForm = useCallback(() => {
     if (!formData.eventTitle) return "Tên sự kiện là bắt buộc!";
@@ -407,10 +449,23 @@ export default function EventPlan() {
   const handleSubmit = useCallback(async () => {
     const validationError = validateForm();
     if (validationError) {
-      toast.error(validationError);
+      enqueueSnackbar(validationError, { variant: "error" });
       return;
     }
-    console.log(localStorage.getItem("token"));
+
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This event will be sent to the Campus Manager for approval.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, create it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     setIsLoading(true);
     try {
       const eventData = prepareEventData();
@@ -424,10 +479,11 @@ export default function EventPlan() {
           },
         }
       );
-      console.log("sasdasda:" + response.data.result?.id);
+
+      const eventId = response.data.result?.id || 0;
+      await handleUploadImages(eventId, localStorage.getItem("token"));
 
       if (response.status === 201) {
-        const eventId = response.data.result?.id || 0; // Lấy eventId từ phản hồi nếu có
         await axios.post(
           "https://localhost:44320/api/SendRequest",
           { eventId },
@@ -438,51 +494,96 @@ export default function EventPlan() {
             },
           }
         );
-        toast.success("Tạo sự kiện thành công và đã gửi yêu cầu!");
+
+        await Swal.fire({
+          title: "Created!",
+          text: "Your event has been successfully submitted.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
         closeModal();
+        navigate("/home");
       } else {
-        toast.error(
-          `Tạo sự kiện thất bại với mã trạng thái: ${response.status}`
+        enqueueSnackbar(
+          `Tạo sự kiện thất bại với mã trạng thái: ${response.status}`,
+          { variant: "error" }
         );
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi tạo sự kiện!");
+      enqueueSnackbar(error.response?.data?.message || "Lỗi khi tạo sự kiện!", {
+        variant: "error",
+      });
       console.error("Lỗi chi tiết:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [prepareEventData, closeModal, validateForm]);
+  }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
   // Gửi yêu cầu lưu bản nháp
-  const handleSaveDraft = useCallback(async () => {
-    const validationError = validateForm();
-    if (validationError) {
-      toast.error(validationError);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const eventData = prepareEventData();
-      const response = await axios.post(
-        "https://localhost:44320/api/Events/save-draft",
-        eventData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+  const handleSaveDraft = useCallback(() => {
+    Swal.fire({
+      title: "Do you want to save the changes?",
+      showDenyButton: true,
+      confirmButtonText: "Save",
+      denyButtonText: `Don't save`,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const validationError = validateForm();
+        if (validationError) {
+          enqueueSnackbar(validationError, { variant: "error" });
+          return;
         }
-      );
-      toast.success("Lưu bản nháp thành công!");
-      closeModal();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi lưu bản nháp!");
-      console.error("Lỗi chi tiết:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [prepareEventData, closeModal, validateForm]);
+
+        setIsLoading(true);
+        try {
+          const eventData = prepareEventData();
+          const response = await axios.post(
+            "https://localhost:44320/api/Events/create",
+            eventData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+
+          await handleUploadImages(
+            response.data.result?.id,
+            localStorage.getItem("token")
+          );
+
+          Swal.fire({
+            title: "Saved!",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+            willClose: () => {
+              closeModal();
+              navigate("/home");
+            },
+          });
+        } catch (error) {
+          enqueueSnackbar(
+            error.response?.data?.message || "Lỗi khi lưu bản nháp!",
+            { variant: "error" }
+          );
+          console.error("Lỗi chi tiết:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (result.isDenied) {
+        Swal.fire({
+          title: "Changes are not saved",
+          icon: "info",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    });
+  }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
   return (
     <div className="working-container">
@@ -1085,6 +1186,57 @@ export default function EventPlan() {
                 </table>
               </div>
             </li>
+
+            <li className="screen">
+              <h3 className="text-primary">Image</h3>
+              <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
+                <Form.Group className="mt-3">
+                  <Row>
+                    <Col xs={3}>
+                      <label
+                        className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                        style={{
+                          cursor: "pointer",
+                          aspectRatio: "1/1",
+                          minHeight: "100px",
+                        }}
+                      >
+                        <FaPlus />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageUpload}
+                          style={{ display: "none" }}
+                        />
+                      </label>
+                    </Col>
+                    {selectedImages.map((file, index) => (
+                      <Col xs={3} key={index} className="position-relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="uploaded"
+                          className="img-fluid rounded w-100 h-100 object-fit-cover"
+                          style={{ aspectRatio: "1/1", minHeight: "100px" }}
+                        />
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="position-absolute top-0 end-0 p-1"
+                          onClick={() =>
+                            setSelectedImages(
+                              selectedImages.filter((_, i) => i !== index)
+                            )
+                          }
+                        >
+                          ✕
+                        </Button>
+                      </Col>
+                    ))}
+                  </Row>
+                </Form.Group>
+              </div>
+            </li>
           </ul>
 
           <Button
@@ -1107,7 +1259,7 @@ export default function EventPlan() {
         </div>
 
         <div className="walkthrough-pagination">
-          {Array(6)
+          {Array(7)
             .fill()
             .map((_, i) => (
               <Button

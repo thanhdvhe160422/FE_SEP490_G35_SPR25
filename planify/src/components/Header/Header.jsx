@@ -80,7 +80,7 @@ export default function Header() {
     ],
     "event organizer": [
       { label: "Home", path: "/home" },
-      { label: "Create Event", path: "/create-event" },
+      { label: "Create Event", path: "/event-plan" },
       { label: "My Request", path: "/my-request" },
     ],
     implementer: [
