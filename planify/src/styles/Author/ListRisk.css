@@ -1,0 +1,100 @@
+.risk-management-container {
+  margin: 20px;
+}
+
+.risk-list-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.risk-title {
+  margin-bottom: 24px !important;
+  color: #333;
+  font-weight: 600;
+}
+
+.risk-table {
+  margin-top: 16px;
+}
+
+.risk-table .ant-table-thead > tr > th {
+  background-color: #f7f7f7;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.edit-button {
+  background-color: #1890ff;
+}
+
+.delete-button:hover {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.risk-update-modal .ant-modal-content {
+  border-radius: 8px;
+}
+
+.risk-update-modal .ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+.risk-update-modal .ant-form-item-label > label {
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .risk-management-container {
+    margin: 10px;
+  }
+
+  .risk-list-card {
+    padding: 12px;
+  }
+}
+/* Header có nút thêm mới */
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.risk-title {
+  margin-bottom: 0 !important;
+}
+
+.add-risk-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.add-risk-button:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+/* CSS cho responsive */
+@media (max-width: 576px) {
+  .risk-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .add-risk-button {
+    margin-top: 16px;
+    align-self: flex-end;
+  }
+}

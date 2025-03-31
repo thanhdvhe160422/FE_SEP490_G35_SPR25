@@ -1,0 +1,249 @@
+/* ListCost.css */
+
+/* Contenedor principal */
+.cost-management-container {
+  width: 100%;
+  padding: 10px 0;
+}
+
+/* Estilos para la tarjeta */
+.cost-list-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* Estilos para el encabezado */
+.cost-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cost-header .ant-typography {
+  margin-bottom: 0;
+  color: #1f1f1f;
+  font-weight: 600;
+}
+
+.cost-header .ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.cost-header .ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+/* Estilos para la tabla */
+.cost-list-card .ant-table-wrapper {
+  margin-top: 10px;
+}
+
+.cost-list-card .ant-table {
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.cost-list-card .ant-table-thead > tr > th {
+  background-color: #f5f7fa;
+  color: #333;
+  font-weight: 600;
+  padding: 16px 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.cost-list-card .ant-table-tbody > tr > td {
+  padding: 14px 12px;
+  color: #4a4a4a;
+}
+
+.cost-list-card .ant-table-tbody > tr:hover > td {
+  background-color: #f0f7ff;
+}
+
+.cost-list-card .ant-table-summary {
+  background-color: #fafafa;
+}
+
+.cost-list-card .ant-table-summary > tr > td {
+  padding: 16px 12px;
+  border-top: 1px solid #e8e8e8;
+}
+
+/* Estilos para los botones de acción */
+.ant-btn-primary.ant-btn-sm {
+  background-color: #1890ff;
+  border: none;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+}
+
+.ant-btn-primary.ant-btn-sm:hover {
+  background-color: #40a9ff;
+  transform: translateY(-1px);
+}
+
+.ant-btn-dangerous.ant-btn-sm {
+  background-color: #fff;
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+.ant-btn-dangerous.ant-btn-sm:hover {
+  background-color: #fff1f0;
+  border-color: #ff7875;
+  color: #ff7875;
+  transform: translateY(-1px);
+}
+
+/* Estilo para el modal */
+.ant-modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-modal-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f1f1f;
+}
+
+.ant-modal-body {
+  padding: 24px;
+}
+
+.ant-modal-footer {
+  padding: 10px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Estilos de formularios dentro del modal */
+.ant-form-item-label > label {
+  color: #333;
+  font-weight: 500;
+}
+
+.ant-input,
+.ant-input-number {
+  border-radius: 4px;
+}
+
+.ant-input:hover,
+.ant-input-number:hover {
+  border-color: #40a9ff;
+}
+
+.ant-input:focus,
+.ant-input-number-focused {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Mensajes de error */
+.ant-form-item-explain-error {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Estados vacíos */
+.ant-empty {
+  margin: 32px 0;
+}
+
+.ant-empty-image {
+  height: 80px;
+}
+
+.ant-empty-description {
+  color: #999;
+  font-size: 14px;
+}
+
+/* Estados de carga */
+.ant-spin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 576px) {
+  .cost-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cost-header .ant-btn-primary {
+    margin-top: 16px;
+    align-self: flex-end;
+  }
+
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-btn-sm {
+    padding: 0 4px;
+    font-size: 12px;
+  }
+}
+
+/* Transiciones para una interfaz más fluida */
+.ant-btn,
+.ant-input,
+.ant-input-number,
+.ant-table-row,
+.ant-pagination-item {
+  transition: all 0.3s ease;
+}
+
+/* Estilos para la paginación */
+.ant-pagination-item-active {
+  border-color: #1890ff;
+  font-weight: 500;
+}
+
+.ant-pagination-item-active a {
+  color: #1890ff;
+}
+
+.ant-pagination-item:hover {
+  border-color: #1890ff;
+}
+
+.ant-pagination-item:hover a {
+  color: #1890ff;
+}
+
+/* Estilos para resaltar el total */
+.total-price-cell {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+/* Estilos para los mensajes de confirmación */
+.ant-popconfirm-message-title {
+  padding-left: 22px;
+}
+
+.ant-popconfirm-buttons {
+  margin-top: 12px;
+}
+
+/* Estilos para tooltips */
+.ant-tooltip-inner {
+  min-height: 24px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
