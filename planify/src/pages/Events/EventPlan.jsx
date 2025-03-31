@@ -15,6 +15,7 @@ import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router";
 import { useSnackbar } from "notistack";
 import Swal from "sweetalert2";
+import Header from "../../components/Header/Header";
 
 // Custom hook để lấy campusId và danh sách categories
 const useCategories = () => {
@@ -586,6 +587,8 @@ export default function EventPlan() {
   }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
   return (
+   <>
+    <Header/>
     <div className="working-container">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="walkthrough show reveal" ref={modalRef}>
@@ -1271,7 +1274,9 @@ export default function EventPlan() {
             ))}
         </div>
 
-        <Button
+        <Button style={
+          {marginTop:'30px'}
+        }
           variant="outline-success"
           className="button fixed-next save-draft"
           onClick={handleSaveDraft}
@@ -1297,5 +1302,6 @@ export default function EventPlan() {
       </div>
       <div className="shade" ref={shadeRef} onClick={closeModal}></div>
     </div>
+   </>
   );
 }
