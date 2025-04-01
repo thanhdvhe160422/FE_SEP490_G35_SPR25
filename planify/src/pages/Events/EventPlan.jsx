@@ -1275,52 +1275,56 @@ export default function EventPlan() {
                 <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
                   <Form.Group className="mt-3">
                     <Row>
-                    <Col xs={3} className="mb-3">
-  <label
-    className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-    style={{
-      cursor: "pointer",
-      aspectRatio: "16/9",
-      minHeight: "120px",
-    }}
-  >
-    <FaPlus />
-    <input
-      type="file"
-      accept="image/*"
-      multiple
-      onChange={handleImageUpload}
-      style={{ display: "none" }}
-    />
-  </label>
-</Col>
+                      <Col xs={3} className="mb-3">
+                        <label
+                          className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                          style={{
+                            cursor: "pointer",
+                            aspectRatio: "16/9",
+                            minHeight: "120px",
+                          }}
+                        >
+                          <FaPlus />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            style={{ display: "none" }}
+                          />
+                        </label>
+                      </Col>
 
-{selectedImages.map((file, index) => (
-  <Col xs={3} key={index} className="position-relative mb-3">
-    <img
-      src={URL.createObjectURL(file)}
-      alt="uploaded"
-      className="img-fluid rounded w-100 h-100 object-fit-cover"
-      style={{
-        aspectRatio: "16/9",
-        minHeight: "120px",
-        objectFit: "cover",
-      }}
-    />
-    <Button
-      variant="danger"
-      size="sm"
-      className="position-absolute top-0 end-0 p-1"
-      onClick={() =>
-        setSelectedImages(
-          selectedImages.filter((_, i) => i !== index)
-        )
-      }
-    >
-      ✕
-    </Button>
-  </Col>
-))}
+                      {selectedImages.map((file, index) => (
+                        <Col
+                          xs={3}
+                          key={index}
+                          className="position-relative mb-3"
+                        >
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt="uploaded"
+                            className="img-fluid rounded w-100 h-100 object-fit-cover"
+                            style={{
+                              aspectRatio: "16/9",
+                              minHeight: "120px",
+                              objectFit: "cover",
+                            }}
+                          />
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="position-absolute top-0 end-0 p-1"
+                            onClick={() =>
+                              setSelectedImages(
+                                selectedImages.filter((_, i) => i !== index)
+                              )
+                            }
+                          >
+                            ✕
+                          </Button>
+                        </Col>
+                      ))}
                     </Row>
                   </Form.Group>
                 </div>
