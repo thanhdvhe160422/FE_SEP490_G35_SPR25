@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useSnackbar } from "notistack";
 import "../../styles/Events/UpdateEvent.css";
@@ -7,11 +7,27 @@ import Header from "../../components/Header/Header";
 import { getEventEOGById, updateEvent } from "../../services/EventService";
 import { getCategoryByCampusId } from "../../services/CategoryService";
 import { getCampusIdByName } from "../../services/campusService";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+
 const UpdateEventForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { id } = useParams();
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(1);
+  const [images, setImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const fileInputRef = useRef();
+
+  const openLightbox = (index) => {
+    setPhotoIndex(index);
+    setIsOpen(true);
+  };
+
   const [event, setEvent] = useState({
     EventTitle: "Annual Tech Meetup",
     EventDescription: "An exciting gathering of tech enthusiasts...",
@@ -43,6 +59,7 @@ const UpdateEventForm = () => {
         const campustName = localStorage.getItem("campus");
         const campusId = await getCampusIdByName(campustName);
         const response = await getCategoryByCampusId(campusId.id);
+        setImages(response.result.images || []);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching category data:", error);
@@ -53,10 +70,21 @@ const UpdateEventForm = () => {
         const response = await getEventEOGById(id);
         setEvent(response.result);
         setSelectedCategory(response.result.categoryEventId);
+
+        if (
+          response.result.eventMedia &&
+          response.result.eventMedia.length > 0
+        ) {
+          const imageUrls = response.result.eventMedia.map(
+            (media) => media.mediaUrl
+          );
+          setImages(imageUrls);
+        }
       } catch (error) {
         console.error("Error fetching event data:", error);
       }
     };
+
     fetchCategoryData();
     fetchEventData();
   }, [id]);
@@ -81,7 +109,7 @@ const UpdateEventForm = () => {
       isPublic: event.isPublic ? 1 : 0,
       timePublic: event.timePublic,
       status: event.status,
-      managerId: event?.manager.id || "",
+      managerId: event?.manager?.id ?? 1,
       campusId: 1,
       categoryEventId: selectedCategory,
       placed: event.placed,
@@ -100,6 +128,7 @@ const UpdateEventForm = () => {
 
     try {
       const response = await updateEvent(event.id, eventData);
+      const resData = await response.json();
       if (response.status === 200) {
         Swal.fire({
           title: "Event Updated Successfully",
@@ -113,6 +142,7 @@ const UpdateEventForm = () => {
           },
         });
       } else {
+        console.error("Update failed:", resData);
         Swal.fire({
           title: "Error",
           text: response.message || "There was an error updating the event.",
@@ -127,6 +157,56 @@ const UpdateEventForm = () => {
         icon: "error",
       });
     }
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const fixDriveUrl = (url) => {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  };
+  // const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
+
+  const handleDeleteImage = (index) => {
+    Swal.fire({
+      title: "Are you sure you want to delete this image?",
+      text: "This image will be removed from the list.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const newImages = [...images];
+        newImages.splice(index, 1);
+        setImages(newImages);
+        Swal.fire({
+          icon: "success",
+          title: "Deleted successfully!",
+          showConfirmButton: false,
+          timer: 2000, // auto close after 2s
+        });
+      }
+    });
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const newImageUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+    setImages((prevImages) => [...prevImages, ...newImageUrls]);
   };
 
   return (
@@ -323,9 +403,64 @@ const UpdateEventForm = () => {
           </div>
 
           <div className="text-end">
-            <button type="submit" className="btn-submit">
-              Update Event
-            </button>
+            <div className="custom-image-grid">
+              <div
+                className="grid-image add-image-btn"
+                onClick={() => fileInputRef.current.click()}
+              >
+                <span className="plus-icon">➕</span>
+              </div>
+
+              {images.map((url, index) => (
+                <div
+                  key={index}
+                  className={`grid-image grid-image-${index + 1}`}
+                >
+                  <img
+                    src={fixDriveUrl(url)}
+                    alt={`Event ${index + 1}`}
+                    className="event-image"
+                    referrerPolicy="no-referrer"
+                    onClick={() => openLightbox(index)}
+                  />
+                  <button
+                    type="button"
+                    className="delete-image-btn"
+                    onClick={() => handleDeleteImage(index)}
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
+            </div>
+
+            {isOpen && (
+              <Lightbox
+                open={isOpen}
+                close={() => setIsOpen(false)}
+                slides={images.map((url) => ({ src: fixDriveUrl(url) }))}
+                index={photoIndex}
+                on={{
+                  view: ({ index }) => setPhotoIndex(index),
+                }}
+              />
+            )}
+
+            <div style={{ marginTop: "30px" }}>
+              {" "}
+              <button type="submit" className="btn-submit">
+                Update Event
+              </button>
+            </div>
           </div>
         </form>
       </div>
