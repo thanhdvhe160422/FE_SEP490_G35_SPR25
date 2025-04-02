@@ -1,4 +1,5 @@
 .working-container {
+  background: linear-gradient(150deg, #fff);
   color: white;
   font-family: "Lato", sans-serif;
   font-weight: 300;
@@ -8,13 +9,6 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(
-    150deg,
-    #e6d3f9 0%,
-    #e6d3f9 50%,
-    #cea0f1 50%,
-    #cea0f1 100%
-  );
 }
 
 .walkthrough {
@@ -22,7 +16,7 @@
   flex-direction: column;
   width: 1500px;
   height: 700px;
-  background: linear-gradient(to right bottom, #9e66c6, #6027e1);
+  background: linear-gradient(to right bottom, #f68b1f, #ed6c00); /* FPT orange */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.23), 0 10px 40px rgba(0, 0, 0, 0.19);
   overflow: hidden;
   font-size: 14px;
@@ -156,10 +150,10 @@
 
 .button.fixed-next {
   position: absolute;
-  bottom: 20px;
+  bottom: 5px;
   right: 20px;
   height: 44px;
-  background: #5da3f2;
+  background: #1d9101;
   color: white;
   font-weight: bold;
   text-transform: uppercase;
@@ -174,7 +168,7 @@
 }
 
 .button.fixed-next:hover {
-  background: #76b4f7;
+  background: #03b453;
 }
 
 .button.fixed-next.finish {
@@ -187,8 +181,8 @@
 
 .button.fixed-next.save-draft {
   position: absolute;
-  bottom: 20px;
-  right: 140px;
+  bottom: 5px;
+  right: 170px;
   height: 44px;
   background: #6c757d;
   color: white;
@@ -285,7 +279,7 @@
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .prev-screen {
     left: -12px;
   }
@@ -293,10 +287,101 @@
   .next-screen {
     right: -12px;
   }
-  
+
   .button.fixed-next.save-draft {
     right: 120px;
     padding: 10px 15px;
     font-size: 12px;
+  }
+}
+/* Thêm style cho ToastContainer */
+.Toastify__toast {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Cải thiện form trong walkthrough */
+.form-control {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #333;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
+  background: #fff;
+}
+
+.form-label {
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* Tối ưu bảng */
+.table th {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 500;
+  border: none;
+}
+
+.table td {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-hover tbody tr:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Tối ưu Task & Subtask */
+.bg-light {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Button trong Task/Subtask */
+.btn-danger, .btn-outline-primary {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-danger {
+  background: #dc3545;
+  border: none;
+}
+
+.btn-outline-primary {
+  border-color: #fff;
+  color: #fff;
+}
+
+.btn-outline-primary:hover {
+  background: #fff;
+  color: #6027e1;
+}
+
+/* Responsive thêm */
+@media (max-width: 768px) {
+  .walkthrough {
+    width: 90vw;
+    height: 80vh;
+  }
+
+  .button.fixed-next {
+    font-size: 11px;
+    padding: 8px 15px;
   }
 }

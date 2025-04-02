@@ -494,6 +494,7 @@ export default function CreateEvent() {
     );
   };
 
+
   const handleAddTask = () => {
     const newGroup = {
       name: `Task ${groups.length + 1}`,
