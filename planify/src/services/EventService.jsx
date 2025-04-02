@@ -236,4 +236,53 @@ export const searchEvents = async (params) => {
     console.error("Error searching events:", error);
     return null;
   }
+  
+};
+export const deleteMedia = async (data) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Events/delete-event-media`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/Events/delete-event-media`,
+            data,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to update group after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error delete media event:", error);
+    Swal.fire("Error", "Unable to delete media event.", "error");
+    return null;
+  }
 };
