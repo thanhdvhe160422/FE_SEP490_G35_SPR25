@@ -18,19 +18,22 @@ function ManageRequest() {
   const [rejectReason, setRejectReason] = useState("");
   const [approveReason, setApproveReason] = useState("");
 
+  // Hàm fetchRequests để tái sử dụng
+  const fetchRequests = async () => {
+    try {
+      const data = await getRequest();
+      console.log("Fetched Requests: ", data);
+      setRequests(data.result);
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+      Swal.fire("Error", "Unable to fetch requests.", "error");
+    }
+  };
+
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const data = await getRequest();
-        console.log("Fetched Requests: ", data);
-        setRequests(data.result);
-      } catch (error) {
-        console.error("Error fetching requests:", error);
-        Swal.fire("Error", "Unable to fetch requests.", "error");
-      }
-    };
     fetchRequests();
   }, []);
+
   const handleApprove = (request) => {
     setSelectedRequest(request);
     setShowPopupApprove(true);
@@ -42,36 +45,42 @@ function ManageRequest() {
   };
 
   const submitReject = async () => {
-    if (!rejectReason.trim()) return;
+    if (!rejectReason.trim()) {
+      Swal.fire("Error", "Please enter a reason for rejection.", "error");
+      return;
+    }
+
     try {
       await rejectRequest(selectedRequest.eventId, rejectReason);
-      setRequests((prev) =>
-        prev.filter((req) => req.eventId !== selectedRequest.eventId)
-      );
+
+      // Quan trọng: Tải lại dữ liệu thay vì cập nhật state thủ công
+      await fetchRequests();
+
       setShowPopupReject(false);
       setRejectReason("");
+      Swal.fire("Success", "Request rejected successfully", "success");
     } catch (error) {
+      console.error("Error rejecting request:", error);
       Swal.fire("Error", "Unable to reject request.", "error");
     }
   };
 
   const submitApprove = async () => {
-    if (!approveReason || !approveReason.trim() === "") {
+    if (!approveReason.trim()) {
       Swal.fire("Error", "Please enter a reason for approval.", "error");
       return;
     }
-    console.log("Approve Reason:", approveReason);
+
     try {
-      console.log("Submitting approve request with payload:", {
-        eventId: selectedRequest.eventId,
-        reason: approveReason,
-      });
-      await approveRequest(selectedRequest.eventId, approveReason);
-      setRequests((prev) =>
-        prev.filter((req) => req.eventId !== selectedRequest.eventId)
-      );
+      console.log("Approving request ID:", selectedRequest.id);
+      await approveRequest(selectedRequest.id, approveReason);
+
+      // Quan trọng: Tải lại dữ liệu thay vì cập nhật state thủ công
+      await fetchRequests();
+
       setShowPopupApprove(false);
       setApproveReason("");
+      Swal.fire("Success", "Request approved successfully", "success");
     } catch (error) {
       console.error("Error approving request:", error);
       Swal.fire("Error", "Unable to approve request.", "error");
@@ -84,7 +93,7 @@ function ManageRequest() {
 
   return (
     <>
-      <Header></Header>
+      <Header />
       <div className="manager-container">
         <h2>List Event Request</h2>
         <div className="requests-grid">
@@ -158,11 +167,12 @@ function ManageRequest() {
           </div>
         )}
       </div>
-      <Footer></Footer>
+      <Footer />
     </>
   );
 }
 
+// Component RequestColumn không thay đổi
 function RequestColumn({ title, requests, children }) {
   const navigate = useNavigate();
   return (
@@ -179,13 +189,13 @@ function RequestColumn({ title, requests, children }) {
                 navigate(`/event-detail-EOG/${req.eventId}`);
               }}
             >
-              {req.eventId}
+              {req.eventTitle}
             </h4>
             <p>
-              <strong>From:</strong> {}
+              <strong>From:</strong> {formatDateTime(req.eventStartTime)}
             </p>
             <p>
-              <strong>To:</strong> {}
+              <strong>To:</strong> {formatDateTime(req.eventEndTime)}
             </p>
             {children && children(req)}
           </div>
