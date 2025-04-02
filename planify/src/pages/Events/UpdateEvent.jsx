@@ -112,7 +112,7 @@ const UpdateEventForm = () => {
       endTime: event.endTime,
       amountBudget: event.amountBudget,
       status: event.status,
-      managerId: event?.manager?.id ?? 1,
+      managerId: event?.manager?.id ?? null,
       campusId: 1,
       categoryEventId: selectedCategory,
       placed: event.placed,
@@ -131,21 +131,22 @@ const UpdateEventForm = () => {
 
     try {
       const response = await updateEvent(event.id, eventData);
-      if (isDeleteImage===1){
-        try{
-          const isDeleteSuccesfully = await deleteMedia(deleteImages);
-          console.log(isDeleteSuccesfully);
-          if (!isDeleteSuccesfully) 
-            throw new Error("Failed to delete media");
-        }catch(error){
-          console.error(error);
-        }
-      }
-      if (isChangeImage===1){
-        var token = localStorage.getItem("token");
-        handleUploadImages(event.id,token);
-      }
       if (response.status === 200) {
+          if (isDeleteImage===1){
+            try{
+              const isDeleteSuccesfully = await deleteMedia(deleteImages);
+              console.log(isDeleteSuccesfully);
+              if (!isDeleteSuccesfully) 
+                throw new Error("Failed to delete media");
+            }catch(error){
+              console.error(error);
+              throw new error();
+            }
+          }
+          if (isChangeImage===1){
+            var token = localStorage.getItem("token");
+            handleUploadImages(event.id,token);
+          }
         Swal.fire({
           title: "Event Updated Successfully",
           icon: "success",
@@ -269,6 +270,7 @@ const UpdateEventForm = () => {
       enqueueSnackbar("Image upload failed. You can try uploading manually.", {
         variant: "warning",
       });
+      throw new error();
     }
   };
   return (
