@@ -27,8 +27,8 @@ export default function Header() {
       try {
         const userData = await getProfileById(userId);
         setFullname(userData.data.firstName + " " + userData.data.lastName);
-        setPicture(localStorage.getItem("avatar"));
-        // setPicture(convertToDirectLink(userData.data.avatar.mediaUrl));
+        //setPicture(localStorage.getItem("avatar"));
+        setPicture(convertToDirectLink(userData?.data?.avatar?.mediaUrl||localStorage.getItem("avatar")));
         console.log("Header", userData.data);
       } catch (error) {
         console.error(error);
