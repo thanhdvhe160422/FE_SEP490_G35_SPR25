@@ -14,6 +14,9 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaMoneyBillAlt,
+  FaQuoteLeft,
+  FaUserFriends,
+  FaBullhorn,
 } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
@@ -293,76 +296,130 @@ const EventDetailEOG = () => {
                   {eventStatus.status}
                 </div>
               </div>
-              <div className="event-time">
-                <FaClock className="icon-time" />
-                <span className="event-info-span">Start Time:</span>
-                {formatDateTime(event.startTime)}
-              </div>
-              <div>
-                <FaClock className="icon-time" />
-                <span className="event-info-span">End Time:</span>
-                {formatDateTime(event.endTime)}
-              </div>
-              <div className="event-location">
-                <FaMapMarkerAlt className="icon-location" />
-                <span className="event-info-span">Location:</span>
-                {event.placed}
-              </div>
-              <div>
-                <FaMoneyBillAlt
-                  className="icon-price"
-                  style={{ marginRight: "10px", color: "grey" }}
-                />
-                <span className="event-info-span">Total Cost:</span>
-                {event.amountBudget.toLocaleString("vi-VN")} VNĐ
-              </div>
-              <div style={{ marginTop: "10px" }}>
-                <MdOutlineCategory
-                  className="icon-category"
-                  style={{ marginRight: "10px", color: "orange" }}
-                />
-                <span className="event-info-span">Category:</span>
-                {event.categoryEventName}
+
+              <div className="time-section">
+                <h3 className="section-title">Timeframe</h3>
+
+                <div className="info-item">
+                  <FaClock className="icon-time" />
+                  <div>
+                    <span className="event-info-span">Start Time:</span>
+                    {formatDateTime(event.startTime)}
+                  </div>
+                </div>
+
+                <div className="info-item">
+                  <FaClock className="icon-time" />
+                  <div>
+                    <span className="event-info-span">End Time:</span>
+                    {formatDateTime(event.endTime)}
+                  </div>
+                </div>
+
+                <div className="info-item">
+                  <FaMapMarkerAlt className="icon-location" />
+                  <div>
+                    <span className="event-info-span">Location:</span>
+                    {event.placed}
+                  </div>
+                </div>
               </div>
 
-              {/* Thêm các trường mới */}
-              {event.sizeParticipants && (
-                <div style={{ marginTop: "10px" }}>
-                  <FaUsers style={{ marginRight: "10px", color: "#4682B4" }} />
-                  <span className="event-info-span">Participants:</span>
-                  {event.sizeParticipants}
-                </div>
-              )}
+              <div className="basic-info-section">
+                <h3 className="section-title">Basic Information</h3>
 
-              {event.goals && (
-                <div style={{ marginTop: "10px" }}>
-                  <FaBullseye
-                    style={{ marginRight: "10px", color: "#D2691E" }}
-                  />
-                  <span className="event-info-span">Goals:</span>
-                  {event.goals}
+                <div className="info-item">
+                  <MdOutlineCategory className="icon-category" />
+                  <div>
+                    <span className="event-info-span">Category:</span>
+                    {event.categoryEventName}
+                  </div>
                 </div>
-              )}
 
-              {event.measuringSuccess && (
-                <div style={{ marginTop: "10px" }}>
-                  <FaChartLine
-                    style={{ marginRight: "10px", color: "#2E8B57" }}
-                  />
-                  <span className="event-info-span">Success Metrics:</span>
-                  {event.measuringSuccess}
+                <div className="info-item">
+                  <FaMoneyBillAlt className="icon-price" />
+                  <div>
+                    <span className="event-info-span">Total Cost:</span>
+                    {event.amountBudget.toLocaleString("vi-VN")} VNĐ
+                  </div>
                 </div>
-              )}
 
-              {event.monitoringProcess && (
-                <div style={{ marginTop: "10px" }}>
-                  <FaClipboardCheck
-                    style={{ marginRight: "10px", color: "#6A5ACD" }}
-                  />
-                  <span className="event-info-span">Monitoring Process:</span>
-                  {event.monitoringProcess}
-                </div>
-              )}
+                {event.sizeParticipants && (
+                  <div className="info-item">
+                    <FaUsers />
+                    <div>
+                      <span className="event-info-span">Participants:</span>
+                      {event.sizeParticipants}
+                    </div>
+                  </div>
+                )}
+
+                {event.sloganEvent && (
+                  <div className="info-item">
+                    <FaQuoteLeft />
+                    <div>
+                      <span className="event-info-span">Slogan:</span>
+                      {event.sloganEvent}
+                    </div>
+                  </div>
+                )}
+
+                {event.targetAudience && (
+                  <div className="info-item">
+                    <FaUserFriends />
+                    <div>
+                      <span className="event-info-span">Target Audience:</span>
+                      {event.targetAudience}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="goals-section">
+                <h3 className="section-title">Goals & Planning</h3>
+
+                {event.goals && (
+                  <div className="info-item">
+                    <FaBullseye />
+                    <div>
+                      <span className="event-info-span">Goals:</span>
+                      {event.goals}
+                    </div>
+                  </div>
+                )}
+
+                {event.measuringSuccess && (
+                  <div className="info-item">
+                    <FaChartLine />
+                    <div>
+                      <span className="event-info-span">Success Metrics:</span>
+                      {event.measuringSuccess}
+                    </div>
+                  </div>
+                )}
+
+                {event.promotionalPlan && (
+                  <div className="info-item">
+                    <FaBullhorn />
+                    <div>
+                      <span className="event-info-span">Promotional Plan:</span>
+                      {event.promotionalPlan}
+                    </div>
+                  </div>
+                )}
+
+                {event.monitoringProcess && (
+                  <div className="info-item">
+                    <FaClipboardCheck />
+                    <div>
+                      <span className="event-info-span">
+                        Monitoring Process:
+                      </span>
+                      {event.monitoringProcess}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="event-description">

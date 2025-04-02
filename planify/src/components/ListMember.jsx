@@ -117,15 +117,12 @@ const ListMember = ({ eventId, data }) => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  // Thêm state để theo dõi khi nào cần refresh
   const [refreshKey, setRefreshKey] = useState(0);
-
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Chuyển fetchParticipants thành memoized function để có thể sử dụng trong useEffect
   const fetchParticipants = useCallback(async () => {
     setLoading(true);
     try {
@@ -172,7 +169,6 @@ const ListMember = ({ eventId, data }) => {
         }
         message.error("Không thể thực hiện tìm kiếm");
       } else {
-        // Lọc ra những người dùng chưa tham gia sự kiện
         const filteredResults = results.filter(
           (user) => !participants.some((p) => p.userId === user.id)
         );
@@ -201,11 +197,7 @@ const ListMember = ({ eventId, data }) => {
         message.error("Không thể thêm người dùng vào sự kiện");
       } else {
         message.success("Đã thêm người dùng vào sự kiện thành công");
-
-        // Tăng refreshKey để kích hoạt re-render và fetch lại data
         setRefreshKey((prevKey) => prevKey + 1);
-
-        // Cập nhật danh sách kết quả tìm kiếm
         setSearchResults(searchResults.filter((user) => user.id !== userId));
       }
     } catch (error) {
@@ -236,7 +228,6 @@ const ListMember = ({ eventId, data }) => {
       if (response.status === 200) {
         message.success("Đã xóa người dùng khỏi sự kiện thành công");
 
-        // Tăng refreshKey để kích hoạt re-render và fetch lại data
         setRefreshKey((prevKey) => prevKey + 1);
       } else {
         message.error("Đã xảy ra lỗi khi xóa người dùng");
@@ -257,14 +248,12 @@ const ListMember = ({ eventId, data }) => {
     setPageSize(newPageSize);
   };
 
-  // Sử dụng useEffect để cập nhật danh sách khi có thay đổi
   useEffect(() => {
     if (eventId) {
       fetchParticipants();
     }
   }, [eventId, fetchParticipants, refreshKey]);
 
-  // Thêm useEffect để cập nhật từ props nếu có
   useEffect(() => {
     if (data?.joinProjects?.length && !refreshKey) {
       console.log("Using data from props:", data.joinProjects);

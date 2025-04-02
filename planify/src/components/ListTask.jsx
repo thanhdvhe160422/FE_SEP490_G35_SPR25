@@ -112,7 +112,6 @@ function ListTask({ eventId, data }) {
       });
       setIsEditSubTaskModalVisible(false);
 
-      // Cập nhật danh sách và hiển thị lại
       fetchTasksFromAPI().then(() => {
         const updatedTask = tasks.find((task) => task.id === selectedTask.id);
         if (updatedTask) {
@@ -184,13 +183,16 @@ function ListTask({ eventId, data }) {
         if (!loading) {
           message.success("Đã tải lại danh sách công việc thành công");
         }
+        return tasksData;
       } else {
         setTasks([]);
+        return [];
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
       message.error("Không thể tải danh sách công việc");
       setError("Không thể tải danh sách công việc");
+      return [];
     } finally {
       setLoading(false);
       setReloading(false);
@@ -227,12 +229,16 @@ function ListTask({ eventId, data }) {
       });
       subTaskForm.resetFields();
       setIsSubTaskModalVisible(false);
-      fetchTasksFromAPI().then(() => {
-        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
-        if (updatedTask) {
-          showSubTasks(updatedTask);
+      const updatedTasks = await fetchTasksFromAPI();
+      if (updatedTasks && updatedTasks.length > 0) {
+        const refreshedTask = updatedTasks.find(
+          (task) => task.id === selectedTask.id
+        );
+        if (refreshedTask) {
+          setSelectedTask(refreshedTask);
+          showSubTasks(refreshedTask);
         }
-      });
+      }
 
       return true;
     } catch (error) {
@@ -535,7 +541,7 @@ function ListTask({ eventId, data }) {
       key: "taskDescription",
       width: "25%",
       ellipsis: true,
-      render: (text) => text || "Chưa có mô tả",
+      render: (text) => text || "No description",
     },
     {
       title: "Start Time",
@@ -873,7 +879,7 @@ function ListTask({ eventId, data }) {
               </div>
               {selectedTask?.taskDescription && (
                 <div className="task-description">
-                  <span className="detail-label">Mô tả:</span>{" "}
+                  <span className="detail-label">Description:</span>{" "}
                   {selectedTask.taskDescription}
                 </div>
               )}
@@ -981,6 +987,23 @@ function ListTask({ eventId, data }) {
                     Deadline
                   </Space>
                 }
+                rules={[
+                  {
+                    required: true,
+                    message: "Please choose a deadline!",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const startTime = getFieldValue("startTime");
+                      if (!value || !startTime || value.isAfter(startTime)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Deadline must be after the start time")
+                      );
+                    },
+                  }),
+                ]}
               >
                 <DatePicker
                   style={{ width: "100%" }}
@@ -990,7 +1013,7 @@ function ListTask({ eventId, data }) {
                   disabledDate={(current) => {
                     const startTime = form.getFieldValue("startTime");
                     return startTime
-                      ? current && current < startTime.startOf("day")
+                      ? current && current <= startTime.startOf("day")
                       : false;
                   }}
                 />
@@ -1030,7 +1053,7 @@ function ListTask({ eventId, data }) {
             <Spin spinning={loadingSubTasks}>
               {!subTasks || subTasks.length === 0 ? (
                 <Empty
-                  description="Chưa có công việc con nào"
+                  description="No subtasks yet"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               ) : (
@@ -1050,11 +1073,11 @@ function ListTask({ eventId, data }) {
                           }}
                         />,
                         <Popconfirm
-                          title="Xác nhận xóa"
-                          description="Bạn có chắc chắn muốn xóa công việc con này?"
+                          title="Confirm deletion"
+                          description="Are you sure you want to delete this subtask?"
                           onConfirm={() => deleteSubTask(item.id)}
-                          okText="Xóa"
-                          cancelText="Hủy"
+                          okText="Delete"
+                          cancelText="Cancel"
                           icon={
                             <ExclamationCircleOutlined
                               style={{ color: "red" }}
@@ -1105,7 +1128,7 @@ function ListTask({ eventId, data }) {
                           </div>
                           {item.deadline && (
                             <div className="sub-task-date">
-                              Hạn: {formatDate(item.deadline)}
+                              Deadline: {formatDate(item.deadline)}
                             </div>
                           )}
                           {item.subTaskDescription && (
@@ -1137,7 +1160,7 @@ function ListTask({ eventId, data }) {
                 />
               )}
               <Modal
-                title="Cập nhật công việc con"
+                title="Update Subtask"
                 open={isEditSubTaskModalVisible}
                 onCancel={() => setIsEditSubTaskModalVisible(false)}
                 footer={null}
@@ -1157,33 +1180,33 @@ function ListTask({ eventId, data }) {
                 >
                   <Form.Item
                     name="subTaskName"
-                    label="Tiêu đề"
+                    label="Title"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập tiêu đề công việc con!",
+                        message: "Please enter a subtask title!",
                       },
                     ]}
                   >
-                    <Input placeholder="Nhập tiêu đề công việc con" />
+                    <Input placeholder="Enter subtask title" />
                   </Form.Item>
 
-                  <Form.Item name="subTaskDescription" label="Mô tả">
-                    <TextArea rows={2} placeholder="Nhập mô tả công việc con" />
+                  <Form.Item name="subTaskDescription" label="Describe">
+                    <TextArea rows={2} placeholder="Describe subtask" />
                   </Form.Item>
 
                   <Form.Item
                     name="startTime"
                     label={
                       <Space>
-                        <CalendarOutlined /> Ngày bắt đầu
+                        <CalendarOutlined /> Start Time
                       </Space>
                     }
                   >
                     <DatePicker
                       style={{ width: "100%" }}
                       format="DD/MM/YYYY"
-                      placeholder="Chọn ngày bắt đầu"
+                      placeholder="Choose a start time"
                     />
                   </Form.Item>
 
@@ -1191,40 +1214,25 @@ function ListTask({ eventId, data }) {
                     name="deadline"
                     label={
                       <Space>
-                        <ClockCircleOutlined /> Hạn chót
+                        <ClockCircleOutlined /> Deadline
                       </Space>
                     }
-                    rules={[
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || !getFieldValue("startTime")) {
-                            return Promise.resolve();
-                          }
-                          if (value.isBefore(getFieldValue("startTime"))) {
-                            return Promise.reject(
-                              new Error("Hạn chót phải sau ngày bắt đầu!")
-                            );
-                          }
-                          return Promise.resolve();
-                        },
-                      }),
-                    ]}
                   >
                     <DatePicker
                       style={{ width: "100%" }}
                       format="DD/MM/YYYY"
-                      placeholder="Chọn hạn chót"
+                      placeholder="Choose a deadline"
                     />
                   </Form.Item>
 
-                  <Form.Item name="amountBudget" label="Ngân sách (VND)">
+                  <Form.Item name="amountBudget" label="Budget (VND)">
                     <InputNumber
                       style={{ width: "100%" }}
                       formatter={(value) =>
                         `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                       }
                       parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                      placeholder="Nhập ngân sách"
+                      placeholder="Enter budget"
                     />
                   </Form.Item>
 
@@ -1233,14 +1241,14 @@ function ListTask({ eventId, data }) {
                       <Button
                         onClick={() => setIsEditSubTaskModalVisible(false)}
                       >
-                        Hủy
+                        Cancel
                       </Button>
                       <Button
                         type="primary"
                         htmlType="submit"
                         loading={isEditSubTaskSubmitting}
                       >
-                        Cập nhật
+                        Update
                       </Button>
                     </Space>
                   </Form.Item>
