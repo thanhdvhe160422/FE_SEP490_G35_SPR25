@@ -5,6 +5,10 @@ import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import refreshAccessToken from "../../services/refreshToken";
 import {
+  FaClipboardCheck,
+  FaChartLine,
+  FaBullseye,
+  FaUsers,
   FaClock,
   FaMapMarkerAlt,
   FaChevronLeft,
@@ -320,6 +324,45 @@ const EventDetailEOG = () => {
                 <span className="event-info-span">Category:</span>
                 {event.categoryEventName}
               </div>
+
+              {/* Thêm các trường mới */}
+              {event.sizeParticipants && (
+                <div style={{ marginTop: "10px" }}>
+                  <FaUsers style={{ marginRight: "10px", color: "#4682B4" }} />
+                  <span className="event-info-span">Participants:</span>
+                  {event.sizeParticipants}
+                </div>
+              )}
+
+              {event.goals && (
+                <div style={{ marginTop: "10px" }}>
+                  <FaBullseye
+                    style={{ marginRight: "10px", color: "#D2691E" }}
+                  />
+                  <span className="event-info-span">Goals:</span>
+                  {event.goals}
+                </div>
+              )}
+
+              {event.measuringSuccess && (
+                <div style={{ marginTop: "10px" }}>
+                  <FaChartLine
+                    style={{ marginRight: "10px", color: "#2E8B57" }}
+                  />
+                  <span className="event-info-span">Success Metrics:</span>
+                  {event.measuringSuccess}
+                </div>
+              )}
+
+              {event.monitoringProcess && (
+                <div style={{ marginTop: "10px" }}>
+                  <FaClipboardCheck
+                    style={{ marginRight: "10px", color: "#6A5ACD" }}
+                  />
+                  <span className="event-info-span">Monitoring Process:</span>
+                  {event.monitoringProcess}
+                </div>
+              )}
             </div>
 
             <div className="event-description">

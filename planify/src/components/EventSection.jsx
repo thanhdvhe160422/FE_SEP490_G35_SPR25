@@ -47,26 +47,37 @@ function EventSection() {
 
     fetchCampus();
   }, []);
-  const handleSearch = async () => {
+  const handleSearch = async (pageNumber = currentPage) => {
     try {
       setIsFiltered(true);
+
       const params = {
-        page: currentPage,
+        page: pageNumber,
         pageSize: EVENTS_PER_PAGE,
         title: searchTerm,
-        categoryId: selectedCategory,
         status: selectedStatus,
         startTime: selectedStart,
         endTime: selectedEnd,
         placed: selectedLocation,
+        CategoryEventId: selectedCategory,
+        creatBy: currentUserId,
       };
-      const response = await searchEvents(params);
 
-      if (response) {
-        const items = Array.isArray(response.items) ? response.items : [];
-        setFilteredEvents(items);
+      if (selectedCategory !== "") {
+        params.categoryEventId = selectedCategory;
+        console.log("Tìm kiếm theo categoryEventId:", selectedCategory);
+      }
+
+      console.log("Tham số tìm kiếm:", params);
+      const response = await searchEvents(params);
+      console.log("Kết quả tìm kiếm:", response);
+
+      if (response && response.items) {
+        console.log(`Tìm thấy ${response.items.length} sự kiện`);
+        setFilteredEvents(response.items);
         setFilteredTotalPages(response.totalPages || 1);
       } else {
+        console.log("Không tìm thấy sự kiện nào");
         setFilteredEvents([]);
         setFilteredTotalPages(1);
       }
@@ -75,6 +86,7 @@ function EventSection() {
       setFilteredTotalPages(1);
     }
   };
+
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategory("");
@@ -88,10 +100,23 @@ function EventSection() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+
     if (isFiltered) {
-      setTimeout(() => {
-        handleSearch();
-      }, 0);
+      if (eventFilter === "my") {
+        const params = {
+          page: newPage,
+          pageSize: EVENTS_PER_PAGE,
+          createBy: currentUserId,
+        };
+        searchEvents(params).then((response) => {
+          if (response && response.items) {
+            setFilteredEvents(response.items);
+            setFilteredTotalPages(response.totalPages || 1);
+          }
+        });
+      } else {
+        handleSearch(newPage);
+      }
     }
   };
 
@@ -186,15 +211,59 @@ function EventSection() {
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
+  const handleMyEvents = async () => {
+    try {
+      setIsFiltered(true);
+
+      const params = {
+        page: 1,
+        pageSize: EVENTS_PER_PAGE,
+        createBy: currentUserId,
+      };
+
+      console.log("Tìm kiếm sự kiện của tôi với tham số:", params);
+      const response = await searchEvents(params);
+      console.log("Kết quả sự kiện của tôi:", response);
+
+      if (response && response.items) {
+        console.log(`Tìm thấy ${response.items.length} sự kiện của tôi`);
+        setFilteredEvents(response.items);
+        setFilteredTotalPages(response.totalPages || 1);
+        setCurrentPage(1);
+      } else {
+        console.log("Không tìm thấy sự kiện nào của tôi");
+        setFilteredEvents([]);
+        setFilteredTotalPages(1);
+      }
+
+      setEventFilter("my");
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm sự kiện của tôi:", error);
+      setFilteredEvents([]);
+      setFilteredTotalPages(1);
+    }
+  };
 
   return (
     <section className="post_section news_post_2">
       <div className="container">
-        <div className="row post_section_inner">
-          <div className="col-lg-4 sidebar">
+        <div className="post_section_inner">
+          <div className="sidebar">
             <div className="filter_section">
               <h3>Filters</h3>
-              <label>Status</label>
+              <label>Category</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.categoryEventName}
+                  </option>
+                ))}
+              </select>
+              {/* <label>Status</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
@@ -203,7 +272,7 @@ function EventSection() {
                 <option value="running">Running</option>
                 <option value="not started yet">Not Started Yet</option>
                 <option value="closed">Closed</option>
-              </select>
+              </select> */}
               <label>Start Time</label>
               <input
                 type="datetime-local"
@@ -231,12 +300,25 @@ function EventSection() {
               >
                 <button
                   className="btn btn-primary"
-                  onClick={handleSearch}
+                  onClick={() => {
+                    setCurrentPage(1);
+                    if (
+                      searchTerm.trim() === "" &&
+                      !selectedCategory &&
+                      !selectedStatus &&
+                      !selectedStart &&
+                      !selectedEnd &&
+                      !selectedLocation
+                    ) {
+                      setIsFiltered(false);
+                    } else {
+                      handleSearch(1);
+                    }
+                  }}
                   style={{ flex: 1 }}
                 >
                   Apply Filters
                 </button>
-
                 {isFiltered && (
                   <button
                     className="btn btn-secondary"
@@ -250,7 +332,7 @@ function EventSection() {
             </div>
           </div>
 
-          <div className="col-lg-8 left_sidebar ls_2">
+          <div className=" main-content">
             <div className="row feature_post_area">
               <div className="col-12">
                 <div className="feature_tittle">
@@ -262,24 +344,7 @@ function EventSection() {
                           className={`filter_button ${
                             eventFilter === "my" ? "active" : ""
                           }`}
-                          onClick={() => {
-                            console.log("📊 CLICK MY EVENT");
-                            console.log(
-                              "currentUserId:",
-                              currentUserId,
-                              "kiểu dữ liệu:",
-                              typeof currentUserId
-                            );
-                            console.log(
-                              "Số lượng sự kiện của tôi:",
-                              events.filter(
-                                (event) =>
-                                  String(event.createBy) ===
-                                  String(currentUserId)
-                              ).length
-                            );
-                            setEventFilter("my");
-                          }}
+                          onClick={handleMyEvents}
                         >
                           My Event
                         </button>
@@ -295,20 +360,6 @@ function EventSection() {
                       </button>
                     </div>
                     <div className="filter_other">
-                      <select
-                        className="post_select"
-                        value={selectedCategory}
-                        onChange={(e) =>
-                          setSelectedCategory(Number(e.target.value))
-                        }
-                      >
-                        <option value="">All Categories</option>
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.categoryEventName}
-                          </option>
-                        ))}
-                      </select>
                       <input
                         style={{ width: "300px" }}
                         type="text"
@@ -345,14 +396,7 @@ function EventSection() {
                 filteredEvents.length > 0 ? (
                   filteredEvents.map((event) => (
                     <div key={event.id} className="col-12 belarus_fast">
-                      <div
-                        style={{
-                          height: "500px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                        }}
-                        className="belarus_items"
-                      >
+                      <div className="belarus_items">
                         <img
                           src={
                             event.eventMedias?.length > 0
@@ -501,13 +545,15 @@ function EventSection() {
                       border: "1px solid #e0e0e0",
                     }}
                   >
-                    <div className="text-center">
-                      <h3 style={{ color: "#555", fontWeight: "500" }}>
-                        Không tìm thấy sự kiện nào
-                      </h3>
-                      <p style={{ color: "#777" }}>
-                        Vui lòng thử lại với các tiêu chí tìm kiếm khác
-                      </p>
+                    <div className="empty-state-container">
+                      <div className="text-center">
+                        <h3 style={{ color: "#555", fontWeight: "500" }}>
+                          Không tìm thấy sự kiện nào
+                        </h3>
+                        <p style={{ color: "#777" }}>
+                          Vui lòng thử lại với các tiêu chí tìm kiếm khác
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )
@@ -666,8 +712,12 @@ function EventSection() {
                     ));
                   }
 
-                  return events.map((event) => (
-                    <div key={event.id} className="col-12 belarus_fast">
+                  return events.map((event, index) => (
+                    <div
+                      key={event.id}
+                      className="col-12 belarus_fast"
+                      data-wow-delay={`${index * 0.1}s`}
+                    >
                       <div
                         style={{
                           height: "500px",
@@ -805,9 +855,12 @@ function EventSection() {
                       Prev
                     </button>
                   </li>
-                  {/* This is the key part that needs to be fixed */}
                   {Array.from({
-                    length: isFiltered ? filteredTotalPages : totalPages,
+                    length: isFiltered
+                      ? filteredTotalPages
+                      : eventFilter === "my"
+                      ? myEventPages
+                      : totalPages,
                   }).map((_, index) => (
                     <li
                       key={index}
@@ -823,6 +876,7 @@ function EventSection() {
                       </button>
                     </li>
                   ))}
+
                   <li
                     className={`page-item ${
                       currentPage ===
