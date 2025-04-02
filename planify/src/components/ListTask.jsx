@@ -26,18 +26,17 @@ import {
   PlusOutlined,
   SyncOutlined,
   CheckOutlined,
-  CloseOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-  ReloadOutlined,
   UnorderedListOutlined,
-  RightOutlined,
 } from "@ant-design/icons";
 import "../styles/Tasks/ListTask.css";
 import { createTaskAPI, updateTask, deleteTask } from "../services/taskService";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -60,13 +59,75 @@ function ListTask({ eventId, data }) {
   const [subTasksVisible, setSubTasksVisible] = useState(false);
   const [subTasks, setSubTasks] = useState([]);
   const [loadingSubTasks, setLoadingSubTasks] = useState(false);
+  const [isEditSubTaskModalVisible, setIsEditSubTaskModalVisible] =
+    useState(false);
+  const [editSubTaskForm] = Form.useForm();
+  const [selectedSubTask, setSelectedSubTask] = useState(null);
+  const [isEditSubTaskSubmitting, setIsEditSubTaskSubmitting] = useState(false);
 
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
+  const showEditSubTaskModal = (subTask) => {
+    setSelectedSubTask(subTask);
+    editSubTaskForm.setFieldsValue({
+      subTaskName: subTask.subTaskName,
+      subTaskDescription: subTask.subTaskDescription,
+      startTime: subTask.startTime ? moment(subTask.startTime) : null,
+      deadline: subTask.deadline ? moment(subTask.deadline) : null,
+      amountBudget: subTask.amountBudget,
+    });
+    setIsEditSubTaskModalVisible(true);
+  };
+  const updateSubTask = async (values) => {
+    try {
+      setIsEditSubTaskSubmitting(true);
 
+      const token = localStorage.getItem("token");
+      const updatedSubTaskData = {
+        subTaskName: values.subTaskName,
+        subTaskDescription: values.subTaskDescription,
+        startTime: values.startTime
+          ? values.startTime.format("YYYY-MM-DD")
+          : null,
+        deadline: values.deadline ? values.deadline.format("YYYY-MM-DD") : null,
+        amountBudget: parseFloat(values.amountBudget) || 0,
+        status: selectedSubTask.status,
+      };
+
+      await axios.put(
+        `https://localhost:44320/api/SubTasks/update/${selectedSubTask.id}`,
+        updatedSubTaskData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Swal.fire({
+        title: "Update Sub-Task Successful!",
+        icon: "success",
+        draggable: true,
+      });
+      setIsEditSubTaskModalVisible(false);
+
+      fetchTasksFromAPI().then(() => {
+        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
+        if (updatedTask) {
+          showSubTasks(updatedTask);
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error updating subtask:", error);
+      message.error("Không thể cập nhật công việc con");
+      return false;
+    } finally {
+      setIsEditSubTaskSubmitting(false);
+    }
+  };
   useEffect(() => {
     if (data && data.tasks && Array.isArray(data.tasks)) {
       console.log("Using tasks data from props:", data.tasks);
@@ -122,21 +183,20 @@ function ListTask({ eventId, data }) {
         if (!loading) {
           message.success("Đã tải lại danh sách công việc thành công");
         }
+        return tasksData;
       } else {
         setTasks([]);
+        return [];
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
       message.error("Không thể tải danh sách công việc");
       setError("Không thể tải danh sách công việc");
+      return [];
     } finally {
       setLoading(false);
       setReloading(false);
     }
-  };
-
-  const fetchTasks = () => {
-    fetchTasksFromAPI();
   };
   const createSubTask = async (values) => {
     try {
@@ -162,15 +222,23 @@ function ListTask({ eventId, data }) {
         }
       );
 
-      message.success("Tạo công việc con thành công");
+      Swal.fire({
+        title: "Create Sub-Task Success!",
+        icon: "success",
+        draggable: true,
+      });
       subTaskForm.resetFields();
       setIsSubTaskModalVisible(false);
-      fetchTasksFromAPI().then(() => {
-        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
-        if (updatedTask) {
-          showSubTasks(updatedTask);
+      const updatedTasks = await fetchTasksFromAPI();
+      if (updatedTasks && updatedTasks.length > 0) {
+        const refreshedTask = updatedTasks.find(
+          (task) => task.id === selectedTask.id
+        );
+        if (refreshedTask) {
+          setSelectedTask(refreshedTask);
+          showSubTasks(refreshedTask);
         }
-      });
+      }
 
       return true;
     } catch (error) {
@@ -233,7 +301,11 @@ function ListTask({ eventId, data }) {
       };
 
       await createTaskAPI(newTaskData);
-      message.success("Tạo công việc mới thành công");
+      Swal.fire({
+        title: "Create Task Successfully!",
+        icon: "success",
+        draggable: true,
+      });
       handleCloseModal();
 
       fetchTasksFromAPI();
@@ -266,7 +338,11 @@ function ListTask({ eventId, data }) {
       };
 
       await updateTask(selectedTask.id, updatedTaskData);
-      message.success("Cập nhật công việc thành công");
+      Swal.fire({
+        title: "Update Task Successfully!",
+        icon: "success",
+        draggable: true,
+      });
       handleCloseModal();
 
       fetchTasksFromAPI();
@@ -285,7 +361,11 @@ function ListTask({ eventId, data }) {
       setReloading(true);
 
       await deleteTask(taskId, -1);
-      message.success("Đã xóa công việc thành công");
+      Swal.fire({
+        title: "Delete Task Successfully!",
+        icon: "success",
+        draggable: true,
+      });
 
       fetchTasksFromAPI();
       return true;
@@ -315,16 +395,34 @@ function ListTask({ eventId, data }) {
 
       const processedSubTasks = task.subTasks.map((subTask) => {
         console.log("Original subtask:", subTask);
+
+        let status = 0;
+
+        if (typeof subTask.status === "number") {
+          status = subTask.status;
+        } else if (
+          subTask.status === true ||
+          subTask.status === "true" ||
+          subTask.status === "1" ||
+          subTask.status === 1
+        ) {
+          status = 1;
+        } else if (
+          subTask.completed === true ||
+          subTask.completed === "true" ||
+          subTask.completed === "1" ||
+          subTask.completed === 1
+        ) {
+          status = 1;
+        }
+
+        console.log(
+          `Subtask ID: ${subTask.id}, Original status: ${subTask.status}, Processed status: ${status}`
+        );
+
         return {
           ...subTask,
-          status:
-            typeof subTask.status === "number"
-              ? subTask.status
-              : subTask.status === true
-              ? 1
-              : subTask.completed === true
-              ? 1
-              : 0,
+          status: status,
         };
       });
 
@@ -372,8 +470,6 @@ function ListTask({ eventId, data }) {
         )
       );
 
-      message.success("Cập nhật trạng thái thành công");
-
       await fetchTasksFromAPI();
 
       if (selectedTask) {
@@ -402,7 +498,11 @@ function ListTask({ eventId, data }) {
 
       setSubTasks((prev) => prev.filter((item) => item.id !== subTaskId));
 
-      message.success("Đã xóa công việc con thành công");
+      Swal.fire({
+        title: "Delete subtask successfully",
+        icon: "success",
+        draggable: true,
+      });
 
       fetchTasksFromAPI();
     } catch (error) {
@@ -413,14 +513,14 @@ function ListTask({ eventId, data }) {
 
   const columns = [
     {
-      title: "STT",
+      title: "#",
       key: "index",
       width: "5%",
       render: (text, record, index) =>
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Tiêu đề",
+      title: "Title",
       dataIndex: "taskName",
       key: "taskName",
       width: "15%",
@@ -429,29 +529,29 @@ function ListTask({ eventId, data }) {
           {text}
           {record.subTasks && record.subTasks.length > 0 && (
             <Tag color="blue" style={{ marginLeft: 8 }}>
-              {record.subTasks.length} công việc con
+              {record.subTasks.length} Subtask
             </Tag>
           )}
         </div>
       ),
     },
     {
-      title: "Mô tả",
+      title: "Description",
       dataIndex: "taskDescription",
       key: "taskDescription",
       width: "25%",
       ellipsis: true,
-      render: (text) => text || "Chưa có mô tả",
+      render: (text) => text || "No description",
     },
     {
-      title: "Ngày bắt đầu",
+      title: "Start Time",
       dataIndex: "startTime",
       key: "startTime",
       width: "12%",
       render: (text) => formatDate(text),
     },
     {
-      title: "Hạn chót",
+      title: "Deadline",
       dataIndex: "deadline",
       key: "deadline",
       width: "12%",
@@ -465,19 +565,19 @@ function ListTask({ eventId, data }) {
       },
     },
     {
-      title: "Ngân sách",
+      title: "Budget",
       dataIndex: "amountBudget",
       key: "amountBudget",
       width: "13%",
       render: (text) => formatCurrency(text),
     },
     {
-      title: "Hành động",
+      title: "Action",
       key: "action",
       width: "18%",
       render: (_, record) => (
         <Space size="small" onClick={handleActionClick}>
-          <Tooltip title="Xem danh sách công việc con">
+          <Tooltip title="Display list subtasks">
             <Button
               icon={<UnorderedListOutlined />}
               onClick={() => showSubTasks(record)}
@@ -493,11 +593,11 @@ function ListTask({ eventId, data }) {
             className="edit-button"
           />
           <Popconfirm
-            title="Xác nhận xóa công việc"
-            description="Bạn có chắc chắn muốn xóa công việc này?"
+            title="Confirm task deletion"
+            description="Are you sure you want to delete this task?"
             onConfirm={() => handleDelete(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText="Delete"
+            cancelText="Cancel"
             icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
           >
             <Button
@@ -516,7 +616,7 @@ function ListTask({ eventId, data }) {
     return (
       <div style={{ textAlign: "center", padding: "50px 0" }}>
         <Spin size="large" />
-        <div style={{ marginTop: "15px" }}>Đang tải danh sách công việc...</div>
+        <div style={{ marginTop: "15px" }}>Loading task list...</div>
       </div>
     );
   }
@@ -532,7 +632,7 @@ function ListTask({ eventId, data }) {
           icon={<SyncOutlined />}
           onClick={fetchTasksFromAPI}
         >
-          Thử lại
+          Retry
         </Button>
       </div>
     );
@@ -555,48 +655,36 @@ function ListTask({ eventId, data }) {
       <Card className="task-list-card">
         <div className="task-header">
           <Title level={3} className="task-title">
-            Danh sách công việc ({filteredTasks.length})
+            List Task ({filteredTasks.length})
           </Title>
 
           <div className="task-actions">
             <Space>
-              {/* Reload button */}
-              <Tooltip title="Làm mới dữ liệu">
-                <Button
-                  icon={<ReloadOutlined spin={reloading} />}
-                  onClick={fetchTasksFromAPI}
-                  loading={reloading}
-                >
-                  Làm mới
-                </Button>
-              </Tooltip>
-
-              {/* Create task button */}
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={showCreateModal}
                 className="add-task-button"
               >
-                Tạo công việc
+                Create Task
               </Button>
             </Space>
           </div>
         </div>
 
-        <Spin spinning={reloading} tip="Đang tải dữ liệu...">
+        <Spin spinning={reloading} tip="Loading data...">
           {displayedTasks.length === 0 ? (
             <Empty
               image="https://cdn-icons-png.flaticon.com/512/7486/7486754.png"
               imageStyle={{ height: 120 }}
-              description="Chưa có công việc nào"
+              description="No tasks yet"
             >
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={showCreateModal}
               >
-                Tạo công việc đầu tiên
+                Create your first task
               </Button>
             </Empty>
           ) : (
@@ -615,7 +703,7 @@ function ListTask({ eventId, data }) {
               }}
               onChange={handleTableChange}
               locale={{
-                emptyText: "Không có công việc nào",
+                emptyText: "No tasks available",
               }}
               rowClassName={(record) =>
                 record.deadline && new Date(record.deadline) < new Date()
@@ -630,9 +718,8 @@ function ListTask({ eventId, data }) {
           )}
         </Spin>
 
-        {/* Task create/edit modal */}
         <Modal
-          title={isEditMode ? "Cập nhật công việc" : "Tạo công việc mới"}
+          title={isEditMode ? "Update Task" : "Create New Task"}
           open={isTaskModalVisible}
           onCancel={handleCloseModal}
           footer={null}
@@ -652,28 +739,52 @@ function ListTask({ eventId, data }) {
           >
             <Form.Item
               name="taskName"
-              label="Tiêu đề"
-              rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
+              label="Title"
+              rules={[{ required: true, message: "Please enter title!" }]}
             >
-              <Input placeholder="Nhập tiêu đề công việc" />
+              <Input placeholder="Enter task title" />
             </Form.Item>
 
-            <Form.Item name="taskDescription" label="Mô tả">
-              <TextArea rows={3} placeholder="Nhập mô tả công việc" />
+            <Form.Item
+              name="taskDescription"
+              label="Description"
+              rules={[{ required: true, message: "Please enter description!" }]}
+            >
+              <TextArea rows={3} placeholder="Enter task description" />
             </Form.Item>
 
             <Form.Item
               name="startTime"
               label={
                 <Space>
-                  <CalendarOutlined /> Ngày bắt đầu
+                  <CalendarOutlined /> Start Time
                 </Space>
               }
+              rules={[
+                { required: true, message: "Please choose a start time!" },
+              ]}
             >
               <DatePicker
                 style={{ width: "100%" }}
-                format="DD/MM/YYYY"
-                placeholder="Chọn ngày bắt đầu"
+                format="DD/MM/YYYY HH:mm"
+                showTime={{ format: "HH:mm" }}
+                placeholder="Choose a start time"
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf("day")
+                }
+                disabledTime={(selectedDate) => {
+                  if (!selectedDate) return {};
+                  const now = dayjs();
+                  return selectedDate.isSame(now, "day")
+                    ? {
+                        disabledHours: () => [...Array(now.hour()).keys()],
+                        disabledMinutes: (hour) =>
+                          hour === now.hour()
+                            ? [...Array(now.minute()).keys()]
+                            : [],
+                      }
+                    : {};
+                }}
               />
             </Form.Item>
 
@@ -681,18 +792,21 @@ function ListTask({ eventId, data }) {
               name="deadline"
               label={
                 <Space>
-                  <ClockCircleOutlined /> Hạn chót
+                  <ClockCircleOutlined /> Deadline
                 </Space>
               }
+              dependencies={["startTime"]}
               rules={[
+                { required: true, message: "Please choose a deadline!" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (!value || !getFieldValue("startTime")) {
+                    const startTime = getFieldValue("startTime");
+                    if (!value || !startTime) {
                       return Promise.resolve();
                     }
-                    if (value.isBefore(getFieldValue("startTime"))) {
+                    if (value.isBefore(startTime)) {
                       return Promise.reject(
-                        new Error("Hạn chót phải sau ngày bắt đầu!")
+                        new Error("Deadline must be after Start Time!")
                       );
                     }
                     return Promise.resolve();
@@ -702,62 +816,70 @@ function ListTask({ eventId, data }) {
             >
               <DatePicker
                 style={{ width: "100%" }}
-                format="DD/MM/YYYY"
-                placeholder="Chọn hạn chót"
+                format="DD/MM/YYYY HH:mm"
+                showTime={{ format: "HH:mm" }}
+                placeholder="Choose a deadline"
+                disabledDate={(current) => {
+                  const startTime = form.getFieldValue("startTime");
+                  return startTime
+                    ? current && current < startTime.startOf("day")
+                    : false;
+                }}
               />
             </Form.Item>
 
-            <Form.Item name="amountBudget" label="Ngân sách (VND)">
+            <Form.Item name="amountBudget" label="Budget (VND)">
               <InputNumber
                 style={{ width: "100%" }}
+                min={0}
+                controls={false}
                 formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
                 }
-                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                placeholder="Nhập ngân sách"
+                parser={(value) => value.replace(/[^0-9]/g, "")}
+                placeholder="Enter budget"
               />
             </Form.Item>
 
             <Form.Item>
               <Space className="form-actions" style={{ float: "right" }}>
-                <Button onClick={handleCloseModal}>Hủy</Button>
+                <Button onClick={handleCloseModal}>Cancel</Button>
                 <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                  {isEditMode ? "Cập nhật" : "Tạo mới"}
+                  {isEditMode ? "Update" : "Create"}
                 </Button>
               </Space>
             </Form.Item>
           </Form>
         </Modal>
 
-        {/* Drawer for sub-tasks */}
         <Drawer
           title={
             <div>
               <div className="task-drawer-title">
-                <span>Chi tiết công việc: {selectedTask?.taskName}</span>
+                <span>Task details: {selectedTask?.taskName}</span>
                 <Tag color="blue">
-                  Hoàn thành: {calculateProgress(selectedTask?.subTasks)}%
+                  Complete: {calculateProgress(selectedTask?.subTasks)}%
                 </Tag>
               </div>
               <div className="task-detail-info">
                 <div>
-                  <span className="detail-label">Bắt đầu:</span>{" "}
+                  <span className="detail-label">Start Time:</span>{" "}
                   {formatDate(selectedTask?.startTime)}
                 </div>
                 <div>
-                  <span className="detail-label">Hạn chót:</span>{" "}
+                  <span className="detail-label">Deadline:</span>{" "}
                   {formatDate(selectedTask?.deadline)}
                 </div>
                 {selectedTask?.amountBudget > 0 && (
                   <div>
-                    <span className="detail-label">Ngân sách:</span>{" "}
+                    <span className="detail-label">Budget:</span>{" "}
                     {formatCurrency(selectedTask?.amountBudget)}
                   </div>
                 )}
               </div>
               {selectedTask?.taskDescription && (
                 <div className="task-description">
-                  <span className="detail-label">Mô tả:</span>{" "}
+                  <span className="detail-label">Description:</span>{" "}
                   {selectedTask.taskDescription}
                 </div>
               )}
@@ -773,12 +895,12 @@ function ListTask({ eventId, data }) {
               icon={<PlusOutlined />}
               onClick={showCreateSubTaskModal}
             >
-              Thêm mới
+              Create New
             </Button>
           }
         >
           <Modal
-            title="Thêm công việc con mới"
+            title="Add new subtask"
             open={isSubTaskModalVisible}
             onCancel={() => setIsSubTaskModalVisible(false)}
             footer={null}
@@ -798,33 +920,62 @@ function ListTask({ eventId, data }) {
             >
               <Form.Item
                 name="subTaskName"
-                label="Tiêu đề"
+                label="Title"
                 rules={[
                   {
                     required: true,
-                    message: "Vui lòng nhập tiêu đề công việc con!",
+                    message: "Please enter a subtask title!",
                   },
                 ]}
               >
-                <Input placeholder="Nhập tiêu đề công việc con" />
+                <Input placeholder="Enter subtask title" />
               </Form.Item>
 
-              <Form.Item name="subTaskDescription" label="Mô tả">
-                <TextArea rows={2} placeholder="Nhập mô tả công việc con" />
+              <Form.Item
+                name="subTaskDescription"
+                label="Description"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter a subtask description!",
+                  },
+                ]}
+              >
+                <TextArea rows={2} placeholder="Enter subtask description" />
               </Form.Item>
 
               <Form.Item
                 name="startTime"
                 label={
                   <Space>
-                    <CalendarOutlined /> Ngày bắt đầu
+                    <CalendarOutlined /> Start Time
                   </Space>
                 }
+                rules={[
+                  { required: true, message: "Please choose a start time!" },
+                ]}
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf("day")
+                }
+                disabledTime={(selectedDate) => {
+                  if (!selectedDate) return {};
+                  const now = dayjs();
+                  return selectedDate.isSame(now, "day")
+                    ? {
+                        disabledHours: () => [...Array(now.hour()).keys()],
+                        disabledMinutes: (hour) =>
+                          hour === now.hour()
+                            ? [...Array(now.minute()).keys()]
+                            : [],
+                      }
+                    : {};
+                }}
               >
                 <DatePicker
                   style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn ngày bắt đầu"
+                  format="DD/MM/YYYY HH:mm"
+                  showTime={{ format: "HH:mm" }}
+                  placeholder="Choose a start time"
                 />
               </Form.Item>
 
@@ -832,29 +983,39 @@ function ListTask({ eventId, data }) {
                 name="deadline"
                 label={
                   <Space>
-                    <ClockCircleOutlined /> Hạn chót
+                    <ClockCircleOutlined />
+                    Deadline
                   </Space>
                 }
                 rules={[
+                  {
+                    required: true,
+                    message: "Please choose a deadline!",
+                  },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (!value || !getFieldValue("startTime")) {
+                      const startTime = getFieldValue("startTime");
+                      if (!value || !startTime || value.isAfter(startTime)) {
                         return Promise.resolve();
                       }
-                      if (value.isBefore(getFieldValue("startTime"))) {
-                        return Promise.reject(
-                          new Error("Hạn chót phải sau ngày bắt đầu!")
-                        );
-                      }
-                      return Promise.resolve();
+                      return Promise.reject(
+                        new Error("Deadline must be after the start time")
+                      );
                     },
                   }),
                 ]}
               >
                 <DatePicker
                   style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn hạn chót"
+                  format="DD/MM/YYYY HH:mm"
+                  showTime={{ format: "HH:mm" }}
+                  placeholder="Choose a deadline"
+                  disabledDate={(current) => {
+                    const startTime = form.getFieldValue("startTime");
+                    return startTime
+                      ? current && current <= startTime.startOf("day")
+                      : false;
+                  }}
                 />
               </Form.Item>
 
@@ -872,14 +1033,14 @@ function ListTask({ eventId, data }) {
               <Form.Item>
                 <Space className="form-actions" style={{ float: "right" }}>
                   <Button onClick={() => setIsSubTaskModalVisible(false)}>
-                    Hủy
+                    Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
                     loading={isSubTaskSubmitting}
                   >
-                    Tạo mới
+                    Create
                   </Button>
                 </Space>
               </Form.Item>
@@ -887,12 +1048,12 @@ function ListTask({ eventId, data }) {
           </Modal>
 
           <div className="sub-tasks-section">
-            <Title level={5}>Danh sách công việc con ({subTasks.length})</Title>
+            <Title level={5}>List Subtask ({subTasks.length})</Title>
 
             <Spin spinning={loadingSubTasks}>
               {!subTasks || subTasks.length === 0 ? (
                 <Empty
-                  description="Chưa có công việc con nào"
+                  description="No subtasks yet"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               ) : (
@@ -908,15 +1069,15 @@ function ListTask({ eventId, data }) {
                           icon={<EditOutlined />}
                           size="small"
                           onClick={() => {
-                            message.info("Chức năng đang phát triển");
+                            showEditSubTaskModal(item);
                           }}
                         />,
                         <Popconfirm
-                          title="Xác nhận xóa"
-                          description="Bạn có chắc chắn muốn xóa công việc con này?"
+                          title="Confirm deletion"
+                          description="Are you sure you want to delete this subtask?"
                           onConfirm={() => deleteSubTask(item.id)}
-                          okText="Xóa"
-                          cancelText="Hủy"
+                          okText="Delete"
+                          cancelText="Cancel"
                           icon={
                             <ExclamationCircleOutlined
                               style={{ color: "red" }}
@@ -933,12 +1094,29 @@ function ListTask({ eventId, data }) {
                       ]}
                     >
                       <div className="sub-task-item">
-                        <Checkbox
-                          checked={item.status === 1}
-                          onChange={(e) =>
-                            toggleSubTaskStatus(item.id, e.target.checked)
-                          }
-                        />
+                        {item.status === 1 ? (
+                          <Button
+                            type="primary"
+                            shape="circle"
+                            icon={<CheckOutlined />}
+                            size="small"
+                            style={{
+                              backgroundColor: "#52c41a",
+                              marginRight: "8px",
+                              cursor: "default",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSubTaskStatus(item.id, false);
+                            }}
+                          />
+                        ) : (
+                          <Checkbox
+                            onChange={(e) =>
+                              toggleSubTaskStatus(item.id, e.target.checked)
+                            }
+                          />
+                        )}
 
                         <div
                           className={`sub-task-content ${
@@ -950,7 +1128,7 @@ function ListTask({ eventId, data }) {
                           </div>
                           {item.deadline && (
                             <div className="sub-task-date">
-                              Hạn: {formatDate(item.deadline)}
+                              Deadline: {formatDate(item.deadline)}
                             </div>
                           )}
                           {item.subTaskDescription && (
@@ -981,6 +1159,101 @@ function ListTask({ eventId, data }) {
                   )}
                 />
               )}
+              <Modal
+                title="Update Subtask"
+                open={isEditSubTaskModalVisible}
+                onCancel={() => setIsEditSubTaskModalVisible(false)}
+                footer={null}
+                className="subtask-modal"
+              >
+                <Form
+                  form={editSubTaskForm}
+                  layout="vertical"
+                  onFinish={updateSubTask}
+                  initialValues={{
+                    subTaskName: "",
+                    subTaskDescription: "",
+                    startTime: null,
+                    deadline: null,
+                    amountBudget: 0,
+                  }}
+                >
+                  <Form.Item
+                    name="subTaskName"
+                    label="Title"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter a subtask title!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter subtask title" />
+                  </Form.Item>
+
+                  <Form.Item name="subTaskDescription" label="Describe">
+                    <TextArea rows={2} placeholder="Describe subtask" />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="startTime"
+                    label={
+                      <Space>
+                        <CalendarOutlined /> Start Time
+                      </Space>
+                    }
+                  >
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      format="DD/MM/YYYY"
+                      placeholder="Choose a start time"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="deadline"
+                    label={
+                      <Space>
+                        <ClockCircleOutlined /> Deadline
+                      </Space>
+                    }
+                  >
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      format="DD/MM/YYYY"
+                      placeholder="Choose a deadline"
+                    />
+                  </Form.Item>
+
+                  <Form.Item name="amountBudget" label="Budget (VND)">
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                      placeholder="Enter budget"
+                    />
+                  </Form.Item>
+
+                  <Form.Item>
+                    <Space className="form-actions" style={{ float: "right" }}>
+                      <Button
+                        onClick={() => setIsEditSubTaskModalVisible(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isEditSubTaskSubmitting}
+                      >
+                        Update
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Form>
+              </Modal>
             </Spin>
           </div>
         </Drawer>

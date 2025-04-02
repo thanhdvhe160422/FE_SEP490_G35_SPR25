@@ -186,6 +186,7 @@ export const searchEvents = async (params) => {
       `https://localhost:44320/api/Events/search`,
       {
         params: {
+          createBy: params.createBy || undefined,
           page: params.page || undefined,
           pageSize: params.pageSize || undefined,
           title: params.title || undefined,
