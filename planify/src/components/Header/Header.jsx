@@ -93,10 +93,9 @@ export default function Header() {
 
   const navItems = navItemsByRole[userRole] || [];
 
-  function convertToDirectLink(googleDriveUrl) {
-    
-    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
-    const fileId = googleDriveUrl.split("id=")[1];
+  function convertToDirectLink(url) {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 }
   return (

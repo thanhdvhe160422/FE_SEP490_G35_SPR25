@@ -4,12 +4,13 @@ import { useSnackbar } from "notistack";
 import "../../styles/Events/UpdateEvent.css";
 import Swal from "sweetalert2";
 import Header from "../../components/Header/Header";
-import { getEventEOGById, updateEvent } from "../../services/EventService";
+import { getEventEOGById, updateEvent, deleteMedia } from "../../services/EventService";
 import { getCategoryByCampusId } from "../../services/CategoryService";
 import { getCampusIdByName } from "../../services/campusService";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import axios from "axios";
 
 const UpdateEventForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -18,10 +19,13 @@ const UpdateEventForm = () => {
   const [selectedCategory, setSelectedCategory] = useState(1);
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const fileInputRef = useRef();
+  const [newImages,setNewImages] = useState([]);
+  const [deleteImages,setDeleteImages] = useState([]);
+  const [isChangeImage, setIsChangeImage] = useState(0);
+  const [isDeleteImage, setIsDeleteImage] = useState(0);
 
   const openLightbox = (index) => {
     setPhotoIndex(index);
@@ -59,7 +63,7 @@ const UpdateEventForm = () => {
         const campustName = localStorage.getItem("campus");
         const campusId = await getCampusIdByName(campustName);
         const response = await getCategoryByCampusId(campusId.id);
-        setImages(response.result.images || []);
+        //setImages(response.result.images || []);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching category data:", error);
@@ -69,17 +73,18 @@ const UpdateEventForm = () => {
       try {
         const response = await getEventEOGById(id);
         setEvent(response.result);
+        setImages(response?.result?.eventMedia || []);
         setSelectedCategory(response.result.categoryEventId);
 
-        if (
-          response.result.eventMedia &&
-          response.result.eventMedia.length > 0
-        ) {
-          const imageUrls = response.result.eventMedia.map(
-            (media) => media.mediaUrl
-          );
-          setImages(imageUrls);
-        }
+        // if (
+        //   response.result.eventMedia &&
+        //   response.result.eventMedia.length > 0
+        // ) {
+        //   const imageUrls = response.result.eventMedia.map(
+        //     (media) => media.mediaUrl
+        //   );
+        //   setImages(imageUrls);
+        // }
       } catch (error) {
         console.error("Error fetching event data:", error);
       }
@@ -89,10 +94,10 @@ const UpdateEventForm = () => {
     fetchEventData();
   }, [id]);
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEvent((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
+    const { name, value } = e.target;
+    setEvent((prevEvent) => ({
+      ...prevEvent,
+      [name]: value,
     }));
   };
 
@@ -106,8 +111,6 @@ const UpdateEventForm = () => {
       startTime: event.startTime,
       endTime: event.endTime,
       amountBudget: event.amountBudget,
-      isPublic: event.isPublic ? 1 : 0,
-      timePublic: event.timePublic,
       status: event.status,
       managerId: event?.manager?.id ?? 1,
       campusId: 1,
@@ -128,7 +131,20 @@ const UpdateEventForm = () => {
 
     try {
       const response = await updateEvent(event.id, eventData);
-      const resData = await response.json();
+      if (isDeleteImage===1){
+        try{
+          const isDeleteSuccesfully = await deleteMedia(deleteImages);
+          console.log(isDeleteSuccesfully);
+          if (!isDeleteSuccesfully) 
+            throw new Error("Failed to delete media");
+        }catch(error){
+          console.error(error);
+        }
+      }
+      if (isChangeImage===1){
+        var token = localStorage.getItem("token");
+        handleUploadImages(event.id,token);
+      }
       if (response.status === 200) {
         Swal.fire({
           title: "Event Updated Successfully",
@@ -142,7 +158,7 @@ const UpdateEventForm = () => {
           },
         });
       } else {
-        console.error("Update failed:", resData);
+        console.error("Update failed:", response);
         Swal.fire({
           title: "Error",
           text: response.message || "There was an error updating the event.",
@@ -172,43 +188,89 @@ const UpdateEventForm = () => {
   };
 
   const fixDriveUrl = (url) => {
-    if (!url.includes("drive.google.com/uc?id=")) return url;
+    if (!url?.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
   // const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
 
-  const handleDeleteImage = (index) => {
-    Swal.fire({
-      title: "Are you sure you want to delete this image?",
-      text: "This image will be removed from the list.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const newImages = [...images];
-        newImages.splice(index, 1);
-        setImages(newImages);
-        Swal.fire({
-          icon: "success",
-          title: "Deleted successfully!",
-          showConfirmButton: false,
-          timer: 2000, // auto close after 2s
-        });
-      }
-    });
+  const handleDeleteImage = (index,item) => {
+    try{
+      Swal.fire({
+        title: "Are you sure you want to delete this image?",
+        text: "This image will be removed from the list.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const _newImages = [...images];
+          _newImages.splice(index, 1);
+          setImages(_newImages);
+          if (item.id!==0){
+            console.log("delete item: "+JSON.stringify(item));
+            //setDeleteImages((deleteImages) => [...deleteImages, item])
+            setDeleteImages((deleteImages) => {
+              const updatedDeleteImages = [...deleteImages, item];
+              console.log("delete image: " + JSON.stringify(updatedDeleteImages, null, 2));
+              return updatedDeleteImages;
+          });
+            setIsDeleteImage(1);
+          //console.log("delete image: "+JSON.stringify(deleteImages,null,2));
+          }
+          // Swal.fire({
+          //   icon: "success",
+          //   title: "Deleted successfully!",
+          //   showConfirmButton: false,
+          //   timer: 2000,
+          // });
+        }
+      });
+    }catch(error){
+      console.error("error when delete image: "+ error);
+    }
   };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const newImageUrls = selectedFiles.map((file) => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...newImageUrls]);
+    const _newImages = selectedFiles.map((file, index) => ({
+      id: 0,
+      mediaUrl: URL.createObjectURL(file),
+    }));
+    setImages((prevImages) => [...prevImages, ..._newImages]);
+    setNewImages((prevNewImages) => [...prevNewImages, ...selectedFiles]);
+    setIsChangeImage(1);
   };
+  const handleUploadImages = async (eventId, token) => {
+    //const images = selectedImagesRef.current;
+    console.log("call api " + images.length);
 
+    if (newImages.length === 0) return;
+
+    const formData = new FormData();
+    newImages.forEach((file) => formData.append("EventMediaFiles", file));
+    formData.append("eventId", eventId);
+    try {
+      await axios.post(
+        "https://localhost:44320/api/Events/upload-image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Image upload failed:", error.response?.data);
+      enqueueSnackbar("Image upload failed. You can try uploading manually.", {
+        variant: "warning",
+      });
+    }
+  };
   return (
     <>
       <Header />
@@ -220,7 +282,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="text"
-              name="EventTitle"
+              name="eventTitle"
               id="EventTitle"
               className="floating-input"
               value={event?.eventTitle}
@@ -233,7 +295,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="text"
-              name="Placed"
+              name="placed"
               id="Placed"
               className="floating-input"
               value={event?.placed}
@@ -246,7 +308,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="datetime-local"
-              name="StartTime"
+              name="startTime"
               id="StartTime"
               className="floating-input"
               value={event?.startTime}
@@ -259,7 +321,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="datetime-local"
-              name="EndTime"
+              name="endTime"
               id="EndTime"
               className="floating-input"
               value={event?.endTime}
@@ -272,7 +334,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="number"
-              name="AmountBudget"
+              name="amountBudget"
               id="AmountBudget"
               className="floating-input"
               value={event?.amountBudget}
@@ -284,7 +346,7 @@ const UpdateEventForm = () => {
 
           <div className="form-floating-group">
             <select
-              name="CategoryEventId"
+              name="categoryEventId"
               id="CategoryEventId"
               className="floating-input"
               value={selectedCategory}
@@ -301,7 +363,7 @@ const UpdateEventForm = () => {
 
           <div className="form-floating-group">
             <textarea
-              name="EventDescription"
+              name="eventDescription"
               id="EventDescription"
               className="floating-input"
               value={event?.eventDescription}
@@ -314,7 +376,7 @@ const UpdateEventForm = () => {
 
           <div className="form-floating-group">
             <textarea
-              name="MeasuringSuccess"
+              name="measuringSuccess"
               id="MeasuringSuccess"
               className="floating-input"
               value={event?.measuringSuccess}
@@ -328,7 +390,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="number"
-              name="SizeParticipants"
+              name="sizeParticipants"
               id="SizeParticipants"
               className="floating-input"
               value={event?.sizeParticipants}
@@ -341,7 +403,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="text"
-              name="SloganEvent"
+              name="sloganEvent"
               id="SloganEvent"
               className="floating-input"
               value={event?.sloganEvent}
@@ -352,7 +414,7 @@ const UpdateEventForm = () => {
           </div>
           <div className="form-floating-group">
             <textarea
-              name="Goals"
+              name="goals"
               id="Goals"
               className="floating-input"
               value={event?.goals}
@@ -365,7 +427,7 @@ const UpdateEventForm = () => {
 
           <div className="form-floating-group">
             <textarea
-              name="PromotionalPlan"
+              name="promotionalPlan"
               id="PromotionalPlan"
               className="floating-input"
               value={event?.promotionalPlan}
@@ -379,7 +441,7 @@ const UpdateEventForm = () => {
           <div className="form-floating-group">
             <input
               type="text"
-              name="TargetAudience"
+              name="targetAudience"
               id="TargetAudience"
               className="floating-input"
               value={event?.targetAudience}
@@ -391,7 +453,7 @@ const UpdateEventForm = () => {
 
           <div className="form-floating-group">
             <textarea
-              name="MonitoringProcess"
+              name="monitoringProcess"
               id="MonitoringProcess"
               className="floating-input"
               value={event?.monitoringProcess}
@@ -411,13 +473,13 @@ const UpdateEventForm = () => {
                 <span className="plus-icon">➕</span>
               </div>
 
-              {images.map((url, index) => (
+              {images.map((item, index) => (
                 <div
                   key={index}
                   className={`grid-image grid-image-${index + 1}`}
                 >
                   <img
-                    src={fixDriveUrl(url)}
+                    src={fixDriveUrl(item.mediaUrl)}
                     alt={`Event ${index + 1}`}
                     className="event-image"
                     referrerPolicy="no-referrer"
@@ -426,7 +488,7 @@ const UpdateEventForm = () => {
                   <button
                     type="button"
                     className="delete-image-btn"
-                    onClick={() => handleDeleteImage(index)}
+                    onClick={() => handleDeleteImage(index,item)}
                   >
                     ❌
                   </button>
