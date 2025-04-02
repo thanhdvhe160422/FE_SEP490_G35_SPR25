@@ -75,6 +75,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/home-spec"
+          element={
+            <PrivateRoute allowedRoles={["Spectator"]}>
+              <HomeSpectator />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/create-event"

@@ -284,3 +284,60 @@ export const searchEvents = async (params) => {
     return null;
   }
 };
+export const searchEventsSpec = async (params) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/EventForSpectators/search`,
+      {
+        params: {
+          name: params.name || undefined,
+          page: params.page || undefined,
+          pageSize: params.pageSize || undefined,
+          placed: params.placed || undefined,
+          startDate: params.startDate || undefined,
+          endDate: params.endDate || undefined,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/EventForSpectators/search`,
+            {
+              params: {
+                name: params.name || undefined,
+                page: params.page || undefined,
+                pageSize: params.pageSize || undefined,
+                placed: params.placed || undefined,
+                startDate: params.startDate || undefined,
+                endDate: params.endDate || undefined,
+              },
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error searching events:", error);
+    return null;
+  }
+};

@@ -60,7 +60,7 @@ export default function Login() {
           navigate(`/home`);
           break;
         case "Spectator":
-          navigate(`/home`);
+          navigate(`/home-spec`);
           break;
         default:
           navigate("/login");
