@@ -64,6 +64,43 @@
   transform: translateY(-5px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
+.event-card .event-image {
+  height: 180px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* .event-title {
+  margin-bottom: 12px;         
+  word-wrap: break-word;    
+  white-space: normal;
+  line-height: 1.4;
+} */
+
+.favourite-icon {
+  font-size: 1.2rem;
+  color: #bbb;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.favourite-icon:hover {
+  transform: scale(1.2);
+  color: #e65c00;
+}
+
+.favourite-icon.active {
+  color: #e65c00;
+}
+
+.status-favourite-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+
 
 .status-badge {
   font-size: 0.75rem;

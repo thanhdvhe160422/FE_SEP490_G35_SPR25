@@ -5,15 +5,7 @@ import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-
-function getStatus(start, end) {
-  const now = new Date();
-  const startTime = new Date(start);
-  const endTime = new Date(end);
-  if (now < startTime) return "Not Yet";
-  if (now >= startTime && now <= endTime) return "Running";
-  return "Closed";
-}
+import { FaHeart, FaRegHeart } from "react-icons/fa"; // solid và regular icon
 
 export default function HomeSpectator() {
   const [events, setEvents] = useState([]);
@@ -24,6 +16,17 @@ export default function HomeSpectator() {
   const [locationFilter, setLocationFilter] = useState("All");
   const navigate = useNavigate();
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  const [likedEvents, setLikedEvents] = useState([]);
+
+  function getStatus(start, end) {
+    const now = new Date();
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    if (now < startTime) return "Not Yet";
+    if (now >= startTime && now <= endTime) return "Running";
+    return "Closed";
+  }
 
   useEffect(() => {
     axios
@@ -46,6 +49,13 @@ export default function HomeSpectator() {
       locationFilter === "All" || event.Placed === locationFilter;
     return matchStatus && matchSearch && matchCategory && matchLocation;
   });
+
+  const toggleFavourite = (id, e) => {
+    e.stopPropagation(); // Ngăn click vào card khi click icon
+    setLikedEvents((prev) =>
+      prev.includes(id) ? prev.filter((eid) => eid !== id) : [...prev, id]
+    );
+  };
 
   return (
     <>
@@ -128,7 +138,9 @@ export default function HomeSpectator() {
                     <Col key={event.Id}>
                       <Card
                         className="h-100 shadow-sm event-card"
-                        onClick={() => navigate(`/event-detail/${event.Id}`)}
+                        onClick={() =>
+                          navigate(`/event-detail-Spec?id=${event.Id}`)
+                        }
                         style={{ cursor: "pointer" }}
                       >
                         <Card.Img
@@ -139,17 +151,32 @@ export default function HomeSpectator() {
                           style={{ objectFit: "cover" }}
                         />
                         <Card.Body>
-                          <span
-                            className={`status-badge ${
-                              status === "Running"
-                                ? "status-running"
-                                : status === "Closed"
-                                ? "status-closed"
-                                : "status-notyet"
-                            }`}
-                          >
-                            {status}
-                          </span>
+                          <div className="status-favourite-row d-flex justify-content-between align-items-center mb-2">
+                            <span
+                              className={`status-badge ${
+                                status === "Running"
+                                  ? "status-running"
+                                  : status === "Closed"
+                                  ? "status-closed"
+                                  : "status-notyet"
+                              }`}
+                            >
+                              {status}
+                            </span>
+
+                            {likedEvents.includes(event.Id) ? (
+                              <FaHeart
+                                className="favourite-icon active"
+                                onClick={(e) => toggleFavourite(event.Id, e)}
+                              />
+                            ) : (
+                              <FaRegHeart
+                                className="favourite-icon"
+                                onClick={(e) => toggleFavourite(event.Id, e)}
+                              />
+                            )}
+                          </div>
+
                           <Card.Title
                             style={{ fontSize: "100%" }}
                             className="event-title fw-bold"
