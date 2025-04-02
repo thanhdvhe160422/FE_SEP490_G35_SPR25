@@ -86,7 +86,7 @@ export const getEventById = async (eventId) => {
 };
 export const updateEvent = async (id, data) => {
   let token = localStorage.getItem("token");
-
+  console.log("data call api: ",data);
   try {
     const response = await axios.put(
       `https://localhost:44320/api/Events/${id}`,
