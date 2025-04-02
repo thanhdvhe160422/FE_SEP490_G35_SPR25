@@ -1,159 +1,241 @@
 .update-event-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 40px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', 'Roboto', sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", "Roboto", sans-serif;
 }
 
 .form-title {
-    font-size: 32px;
-    font-weight: 700;
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
 }
 
 .update-event-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
 }
 
 .form-group.full-width {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 .field-label {
-    font-weight: 600;
-    color: #34495e;
-    font-size: 15px;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 15px;
 }
 
 .form-control {
-    background: #f9f9f9;
-    border: 1px solid #dcdcdc;
-    font-size: 14px;
-    padding: 12px;
-    border-radius: 4px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: #f9f9f9;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 4px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-
 .form-control:focus {
-    border-color: #a2b400;
-    outline: none;
-    box-shadow: 0 0 5px rgba(162, 180, 0, 0.5);
+  border-color: #a2b400;
+  outline: none;
+  box-shadow: 0 0 5px rgba(162, 180, 0, 0.5);
 }
 
 textarea.form-control {
-    resize: vertical;
-    min-height: 100px;
+  resize: vertical;
+  min-height: 100px;
 }
 
 .form-check-group {
-    grid-column: span 2;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .form-check {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .form-check-input {
-    accent-color: #ffa600;
-    width: 20px;
-    height: 20px;
+  accent-color: #ffa600;
+  width: 20px;
+  height: 20px;
 }
 
 .btn-submit {
-    padding: 12px 28px;
-    background-color: #ff9900;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+  padding: 12px 28px;
+  background-color: #ff9900;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+select.floating-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #fa6f1e;
+  padding: 16px 12px 8px;
+  font-size: 16px;
+  outline: none;
 }
 
 .btn-submit:hover {
-    background-color: #ff8800;
-    transform: translateY(-2px);
+  background-color: #ff8800;
+  transform: translateY(-2px);
 }
 
 .text-end {
-    grid-column: span 2;
-    text-align: right;
+  grid-column: span 2;
+  text-align: right;
 }
 
 @media (max-width: 768px) {
-    .update-event-form {
-        grid-template-columns: 1fr;
-    }
+  .update-event-form {
+    grid-template-columns: 1fr;
+  }
 
-    .text-end {
-        text-align: center;
-    }
+  .text-end {
+    text-align: center;
+  }
 }
 
 .form-floating-group {
-    position: relative;
-    margin-bottom: 24px;
+  position: relative;
+  margin-bottom: 24px;
 }
 
 .floating-input {
-    width: 100%;
-    padding: 16px 12px 8px;
-    font-size: 16px;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid #fa6f1e;
-    outline: none;
-    transition: border-color 0.3s;
+  width: 100%;
+  padding: 16px 12px 8px;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #fa6f1e;
+  outline: none;
+  transition: border-color 0.3s;
 }
 
 .floating-input::placeholder {
-    color: transparent;
+  color: transparent;
 }
 
 .floating-label {
-    position: absolute;
-    top: 16px;
-    left: 12px;
-    color: #000000;
-    font-size: 20px;
-    font-weight: 500;
-    pointer-events: none;
-    transition: 0.2s ease all;
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 500;
+  pointer-events: none;
+  transition: 0.2s ease all;
 }
 
 .floating-input:focus + .floating-label,
 .floating-input:not(:placeholder-shown) + .floating-label {
-    top: -8px;
-    left: 8px;
-    font-size: 15px;
-    color: #000;
-    background: #fff;
-    padding: 0 4px;
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #000;
+  background: #fff;
+  padding: 0 4px;
 }
 
 textarea.floating-input {
-    resize: vertical;
-    min-height: 100px;
+  resize: vertical;
+  min-height: 100px;
 }
+
+.custom-image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .grid-image {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+  }
+  
+  .grid-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .delete-image-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+  
+  .delete-image-btn:hover {
+    background: rgba(255, 0, 0, 0.7);
+  }
+  
+
+  .add-image-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border: 2px dashed #aaa;
+    cursor: pointer;
+    font-size: 32px;
+    color: #555;
+    position: relative;
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  
+  .add-image-btn:hover {
+    background-color: #e6e6e6;
+  }
+  
+  .plus-icon {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  

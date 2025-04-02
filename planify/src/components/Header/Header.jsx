@@ -27,8 +27,8 @@ export default function Header() {
       try {
         const userData = await getProfileById(userId);
         setFullname(userData.data.firstName + " " + userData.data.lastName);
-        setPicture(localStorage.getItem("avatar"));
-        // setPicture(convertToDirectLink(userData.data.avatar.mediaUrl));
+        //setPicture(localStorage.getItem("avatar"));
+        setPicture(convertToDirectLink(userData?.data?.avatar?.mediaUrl||localStorage.getItem("avatar")));
         console.log("Header", userData.data);
       } catch (error) {
         console.error(error);
@@ -93,10 +93,9 @@ export default function Header() {
 
   const navItems = navItemsByRole[userRole] || [];
 
-  function convertToDirectLink(googleDriveUrl) {
-    
-    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
-    const fileId = googleDriveUrl.split("id=")[1];
+  function convertToDirectLink(url) {
+    if (!url.includes("drive.google.com/uc?id=")) return url;
+    const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 }
   return (
