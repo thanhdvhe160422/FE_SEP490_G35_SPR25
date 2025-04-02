@@ -242,17 +242,7 @@ const EventDetailEOG = () => {
       <div className="event-container">
         {event && (
           <>
-            <div
-              className="event-header"
-              style={{
-                padding: "30px",
-                borderRadius: "10px",
-                width: "90%",
-                height: "500px",
-                color: "white",
-                position: "relative",
-              }}
-            >
+            <div className="event-header">
               <img
                 src={fixDriveUrl(images[currentImageIndex] || defaultImage)}
                 alt="Event"
@@ -272,7 +262,6 @@ const EventDetailEOG = () => {
                   >
                     <FaChevronLeft />
                   </button>
-
                   <button
                     className="nav-button next-button"
                     onClick={handleNextImage}
@@ -285,14 +274,8 @@ const EventDetailEOG = () => {
 
             <div className="event-details">
               <div className="event-title-container">
-                <h1 style={{ color: "purple", fontWeight: "bold" }}>
-                  {event.eventTitle}
-                </h1>
-                <div
-                  className="event-status"
-                  data-status={eventStatus.status}
-                  style={{ backgroundColor: eventStatus.color }}
-                >
+                <h1>{event.eventTitle}</h1>
+                <div className="event-status" data-status={eventStatus.status}>
                   {eventStatus.status}
                 </div>
               </div>
@@ -339,7 +322,7 @@ const EventDetailEOG = () => {
                 <div className="info-item">
                   <FaMoneyBillAlt className="icon-price" />
                   <div>
-                    <span className="event-info-span">Total Cost:</span>
+                    <span className="event-info-span"> Total Cost:</span>
                     {event.amountBudget.toLocaleString("vi-VN")} VNĐ
                   </div>
                 </div>
@@ -374,10 +357,12 @@ const EventDetailEOG = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="goals-planning-section">
+              <h3 className="section-title">Goals & Planning</h3>
 
               <div className="goals-section">
-                <h3 className="section-title">Goals & Planning</h3>
-
                 {event.goals && (
                   <div className="info-item">
                     <FaBullseye />
@@ -423,61 +408,56 @@ const EventDetailEOG = () => {
             </div>
 
             <div className="event-description">
-              <div style={{ fontWeight: "bold", fontSize: "18px" }}>
-                Description:
-              </div>
+              <div>Description:</div>
               <div className="eventDescription">
                 <span>{event.eventDescription}</span>
               </div>
             </div>
           </>
         )}
+
         <div className="event-actions">
           {event &&
             event.createdBy &&
             localStorage.getItem("userId") === String(event.createdBy.id) && (
-              <button
-                className="delete-event-btn"
-                onClick={handleDeleteEvent}
-                disabled={event.status === 1 || event.status === 2}
-                style={{
-                  opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
-                  cursor:
-                    event.status === 1 || event.status === 2
-                      ? "not-allowed"
-                      : "pointer",
-                }}
-              >
-                Delete event
-              </button>
-            )}
-          {event &&
-            event.createdBy &&
-            localStorage.getItem("userId") === String(event.createdBy.id) && (
-              <button
-                className="update-event-btn"
-                onClick={() => {
-                  navigate(`/update-event/${eventId}`);
-                }}
-                disabled={event.status === 1 || event.status === 2}
-                style={{
-                  opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
-                  cursor:
-                    event.status === 1 || event.status === 2
-                      ? "not-allowed"
-                      : "pointer",
-                }}
-              >
-                Update event
-              </button>
+              <>
+                <button
+                  className="delete-event-btn"
+                  onClick={handleDeleteEvent}
+                  disabled={event.status === 1 || event.status === 2}
+                  style={{
+                    opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
+                    cursor:
+                      event.status === 1 || event.status === 2
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
+                  Delete event
+                </button>
+                <button
+                  className="update-event-btn"
+                  onClick={() => navigate(`/update-event/${eventId}`)}
+                  disabled={event.status === 1 || event.status === 2}
+                  style={{
+                    opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
+                    cursor:
+                      event.status === 1 || event.status === 2
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
+                  Update event
+                </button>
+              </>
             )}
         </div>
-        <ListTask eventId={eventId} data={event}></ListTask>
-        <ListMember eventId={eventId} data={event}></ListMember>
-        <ListRisk eventId={eventId} data={event}></ListRisk>
-        <ListCost eventId={eventId} data={event}></ListCost>
-      </div>
 
+        <ListTask eventId={eventId} data={event} />
+        <ListMember eventId={eventId} data={event} />
+        <ListRisk eventId={eventId} data={event} />
+        <ListCost eventId={eventId} data={event} />
+      </div>
       <Footer />
     </>
   );
