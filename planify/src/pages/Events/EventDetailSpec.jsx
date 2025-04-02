@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/Events/EventDetailSpec.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { getEventById } from "../../services/EventService";
+import { getEventById, getEventSpecById } from "../../services/EventService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
@@ -27,7 +27,7 @@ function EventDetailSpec() {
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
-        const data = await getEventById(eventId);
+        const data = await getEventSpecById(eventId);
         if (data.status === -2) {
           navigate("/home");
           return;
@@ -150,6 +150,12 @@ function EventDetailSpec() {
             <span>
               <strong> Location:</strong> {event.placed}
             </span>
+          </div>
+        </div>
+        <div className="event-description">
+          <div>Description:</div>
+          <div className="eventDescription">
+            <span>{event.eventDescription}</span>
           </div>
         </div>
       </div>
