@@ -509,7 +509,7 @@ const UpdateEventForm = () => {
               <Lightbox
                 open={isOpen}
                 close={() => setIsOpen(false)}
-                slides={images.map((url) => ({ src: fixDriveUrl(url) }))}
+               
                 index={photoIndex}
                 on={{
                   view: ({ index }) => setPhotoIndex(index),
