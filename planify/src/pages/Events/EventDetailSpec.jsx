@@ -3,27 +3,26 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/Events/EventDetailSpec.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { getEventById, getEventSpecById } from "../../services/EventService";
+import { getEventSpecById } from "../../services/EventService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import {
-  FaClock,
-  FaMapMarkerAlt,
-  FaChartLine,
-  FaFlag,
-  FaChartBar,
-  FaUsers,
-} from "react-icons/fa";
+import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import { parseISO } from "date-fns";
 import { MdOutlineCategory } from "react-icons/md";
+import { BiGridAlt } from "react-icons/bi";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 
 function EventDetailSpec() {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
+  const [openLightbox, setOpenLightbox] = useState(false);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
@@ -53,13 +52,7 @@ function EventDetailSpec() {
 
     fetchEventDetail();
   }, [eventId]);
-  useEffect(() => {
-    if (bannerImages.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % bannerImages.length);
-    }, 3000); // 3s đổi ảnh
-    return () => clearInterval(interval);
-  }, [bannerImages]);
+
   const statusEvent = (start, end) => {
     const now = new Date();
     const startDateTime = new Date(start);
@@ -83,28 +76,67 @@ function EventDetailSpec() {
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
 
+  console.log("event:", event);
+
   return (
     <>
       <Header />
       <div className="event-container">
-        <div className="event-banner">
-          {bannerImages.length > 0 ? (
-            <div className="banner-slider">
-              {bannerImages.map((img, index) => (
+        <div className="event-banner-gallery">
+          <div className="gallery-left" onClick={() => setOpenLightbox(true)}>
+            {bannerImages[0] && (
+              <img
+                src={fixDriveUrl(bannerImages[0])}
+                alt="Main Event"
+                className="main-banner-img"
+              />
+            )}
+          </div>
+          <div className="gallery-right">
+            {bannerImages.slice(1, 3).map((img, index) => (
+              <div className="thumbnail-wrapper" key={index}>
                 <img
-                  key={index}
                   src={fixDriveUrl(img)}
-                  alt={`Event Banner ${index}`}
-                  className={`banner-image ${
-                    index === currentIndex ? "active" : ""
-                  }`}
+                  alt={`Thumbnail ${index + 1}`}
+                  className="thumbnail-img"
+                  onClick={() => setOpenLightbox(true)}
                 />
-              ))}
-            </div>
-          ) : (
-            <p>No images available</p>
+                {index === 1 && bannerImages.length > 3 && (
+                  <button
+                    className="view-all-btn"
+                    onClick={() => setOpenLightbox(true)}
+                  >
+                    <BiGridAlt
+                      style={{
+                        marginRight: "6px",
+                        fontSize: "17px",
+                        marginBottom: "5px",
+                      }}
+                    />
+                    <strong>View All Images</strong>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {openLightbox && (
+            <Lightbox
+              open={openLightbox}
+              close={() => setOpenLightbox(false)}
+              slides={bannerImages.map((url) => ({
+                src: fixDriveUrl(url),
+              }))}
+              plugins={[Thumbnails]}
+            />
           )}
         </div>
+        <div style={{ marginRight: "70%" }}>
+          <button className="btn btn-warning" style={{ height: "50px" }}>
+            Đăng ký tham gia
+          </button>
+        </div>
+
         <div className="event-details">
           <div className="event-title-container">
             <h1 style={{ color: "purple", fontWeight: "bold" }}>
@@ -127,19 +159,28 @@ function EventDetailSpec() {
           <div className="event-time">
             <FaClock className="icon-time" />
             <span>
-              <strong> From:</strong> {formatDateTime(event.startTime)}
+              <strong> From:</strong>{" "}
+              {event?.startTime
+                ? formatDateTime(event.startTime)
+                : "Not updated yet"}
             </span>
           </div>
+
           <div className="event-location">
             <FaMapMarkerAlt className="icon-location" />
             <span>
-              <strong> Location:</strong> {event.placed}
+              <strong> Location:</strong>{" "}
+              {event?.placed || "Location not updated"}
             </span>
           </div>
-          <div>
+
+          <div className="event-time">
             <FaClock className="icon-time" />
             <span>
-              <strong>To:</strong> {formatDateTime(event.endTime)}
+              <strong>To:</strong>{" "}
+              {event?.endTime
+                ? formatDateTime(event.endTime)
+                : "Not updated yet"}
             </span>
           </div>
 
@@ -152,8 +193,16 @@ function EventDetailSpec() {
               <span style={{ fontWeight: "bold" }} className="event-info-span">
                 Category:{" "}
               </span>
-              {event.categoryViewModel.categoryEventName}
+              {event?.categoryViewModel?.categoryEventName || "Not determined"}
             </span>
+          </div>
+
+          {/* <div style={{textAlign:'center', justifyContent:'center'}}>{event.targetAudience}</div> */}
+        </div>
+        <div className="event-description">
+          <div>Slogan</div>
+          <div className="eventDescription">
+            <span> {event.sloganEvent}</span>
           </div>
         </div>
         <div className="event-description">
