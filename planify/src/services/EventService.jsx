@@ -437,3 +437,55 @@ export const getNotification = async () => {
     return null;
   }
 };
+export const RegisterParticipant = async (eventId,userId) => {
+  var formData = {
+    eventId:eventId,
+    userId:userId
+  }
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.post(
+      `https://localhost:44320/api/Participant/register`,
+      formData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.post(
+            `https://localhost:44320/api/Participant/register`,
+            formData,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to register participant after token refresh.\n"+retryError.response?.data?.message,
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error register participant:", error);
+    Swal.fire("Error", "Unable to register participant.\n"+error.response?.data?.message, "error");
+    return null;
+  }
+}
