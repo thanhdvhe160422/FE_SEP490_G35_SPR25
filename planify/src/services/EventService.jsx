@@ -206,11 +206,6 @@ export const getEventSpecById = async (id) => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire(
-            "Error",
-            "Unable to update group after token refresh.",
-            "error"
-          );
           return { error: "unauthorized" };
         }
       } else {
@@ -220,7 +215,6 @@ export const getEventSpecById = async (id) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
     return null;
   }
 };
@@ -387,6 +381,139 @@ export const searchEventsSpec = async (params) => {
     }
 
     console.error("Error searching events:", error);
+    return null;
+  }
+};
+export const createFavoriteEvent = async (eventId) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.post(
+      `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
+
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.post(
+            `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to update group after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Unable to update group.", "error");
+    return null;
+  }
+};
+export const deleteFavouriteEvent = async (id) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.delete(
+      `https://localhost:44320/api/FavouriteEvent/delete/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.delete(
+            `https://localhost:44320/api/FavouriteEvent/delete/${id}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to update group after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    Swal.fire("Error", "Unable to update group.", "error");
+    return null;
+  }
+};
+export const getFavouriteEvents = async (page, pageSize) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
     return null;
   }
 };

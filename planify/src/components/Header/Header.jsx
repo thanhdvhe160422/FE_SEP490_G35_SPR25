@@ -144,16 +144,29 @@ export default function Header() {
       { label: "Assigned Tasks", path: "/assigned-tasks" },
       { label: "History", path: "/history" },
     ],
-    spectator: [{ label: "Home", path: "/home" }],
+    spectator: [
+      { label: "Home", path: "/home" },
+      {
+        label: "Favorite Events",
+        path: "/favorite-events",
+      },
+    ],
   };
 
   const navItems = navItemsByRole[userRole] || [];
 
+<<<<<<< HEAD
   function convertToDirectLink(url) {
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
+=======
+  function convertToDirectLink(googleDriveUrl) {
+    if (!googleDriveUrl.includes("drive.google.com/uc?id="))
+      return googleDriveUrl;
+    const fileId = googleDriveUrl.split("id=")[1];
+>>>>>>> 32774b6 (favorite event)
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-}
+  }
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/home")}>

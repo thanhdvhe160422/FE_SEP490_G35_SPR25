@@ -12,8 +12,14 @@ import {
 import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
 import { useNavigate } from "react-router-dom";
 import getPosts, { searchEventsSpec } from "../../services/EventService";
+import {
+  createFavoriteEvent,
+  deleteFavouriteEvent,
+  getFavouriteEvents,
+} from "../../services/EventService";
 
 export default function HomeSpectator() {
   const [events, setEvents] = useState([]);
@@ -34,6 +40,7 @@ export default function HomeSpectator() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
+  const [favoriteEvents, setFavoriteEvents] = useState([]);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
@@ -48,6 +55,46 @@ export default function HomeSpectator() {
       return "https://placehold.co/600x400?text=No+Image";
     }
     return eventMedias[0].mediaDTO.mediaUrl;
+  };
+
+  const isEventFavorited = (eventId) => {
+    return favoriteEvents.includes(eventId);
+  };
+
+  const handleCreateFavorite = async (eventId, e) => {
+    try {
+      e.stopPropagation();
+      await createFavoriteEvent({ eventId });
+      setFavoriteEvents([...favoriteEvents, eventId]);
+      console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+    } catch (error) {
+      console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
+    }
+  };
+
+  const handleDeleteFavorite = async (eventId, e) => {
+    try {
+      e.stopPropagation();
+      await deleteFavouriteEvent(eventId);
+      setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
+      console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+    } catch (error) {
+      console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
+    }
+  };
+
+  const fetchFavoriteEvents = async () => {
+    try {
+      const response = await getFavouriteEvents(currentPage, pageSize);
+      if (response && Array.isArray(response)) {
+        const favoriteIds = response.map((event) =>
+          typeof event === "object" ? event.id : event
+        );
+        setFavoriteEvents(favoriteIds);
+      }
+    } catch (error) {
+      console.error("Error fetching favorite events:", error);
+    }
   };
 
   const fetchEvents = async (page) => {
@@ -156,6 +203,7 @@ export default function HomeSpectator() {
 
   useEffect(() => {
     fetchEvents(1);
+    fetchFavoriteEvents();
   }, []);
 
   const handlePageChange = (pageNumber) => {
@@ -401,7 +449,7 @@ export default function HomeSpectator() {
                             onClick={() =>
                               navigate(`/event-detail-spec/${event.id}`)
                             }
-                            style={{ cursor: "pointer" }}
+                            style={{ cursor: "pointer", position: "relative" }}
                           >
                             <Card.Img
                               variant="top"
@@ -414,6 +462,31 @@ export default function HomeSpectator() {
                                   "https://placehold.co/600x400?text=No+Image";
                               }}
                             />
+                            <div
+                              className="favorite-button"
+                              style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                                zIndex: 10,
+                                background: "rgba(255,255,255,0.7)",
+                                borderRadius: "50%",
+                                padding: "5px",
+                                cursor: "pointer",
+                              }}
+                              onClick={(e) =>
+                                isEventFavorited(event.id)
+                                  ? handleDeleteFavorite(event.id, e)
+                                  : handleCreateFavorite(event.id, e)
+                              }
+                            >
+                              {isEventFavorited(event.id) ? (
+                                <FaHeart size={20} color="red" />
+                              ) : (
+                                <FaRegHeart size={20} color="red" />
+                              )}
+                            </div>
+
                             <Card.Body>
                               <span
                                 className={`status-badge ${
@@ -432,7 +505,7 @@ export default function HomeSpectator() {
                               >
                                 {event.eventTitle}
                               </Card.Title>
-                              <Card.Text>
+                              <div>
                                 <div>
                                   <small className="text-muted">
                                     {new Date(event.startTime).toLocaleString(
@@ -464,7 +537,7 @@ export default function HomeSpectator() {
                                     </small>
                                   </div>
                                 )}
-                              </Card.Text>
+                              </div>
                             </Card.Body>
                           </Card>
                         </Col>
