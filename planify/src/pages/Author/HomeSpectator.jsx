@@ -399,7 +399,7 @@ export default function HomeSpectator() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail/${event.id}`)
+                              navigate(`/event-detail-spec/${event.id}`)
                             }
                             style={{ cursor: "pointer" }}
                           >
