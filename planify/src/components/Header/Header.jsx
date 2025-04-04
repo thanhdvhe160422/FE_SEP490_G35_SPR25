@@ -6,6 +6,7 @@ import logo from "../../assets/logo-fptu.png";
 import { getProfileById } from "../../services/userService";
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { useSnackbar } from "notistack";
+import { getNotification } from "../../services/EventService";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -26,6 +27,13 @@ export default function Header() {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
+    const fetchNotification = async () => {
+      try{
+          await getNotification();
+      }catch(error){
+        console.error("error while load incoming event notification: " + error);
+      }
+    }
     var token = localStorage.getItem('token')
     const savedMessages = JSON.parse(localStorage.getItem('messages')) || [];
     setMessages(savedMessages);
@@ -39,6 +47,7 @@ export default function Header() {
       .start()
       .then(() => {
         console.log('Connected to SignalR');
+        fetchNotification();
       })
       .catch((err) => console.error('Error while starting connection: ' + err));
 
@@ -66,10 +75,12 @@ export default function Header() {
       newConnection.stop();
     };
   }, []);
+
   useEffect(()=>{
     if (messages.length===0) return;
     localStorage.setItem('messages', JSON.stringify(messages));
   },[messages])
+
   const handleLinkClick = (index) => {
     const updatedMessages = [...messages];
     updatedMessages[index].read = true;
@@ -79,22 +90,19 @@ export default function Header() {
     const userId = localStorage.getItem("userId");
 
     if (!userId) return;
-    const fetchProvinces = async () => {
+    const fetchData = async () => {
       try {
         const userData = await getProfileById(userId);
         setFullname(userData.data.firstName + " " + userData.data.lastName);
         //setPicture(localStorage.getItem("avatar"));
-        setPicture(
-          convertToDirectLink(
-            userData?.data?.avatar?.mediaUrl || localStorage.getItem("avatar")
-          )
-        );
-        console.log("Header", userData.data);
+        setPicture(convertToDirectLink(userData?.data?.avatar?.mediaUrl||localStorage.getItem("avatar")));
+        //console.log("Header", userData.data);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchProvinces();
+    
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -149,7 +157,7 @@ export default function Header() {
       { label: "History", path: "/history" },
     ],
     spectator: [
-      { label: "Home", path: "/home" },
+      { label: "Home", path: "/home-spec" },
       {
         label: "Favorite Events",
         path: "/favorite-events",
