@@ -34,7 +34,7 @@
     "sweetalert2": "^11.17.2",
     "web-vitals": "^4.2.4",
     "wow.js": "^1.2.2",
-    "yet-another-react-lightbox": "^3.21.9"
+    "yet-another-react-lightbox": "^3.22.0"
   },
   "scripts": {
     "start": "react-scripts start",
