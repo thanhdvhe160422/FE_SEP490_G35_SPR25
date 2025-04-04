@@ -123,20 +123,17 @@ function EventDetailSpec() {
               {statusEvent(event.startTime, event.endTime)}
             </div>
           </div>
-          <div className="event-category">
-            <span>
-              <MdOutlineCategory
-                className="icon-category"
-                style={{ marginRight: "10px", color: "orange" }}
-              />
-              <span className="event-info-span">Category:</span>
-              {event.categoryViewModel.categoryEventName}
-            </span>
-          </div>
+
           <div className="event-time">
             <FaClock className="icon-time" />
             <span>
               <strong> From:</strong> {formatDateTime(event.startTime)}
+            </span>
+          </div>
+          <div className="event-location">
+            <FaMapMarkerAlt className="icon-location" />
+            <span>
+              <strong> Location:</strong> {event.placed}
             </span>
           </div>
           <div>
@@ -145,10 +142,17 @@ function EventDetailSpec() {
               <strong>To:</strong> {formatDateTime(event.endTime)}
             </span>
           </div>
-          <div className="event-location">
-            <FaMapMarkerAlt className="icon-location" />
+
+          <div className="event-category">
             <span>
-              <strong> Location:</strong> {event.placed}
+              <MdOutlineCategory
+                className="icon-category"
+                style={{ marginRight: "10px", color: "orange" }}
+              />
+              <span style={{ fontWeight: "bold" }} className="event-info-span">
+                Category:{" "}
+              </span>
+              {event.categoryViewModel.categoryEventName}
             </span>
           </div>
         </div>
