@@ -343,6 +343,22 @@ export default function HomeSpectator() {
               >
                 Apply Filters
               </Button>
+
+              {(searchTerm.trim() !== "" ||
+                statusFilter !== "All" ||
+                categoryFilter !== "" ||
+                locationFilter !== "" ||
+                startDate !== "" ||
+                endDate !== "") && (
+                <Button
+                  style={{ backgroundColor: "red", marginTop: "10px" }}
+                  className="w-100"
+                  variant="outline-primary"
+                  onClick={handleResetFilters}
+                >
+                  Clear Filters
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -430,7 +446,7 @@ export default function HomeSpectator() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail/${event.id}`)
+                              navigate(`/event-detail-spec/${event.id}`)
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >
@@ -527,14 +543,15 @@ export default function HomeSpectator() {
                       ))
                     ) : (
                       <Col xs={12}>
-                        <div className="text-center py-5">
-                          <p>No events found matching your criteria.</p>
-                          <Button
-                            variant="outline-primary"
-                            onClick={handleResetFilters}
-                          >
-                            Clear Filters
-                          </Button>
+                        <div
+                          className="d-flex flex-column justify-content-center align-items-center"
+                          style={{ height: "300px" }}
+                        >
+                          <p className="text-muted text-center">
+                            {totalEvents === 0
+                              ? "No events available."
+                              : "No events found matching your criteria."}
+                          </p>
                         </div>
                       </Col>
                     )}
