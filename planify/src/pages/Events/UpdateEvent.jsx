@@ -131,6 +131,7 @@ const UpdateEventForm = () => {
 
     try {
       const response = await updateEvent(event.id, eventData);
+      console.log("response: "+response);
       if (response.status === 200) {
           if (isDeleteImage===1){
             try{
@@ -159,12 +160,29 @@ const UpdateEventForm = () => {
           },
         });
       } else {
-        console.error("Update failed:", response);
-        Swal.fire({
-          title: "Error",
-          text: response.message || "There was an error updating the event.",
-          icon: "error",
-        });
+        if (response.status === 401){
+          console.error("Update failed:", response);
+          Swal.fire({
+            title: "Error",
+            text: response.message || "Please login.",
+            icon: "error",
+          });
+        }
+        if (response.status === 403){
+          console.error("Update failed:", response);
+          Swal.fire({
+            title: "Error",
+            text: response.message || "Your account don't have permission to update event.",
+            icon: "error",
+          });
+        }else{
+          console.error("Update failed:", response);
+          Swal.fire({
+            title: "Error",
+            text: response.message || "There was an error updating the event.",
+            icon: "error",
+          });
+        }
       }
     } catch (error) {
       console.error("Error updating event:", error);
@@ -511,7 +529,7 @@ const UpdateEventForm = () => {
               <Lightbox
                 open={isOpen}
                 close={() => setIsOpen(false)}
-                slides={images.map((url) => ({ src: fixDriveUrl(url) }))}
+                slides={images.map((item) => ({ src: fixDriveUrl(item.mediaUrl) }))}
                 index={photoIndex}
                 on={{
                   view: ({ index }) => setPhotoIndex(index),
