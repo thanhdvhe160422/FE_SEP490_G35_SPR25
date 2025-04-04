@@ -57,7 +57,7 @@ function EventDetailSpec() {
     if (bannerImages.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % bannerImages.length);
-    }, 3000); // 3s đổi ảnh
+    }, 3000);
     return () => clearInterval(interval);
   }, [bannerImages]);
   const statusEvent = (start, end) => {

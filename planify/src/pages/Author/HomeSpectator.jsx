@@ -64,7 +64,7 @@ export default function HomeSpectator() {
   const handleCreateFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await createFavoriteEvent({ eventId });
+      await createFavoriteEvent(eventId);
       setFavoriteEvents([...favoriteEvents, eventId]);
       console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
     } catch (error) {
@@ -86,14 +86,13 @@ export default function HomeSpectator() {
   const fetchFavoriteEvents = async () => {
     try {
       const response = await getFavouriteEvents(currentPage, pageSize);
-      if (response && Array.isArray(response)) {
-        const favoriteIds = response.map((event) =>
-          typeof event === "object" ? event.id : event
-        );
+      if (response && response.items) {
+        const favoriteIds = response.items.map((item) => item.eventId);
         setFavoriteEvents(favoriteIds);
+        console.log("Danh sách eventId yêu thích:", favoriteIds);
       }
     } catch (error) {
-      console.error("Error fetching favorite events:", error);
+      console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
     }
   };
 

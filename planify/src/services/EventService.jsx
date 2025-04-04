@@ -86,7 +86,7 @@ export const getEventById = async (eventId) => {
 };
 export const updateEvent = async (id, data) => {
   let token = localStorage.getItem("token");
-  console.log("data call api: ",data);
+  console.log("data call api: ", data);
   try {
     const response = await axios.put(
       `https://localhost:44320/api/Events/${id}`,
@@ -277,7 +277,6 @@ export const searchEvents = async (params) => {
     console.error("Error searching events:", error);
     return null;
   }
-  
 };
 export const deleteMedia = async (data) => {
   let token = localStorage.getItem("token");
@@ -390,7 +389,7 @@ export const createFavoriteEvent = async (eventId) => {
   try {
     const response = await axios.post(
       `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
-
+      null,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -402,10 +401,10 @@ export const createFavoriteEvent = async (eventId) => {
       const newToken = await refreshAccessToken();
 
       if (newToken) {
-        localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.post(
             `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
+            null,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -413,11 +412,6 @@ export const createFavoriteEvent = async (eventId) => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire(
-            "Error",
-            "Unable to update group after token refresh.",
-            "error"
-          );
           return { error: "unauthorized" };
         }
       } else {
@@ -426,11 +420,11 @@ export const createFavoriteEvent = async (eventId) => {
       }
     }
 
-    console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    console.error("Lỗi khi tạo favorite:", error.response?.data || error);
     return null;
   }
 };
+
 export const deleteFavouriteEvent = async (id) => {
   let token = localStorage.getItem("token");
 
@@ -459,11 +453,6 @@ export const deleteFavouriteEvent = async (id) => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire(
-            "Error",
-            "Unable to update group after token refresh.",
-            "error"
-          );
           return { error: "unauthorized" };
         }
       } else {
@@ -473,7 +462,6 @@ export const deleteFavouriteEvent = async (id) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
     return null;
   }
 };
