@@ -14,6 +14,8 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import { RegisterParticipant } from "../../services/EventService";
+import Swal from "sweetalert2";
 
 function EventDetailSpec() {
   const { eventId } = useParams();
@@ -53,14 +55,6 @@ function EventDetailSpec() {
     fetchEventDetail();
   }, [eventId]);
 
-  useEffect(() => {
-    if (bannerImages.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % bannerImages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [bannerImages]);
-
   const statusEvent = (start, end) => {
     const now = new Date();
     const startDateTime = new Date(start);
@@ -85,7 +79,28 @@ function EventDetailSpec() {
   };
 
   console.log("event:", event);
-
+  async function HandleRegisterParticipant(){
+    try{
+      var eventId = event.id;
+      var userId = localStorage.getItem("userId")
+      const response = await RegisterParticipant(eventId,userId);
+      console.log(JSON.stringify(response,null,2))
+      if (response.status===201){
+        console.log("register successfully");
+        Swal.fire("Success",
+                  "Register successfully",
+                  "success"
+                  );
+      }else{
+        Swal.fire("Error",
+                  response?.status,
+                  "error"
+                  );
+      }
+    }catch(error){
+      console.error(error);
+    }
+  }
   return (
     <>
       <Header />
@@ -140,7 +155,8 @@ function EventDetailSpec() {
           )}
         </div>
         <div style={{ marginRight: "70%" }}>
-          <button className="btn btn-warning" style={{ height: "50px" }}>
+          <button className="btn btn-warning" style={{ height: "50px" }}
+          onClick={HandleRegisterParticipant}>
             Đăng ký tham gia
           </button>
         </div>
