@@ -157,7 +157,7 @@ export default function Header() {
       { label: "History", path: "/history" },
     ],
     spectator: [
-      { label: "Home", path: "/home" },
+      { label: "Home", path: "/home-spec" },
       {
         label: "Favorite Events",
         path: "/favorite-events",
