@@ -75,7 +75,9 @@ export default function Login() {
       localStorage.setItem("reToken", res.data.result.refreshToken);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      enqueueSnackbar("Your account is not allowed to log in to the system.", { variant: "error" });
+      enqueueSnackbar("Your account is not allowed to log in to the system.", {
+        variant: "error",
+      });
     }
   };
 

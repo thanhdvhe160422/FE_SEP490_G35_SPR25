@@ -4,13 +4,18 @@ import { useSnackbar } from "notistack";
 import "../../styles/Events/UpdateEvent.css";
 import Swal from "sweetalert2";
 import Header from "../../components/Header/Header";
-import { getEventEOGById, updateEvent, deleteMedia } from "../../services/EventService";
+import {
+  getEventEOGById,
+  updateEvent,
+  deleteMedia,
+} from "../../services/EventService";
 import { getCategoryByCampusId } from "../../services/CategoryService";
 import { getCampusIdByName } from "../../services/campusService";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UpdateEventForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -22,10 +27,11 @@ const UpdateEventForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const fileInputRef = useRef();
-  const [newImages,setNewImages] = useState([]);
-  const [deleteImages,setDeleteImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
+  const [deleteImages, setDeleteImages] = useState([]);
   const [isChangeImage, setIsChangeImage] = useState(0);
   const [isDeleteImage, setIsDeleteImage] = useState(0);
+  const navigate = useNavigate();
 
   const openLightbox = (index) => {
     setPhotoIndex(index);
@@ -131,58 +137,42 @@ const UpdateEventForm = () => {
 
     try {
       const response = await updateEvent(event.id, eventData);
-      console.log("response: "+response);
-      if (response.status === 200) {
-          if (isDeleteImage===1){
-            try{
-              const isDeleteSuccesfully = await deleteMedia(deleteImages);
-              console.log(isDeleteSuccesfully);
-              if (!isDeleteSuccesfully) 
-                throw new Error("Failed to delete media");
-            }catch(error){
-              console.error(error);
-              throw new error();
-            }
+      if (response && response.status === 200) {
+        if (isDeleteImage === 1) {
+          try {
+            const isDeleteSuccesfully = await deleteMedia(deleteImages);
+            if (!isDeleteSuccesfully) throw new Error("Failed to delete media");
+          } catch (error) {
+            console.error(error);
+            throw new error();
           }
-          if (isChangeImage===1){
-            var token = localStorage.getItem("token");
-            handleUploadImages(event.id,token);
-          }
+        }
+
+        if (isChangeImage === 1) {
+          const token = localStorage.getItem("token");
+          await handleUploadImages(event.id, token);
+        }
+
         Swal.fire({
           title: "Event Updated Successfully",
           icon: "success",
-          confirmButtonText: "OK",
-          allowOutsideClick: true,
-          allowEscapeKey: true,
-          showCloseButton: true,
+          timer: 2000,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
           didOpen: () => {
             Swal.getPopup().setAttribute("draggable", true);
           },
+        }).then(() => {
+          navigate(`/event-detail-EOG/${event.id}`);
         });
       } else {
-        if (response.status === 401){
-          console.error("Update failed:", response);
-          Swal.fire({
-            title: "Error",
-            text: response.message || "Please login.",
-            icon: "error",
-          });
-        }
-        if (response.status === 403){
-          console.error("Update failed:", response);
-          Swal.fire({
-            title: "Error",
-            text: response.message || "Your account don't have permission to update event.",
-            icon: "error",
-          });
-        }else{
-          console.error("Update failed:", response);
-          Swal.fire({
-            title: "Error",
-            text: response.message || "There was an error updating the event.",
-            icon: "error",
-          });
-        }
+        console.error("Update failed:", response);
+        Swal.fire({
+          title: "Error",
+          text: response?.message || "There was an error updating the event.",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("Error updating event:", error);
@@ -194,27 +184,29 @@ const UpdateEventForm = () => {
     }
   };
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
+  // const handlePrevImage = () => {
+  //   setCurrentImageIndex((prevIndex) =>
+  //     prevIndex === 0 ? images.length - 1 : prevIndex - 1
+  //   );
+  // };
 
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
+  // const handleNextImage = () => {
+  //   setCurrentImageIndex((prevIndex) =>
+  //     prevIndex === images.length - 1 ? 0 : prevIndex + 1
+  //   );
+  // };
 
   const fixDriveUrl = (url) => {
-    if (!url?.includes("drive.google.com/uc?id=")) return url;
+    if (typeof url !== "string") return "";
+    if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
+
   // const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
 
-  const handleDeleteImage = (index,item) => {
-    try{
+  const handleDeleteImage = (index, item) => {
+    try {
       Swal.fire({
         title: "Are you sure you want to delete this image?",
         text: "This image will be removed from the list.",
@@ -229,16 +221,18 @@ const UpdateEventForm = () => {
           const _newImages = [...images];
           _newImages.splice(index, 1);
           setImages(_newImages);
-          if (item.id!==0){
-            console.log("delete item: "+JSON.stringify(item));
+          if (item.id !== 0) {
+            console.log("delete item: " + JSON.stringify(item));
             //setDeleteImages((deleteImages) => [...deleteImages, item])
             setDeleteImages((deleteImages) => {
               const updatedDeleteImages = [...deleteImages, item];
-              console.log("delete image: " + JSON.stringify(updatedDeleteImages, null, 2));
+              console.log(
+                "delete image: " + JSON.stringify(updatedDeleteImages, null, 2)
+              );
               return updatedDeleteImages;
-          });
+            });
             setIsDeleteImage(1);
-          //console.log("delete image: "+JSON.stringify(deleteImages,null,2));
+            //console.log("delete image: "+JSON.stringify(deleteImages,null,2));
           }
           // Swal.fire({
           //   icon: "success",
@@ -248,8 +242,8 @@ const UpdateEventForm = () => {
           // });
         }
       });
-    }catch(error){
-      console.error("error when delete image: "+ error);
+    } catch (error) {
+      console.error("error when delete image: " + error);
     }
   };
 
@@ -508,7 +502,7 @@ const UpdateEventForm = () => {
                   <button
                     type="button"
                     className="delete-image-btn"
-                    onClick={() => handleDeleteImage(index,item)}
+                    onClick={() => handleDeleteImage(index, item)}
                   >
                     ❌
                   </button>
@@ -529,7 +523,9 @@ const UpdateEventForm = () => {
               <Lightbox
                 open={isOpen}
                 close={() => setIsOpen(false)}
-                slides={images.map((item) => ({ src: fixDriveUrl(item.mediaUrl) }))}
+                slides={images.map((img) => ({
+                  src: fixDriveUrl(img.mediaUrl),
+                }))}
                 index={photoIndex}
                 on={{
                   view: ({ index }) => setPhotoIndex(index),

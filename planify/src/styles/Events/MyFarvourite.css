@@ -1,0 +1,128 @@
+.sidebar {
+    width: 350px;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 20px;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    overflow: visible;
+  }
+  
+  .sidebar.closed {
+    width: 48px;
+    padding: 0;
+    overflow: visible;
+  }
+  
+  .sidebar-toggle {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .sidebar-toggle:hover {
+    background-color: #f3f3f3;
+    border-color: #bbb;
+  }
+  
+  .sidebar-content {
+    margin-top: 100px;
+  }
+  
+  .sidebar-content h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .sidebar-content label {
+    font-weight: 500;
+    color: #e65c00;
+  }
+  
+  .event-card {
+    transition: all 0.3s ease;
+  }
+  
+  .event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+  .event-card .event-image {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+  }
+  
+  /* .event-title {
+    margin-bottom: 12px;         
+    word-wrap: break-word;    
+    white-space: normal;
+    line-height: 1.4;
+  } */
+  
+  .favourite-icon {
+    font-size: 1.2rem;
+    color: #bbb;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  
+  .favourite-icon:hover {
+    transform: scale(1.2);
+    color: #e65c00;
+  }
+  
+  .favourite-icon.active {
+    color: #e65c00;
+  }
+  
+  .status-favourite-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  
+  .status-notyet {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+  
+  .status-running {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  
+  .status-closed {
+    background-color: #e2e3e5;
+    color: #41464b;
+  }
+  
