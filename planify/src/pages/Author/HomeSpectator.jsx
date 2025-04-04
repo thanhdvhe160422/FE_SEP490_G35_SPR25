@@ -465,7 +465,7 @@ export default function HomeSpectator() {
                               className="favorite-button"
                               style={{
                                 position: "absolute",
-                                top: "10px",
+                                top: "190px",
                                 right: "10px",
                                 zIndex: 10,
                                 background: "rgba(255,255,255,0.7)",
