@@ -75,7 +75,7 @@ function ListParticipant({ eventId }) {
       </div>
 
       {totalPages > 1 && (
-        <div className="pagination">
+        <div className=".pagination-participant">
           <button
             onClick={() => setCurrentPage((prev) => prev - 1)}
             disabled={currentPage === 1}
