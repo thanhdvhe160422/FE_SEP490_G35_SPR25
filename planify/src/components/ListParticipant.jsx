@@ -8,6 +8,7 @@ function ListParticipant({ eventId }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [numberOfParticipants, setNumberOfParticipants] = useState(0);
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -34,6 +35,7 @@ function ListParticipant({ eventId }) {
       if (response.data.result) {
         setParticipants(response.data.result.participants);
         setTotalPages(response.data.result.totalPages);
+        setNumberOfParticipants(response.data.result.totalParticipants);
       }
     } catch (err) {
       setError("Could not fetch participants");
@@ -53,7 +55,7 @@ function ListParticipant({ eventId }) {
 
   return (
     <div className="list-participant">
-      <h2>Participants List</h2>
+      <h2>Participants List ({numberOfParticipants})</h2>
 
       <div className="participants-container">
         {participants.length === 0 ? (

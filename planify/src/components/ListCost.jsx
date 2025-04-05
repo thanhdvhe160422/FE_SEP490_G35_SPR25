@@ -41,6 +41,7 @@ function ListCost({ eventId, data }) {
     pageSize: 10,
     total: 0,
   });
+  const userId = localStorage.getItem("userId");
 
   // Khởi tạo dữ liệu từ props hoặc API
   useEffect(() => {
@@ -234,71 +235,93 @@ function ListCost({ eventId, data }) {
     fetchCostsFromAPI();
   };
 
-  const columns = [
-    {
-      title: "STT",
-      key: "index",
-      width: "5%",
-      render: (text, record, index) =>
-        (pagination.current - 1) * pagination.pageSize + index + 1,
-    },
-    {
-      title: "Tên chi phí",
-      dataIndex: "name",
-      key: "name",
-      width: "25%",
-    },
-    {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      key: "quantity",
-      width: "15%",
-      render: (text) => text || 0,
-    },
-    {
-      title: "Đơn giá",
-      dataIndex: "priceByOne",
-      key: "priceByOne",
-      width: "20%",
-      render: (text) => formatCurrency(text),
-    },
-    {
-      title: "Thành tiền",
-      key: "totalPrice",
-      width: "20%",
-      render: (_, record) =>
-        formatCurrency(calculateTotalPrice(record.quantity, record.priceByOne)),
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      width: "15%",
-      render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Cập nhật">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => showUpdateModal(record)}
-              size="small"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Xác nhận xóa chi phí"
-            description="Bạn có chắc chắn muốn xóa chi phí này?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-          >
-            <Tooltip title="Xóa">
-              <Button danger icon={<DeleteOutlined />} size="small" />
+  const getColumns = () => {
+    const showActionColumn = userId === data.createdBy.id;
+
+    // Điều chỉnh width dựa trên việc có hiển thị cột action hay không
+    const indexWidth = showActionColumn ? "5%" : "5%";
+    const nameWidth = showActionColumn ? "25%" : "30%";
+    const quantityWidth = showActionColumn ? "15%" : "15%";
+    const priceWidth = showActionColumn ? "20%" : "25%";
+    const totalWidth = showActionColumn ? "20%" : "25%";
+
+    const baseColumns = [
+      {
+        title: "STT",
+        key: "index",
+        width: indexWidth,
+        render: (text, record, index) =>
+          (pagination.current - 1) * pagination.pageSize + index + 1,
+      },
+      {
+        title: "Tên chi phí",
+        dataIndex: "name",
+        key: "name",
+        width: nameWidth,
+      },
+      {
+        title: "Số lượng",
+        dataIndex: "quantity",
+        key: "quantity",
+        width: quantityWidth,
+        ellipsis: true,
+        render: (text) => text || 0,
+      },
+      {
+        title: "Đơn giá",
+        dataIndex: "priceByOne",
+        key: "priceByOne",
+        width: priceWidth,
+        ellipsis: true,
+        render: (text) => formatCurrency(text),
+      },
+      {
+        title: "Thành tiền",
+        key: "totalPrice",
+        width: totalWidth,
+        ellipsis: true,
+        render: (_, record) =>
+          formatCurrency(
+            calculateTotalPrice(record.quantity, record.priceByOne)
+          ),
+      },
+    ];
+
+    // Thêm cột Action nếu cần
+    if (showActionColumn) {
+      baseColumns.push({
+        title: "Hành động",
+        key: "action",
+        width: "15%",
+        render: (_, record) => (
+          <Space size="small">
+            <Tooltip title="Cập nhật">
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => showUpdateModal(record)}
+                size="small"
+              />
             </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title="Xác nhận xóa chi phí"
+              description="Bạn có chắc chắn muốn xóa chi phí này?"
+              onConfirm={() => handleDelete(record.id)}
+              okText="Xóa"
+              cancelText="Hủy"
+              icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
+            >
+              <Tooltip title="Xóa">
+                <Button danger icon={<DeleteOutlined />} size="small" />
+              </Tooltip>
+            </Popconfirm>
+          </Space>
+        ),
+      });
+    }
+
+    return baseColumns;
+  };
 
   if (loading && !reloading) {
     return (
@@ -343,22 +366,24 @@ function ListCost({ eventId, data }) {
                 Làm mới
               </Button>
             </Tooltip>
-
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showCreateModal}
-            >
-              Thêm chi phí
-            </Button>
+            {userId === data.createdBy.id && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showCreateModal}
+              >
+                Thêm chi phí
+              </Button>
+            )}
           </Space>
         </div>
 
         <Spin spinning={reloading}>
           <Table
             dataSource={costs}
-            columns={columns}
+            columns={getColumns()}
             rowKey="id"
+            tableLayout="auto"
             pagination={{
               ...pagination,
               showSizeChanger: true,

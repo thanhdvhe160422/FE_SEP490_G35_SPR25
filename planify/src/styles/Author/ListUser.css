@@ -1,6 +1,5 @@
-/* Event Participants Manager Styles */
-
 .event-participants-container {
+  width: 100%;
   padding: 20px;
   background-color: #f5f5f5;
 }

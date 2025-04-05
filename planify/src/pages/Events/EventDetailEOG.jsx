@@ -417,15 +417,20 @@ const EventDetailEOG = () => {
           </>
         )}
 
+        <ListTask eventId={eventId} data={event} />
+        <ListMember eventId={eventId} data={event} />
+        <ListRisk eventId={eventId} data={event} />
+        <ListCost eventId={eventId} data={event} />
+        <ListParticipant eventId={eventId}></ListParticipant>
         <div className="event-actions">
           {event &&
             event.createdBy &&
+            event.status === 0 &&
             localStorage.getItem("userId") === String(event.createdBy.id) && (
               <>
                 <button
                   className="delete-event-btn"
                   onClick={handleDeleteEvent}
-                  disabled={event.status === 1 || event.status === 2}
                   style={{
                     opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
                     cursor:
@@ -439,7 +444,6 @@ const EventDetailEOG = () => {
                 <button
                   className="update-event-btn"
                   onClick={() => navigate(`/update-event/${eventId}`)}
-                  disabled={event.status === 1 || event.status === 2}
                   style={{
                     opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
                     cursor:
@@ -453,12 +457,6 @@ const EventDetailEOG = () => {
               </>
             )}
         </div>
-
-        <ListTask eventId={eventId} data={event} />
-        <ListMember eventId={eventId} data={event} />
-        <ListRisk eventId={eventId} data={event} />
-        <ListCost eventId={eventId} data={event} />
-        <ListParticipant eventId={eventId}></ListParticipant>
       </div>
       <Footer />
     </>

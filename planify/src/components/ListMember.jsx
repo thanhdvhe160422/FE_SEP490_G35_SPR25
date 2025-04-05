@@ -279,7 +279,11 @@ const ListMember = ({ eventId, data }) => {
       key: "timeJoinProject",
       render: (text) => new Date(text).toLocaleString(),
     },
-    {
+  ];
+  const userIdx = Number(localStorage.getItem("userId"));
+  // Nếu userId === createdBy, thêm cột hành động
+  if (userIdx === data.createdBy.id) {
+    participantColumns.push({
       title: "Hành động",
       key: "action",
       render: (_, record) => (
@@ -298,8 +302,8 @@ const ListMember = ({ eventId, data }) => {
           </Popconfirm>
         </Space>
       ),
-    },
-  ];
+    });
+  }
 
   const searchResultColumns = [
     {
@@ -349,6 +353,7 @@ const ListMember = ({ eventId, data }) => {
       fetchParticipants();
     }
   };
+  const userId = localStorage.getItem("userId");
 
   return (
     <div className="event-participants-container">
@@ -357,14 +362,16 @@ const ListMember = ({ eventId, data }) => {
           <Title level={3} className="event-participants-title">
             <TeamOutlined /> Quản lý người tham gia sự kiện
           </Title>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setIsSearchModalVisible(true)}
-            className="add-participant-btn"
-          >
-            Thêm người tham gia
-          </Button>
+          {userId === data.createdBy.id && (
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={() => setIsSearchModalVisible(true)}
+              className="add-participant-btn"
+            >
+              Thêm người tham gia
+            </Button>
+          )}
         </div>
 
         <div className="participants-table-container">

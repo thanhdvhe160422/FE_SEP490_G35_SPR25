@@ -70,6 +70,7 @@ function ListTask({ eventId, data }) {
     pageSize: 10,
     total: 0,
   });
+  const userId = localStorage.getItem("userId");
   const showEditSubTaskModal = (subTask) => {
     setSelectedSubTask(subTask);
     editSubTaskForm.setFieldsValue({
@@ -660,14 +661,16 @@ function ListTask({ eventId, data }) {
 
           <div className="task-actions">
             <Space>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={showCreateModal}
-                className="add-task-button"
-              >
-                Create Task
-              </Button>
+              {userId === data.createdBy.id && (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={showCreateModal}
+                  className="add-task-button"
+                >
+                  Create Task
+                </Button>
+              )}
             </Space>
           </div>
         </div>
@@ -679,13 +682,15 @@ function ListTask({ eventId, data }) {
               imageStyle={{ height: 120 }}
               description="No tasks yet"
             >
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={showCreateModal}
-              >
-                Create your first task
-              </Button>
+              {userId === data.createdBy.id && (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={showCreateModal}
+                >
+                  Create your first task
+                </Button>
+              )}
             </Empty>
           ) : (
             <Table
