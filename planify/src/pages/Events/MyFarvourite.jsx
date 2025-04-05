@@ -16,7 +16,7 @@ import {
   deleteFavouriteEvent,
   getFavouriteEvents,
   getPosts,
-  getMyFavouriteEvents
+  getMyFavouriteEvents,
 } from "../../services/EventService";
 
 export default function MyFarvourite() {
@@ -53,6 +53,7 @@ export default function MyFarvourite() {
         setFavoriteEvents(response.items);
         setTotalPages(response.totalPages || 1);
         setTotalEvents(response.totalCount || 0);
+        console.log(response.totalCount);
       } else {
         setFavoriteEvents([]);
         setTotalPages(1);
@@ -152,7 +153,9 @@ export default function MyFarvourite() {
                         >
                           <Card.Img
                             variant="top"
-                            src={fixDriveUrl(getImageUrl(event.eventMedias))}
+                            src={fixDriveUrl(
+                              getImageUrl(event?.eventMedia?.mediaUrl)
+                            )}
                             height="180"
                             className="event-image"
                             style={{ objectFit: "cover" }}
@@ -173,9 +176,7 @@ export default function MyFarvourite() {
                               padding: "5px",
                               cursor: "pointer",
                             }}
-                            onClick={(e) =>
-                              handleDeleteFavorite(event.id, e)
-                            }
+                            onClick={(e) => handleDeleteFavorite(event.id, e)}
                           >
                             <FaHeart size={20} color="red" />
                           </div>
