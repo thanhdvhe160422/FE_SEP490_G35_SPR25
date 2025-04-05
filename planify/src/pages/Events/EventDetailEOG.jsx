@@ -28,6 +28,7 @@ import ListTask from "../../components/ListTask";
 import ListMember from "../../components/ListMember";
 import ListRisk from "../../components/ListRisk";
 import ListCost from "../../components/ListCost";
+import ListParticipant from "../../components/ListParticipant";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -457,6 +458,7 @@ const EventDetailEOG = () => {
         <ListMember eventId={eventId} data={event} />
         <ListRisk eventId={eventId} data={event} />
         <ListCost eventId={eventId} data={event} />
+        <ListParticipant eventId={eventId}></ListParticipant>
       </div>
       <Footer />
     </>
