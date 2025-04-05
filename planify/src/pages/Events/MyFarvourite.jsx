@@ -6,6 +6,7 @@ import Header from "../../components/Header/Header";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa"; // solid và regular icon
+import { getMyFavouriteEvents,deleteFavouriteEvent } from "../../services/EventService";
 
 export default function MyFarvourite() {
   const [events, setEvents] = useState([]);
@@ -28,29 +29,40 @@ export default function MyFarvourite() {
     return "Closed";
   }
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:4000/events")
-      .then((res) => {
-        setEvents(res.data);
-      })
-      .catch((err) => console.error("Error fetching events:", err));
-  }, []);
-
-  const filteredEvents = events
-    .filter((event) => likedEvents.includes(event.Id))
-    .filter((event) => {
-      const status = getStatus(event.StartTime, event.EndTime);
-      const matchStatus = statusFilter === "All" || status === statusFilter;
-      const matchSearch = event.EventTitle.toLowerCase().includes(
-        searchTerm.toLowerCase()
-      );
-      const matchCategory =
-        categoryFilter === "All" || event.Category === categoryFilter;
-      const matchLocation =
-        locationFilter === "All" || event.Placed === locationFilter;
-      return matchStatus && matchSearch && matchCategory && matchLocation;
-    });
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:4000/events")
+  //     .then((res) => {
+  //       setEvents(res.data);
+  //     })
+  //     .catch((err) => console.error("Error fetching events:", err));
+  // }, []);
+  useEffect(()=>{
+    const fetchFavoriteEvent = async() =>{
+      try{
+        const response = await getMyFavouriteEvents(1,8);
+        setEvents(response.items);
+      }catch(error){
+        console.log("Error while fetch favorite event: "+error);
+      }
+    }
+    fetchFavoriteEvent();
+  },[])
+  // const filteredEvents = events
+  //   .filter((event) => likedEvents.includes(event.Id))
+  //   .filter((event) => {
+  //     const status = getStatus(event.StartTime, event.EndTime);
+  //     const matchStatus = statusFilter === "All" || status === statusFilter;
+  //     const matchSearch = event.EventTitle.toLowerCase().includes(
+  //       searchTerm.toLowerCase()
+  //     );
+  //     // const matchCategory =
+  //     //   categoryFilter === "All" || event.Category === categoryFilter;
+  //     const matchLocation =
+  //       locationFilter === "All" || event.Placed === locationFilter;
+  //     return matchStatus && matchSearch && matchLocation;
+  //   });
+  //   console.log(filteredEvents);
 
   const toggleFavourite = (id, e) => {
     e.stopPropagation();
@@ -58,7 +70,21 @@ export default function MyFarvourite() {
       prev.includes(id) ? prev.filter((eid) => eid !== id) : [...prev, id]
     );
   };
-
+  const HandleDeleteFavorite = (eventId) => {
+    return async (e) => {
+      e.stopPropagation();
+      try {
+        const isDelete = await deleteFavouriteEvent(eventId);
+        if (isDelete?.status === 200) {
+          const response = await getMyFavouriteEvents(1, 8);
+          setEvents(response.items);
+        }
+      } catch (error) {
+        console.log("Error while deleting favorite: " + error);
+      }
+    };
+  };
+  
   return (
     <>
       <Header />
@@ -78,7 +104,8 @@ export default function MyFarvourite() {
             </div>
 
             <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
-              {filteredEvents.length === 0 ? (
+              {/* {filteredEvents.length === 0 ? ( */}
+              {events?.length === 0 ? (
                 <div
                   className="text-center text-muted mt-5"
                   style={{ fontSize: "1.1rem" }}
@@ -87,18 +114,19 @@ export default function MyFarvourite() {
                 </div>
               ) : (
                 <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-                  {filteredEvents.map((event) => {
-                    const status = getStatus(event.StartTime, event.EndTime);
+                  {/* {filteredEvents.map((event) => { */}
+                  {events?.map((event) => {
+                    const status = getStatus(event.startTime, event.endTime);
                     return (
-                      <Col key={event.Id}>
+                      <Col key={event.id}>
                         <Card
                           className="h-100 shadow-sm event-card"
-                          onClick={() => navigate(`/event-detail/${event.Id}`)}
+                          onClick={() => navigate(`/event-detail/${event.id}`)}
                           style={{ cursor: "pointer" }}
                         >
                           <Card.Img
                             variant="top"
-                            src={event.Image}
+                            src={event?.eventMedia[0]?.mediaUrl}
                             height="180"
                             className="event-image"
                             style={{ objectFit: "cover" }}
@@ -117,29 +145,33 @@ export default function MyFarvourite() {
                                 {status}
                               </span>
 
-                              {likedEvents.includes(event.Id) ? (
+                              {/* {likedEvents.includes(event.id) ? (
                                 <FaHeart
                                   className="favourite-icon active"
-                                  onClick={(e) => toggleFavourite(event.Id, e)}
+                                  onClick={(e) => toggleFavourite(event.id, e)}
                                 />
                               ) : (
                                 <FaRegHeart
                                   className="favourite-icon"
-                                  onClick={(e) => toggleFavourite(event.Id, e)}
+                                  onClick={(e) => toggleFavourite(event.id, e)}
                                 />
-                              )}
+                              )} */}
+                              <FaHeart
+                                  className="favourite-icon active"
+                                  onClick={HandleDeleteFavorite(event.id)}
+                                />
                             </div>
 
                             <Card.Title
                               style={{ fontSize: "100%" }}
                               className="event-title fw-bold"
                             >
-                              {event.EventTitle}
+                              {event.eventTitle}
                             </Card.Title>
                             <Card.Text>
                               <div>
                                 <small className="text-muted">
-                                  {new Date(event.StartTime).toLocaleString(
+                                  {new Date(event.startTime).toLocaleString(
                                     "en-US",
                                     {
                                       weekday: "short",
@@ -154,7 +186,7 @@ export default function MyFarvourite() {
                               </div>
                               <div>
                                 <small className="text-muted">
-                                  Place: {event.Placed}
+                                  Place: {event.placed}
                                 </small>
                               </div>
                             </Card.Text>
