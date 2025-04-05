@@ -25,7 +25,7 @@ function EventDetailSpec() {
   const [openLightbox, setOpenLightbox] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  // const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
