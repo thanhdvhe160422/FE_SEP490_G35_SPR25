@@ -52,7 +52,8 @@ export default function MyFarvourite() {
     if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
       return "https://placehold.co/600x400?text=No+Image";
     }
-    return eventMedias[0].mediaUrl;
+    console.log("sang day " + eventMedias);
+    return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   // const isEventFavorited = (eventId) => {
@@ -360,7 +361,7 @@ export default function MyFarvourite() {
                                 event.eventMedia &&
                                 event.eventMedia.length > 0 &&
                                 event.eventMedia[0]
-                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
+                                  ? getImageUrl(event.eventMedia)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"
