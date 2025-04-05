@@ -24,6 +24,7 @@ import UpdateTask from "./pages/Tasks/UpdateTask";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
+import MyFarvourite from "./pages/Events/MyFarvourite";
 
 function App() {
   return (
@@ -93,7 +94,6 @@ function App() {
           }
         />
 
-        {/* Thêm route cho EventPlan */}
         <Route
           path="/event-plan"
           element={
@@ -207,6 +207,22 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/my-favorite-events"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Campus Manager",
+                "Event Organizer",
+                "Implementer",
+                "Spectator",
+              ]}
+            >
+              <MyFarvourite />
+            </PrivateRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/login" replace />} />
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>

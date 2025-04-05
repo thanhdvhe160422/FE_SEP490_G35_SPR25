@@ -22,7 +22,7 @@ function EventDetailSpec() {
   const [bannerImages, setBannerImages] = useState([]);
   const [openLightbox, setOpenLightbox] = useState(false);
 
-  // const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
