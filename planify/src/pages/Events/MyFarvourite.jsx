@@ -5,29 +5,42 @@ import {
   Col,
   Card,
   Form,
-  Button,
   Pagination,
+  Button,
+  Badge,
 } from "react-bootstrap";
-import "../../styles/Events/MyFarvourite.css";
+import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
+import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
 import { useNavigate } from "react-router-dom";
-import { FaHeart } from "react-icons/fa";
+import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
+  createFavoriteEvent,
   deleteFavouriteEvent,
   getFavouriteEvents,
-  getPosts,
-  getMyFavouriteEvents
 } from "../../services/EventService";
 
-export default function MyFarvourite() {
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
+export default function HomeSpectator() {
+  const [events, setEvents] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalEvents, setTotalEvents] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const navigate = useNavigate();
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const pageSize = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [favoriteEvents, setFavoriteEvents] = useState([]);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
@@ -44,25 +57,18 @@ export default function MyFarvourite() {
     return eventMedias[0].mediaDTO.mediaUrl;
   };
 
-  const fetchFavoriteEvents = async (page) => {
-    try {
-      setLoading(true);
-      const response = await getMyFavouriteEvents(page, pageSize);
+  const isEventFavorited = (eventId) => {
+    return favoriteEvents.includes(eventId);
+  };
 
-      if (response && response.items) {
-        setFavoriteEvents(response.items);
-        setTotalPages(response.totalPages || 1);
-        setTotalEvents(response.totalCount || 0);
-      } else {
-        setFavoriteEvents([]);
-        setTotalPages(1);
-        setTotalEvents(0);
-      }
+  const handleCreateFavorite = async (eventId, e) => {
+    try {
+      e.stopPropagation();
+      await createFavoriteEvent(eventId);
+      setFavoriteEvents([...favoriteEvents, eventId]);
+      console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
-      setFavoriteEvents([]);
-    } finally {
-      setLoading(false);
+      console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
     }
   };
 
@@ -70,34 +76,177 @@ export default function MyFarvourite() {
     try {
       e.stopPropagation();
       await deleteFavouriteEvent(eventId);
-      setFavoriteEvents(
-        favoriteEvents.filter((event) => event.eventId !== eventId)
-      );
+      setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
       console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
-
-      if (favoriteEvents.length === 1 && currentPage > 1) {
-        setCurrentPage((prev) => prev - 1);
-      } else {
-        fetchFavoriteEvents(currentPage);
-      }
     } catch (error) {
       console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
     }
   };
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    fetchFavoriteEvents(pageNumber);
-    window.scrollTo(0, 0);
+  const fetchFavoriteEvents = async () => {
+    try {
+      const response = await getFavouriteEvents(currentPage, pageSize);
+      if (response && response.items) {
+        const favoriteIds = response.items.map((item) => item.eventId);
+        setFavoriteEvents(favoriteIds);
+        console.log("Danh sách eventId yêu thích:", favoriteIds);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
+    }
   };
 
-  const filteredEvents = favoriteEvents.filter((event) =>
-    event.eventTitle?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchEvents = async (page) => {
+    try {
+      setLoading(true);
+      setIsSearchMode(false);
+
+      const response = await getPosts(page, pageSize);
+
+      if (response && response.items) {
+        setEvents(response.items);
+        setTotalEvents(response.totalCount || 0);
+        setTotalPages(response.totalPages || 1);
+
+        if (categories.length === 0 || locations.length === 0) {
+          extractCategoriesAndLocations(response.items);
+        }
+      } else {
+        console.error("Unexpected API response format:", response);
+        setEvents([]);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchEvents = async (page = 1) => {
+    try {
+      setLoading(true);
+      setIsSearchMode(true);
+
+      const params = {
+        page: page,
+        pageSize: pageSize,
+        name: searchTerm,
+        placed: locationFilter !== "" ? locationFilter : undefined,
+        status: statusFilter !== "All" ? statusFilter : undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      };
+
+      if (categoryFilter !== "") {
+        const categoryId = getCategoryId(categoryFilter);
+        if (categoryId) {
+          params.categoryEventId = categoryId;
+        }
+      }
+
+      console.log("Search params:", params);
+      const response = await searchEventsSpec(params);
+
+      if (response && response.items) {
+        setEvents(response.items);
+        setTotalEvents(response.totalCount || 0);
+        setTotalPages(response.totalPages || 1);
+
+        if (categories.length === 0 || locations.length === 0) {
+          extractCategoriesAndLocations(response.items);
+        }
+      } else {
+        setEvents([]);
+        setTotalPages(1);
+      }
+    } catch (error) {
+      console.error("Error searching events:", error);
+      setEvents([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const extractCategoriesAndLocations = (eventsData) => {
+    if (!eventsData || !Array.isArray(eventsData)) return;
+
+    const categoriesSet = new Set();
+    const locationsSet = new Set();
+
+    eventsData.forEach((event) => {
+      if (
+        event.categoryViewModel &&
+        event.categoryViewModel.categoryEventName
+      ) {
+        categoriesSet.add(event.categoryViewModel.categoryEventName);
+      }
+      if (event.placed) {
+        locationsSet.add(event.placed);
+      }
+    });
+
+    setCategories(Array.from(categoriesSet));
+    setLocations(Array.from(locationsSet));
+  };
+
+  const getCategoryId = (categoryName) => {
+    const categoryMap = {
+      "Technology Conference": 1,
+      Workshop: 2,
+    };
+
+    return categoryMap[categoryName];
+  };
 
   useEffect(() => {
-    fetchFavoriteEvents(currentPage);
-  }, [currentPage]);
+    fetchEvents(1);
+    fetchFavoriteEvents();
+  }, []);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+
+    if (isSearchMode) {
+      searchEvents(pageNumber);
+    } else {
+      fetchEvents(pageNumber);
+    }
+  };
+
+  const handleApplyFilters = () => {
+    setCurrentPage(1);
+    if (
+      searchTerm.trim() !== "" ||
+      statusFilter !== "All" ||
+      categoryFilter !== "" ||
+      locationFilter !== "" ||
+      startDate !== "" ||
+      endDate !== ""
+    ) {
+      searchEvents(1);
+    } else {
+      fetchEvents(1);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("All");
+    setCategoryFilter("");
+    setLocationFilter("");
+    setStartDate("");
+    setEndDate("");
+    fetchEvents(1);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US");
+  };
 
   return (
     <>
@@ -106,16 +255,69 @@ export default function MyFarvourite() {
         <div className="flex-grow-1 px-4" style={{ marginTop: "100px" }}>
           <Container fluid className="px-2">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="fw-bold mb-0">Favorite Events</h2>
+              <h2 className="fw-bold mb-0">My Farvourite Events</h2>
               <div className="d-flex" style={{ width: "50%" }}>
                 <Form.Control
                   type="text"
-                  placeholder="Search favorite events..."
+                  placeholder="Search events..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleApplyFilters();
+                    }
+                  }}
                 />
+                <Button
+                  variant="primary"
+                  className="ms-2"
+                  onClick={handleApplyFilters}
+                >
+                  Search
+                </Button>
               </div>
             </div>
+
+            {(searchTerm ||
+              statusFilter !== "All" ||
+              categoryFilter ||
+              locationFilter ||
+              startDate ||
+              endDate) && (
+              <div className="mb-3">
+                <span className="me-2">Active filters:</span>
+                {searchTerm && (
+                  <Badge bg="info" className="me-2">
+                    Keyword: {searchTerm}
+                  </Badge>
+                )}
+                {statusFilter !== "All" && (
+                  <Badge bg="info" className="me-2">
+                    Status: {statusFilter}
+                  </Badge>
+                )}
+                {categoryFilter && (
+                  <Badge bg="info" className="me-2">
+                    Category: {categoryFilter}
+                  </Badge>
+                )}
+                {locationFilter && (
+                  <Badge bg="info" className="me-2">
+                    Location: {locationFilter}
+                  </Badge>
+                )}
+                {startDate && (
+                  <Badge bg="info" className="me-2">
+                    From: {formatDate(startDate)}
+                  </Badge>
+                )}
+                {endDate && (
+                  <Badge bg="info" className="me-2">
+                    To: {formatDate(endDate)}
+                  </Badge>
+                )}
+              </div>
+            )}
 
             <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
               {loading ? (
@@ -124,114 +326,124 @@ export default function MyFarvourite() {
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-              ) : filteredEvents.length === 0 ? (
-                <div
-                  className="text-center text-muted mt-5 py-5"
-                  style={{ fontSize: "1.1rem" }}
-                >
-                  {searchTerm
-                    ? "No favorite events match your search."
-                    : "You haven't favorited any events yet."}
-                  <div className="mt-3">
-                    <Button variant="primary" onClick={() => navigate("/")}>
-                      Browse Events
-                    </Button>
-                  </div>
-                </div>
               ) : (
                 <>
                   <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-                    {filteredEvents.map((event) => (
-                      <Col key={event.id}>
-                        <Card
-                          className="h-100 shadow-sm event-card"
-                          onClick={() =>
-                            navigate(`/event-detail-spec/${event.id}`)
-                          }
-                          style={{ cursor: "pointer", position: "relative" }}
-                        >
-                          <Card.Img
-                            variant="top"
-                            src={fixDriveUrl(getImageUrl(event.eventMedias))}
-                            height="180"
-                            className="event-image"
-                            style={{ objectFit: "cover" }}
-                            onError={(e) => {
-                              e.target.src =
-                                "https://placehold.co/600x400?text=No+Image";
-                            }}
-                          />
-                          <div
-                            className="favorite-button"
-                            style={{
-                              position: "absolute",
-                              top: "10px",
-                              right: "10px",
-                              zIndex: 10,
-                              background: "rgba(255,255,255,0.7)",
-                              borderRadius: "50%",
-                              padding: "5px",
-                              cursor: "pointer",
-                            }}
-                            onClick={(e) =>
-                              handleDeleteFavorite(event.id, e)
+                    {events.length > 0 ? (
+                      events.map((event) => (
+                        <Col key={event.id}>
+                          <Card
+                            className="h-100 shadow-sm event-card"
+                            onClick={() =>
+                              navigate(`/event-detail-spec/${event.id}`)
                             }
+                            style={{ cursor: "pointer", position: "relative" }}
                           >
-                            <FaHeart size={20} color="red" />
-                          </div>
-
-                          <Card.Body>
-                            <span
-                              className={`status-badge ${
-                                event.statusMessage === "Running"
-                                  ? "status-running"
-                                  : event.statusMessage === "Closed"
-                                  ? "status-closed"
-                                  : "status-notyet"
-                              }`}
+                            <Card.Img
+                              variant="top"
+                              src={fixDriveUrl(getImageUrl(event.eventMedias))}
+                              height="180"
+                              className="event-image"
+                              style={{ objectFit: "cover" }}
+                              onError={(e) => {
+                                e.target.src =
+                                  "https://placehold.co/600x400?text=No+Image";
+                              }}
+                            />
+                            <div
+                              className="favorite-button"
+                              style={{
+                                position: "absolute",
+                                top: "190px",
+                                right: "10px",
+                                zIndex: 10,
+                                background: "rgba(255,255,255,0.7)",
+                                borderRadius: "50%",
+                                padding: "5px",
+                                cursor: "pointer",
+                              }}
+                              onClick={(e) =>
+                                isEventFavorited(event.id)
+                                  ? handleDeleteFavorite(event.id, e)
+                                  : handleCreateFavorite(event.id, e)
+                              }
                             >
-                              {event.statusMessage}
-                            </span>
-                            <Card.Title
-                              style={{ fontSize: "100%" }}
-                              className="event-title fw-bold"
-                            >
-                              {event.eventTitle}
-                            </Card.Title>
-                            <div>
-                              <div>
-                                <small className="text-muted">
-                                  {new Date(event.startTime).toLocaleString(
-                                    "en-US",
-                                    {
-                                      weekday: "short",
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "numeric",
-                                      minute: "2-digit",
-                                      hour12: true,
-                                    }
-                                  )}
-                                </small>
-                              </div>
-                              <div>
-                                <small className="text-muted">
-                                  Location: {event.placed}
-                                </small>
-                              </div>
-                              {event.categoryViewModel && (
-                                <div>
-                                  <small className="text-muted">
-                                    Category:{" "}
-                                    {event.categoryViewModel.categoryEventName}
-                                  </small>
-                                </div>
+                              {isEventFavorited(event.id) ? (
+                                <FaHeart size={20} color="red" />
+                              ) : (
+                                <FaRegHeart size={20} color="red" />
                               )}
                             </div>
-                          </Card.Body>
-                        </Card>
+
+                            <Card.Body>
+                              <span
+                                className={`status-badge ${
+                                  event.statusMessage === "Running"
+                                    ? "status-running"
+                                    : event.statusMessage === "Closed"
+                                    ? "status-closed"
+                                    : "status-notyet"
+                                }`}
+                              >
+                                {event.statusMessage}
+                              </span>
+                              <Card.Title
+                                style={{ fontSize: "100%" }}
+                                className="event-title fw-bold"
+                              >
+                                {event.eventTitle}
+                              </Card.Title>
+                              <div>
+                                <div>
+                                  <small className="text-muted">
+                                    {new Date(event.startTime).toLocaleString(
+                                      "en-US",
+                                      {
+                                        weekday: "short",
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                      }
+                                    )}
+                                  </small>
+                                </div>
+                                <div>
+                                  <small className="text-muted">
+                                    Location: {event.placed}
+                                  </small>
+                                </div>
+                                {event.categoryViewModel && (
+                                  <div>
+                                    <small className="text-muted">
+                                      Category:{" "}
+                                      {
+                                        event.categoryViewModel
+                                          .categoryEventName
+                                      }
+                                    </small>
+                                  </div>
+                                )}
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))
+                    ) : (
+                      <Col xs={12}>
+                        <div
+                          className="d-flex flex-column justify-content-center align-items-center"
+                          style={{ height: "300px" }}
+                        >
+                          <p className="text-muted text-center">
+                            {totalEvents === 0
+                              ? "No events available."
+                              : "No events found matching your criteria."}
+                          </p>
+                        </div>
                       </Col>
-                    ))}
+                    )}
                   </Row>
 
                   {totalPages > 1 && (
@@ -295,8 +507,8 @@ export default function MyFarvourite() {
 
                   <div className="text-center mt-2 mb-4 text-muted">
                     Page {currentPage} / {totalPages || 1}
-                    {filteredEvents.length > 0 &&
-                      ` (Showing: ${filteredEvents.length} / Total: ${totalEvents} favorites)`}
+                    {events.length > 0 &&
+                      ` (Showing: ${events.length} / Total: ${totalEvents} events)`}
                   </div>
                 </>
               )}

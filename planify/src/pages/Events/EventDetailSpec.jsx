@@ -14,7 +14,11 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import { RegisterParticipant, DeleteRegisterParticipant, IsRegisterParticipant } from "../../services/EventService";
+import {
+  RegisterParticipant,
+  DeleteRegisterParticipant,
+  IsRegisterParticipant,
+} from "../../services/EventService";
 import Swal from "sweetalert2";
 
 function EventDetailSpec() {
@@ -53,17 +57,16 @@ function EventDetailSpec() {
       }
     };
     const fetchDataPaticipant = async () => {
-      try{
+      try {
         const response = await IsRegisterParticipant(eventId);
-        if (response.status===200)
-          setIsRegistered(true);
-        else{
+        if (response.status === 200) setIsRegistered(true);
+        else {
           setIsRegistered(false);
         }
-      }catch{
+      } catch {
         setIsRegistered(false);
       }
-    }
+    };
 
     fetchEventDetail();
     fetchDataPaticipant();
@@ -92,47 +95,35 @@ function EventDetailSpec() {
   };
 
   console.log("event:", event);
-  async function HandleRegisterParticipant(){
-    try{
+  async function HandleRegisterParticipant() {
+    try {
       var eventId = event.id;
-      var userId = localStorage.getItem("userId")
-      const response = await RegisterParticipant(eventId,userId);
-      console.log(JSON.stringify(response,null,2))
-      if (response.status===201){
+      var userId = localStorage.getItem("userId");
+      const response = await RegisterParticipant(eventId, userId);
+      console.log(JSON.stringify(response, null, 2));
+      if (response.status === 201) {
         setIsRegistered(true);
-        Swal.fire("Success",
-                  "Register successfully",
-                  "success"
-                  );
-      }else{
-        Swal.fire("Error",
-                  response?.message,
-                  "error"
-                  );
+        Swal.fire("Success", "Register successfully", "success");
+      } else {
+        Swal.fire("Error", response?.message, "error");
       }
-    }catch(error){
+    } catch (error) {
       console.error(error);
     }
   }
-  async function handleCancelRegisterParticipant(){
-    try{
+  async function handleCancelRegisterParticipant() {
+    try {
       var eventId = event.id;
-      var userId = localStorage.getItem("userId")
-      const response = await DeleteRegisterParticipant(eventId,userId);
-      console.log(JSON.stringify(response,null,2))
-      if (response.status===200){
+      var userId = localStorage.getItem("userId");
+      const response = await DeleteRegisterParticipant(eventId, userId);
+      console.log(JSON.stringify(response, null, 2));
+      if (response.status === 200) {
         setIsRegistered(false);
-        Swal.fire("Success",
-                  "Cancel register successfully",
-                  "success"
-                  );
-      }else{
-        Swal.fire("Error",
-                  response?.message,
-                  "error"
-                  );
+        Swal.fire("Success", "Cancel register successfully", "success");
+      } else {
+        Swal.fire("Error", response?.message, "error");
       }
-    }catch(error){
+    } catch (error) {
       console.error(error);
     }
   }
@@ -191,24 +182,24 @@ function EventDetailSpec() {
         </div>
         <div style={{ marginRight: "70%" }}>
           {isRegistered ? (
-          <button
-            className="btn btn-danger"
-            style={{ height: "50px" }}
-            id="btn-cancel-register"
-            onClick={handleCancelRegisterParticipant}
-          >
-            Hủy tham gia
-          </button>
-        ) : (
-          <button
-            className="btn btn-warning"
-            style={{ height: "50px" }}
-            id="btn-register"
-            onClick={HandleRegisterParticipant}
-          >
-            Đăng ký tham gia
-          </button>
-        )}
+            <button
+              className="btn btn-danger"
+              style={{ height: "50px" }}
+              id="btn-cancel-register"
+              onClick={handleCancelRegisterParticipant}
+            >
+              Hủy tham gia
+            </button>
+          ) : (
+            <button
+              className="btn btn-warning"
+              style={{ height: "50px" }}
+              id="btn-register"
+              onClick={HandleRegisterParticipant}
+            >
+              Đăng ký tham gia
+            </button>
+          )}
         </div>
 
         <div className="event-details">
