@@ -241,9 +241,15 @@
   margin-top: 12px;
 }
 
-/* Estilos para tooltips */
 .ant-tooltip-inner {
   min-height: 24px;
   padding: 6px 10px;
   font-size: 12px;
+}
+.cost-list-card .ant-table {
+  width: 100%;
+}
+
+.cost-list-card .ant-table-container {
+  overflow-x: auto;
 }
