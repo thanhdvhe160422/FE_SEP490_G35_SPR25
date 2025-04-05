@@ -58,7 +58,7 @@ const WeekCalendar = () => {
       .calendar-controls {
         position: fixed;
         width: 100%;
-        z-index: 1001;
+        z-index: 10;
         top: 80px; 
         display: flex;
         justify-content: space-between;
@@ -73,7 +73,7 @@ const WeekCalendar = () => {
         display: flex;
         position: fixed;
         width: 100%;
-        z-index: 1000;
+        z-index: 10;
         top: 130px;
         border-bottom: 2px solid #ddd;
         background-color: #f5f5f5;
