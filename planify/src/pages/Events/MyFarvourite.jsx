@@ -16,6 +16,7 @@ import {
   deleteFavouriteEvent,
   getFavouriteEvents,
   getPosts,
+  getMyFavouriteEvents
 } from "../../services/EventService";
 
 export default function MyFarvourite() {
@@ -46,7 +47,7 @@ export default function MyFarvourite() {
   const fetchFavoriteEvents = async (page) => {
     try {
       setLoading(true);
-      const response = await getFavouriteEvents(page, pageSize);
+      const response = await getMyFavouriteEvents(page, pageSize);
 
       if (response && response.items) {
         setFavoriteEvents(response.items);
@@ -141,11 +142,11 @@ export default function MyFarvourite() {
                 <>
                   <Row xs={1} sm={2} md={3} lg={4} className="g-4">
                     {filteredEvents.map((event) => (
-                      <Col key={event.eventId}>
+                      <Col key={event.id}>
                         <Card
                           className="h-100 shadow-sm event-card"
                           onClick={() =>
-                            navigate(`/event-detail/${event.eventId}`)
+                            navigate(`/event-detail-spec/${event.id}`)
                           }
                           style={{ cursor: "pointer", position: "relative" }}
                         >
@@ -173,7 +174,7 @@ export default function MyFarvourite() {
                               cursor: "pointer",
                             }}
                             onClick={(e) =>
-                              handleDeleteFavorite(event.eventId, e)
+                              handleDeleteFavorite(event.id, e)
                             }
                           >
                             <FaHeart size={20} color="red" />

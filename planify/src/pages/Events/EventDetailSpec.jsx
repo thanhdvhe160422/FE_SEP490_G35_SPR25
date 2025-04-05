@@ -53,24 +53,21 @@ function EventDetailSpec() {
       }
     };
     const fetchDataPaticipant = async () => {
-        try{
-          var userId = localStorage.getItem("userId");
-          const response = await IsRegisterParticipant(event.id,userId);
-          console.log("check resigter: "+JSON.stringify(response,null,2));
-          if (response.status===200)
-            setIsRegistered(true);
-          else{
-            setIsRegistered(false);
-          }
-        }catch{
+      try{
+        const response = await IsRegisterParticipant(eventId);
+        if (response.status===200)
+          setIsRegistered(true);
+        else{
           setIsRegistered(false);
         }
+      }catch{
+        setIsRegistered(false);
+      }
     }
 
     fetchEventDetail();
     fetchDataPaticipant();
   }, [eventId]);
-
   const statusEvent = (start, end) => {
     const now = new Date();
     const startDateTime = new Date(start);

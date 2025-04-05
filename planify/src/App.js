@@ -86,6 +86,14 @@ function App() {
         />
 
         <Route
+          path="/favorite-events"
+          element={
+            <PrivateRoute allowedRoles={["Spectator"]}>
+              <MyFarvourite />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/create-event"
           element={
             <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
