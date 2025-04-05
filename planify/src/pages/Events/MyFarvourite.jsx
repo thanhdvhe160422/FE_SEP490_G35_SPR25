@@ -49,10 +49,11 @@ export default function HomeSpectator() {
   };
 
   const getImageUrl = (eventMedias) => {
-    if (!eventMedias || !eventMedias.length || !eventMedias[0].mediaDTO) {
+    if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
       return "https://placehold.co/600x400?text=No+Image";
     }
-    return eventMedias[0].mediaDTO.mediaUrl;
+    console.log("sang day " + eventMedias);
+    return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   // const isEventFavorited = (eventId) => {
@@ -356,7 +357,13 @@ export default function HomeSpectator() {
                           >
                             <Card.Img
                               variant="top"
-                              src={fixDriveUrl(getImageUrl(event.eventMedias))}
+                              src={
+                                event.eventMedia &&
+                                event.eventMedia.length > 0 &&
+                                event.eventMedia[0]
+                                  ? getImageUrl(event.eventMedia)
+                                  : "https://placehold.co/600x400?text=No+Image"
+                              }
                               height="180"
                               className="event-image"
                               style={{ objectFit: "cover" }}
