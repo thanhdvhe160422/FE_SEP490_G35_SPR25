@@ -323,7 +323,7 @@ export default function HomeSpectator() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
+              {/* <Form.Group className="mb-3">
                 <Form.Label>Status</Form.Label>
                 <Form.Select
                   value={statusFilter}
@@ -334,7 +334,7 @@ export default function HomeSpectator() {
                   <option value="Running">Ongoing</option>
                   <option value="Closed">Completed</option>
                 </Form.Select>
-              </Form.Group>
+              </Form.Group> */}
 
               <Button
                 variant="primary"
@@ -465,7 +465,7 @@ export default function HomeSpectator() {
                               className="favorite-button"
                               style={{
                                 position: "absolute",
-                                top: "10px",
+                                top: "190px",
                                 right: "10px",
                                 zIndex: 10,
                                 background: "rgba(255,255,255,0.7)",
