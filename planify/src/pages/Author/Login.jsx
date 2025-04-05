@@ -57,7 +57,7 @@ export default function Login() {
           navigate(`/home`);
           break;
         case "Implementer":
-          navigate(`/home`);
+          navigate(`/home-implementer`);
           break;
         case "Spectator":
           navigate(`/home-spec`);

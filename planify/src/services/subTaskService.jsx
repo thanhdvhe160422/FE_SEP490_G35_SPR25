@@ -55,3 +55,47 @@ export const createSubTask = async (subTaskData, token) => {
     );
   }
 };
+export const getSubtaskByImplementer = async (
+  implementerId,
+  startDate,
+  endDate
+) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error get subtask:", error);
+    return null;
+  }
+};

@@ -50,3 +50,190 @@
   font-size: 12px;
   color: #7f8c8d;
 }
+.gantt-container {
+  margin-top: 80px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-controls {
+  display: flex;
+  position: sticky;
+  top: 80px;
+  z-index: 1000;
+  background-color: rgb(231, 231, 231);
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.calendar-controls button {
+  background-color: #4285f4;
+  color: rgb(227, 227, 227);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.calendar-controls button:hover {
+  background-color: #3367d6;
+}
+
+.date-selectors {
+  display: flex;
+  gap: 15px;
+}
+
+.date-selectors label {
+  font-weight: 500;
+}
+
+.date-selectors select {
+  margin-left: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.gantt-header {
+  display: flex;
+  position: sticky;
+
+  top: 140px;
+  z-index: 1000;
+  border-bottom: 2px solid #ddd;
+  background-color: #f5f5f5;
+  border-radius: 4px 4px 0 0;
+}
+
+.task-info {
+  width: 200px;
+  padding: 15px;
+  background-color: #eaeaea;
+  font-weight: bold;
+  border-right: 1px solid #ddd;
+}
+
+.timeline-header {
+  flex: 1;
+  display: flex;
+}
+
+.day-column {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border-left: 1px solid #ddd;
+}
+
+.day-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.day-date {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.gantt-body {
+  position: relative;
+}
+
+.task-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  min-height: 80px;
+}
+
+.task-row:hover {
+  background-color: #f0f8ff;
+}
+
+.task-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.task-details {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.task-details div {
+  margin-bottom: 3px;
+}
+
+.task-details span {
+  font-weight: 500;
+  color: #333;
+}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  min-height: 80px;
+}
+
+.day-column-bg {
+  flex: 1;
+  border-left: 1px solid #eee;
+}
+
+.task-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  height: 30px;
+  background-color: #4caf50;
+  border-radius: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.task-bar:hover {
+  height: 36px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.task-bar-label {
+  display: block;
+  font-size: 12px;
+  color: white;
+  padding: 0 10px;
+  line-height: 30px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  color: white;
+  font-weight: bold;
+}
+
+.loading,
+.no-tasks {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  width: 100%;
+  font-style: italic;
+}

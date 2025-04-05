@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import "./Header.css";
 import logo from "../../assets/logo-fptu.png";
 import { getProfileById } from "../../services/userService";
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useSnackbar } from "notistack";
 import { getNotification } from "../../services/EventService";
 
@@ -37,11 +37,11 @@ export default function Header() {
     var token = localStorage.getItem('token')
     const savedMessages = JSON.parse(localStorage.getItem('messages')) || [];
     setMessages(savedMessages);
-    
+
     const newConnection = new HubConnectionBuilder()
-        .withUrl('https://localhost:44320/notificationHub', {
-          accessTokenFactory: () => token,
-        })
+      .withUrl("https://localhost:44320/notificationHub", {
+        accessTokenFactory: () => token,
+      })
       .build();
     newConnection
       .start()
@@ -49,25 +49,28 @@ export default function Header() {
         console.log('Connected to SignalR');
         fetchNotification();
       })
-      .catch((err) => console.error('Error while starting connection: ' + err));
+      .catch((err) => console.error("Error while starting connection: " + err));
 
-      newConnection.on('ReceiveNotification', (message, link) => {
-            const localMessages = JSON.parse(localStorage.getItem('messages')) || [];
-            const newMessages = [ ...localMessages,{ message, link, isRead:false}];
-            setMessages(newMessages);
-            enqueueSnackbar(<>
-                    {message}
-                    <a href={link} target="_blank" rel="noopener noreferrer">
-                        Xem thêm
-                    </a>
-                  </>, { 
-                    anchorOrigin:{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    },
-                    variant: 'info' 
-                  });
-        });
+    newConnection.on("ReceiveNotification", (message, link) => {
+      const localMessages = JSON.parse(localStorage.getItem("messages")) || [];
+      const newMessages = [...localMessages, { message, link, isRead: false }];
+      setMessages(newMessages);
+      enqueueSnackbar(
+        <>
+          {message}
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            Xem thêm
+          </a>
+        </>,
+        {
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+          },
+          variant: "info",
+        }
+      );
+    });
 
     setConnection(newConnection);
 
@@ -75,6 +78,7 @@ export default function Header() {
       newConnection.stop();
     };
   }, []);
+
 
   useEffect(()=>{
     if (messages.length===0) return;
@@ -145,22 +149,34 @@ export default function Header() {
       { label: "Create Event Organizer", path: "/create-event-organizer" },
       { label: "Create Event", path: "/create-event" },
       { label: "Manage Requests", path: "/manage-request" },
+      {
+        label: "Favorite Events",
+        path: "/my-favorite-events",
+      },
     ],
     "event organizer": [
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/event-plan" },
       { label: "My Request", path: "/my-request" },
-    ],
-    implementer: [
-      { label: "Home", path: "/home" },
-      { label: "Assigned Tasks", path: "/assigned-tasks" },
-      { label: "History", path: "/history" },
-    ],
-    spectator: [
-      { label: "Home", path: "/home" },
       {
         label: "Favorite Events",
-        path: "/favorite-events",
+        path: "/my-favorite-events",
+      },
+    ],
+    implementer: [
+      { label: "Home", path: "/home-implementer" },
+      { label: "Assigned Tasks", path: "/assigned-tasks" },
+      { label: "History", path: "/history" },
+      {
+        label: "Favorite Events",
+        path: "/my-favorite-events",
+      },
+    ],
+    spectator: [
+      { label: "Home", path: "/home-spec" },
+      {
+        label: "Favorite Events",
+        path: "/my-favorite-events",
       },
     ],
   };
@@ -220,32 +236,39 @@ export default function Header() {
                   </div>
                 ))
               )} */}
-              <div className='text-center'>
-                <h4 className='fw-bold'>Notification</h4>
+              <div className="text-center">
+                <h4 className="fw-bold">Notification</h4>
                 {messages.length === 0 ? (
                   <p>No notification found!</p>
                 ) : (
-                  <table className='table table-hover mx-auto'>
+                  <table className="table table-hover mx-auto">
                     <tbody>
                       {messages
-                      .slice()
-                      .reverse().map((msg, index) => (
+                        .slice()
+                        .reverse()
+                        .map((msg, index) => (
                           <tr key={index}>
-                              <td className={`text-start ${msg.read ? '' : 'table-secondary'}`}>
-                                  <a href={msg.link} target="_blank" rel="noopener noreferrer" 
-                                      className='link-offset-2 link-underline link-underline-opacity-0 me-2'
-                                      onClick={() => handleLinkClick(index)}
-                                  >{msg.message}
-                                      <span> </span>
-                                      <span 
-                                          className='text-decoration-underline'
-                                      >
-                                          Detail!
-                                      </span>
-                                  </a>
-                              </td>
+                            <td
+                              className={`text-start ${
+                                msg.read ? "" : "table-secondary"
+                              }`}
+                            >
+                              <a
+                                href={msg.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="link-offset-2 link-underline link-underline-opacity-0 me-2"
+                                onClick={() => handleLinkClick(index)}
+                              >
+                                {msg.message}
+                                <span> </span>
+                                <span className="text-decoration-underline">
+                                  Detail!
+                                </span>
+                              </a>
+                            </td>
                           </tr>
-                      ))}
+                        ))}
                     </tbody>
                   </table>
                 )}

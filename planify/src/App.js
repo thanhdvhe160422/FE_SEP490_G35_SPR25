@@ -102,7 +102,6 @@ function App() {
           }
         />
 
-        {/* Thêm route cho EventPlan */}
         <Route
           path="/event-plan"
           element={
@@ -216,6 +215,22 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/my-favorite-events"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Campus Manager",
+                "Event Organizer",
+                "Implementer",
+                "Spectator",
+              ]}
+            >
+              <MyFarvourite />
+            </PrivateRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/login" replace />} />
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
