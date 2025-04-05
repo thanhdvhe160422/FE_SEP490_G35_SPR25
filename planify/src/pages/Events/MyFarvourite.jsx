@@ -56,31 +56,6 @@ export default function HomeSpectator() {
     return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
-  // const isEventFavorited = (eventId) => {
-  //   return favoriteEvents.includes(eventId);
-  // };
-
-  // const handleCreateFavorite = async (eventId, e) => {
-  //   try {
-  //     e.stopPropagation();
-  //     await createFavoriteEvent(eventId);
-  //     setFavoriteEvents([...favoriteEvents, eventId]);
-  //     console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
-  //   } catch (error) {
-  //     console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
-  //   }
-  // };
-
-  // const handleDeleteFavorite = async (eventId, e) => {
-  //   try {
-  //     e.stopPropagation();
-  //     await deleteFavouriteEvent(eventId);
-  //     setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
-  //     console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
-  //   } catch (error) {
-  //     console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
-  //   }
-  // };
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
@@ -99,18 +74,6 @@ export default function HomeSpectator() {
       console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
     }
   };
-  // const fetchFavoriteEvents = async () => {
-  //   try {
-  //     const response = await getFavouriteEvents(currentPage, pageSize);
-  //     if (response && response.items) {
-  //       const favoriteIds = response.items.map((item) => item.eventId);
-  //       setFavoriteEvents(favoriteIds);
-  //       console.log("Danh sách eventId yêu thích:", favoriteIds);
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
-  //   }
-  // };
 
   const fetchEvents = async (page) => {
     try {
@@ -139,51 +102,6 @@ export default function HomeSpectator() {
     }
   };
 
-  // const searchEvents = async (page = 1) => {
-  //   try {
-  //     setLoading(true);
-  //     setIsSearchMode(true);
-
-  //     const params = {
-  //       page: page,
-  //       pageSize: pageSize,
-  //       name: searchTerm,
-  //       placed: locationFilter !== "" ? locationFilter : undefined,
-  //       status: statusFilter !== "All" ? statusFilter : undefined,
-  //       startDate: startDate || undefined,
-  //       endDate: endDate || undefined,
-  //     };
-
-  //     if (categoryFilter !== "") {
-  //       const categoryId = getCategoryId(categoryFilter);
-  //       if (categoryId) {
-  //         params.categoryEventId = categoryId;
-  //       }
-  //     }
-
-  //     console.log("Search params:", params);
-  //     const response = await searchEventsSpec(params);
-
-  //     if (response && response.items) {
-  //       setEvents(response.items);
-  //       setTotalEvents(response.totalCount || 0);
-  //       setTotalPages(response.totalPages || 1);
-
-  //       if (categories.length === 0 || locations.length === 0) {
-  //         extractCategoriesAndLocations(response.items);
-  //       }
-  //     } else {
-  //       setEvents([]);
-  //       setTotalPages(1);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error searching events:", error);
-  //     setEvents([]);
-  //     setTotalPages(1);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const extractCategoriesAndLocations = (eventsData) => {
     if (!eventsData || !Array.isArray(eventsData)) return;
@@ -207,62 +125,20 @@ export default function HomeSpectator() {
     setLocations(Array.from(locationsSet));
   };
 
-  // const getCategoryId = (categoryName) => {
-  //   const categoryMap = {
-  //     "Technology Conference": 1,
-  //     Workshop: 2,
-  //   };
-
-  //   return categoryMap[categoryName];
-  // };
+ 
 
   useEffect(() => {
     fetchEvents(1);
-    //fetchFavoriteEvents();
   }, []);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
     fetchEvents(pageNumber);
-    // if (isSearchMode) {
-    //   searchEvents(pageNumber);
-    // } else {
-    //   fetchEvents(pageNumber);
-    // }
+  
   };
 
-  // const handleApplyFilters = () => {
-  //   setCurrentPage(1);
-  //   if (
-  //     searchTerm.trim() !== "" ||
-  //     statusFilter !== "All" ||
-  //     categoryFilter !== "" ||
-  //     locationFilter !== "" ||
-  //     startDate !== "" ||
-  //     endDate !== ""
-  //   ) {
-  //     searchEvents(1);
-  //   } else {
-  //     fetchEvents(1);
-  //   }
-  // };
 
-  // const handleResetFilters = () => {
-  //   setSearchTerm("");
-  //   setStatusFilter("All");
-  //   setCategoryFilter("");
-  //   setLocationFilter("");
-  //   setStartDate("");
-  //   setEndDate("");
-  //   fetchEvents(1);
-  // };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US");
-  };
 
   return (
     <>
