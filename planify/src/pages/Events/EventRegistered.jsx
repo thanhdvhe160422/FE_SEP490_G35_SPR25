@@ -16,12 +16,13 @@ import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
 import { useNavigate } from "react-router-dom";
 import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
+  GetRegisterdByUserId,
   createFavoriteEvent,
   deleteFavouriteEvent,
   getFavouriteEvents,
 } from "../../services/EventService";
 
-export default function HomeSpectator() {
+export default function EventRegistered() {
   const [events, setEvents] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,15 +102,15 @@ export default function HomeSpectator() {
       setLoading(true);
       setIsSearchMode(false);
 
-      const response = await getPosts(page, pageSize);
+      const response = await GetRegisterdByUserId();
 
-      if (response && response.items) {
-        setEvents(response.items);
+      if (response && response.result) {
+        setEvents(response.result);
         setTotalEvents(response.totalCount || 0);
         setTotalPages(response.totalPages || 1);
 
         if (categories.length === 0 || locations.length === 0) {
-          extractCategoriesAndLocations(response.items);
+          extractCategoriesAndLocations(response.result);
         }
       } else {
         console.error("Unexpected API response format:", response);

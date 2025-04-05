@@ -25,6 +25,7 @@ import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
 import MyFarvourite from "./pages/Events/MyFarvourite";
+import EventRegistered from "./pages/Events/EventRegistered";
 
 function App() {
   return (
@@ -90,6 +91,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Spectator"]}>
               <MyFarvourite />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/event-registered"
+          element={
+            <PrivateRoute allowedRoles={["Spectator"]}>
+              <EventRegistered />
             </PrivateRoute>
           }
         />
