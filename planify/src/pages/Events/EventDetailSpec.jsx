@@ -20,6 +20,7 @@ import {
   IsRegisterParticipant,
 } from "../../services/EventService";
 import Swal from "sweetalert2";
+import Loading from "../../components/Loading";
 
 function EventDetailSpec() {
   const { eventId } = useParams();
@@ -83,7 +84,7 @@ function EventDetailSpec() {
       return "not started yet";
     }
   };
-  if (!event) return <p>Loading event details...</p>;
+  if (!event) return <Loading />;
   const formatDateTime = (dateTime) => {
     const date = parseISO(dateTime);
     return format(date, "HH:mm eeee, dd/MM/yyyy", { locale: vi });
