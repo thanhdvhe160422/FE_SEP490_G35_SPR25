@@ -14,11 +14,9 @@ import Header from "../../components/Header/Header";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
 import { useNavigate } from "react-router-dom";
-import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
-  createFavoriteEvent,
   deleteFavouriteEvent,
-  getFavouriteEvents,
+  getMyFavouriteEvents,
 } from "../../services/EventService";
 
 export default function HomeSpectator() {
@@ -57,51 +55,68 @@ export default function HomeSpectator() {
     return eventMedias[0].mediaDTO.mediaUrl;
   };
 
-  const isEventFavorited = (eventId) => {
-    return favoriteEvents.includes(eventId);
-  };
+  // const isEventFavorited = (eventId) => {
+  //   return favoriteEvents.includes(eventId);
+  // };
 
-  const handleCreateFavorite = async (eventId, e) => {
-    try {
-      e.stopPropagation();
-      await createFavoriteEvent(eventId);
-      setFavoriteEvents([...favoriteEvents, eventId]);
-      console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
-    } catch (error) {
-      console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
-    }
-  };
+  // const handleCreateFavorite = async (eventId, e) => {
+  //   try {
+  //     e.stopPropagation();
+  //     await createFavoriteEvent(eventId);
+  //     setFavoriteEvents([...favoriteEvents, eventId]);
+  //     console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+  //   } catch (error) {
+  //     console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
+  //   }
+  // };
 
+  // const handleDeleteFavorite = async (eventId, e) => {
+  //   try {
+  //     e.stopPropagation();
+  //     await deleteFavouriteEvent(eventId);
+  //     setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
+  //     console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+  //   } catch (error) {
+  //     console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
+  //   }
+  // };
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
       await deleteFavouriteEvent(eventId);
-      setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
+      setFavoriteEvents(
+        favoriteEvents.filter((event) => event.eventId !== eventId)
+      );
       console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+
+      if (favoriteEvents.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      } else {
+        fetchEvents(currentPage);
+      }
     } catch (error) {
       console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
     }
   };
-
-  const fetchFavoriteEvents = async () => {
-    try {
-      const response = await getFavouriteEvents(currentPage, pageSize);
-      if (response && response.items) {
-        const favoriteIds = response.items.map((item) => item.eventId);
-        setFavoriteEvents(favoriteIds);
-        console.log("Danh sách eventId yêu thích:", favoriteIds);
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
-    }
-  };
+  // const fetchFavoriteEvents = async () => {
+  //   try {
+  //     const response = await getFavouriteEvents(currentPage, pageSize);
+  //     if (response && response.items) {
+  //       const favoriteIds = response.items.map((item) => item.eventId);
+  //       setFavoriteEvents(favoriteIds);
+  //       console.log("Danh sách eventId yêu thích:", favoriteIds);
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
+  //   }
+  // };
 
   const fetchEvents = async (page) => {
     try {
       setLoading(true);
       setIsSearchMode(false);
 
-      const response = await getPosts(page, pageSize);
+      const response = await getMyFavouriteEvents(page, pageSize);
 
       if (response && response.items) {
         setEvents(response.items);
@@ -123,51 +138,51 @@ export default function HomeSpectator() {
     }
   };
 
-  const searchEvents = async (page = 1) => {
-    try {
-      setLoading(true);
-      setIsSearchMode(true);
+  // const searchEvents = async (page = 1) => {
+  //   try {
+  //     setLoading(true);
+  //     setIsSearchMode(true);
 
-      const params = {
-        page: page,
-        pageSize: pageSize,
-        name: searchTerm,
-        placed: locationFilter !== "" ? locationFilter : undefined,
-        status: statusFilter !== "All" ? statusFilter : undefined,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-      };
+  //     const params = {
+  //       page: page,
+  //       pageSize: pageSize,
+  //       name: searchTerm,
+  //       placed: locationFilter !== "" ? locationFilter : undefined,
+  //       status: statusFilter !== "All" ? statusFilter : undefined,
+  //       startDate: startDate || undefined,
+  //       endDate: endDate || undefined,
+  //     };
 
-      if (categoryFilter !== "") {
-        const categoryId = getCategoryId(categoryFilter);
-        if (categoryId) {
-          params.categoryEventId = categoryId;
-        }
-      }
+  //     if (categoryFilter !== "") {
+  //       const categoryId = getCategoryId(categoryFilter);
+  //       if (categoryId) {
+  //         params.categoryEventId = categoryId;
+  //       }
+  //     }
 
-      console.log("Search params:", params);
-      const response = await searchEventsSpec(params);
+  //     console.log("Search params:", params);
+  //     const response = await searchEventsSpec(params);
 
-      if (response && response.items) {
-        setEvents(response.items);
-        setTotalEvents(response.totalCount || 0);
-        setTotalPages(response.totalPages || 1);
+  //     if (response && response.items) {
+  //       setEvents(response.items);
+  //       setTotalEvents(response.totalCount || 0);
+  //       setTotalPages(response.totalPages || 1);
 
-        if (categories.length === 0 || locations.length === 0) {
-          extractCategoriesAndLocations(response.items);
-        }
-      } else {
-        setEvents([]);
-        setTotalPages(1);
-      }
-    } catch (error) {
-      console.error("Error searching events:", error);
-      setEvents([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       if (categories.length === 0 || locations.length === 0) {
+  //         extractCategoriesAndLocations(response.items);
+  //       }
+  //     } else {
+  //       setEvents([]);
+  //       setTotalPages(1);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error searching events:", error);
+  //     setEvents([]);
+  //     setTotalPages(1);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const extractCategoriesAndLocations = (eventsData) => {
     if (!eventsData || !Array.isArray(eventsData)) return;
@@ -191,56 +206,56 @@ export default function HomeSpectator() {
     setLocations(Array.from(locationsSet));
   };
 
-  const getCategoryId = (categoryName) => {
-    const categoryMap = {
-      "Technology Conference": 1,
-      Workshop: 2,
-    };
+  // const getCategoryId = (categoryName) => {
+  //   const categoryMap = {
+  //     "Technology Conference": 1,
+  //     Workshop: 2,
+  //   };
 
-    return categoryMap[categoryName];
-  };
+  //   return categoryMap[categoryName];
+  // };
 
   useEffect(() => {
     fetchEvents(1);
-    fetchFavoriteEvents();
+    //fetchFavoriteEvents();
   }, []);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
-
-    if (isSearchMode) {
-      searchEvents(pageNumber);
-    } else {
-      fetchEvents(pageNumber);
-    }
+    fetchEvents(pageNumber);
+    // if (isSearchMode) {
+    //   searchEvents(pageNumber);
+    // } else {
+    //   fetchEvents(pageNumber);
+    // }
   };
 
-  const handleApplyFilters = () => {
-    setCurrentPage(1);
-    if (
-      searchTerm.trim() !== "" ||
-      statusFilter !== "All" ||
-      categoryFilter !== "" ||
-      locationFilter !== "" ||
-      startDate !== "" ||
-      endDate !== ""
-    ) {
-      searchEvents(1);
-    } else {
-      fetchEvents(1);
-    }
-  };
+  // const handleApplyFilters = () => {
+  //   setCurrentPage(1);
+  //   if (
+  //     searchTerm.trim() !== "" ||
+  //     statusFilter !== "All" ||
+  //     categoryFilter !== "" ||
+  //     locationFilter !== "" ||
+  //     startDate !== "" ||
+  //     endDate !== ""
+  //   ) {
+  //     searchEvents(1);
+  //   } else {
+  //     fetchEvents(1);
+  //   }
+  // };
 
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("All");
-    setCategoryFilter("");
-    setLocationFilter("");
-    setStartDate("");
-    setEndDate("");
-    fetchEvents(1);
-  };
+  // const handleResetFilters = () => {
+  //   setSearchTerm("");
+  //   setStatusFilter("All");
+  //   setCategoryFilter("");
+  //   setLocationFilter("");
+  //   setStartDate("");
+  //   setEndDate("");
+  //   fetchEvents(1);
+  // };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -254,7 +269,7 @@ export default function HomeSpectator() {
       <div className="d-flex">
         <div className="flex-grow-1 px-4" style={{ marginTop: "100px" }}>
           <Container fluid className="px-2">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            {/* <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="fw-bold mb-0">My Farvourite Events</h2>
               <div className="d-flex" style={{ width: "50%" }}>
                 <Form.Control
@@ -276,9 +291,9 @@ export default function HomeSpectator() {
                   Search
                 </Button>
               </div>
-            </div>
+            </div> */}
 
-            {(searchTerm ||
+            {/* {(searchTerm ||
               statusFilter !== "All" ||
               categoryFilter ||
               locationFilter ||
@@ -317,7 +332,7 @@ export default function HomeSpectator() {
                   </Badge>
                 )}
               </div>
-            )}
+            )} */}
 
             <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
               {loading ? (
@@ -362,17 +377,14 @@ export default function HomeSpectator() {
                                 padding: "5px",
                                 cursor: "pointer",
                               }}
-                              onClick={(e) =>
-                                isEventFavorited(event.id)
-                                  ? handleDeleteFavorite(event.id, e)
-                                  : handleCreateFavorite(event.id, e)
-                              }
+                              onClick={(e) => handleDeleteFavorite(event.id, e)}
                             >
-                              {isEventFavorited(event.id) ? (
+                              <FaHeart size={20} color="red" />
+                              {/* {isEventFavorited(event.id) ? (
                                 <FaHeart size={20} color="red" />
                               ) : (
                                 <FaRegHeart size={20} color="red" />
-                              )}
+                              )} */}
                             </div>
 
                             <Card.Body>
