@@ -21,15 +21,7 @@ import {
 
 export default function MyFarvourite() {
   const [events, setEvents] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const navigate = useNavigate();
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
@@ -37,8 +29,6 @@ export default function MyFarvourite() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-  const [isSearchMode, setIsSearchMode] = useState(false);
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
@@ -52,24 +42,18 @@ export default function MyFarvourite() {
     if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
       return "https://placehold.co/600x400?text=No+Image";
     }
-
-    console.log("sang day " + fixDriveUrl(eventMedias[0].mediaUrl));
     return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await deleteFavouriteEvent(eventId);
-      setFavoriteEvents(
-        favoriteEvents.filter((event) => event.eventId !== eventId)
-      );
-      console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
-
-      if (favoriteEvents.length === 1 && currentPage > 1) {
-        setCurrentPage((prev) => prev - 1);
-      } else {
-        fetchEvents(currentPage);
+      var response = await deleteFavouriteEvent(eventId);
+      if (response.status === 200) {
+        console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event.id !== eventId)
+        );
       }
     } catch (error) {
       console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
@@ -79,7 +63,6 @@ export default function MyFarvourite() {
   const fetchEvents = async (page) => {
     try {
       setLoading(true);
-      setIsSearchMode(false);
 
       const response = await getMyFavouriteEvents(page, pageSize);
 
@@ -103,7 +86,6 @@ export default function MyFarvourite() {
     }
   };
 
-
   const extractCategoriesAndLocations = (eventsData) => {
     if (!eventsData || !Array.isArray(eventsData)) return;
 
@@ -126,8 +108,6 @@ export default function MyFarvourite() {
     setLocations(Array.from(locationsSet));
   };
 
- 
-
   useEffect(() => {
     fetchEvents(1);
   }, []);
@@ -136,10 +116,7 @@ export default function MyFarvourite() {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
     fetchEvents(pageNumber);
-  
   };
-
-
 
   return (
     <>
@@ -147,71 +124,6 @@ export default function MyFarvourite() {
       <div className="d-flex">
         <div className="flex-grow-1 px-4" style={{ marginTop: "100px" }}>
           <Container fluid className="px-2">
-            {/* <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="fw-bold mb-0">My Farvourite Events</h2>
-              <div className="d-flex" style={{ width: "50%" }}>
-                <Form.Control
-                  type="text"
-                  placeholder="Search events..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      handleApplyFilters();
-                    }
-                  }}
-                />
-                <Button
-                  variant="primary"
-                  className="ms-2"
-                  onClick={handleApplyFilters}
-                >
-                  Search
-                </Button>
-              </div>
-            </div> */}
-
-            {/* {(searchTerm ||
-              statusFilter !== "All" ||
-              categoryFilter ||
-              locationFilter ||
-              startDate ||
-              endDate) && (
-              <div className="mb-3">
-                <span className="me-2">Active filters:</span>
-                {searchTerm && (
-                  <Badge bg="info" className="me-2">
-                    Keyword: {searchTerm}
-                  </Badge>
-                )}
-                {statusFilter !== "All" && (
-                  <Badge bg="info" className="me-2">
-                    Status: {statusFilter}
-                  </Badge>
-                )}
-                {categoryFilter && (
-                  <Badge bg="info" className="me-2">
-                    Category: {categoryFilter}
-                  </Badge>
-                )}
-                {locationFilter && (
-                  <Badge bg="info" className="me-2">
-                    Location: {locationFilter}
-                  </Badge>
-                )}
-                {startDate && (
-                  <Badge bg="info" className="me-2">
-                    From: {formatDate(startDate)}
-                  </Badge>
-                )}
-                {endDate && (
-                  <Badge bg="info" className="me-2">
-                    To: {formatDate(endDate)}
-                  </Badge>
-                )}
-              </div>
-            )} */}
-
             <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
               {loading ? (
                 <div className="text-center py-5">
@@ -266,11 +178,6 @@ export default function MyFarvourite() {
                               onClick={(e) => handleDeleteFavorite(event.id, e)}
                             >
                               <FaHeart size={20} color="red" />
-                              {/* {isEventFavorited(event.id) ? (
-                                <FaHeart size={20} color="red" />
-                              ) : (
-                                <FaRegHeart size={20} color="red" />
-                              )} */}
                             </div>
 
                             <Card.Body>

@@ -18,7 +18,6 @@ import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
   createFavoriteEvent,
   deleteFavouriteEvent,
-  getFavouriteEvents,
 } from "../../services/EventService";
 
 export default function HomeSpectator() {
@@ -40,7 +39,6 @@ export default function HomeSpectator() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
 
   const fixDriveUrl = (url) => {
     console.log(url);
@@ -58,16 +56,18 @@ export default function HomeSpectator() {
     return eventMedias[0].mediaDTO.mediaUrl;
   };
 
-  const isEventFavorited = (eventId) => {
-    return favoriteEvents.includes(eventId);
-  };
-
   const handleCreateFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await createFavoriteEvent(eventId);
-      setFavoriteEvents([...favoriteEvents, eventId]);
-      console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+      var response = await createFavoriteEvent(eventId);
+      if (response.status === 201) {
+        console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, isFavorite: true } : event
+          )
+        );
+      }
     } catch (error) {
       console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
     }
@@ -76,24 +76,17 @@ export default function HomeSpectator() {
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await deleteFavouriteEvent(eventId);
-      setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
-      console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
-    } catch (error) {
-      console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
-    }
-  };
-
-  const fetchFavoriteEvents = async () => {
-    try {
-      const response = await getFavouriteEvents(currentPage, pageSize);
-      if (response && response.items) {
-        const favoriteIds = response.items.map((item) => item.eventId);
-        setFavoriteEvents(favoriteIds);
-        console.log("Danh sách eventId yêu thích:", favoriteIds);
+      var response = await deleteFavouriteEvent(eventId);
+      if (response.status === 200) {
+        console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, isFavorite: false } : event
+          )
+        );
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách sự kiện yêu thích:", error);
+      console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
     }
   };
 
@@ -203,7 +196,6 @@ export default function HomeSpectator() {
 
   useEffect(() => {
     fetchEvents(1);
-    fetchFavoriteEvents();
   }, []);
 
   const handlePageChange = (pageNumber) => {
