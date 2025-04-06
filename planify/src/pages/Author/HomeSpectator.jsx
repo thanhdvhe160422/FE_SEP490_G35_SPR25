@@ -43,6 +43,7 @@ export default function HomeSpectator() {
   const [favoriteEvents, setFavoriteEvents] = useState([]);
 
   const fixDriveUrl = (url) => {
+    console.log(url);
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
     if (!url.includes("drive.google.com/uc?id=")) return url;
@@ -452,6 +453,7 @@ export default function HomeSpectator() {
                           >
                             <Card.Img
                               variant="top"
+                              // src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               height="180"
                               className="event-image"
@@ -474,12 +476,12 @@ export default function HomeSpectator() {
                                 cursor: "pointer",
                               }}
                               onClick={(e) =>
-                                isEventFavorited(event.id)
+                                event.isFavorite
                                   ? handleDeleteFavorite(event.id, e)
                                   : handleCreateFavorite(event.id, e)
                               }
                             >
-                              {isEventFavorited(event.id) ? (
+                              {event.isFavorite ? (
                                 <FaHeart size={20} color="red" />
                               ) : (
                                 <FaRegHeart size={20} color="red" />
