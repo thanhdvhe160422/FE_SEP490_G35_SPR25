@@ -30,6 +30,7 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   UnorderedListOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import "../styles/Tasks/ListTask.css";
 import { createTaskAPI, updateTask, deleteTask } from "../services/taskService";
@@ -64,13 +65,170 @@ function ListTask({ eventId, data }) {
   const [editSubTaskForm] = Form.useForm();
   const [selectedSubTask, setSelectedSubTask] = useState(null);
   const [isEditSubTaskSubmitting, setIsEditSubTaskSubmitting] = useState(false);
-
+  const [eventUsers, setEventUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userSearchValue, setUserSearchValue] = useState("");
+  const [assignedUsers, setAssignedUsers] = useState([]);
+  const [assigningUser, setAssigningUser] = useState(false);
+  const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
+  const [selectedSubTaskForAssign, setSelectedSubTaskForAssign] =
+    useState(null);
+  const showAssignModal = (subTask) => {
+    setSelectedSubTaskForAssign(subTask);
+    setAssignedUsers(subTask.assignedUsers || []);
+    setUserSearchValue("");
+    searchEventUsers();
+    setIsAssignModalVisible(true);
+  };
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
   const userId = localStorage.getItem("userId");
+  const handleAssignUsers = async () => {
+    if (!selectedSubTaskForAssign || assignedUsers.length === 0) {
+      message.warning("Please select at least one user to assign");
+      return;
+    }
+
+    const userIds = assignedUsers.map((user) => user.userId || user.id);
+    const success = await handleMultipleAssignments(
+      selectedSubTaskForAssign.id,
+      userIds
+    );
+
+    if (success) {
+      setIsAssignModalVisible(false);
+      fetchTasksFromAPI().then(() => {
+        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
+        if (updatedTask) {
+          showSubTasks(updatedTask);
+        }
+      });
+    }
+  };
+  const renderSubTaskActions = (item) => {
+    const actions = [
+      <Button
+        type="text"
+        icon={<EditOutlined />}
+        size="small"
+        onClick={() => showEditSubTaskModal(item)}
+      />,
+      <Button
+        type="text"
+        icon={<UserAddOutlined />}
+        size="small"
+        onClick={() => showAssignModal(item)}
+      />,
+      <Popconfirm
+        title="Confirm deletion"
+        description="Are you sure you want to delete this subtask?"
+        onConfirm={() => deleteSubTask(item.id)}
+        okText="Delete"
+        cancelText="Cancel"
+        icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
+      >
+        <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+      </Popconfirm>,
+    ];
+    return actions;
+  };
+  const searchEventUsers = async (searchValue = "") => {
+    try {
+      setLoadingUsers(true);
+      const token = localStorage.getItem("token");
+
+      const params = new URLSearchParams({
+        page: 1,
+        pageSize: 1000,
+        eventId: eventId,
+      });
+
+      if (searchValue) {
+        if (searchValue.includes("@")) {
+          params.append("email", searchValue);
+        } else {
+          params.append("name", searchValue);
+        }
+      }
+
+      const response = await axios.get(
+        `https://localhost:44320/api/JoinProject/search-implement-joined-project?${params.toString()}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data && response.data.items) {
+        const users = response.data.items.map((item) => ({
+          userId: item.userId,
+          email: item.user.email,
+          fullName: `${item.user.firstName} ${item.user.lastName}`,
+        }));
+        setEventUsers(users);
+      } else {
+        setEventUsers([]);
+      }
+    } catch (error) {
+      console.error("Error searching event users:", error);
+      message.error("Could not load event members");
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+  useEffect(() => {
+    if (eventId) {
+      searchEventUsers();
+    }
+  }, [eventId]);
+  const assignUserToSubtask = async (subtaskId, userId) => {
+    try {
+      setAssigningUser(true);
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        `https://localhost:44320/api/SubTasks/assign-subtask?userId=${userId}&subtaskId=${subtaskId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return true;
+    } catch (error) {
+      console.error("Error assigning user to subtask:", error);
+      message.error(`Failed to assign user to subtask: ${error.message}`);
+      return false;
+    } finally {
+      setAssigningUser(false);
+    }
+  };
+  const handleMultipleAssignments = async (subtaskId, userIds) => {
+    let successCount = 0;
+    setAssigningUser(true);
+
+    for (const userId of userIds) {
+      const success = await assignUserToSubtask(subtaskId, userId);
+      if (success) successCount++;
+    }
+
+    setAssigningUser(false);
+
+    if (successCount === userIds.length) {
+      message.success("All users assigned successfully");
+      return true;
+    } else if (successCount > 0) {
+      message.warning(
+        `Assigned ${successCount} out of ${userIds.length} users`
+      );
+      return true;
+    } else {
+      message.error("Failed to assign any users");
+      return false;
+    }
+  };
   const showEditSubTaskModal = (subTask) => {
     setSelectedSubTask(subTask);
     editSubTaskForm.setFieldsValue({
@@ -1067,37 +1225,7 @@ function ListTask({ eventId, data }) {
                   itemLayout="horizontal"
                   dataSource={subTasks}
                   renderItem={(item) => (
-                    <List.Item
-                      actions={[
-                        <Button
-                          type="text"
-                          icon={<EditOutlined />}
-                          size="small"
-                          onClick={() => {
-                            showEditSubTaskModal(item);
-                          }}
-                        />,
-                        <Popconfirm
-                          title="Confirm deletion"
-                          description="Are you sure you want to delete this subtask?"
-                          onConfirm={() => deleteSubTask(item.id)}
-                          okText="Delete"
-                          cancelText="Cancel"
-                          icon={
-                            <ExclamationCircleOutlined
-                              style={{ color: "red" }}
-                            />
-                          }
-                        >
-                          <Button
-                            type="text"
-                            danger
-                            icon={<DeleteOutlined />}
-                            size="small"
-                          />
-                        </Popconfirm>,
-                      ]}
-                    >
+                    <List.Item actions={[renderSubTaskActions(item)]}>
                       <div className="sub-task-item">
                         {item.status === 1 ? (
                           <Button
@@ -1117,6 +1245,7 @@ function ListTask({ eventId, data }) {
                           />
                         ) : (
                           <Checkbox
+                            checked={item.status === 1}
                             onChange={(e) =>
                               toggleSubTaskStatus(item.id, e.target.checked)
                             }
@@ -1130,6 +1259,12 @@ function ListTask({ eventId, data }) {
                         >
                           <div className="sub-task-title">
                             {item.subTaskName}
+                            {item.assignedUsers &&
+                              item.assignedUsers.length > 0 && (
+                                <Tag color="green" style={{ marginLeft: 8 }}>
+                                  {item.assignedUsers.length} assigned
+                                </Tag>
+                              )}
                           </div>
                           {item.deadline && (
                             <div className="sub-task-date">
@@ -1141,6 +1276,17 @@ function ListTask({ eventId, data }) {
                               {item.subTaskDescription}
                             </div>
                           )}
+                          {item.assignedUsers &&
+                            item.assignedUsers.length > 0 && (
+                              <div className="assigned-users">
+                                Assigned to:{" "}
+                                {item.assignedUsers.map((user) => (
+                                  <Tag key={user.userId || user.id}>
+                                    {user.fullName || user.name || user.email}
+                                  </Tag>
+                                ))}
+                              </div>
+                            )}
                         </div>
                         {item.priority && (
                           <Tag
@@ -1164,6 +1310,71 @@ function ListTask({ eventId, data }) {
                   )}
                 />
               )}
+              <Modal
+                title={`Assign Users to ${selectedSubTaskForAssign?.subTaskName}`}
+                open={isAssignModalVisible}
+                onCancel={() => setIsAssignModalVisible(false)}
+                footer={[
+                  <Button
+                    key="cancel"
+                    onClick={() => setIsAssignModalVisible(false)}
+                  >
+                    Cancel
+                  </Button>,
+                  <Button
+                    key="submit"
+                    type="primary"
+                    loading={assigningUser}
+                    onClick={handleAssignUsers}
+                  >
+                    Assign
+                  </Button>,
+                ]}
+              >
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Input
+                    placeholder="Search by name or email"
+                    value={userSearchValue}
+                    onChange={(e) => {
+                      setUserSearchValue(e.target.value);
+                      searchEventUsers(e.target.value);
+                    }}
+                    style={{ marginBottom: 16 }}
+                  />
+                  <Spin spinning={loadingUsers}>
+                    <List
+                      dataSource={eventUsers}
+                      renderItem={(user) => (
+                        <List.Item>
+                          <Checkbox
+                            checked={assignedUsers.some(
+                              (u) =>
+                                (u.userId || u.id) === (user.userId || user.id)
+                            )}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setAssignedUsers([...assignedUsers, user]);
+                              } else {
+                                setAssignedUsers(
+                                  assignedUsers.filter(
+                                    (u) =>
+                                      (u.userId || u.id) !==
+                                      (user.userId || user.id)
+                                  )
+                                );
+                              }
+                            }}
+                          >
+                            {user.fullName}
+                            <br />
+                            {user.email}
+                          </Checkbox>
+                        </List.Item>
+                      )}
+                    />
+                  </Spin>
+                </Space>
+              </Modal>
               <Modal
                 title="Update Subtask"
                 open={isEditSubTaskModalVisible}

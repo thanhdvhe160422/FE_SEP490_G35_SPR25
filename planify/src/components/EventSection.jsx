@@ -13,7 +13,7 @@ const EVENTS_PER_PAGE = 5;
 
 function EventSection() {
   const [myEventPages, setMyEventPages] = useState(1);
-  const [filteredTotalPages, setFilteredTotalPages] = useState(1);
+  const [filteredTotalPages, setFilteredTotalPages] = useState();
   const [isFiltered, setIsFiltered] = useState(false);
   const [events, setEvents] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -75,15 +75,15 @@ function EventSection() {
       if (response && response.items) {
         console.log(`Tìm thấy ${response.items.length} sự kiện`);
         setFilteredEvents(response.items);
-        setFilteredTotalPages(response.totalPages || 1);
+        setFilteredTotalPages(response.totalPages);
       } else {
         console.log("Không tìm thấy sự kiện nào");
         setFilteredEvents([]);
-        setFilteredTotalPages(1);
+        setFilteredTotalPages(0);
       }
     } catch (error) {
       console.error("Error searching events:", error);
-      setFilteredTotalPages(1);
+      setFilteredTotalPages(0);
     }
   };
 
@@ -111,7 +111,7 @@ function EventSection() {
         searchEvents(params).then((response) => {
           if (response && response.items) {
             setFilteredEvents(response.items);
-            setFilteredTotalPages(response.totalPages || 1);
+            setFilteredTotalPages(response.totalPages);
           }
         });
       } else {
@@ -141,7 +141,7 @@ function EventSection() {
           (event) => currentCampus(event) === campus
         );
         setEvents(campusEvents);
-        setTotalPages(allData.totalPages || 1);
+        setTotalPages(allData.totalPages);
       } catch (error) {
         console.error("❌ Lỗi khi lấy sự kiện:", error);
         setEvents([]);
@@ -228,19 +228,19 @@ function EventSection() {
       if (response && response.items) {
         console.log(`Tìm thấy ${response.items.length} sự kiện của tôi`);
         setFilteredEvents(response.items);
-        setFilteredTotalPages(response.totalPages || 1);
+        setFilteredTotalPages(response.totalPages);
         setCurrentPage(1);
       } else {
         console.log("Không tìm thấy sự kiện nào của tôi");
         setFilteredEvents([]);
-        setFilteredTotalPages(1);
+        setFilteredTotalPages(0);
       }
 
       setEventFilter("my");
     } catch (error) {
       console.error("Lỗi khi tìm kiếm sự kiện của tôi:", error);
       setFilteredEvents([]);
-      setFilteredTotalPages(1);
+      setFilteredTotalPages(0);
     }
   };
 

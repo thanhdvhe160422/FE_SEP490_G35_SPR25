@@ -28,14 +28,14 @@ export default function Header() {
 
   useEffect(() => {
     const fetchNotification = async () => {
-      try{
-          await getNotification();
-      }catch(error){
+      try {
+        await getNotification();
+      } catch (error) {
         console.error("error while load incoming event notification: " + error);
       }
-    }
-    var token = localStorage.getItem('token')
-    const savedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+    };
+    var token = localStorage.getItem("token");
+    const savedMessages = JSON.parse(localStorage.getItem("messages")) || [];
     setMessages(savedMessages);
 
     const newConnection = new HubConnectionBuilder()
@@ -46,7 +46,7 @@ export default function Header() {
     newConnection
       .start()
       .then(() => {
-        console.log('Connected to SignalR');
+        console.log("Connected to SignalR");
         fetchNotification();
       })
       .catch((err) => console.error("Error while starting connection: " + err));
@@ -79,11 +79,10 @@ export default function Header() {
     };
   }, []);
 
-
-  useEffect(()=>{
-    if (messages.length===0) return;
-    localStorage.setItem('messages', JSON.stringify(messages));
-  },[messages])
+  useEffect(() => {
+    if (messages.length === 0) return;
+    localStorage.setItem("messages", JSON.stringify(messages));
+  }, [messages]);
 
   const handleLinkClick = (index) => {
     const updatedMessages = [...messages];
@@ -99,13 +98,17 @@ export default function Header() {
         const userData = await getProfileById(userId);
         setFullname(userData.data.firstName + " " + userData.data.lastName);
         //setPicture(localStorage.getItem("avatar"));
-        setPicture(convertToDirectLink(userData?.data?.avatar?.mediaUrl||localStorage.getItem("avatar")));
+        setPicture(
+          convertToDirectLink(
+            userData?.data?.avatar?.mediaUrl || localStorage.getItem("avatar")
+          )
+        );
         //console.log("Header", userData.data);
       } catch (error) {
         console.error(error);
       }
     };
-    
+
     fetchData();
   }, []);
 
@@ -166,7 +169,7 @@ export default function Header() {
     implementer: [
       { label: "Home", path: "/home-implementer" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
-      { label: "History", path: "/history" },
+      { label: "History", path: "/history-event" },
       {
         label: "Favorite Events",
         path: "/my-favorite-events",
