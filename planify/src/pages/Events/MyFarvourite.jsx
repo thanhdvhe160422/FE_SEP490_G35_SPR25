@@ -19,7 +19,7 @@ import {
   getMyFavouriteEvents,
 } from "../../services/EventService";
 
-export default function HomeSpectator() {
+export default function MyFarvourite() {
   const [events, setEvents] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

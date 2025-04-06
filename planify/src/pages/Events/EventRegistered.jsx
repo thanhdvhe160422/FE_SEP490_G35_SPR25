@@ -16,12 +16,13 @@ import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
 import { useNavigate } from "react-router-dom";
 import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
+  GetRegisterdByUserId,
   createFavoriteEvent,
   deleteFavouriteEvent,
   getFavouriteEvents,
 } from "../../services/EventService";
 
-export default function HomeSpectator() {
+export default function EventRegistered() {
   const [events, setEvents] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,13 +52,15 @@ export default function HomeSpectator() {
   };
 
   const getImageUrl = (eventMedias) => {
-    if (!eventMedias || !eventMedias.length || !eventMedias[0].mediaDTO) {
+    if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
       return "https://placehold.co/600x400?text=No+Image";
     }
-    return eventMedias[0].mediaDTO.mediaUrl;
+    console.log("sang day " + eventMedias);
+    return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   const isEventFavorited = (eventId) => {
+    console.log("is favorited: " + eventId);
     return favoriteEvents.includes(eventId);
   };
 
@@ -101,15 +104,15 @@ export default function HomeSpectator() {
       setLoading(true);
       setIsSearchMode(false);
 
-      const response = await getPosts(page, pageSize);
+      const response = await GetRegisterdByUserId();
 
-      if (response && response.items) {
-        setEvents(response.items);
+      if (response && response.result) {
+        setEvents(response.result);
         setTotalEvents(response.totalCount || 0);
         setTotalPages(response.totalPages || 1);
 
         if (categories.length === 0 || locations.length === 0) {
-          extractCategoriesAndLocations(response.items);
+          extractCategoriesAndLocations(response.result);
         }
       } else {
         console.error("Unexpected API response format:", response);
@@ -270,13 +273,19 @@ export default function HomeSpectator() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-spec/${event.id}`)
+                              navigate(`/event-detail-spec/${event.eventId}`)
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >
                             <Card.Img
                               variant="top"
-                              src={fixDriveUrl(getImageUrl(event.eventMedias))}
+                              src={
+                                event.eventMedia &&
+                                event.eventMedia.length > 0 &&
+                                event.eventMedia[0]
+                                  ? getImageUrl(event.eventMedia)
+                                  : "https://placehold.co/600x400?text=No+Image"
+                              }
                               height="180"
                               className="event-image"
                               style={{ objectFit: "cover" }}
@@ -298,12 +307,12 @@ export default function HomeSpectator() {
                                 cursor: "pointer",
                               }}
                               onClick={(e) =>
-                                isEventFavorited(event.id)
-                                  ? handleDeleteFavorite(event.id, e)
-                                  : handleCreateFavorite(event.id, e)
+                                isEventFavorited(event.eventId)
+                                  ? handleDeleteFavorite(event.eventId, e)
+                                  : handleCreateFavorite(event.eventId, e)
                               }
                             >
-                              {isEventFavorited(event.id) ? (
+                              {isEventFavorited(event.eventId) ? (
                                 <FaHeart size={20} color="red" />
                               ) : (
                                 <FaRegHeart size={20} color="red" />

@@ -181,6 +181,10 @@ export default function Header() {
         label: "Favorite Events",
         path: "/my-favorite-events",
       },
+      {
+        label: "Registered Events",
+        path: "/event-registered",
+      },
     ],
   };
 

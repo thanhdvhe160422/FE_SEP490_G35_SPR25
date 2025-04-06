@@ -552,11 +552,11 @@ export const getNotification = async () => {
     return null;
   }
 };
-export const RegisterParticipant = async (eventId,userId) => {
+export const RegisterParticipant = async (eventId, userId) => {
   var formData = {
-    eventId:eventId,
-    userId:userId
-  }
+    eventId: eventId,
+    userId: userId,
+  };
   let token = localStorage.getItem("token");
 
   try {
@@ -588,7 +588,8 @@ export const RegisterParticipant = async (eventId,userId) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to register participant after token refresh.\n"+retryError.response?.data?.message,
+            "Unable to register participant after token refresh.\n" +
+              retryError.response?.data?.message,
             "error"
           );
           return { error: "unauthorized" };
@@ -600,10 +601,14 @@ export const RegisterParticipant = async (eventId,userId) => {
     }
 
     console.error("Error register participant:", error);
-    Swal.fire("Error", "Unable to register participant.\n"+error.response?.data?.message, "error");
+    Swal.fire(
+      "Error",
+      "Unable to register participant.\n" + error.response?.data?.message,
+      "error"
+    );
     return null;
   }
-}
+};
 export const IsRegisterParticipant = async (eventId) => {
   let token = localStorage.getItem("token");
 
@@ -633,7 +638,7 @@ export const IsRegisterParticipant = async (eventId) => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          
+
           return { error: "unauthorized" };
         }
       } else {
@@ -645,12 +650,12 @@ export const IsRegisterParticipant = async (eventId) => {
     console.error("Error register participant:", error);
     return null;
   }
-}
-export const DeleteRegisterParticipant = async (eventId,userId) => {
+};
+export const DeleteRegisterParticipant = async (eventId, userId) => {
   var formData = {
-    eventId:eventId,
-    userId:userId
-  }
+    eventId: eventId,
+    userId: userId,
+  };
   let token = localStorage.getItem("token");
 
   try {
@@ -682,7 +687,8 @@ export const DeleteRegisterParticipant = async (eventId,userId) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to unregister participant after token refresh.\n"+retryError.response?.data?.message,
+            "Unable to unregister participant after token refresh.\n" +
+              retryError.response?.data?.message,
             "error"
           );
           return { error: "unauthorized" };
@@ -694,10 +700,14 @@ export const DeleteRegisterParticipant = async (eventId,userId) => {
     }
 
     console.error("Error register participant:", error);
-    Swal.fire("Error", "Unable to unregister participant.\n"+error.response?.data?.message, "error");
+    Swal.fire(
+      "Error",
+      "Unable to unregister participant.\n" + error.response?.data?.message,
+      "error"
+    );
     return null;
   }
-}
+};
 export const getMyFavouriteEvents = async (page, pageSize) => {
   let token = localStorage.getItem("token");
 
@@ -735,6 +745,48 @@ export const getMyFavouriteEvents = async (page, pageSize) => {
     }
 
     console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const GetRegisterdByUserId = async () => {
+  let token = localStorage.getItem("token");
+  let userId = localStorage.getItem("userId");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Participant/registered/${userId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Participant/registered/${userId}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error get registerd by userId:", error);
     return null;
   }
 };
