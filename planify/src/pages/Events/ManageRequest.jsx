@@ -188,6 +188,12 @@ function RequestColumn({ title, requests, children }) {
             >
               {req.eventTitle}
             </h4>
+            {req.reason && (
+              <p>
+                <strong>Resaon:</strong> {req.reason}
+              </p>
+            )}
+
             <p>
               <strong>From:</strong> {formatDateTime(req.eventStartTime)}
             </p>

@@ -1,5 +1,5 @@
 .manager-container {
-  padding: 20px;
+  padding-top: 100px;
   max-width: 1200px;
   margin: auto;
   font-family: "Arial", sans-serif;
@@ -22,6 +22,7 @@ h2 {
 
 .request-column {
   flex: 1;
+
   padding: 20px;
   border-radius: 10px;
   background-color: #f9f9f9;

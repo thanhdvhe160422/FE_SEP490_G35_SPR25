@@ -30,10 +30,7 @@ function MyRequest(props) {
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <Header />
-      <div
-        className="event-request-content"
-        style={{ flex: 1, padding: "20px" }}
-      >
+      <div className="event-request-content">
         <h2>List Event Request</h2>
         <div className="event-request-columns">
           <RequestColumn title="Not Approved Yet" requests={pendingRequests} />

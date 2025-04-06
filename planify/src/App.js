@@ -217,8 +217,12 @@ function App() {
           }
         />
         <Route
-          path="/create-event-organizer"
-          element={<CreateEventOrganizer />}
+          path="/manage-eog"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager"]}>
+              <CreateEventOrganizer />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/update-event-organizer/:userId"
