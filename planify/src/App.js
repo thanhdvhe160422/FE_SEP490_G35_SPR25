@@ -27,6 +27,7 @@ import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
+import MyEvent from "./pages/Events/MyEvent"
 
 function App() {
   return (
@@ -228,6 +229,16 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Implementer"]}>
               <HistoryEvent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-event"
+          element={
+            <PrivateRoute allowedRoles={[
+              "Campus Manager",
+              "Event Organizer",]}>
+              <MyEvent />
             </PrivateRoute>
           }
         />

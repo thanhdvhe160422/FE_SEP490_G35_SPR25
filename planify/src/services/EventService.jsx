@@ -790,3 +790,43 @@ export const GetRegisterdByUserId = async () => {
     return null;
   }
 };
+export const getMyEvents = async (page, pageSize) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
