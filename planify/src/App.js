@@ -26,6 +26,7 @@ import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
+import HistoryEvent from "./pages/Events/HistoryEvent";
 
 function App() {
   return (
@@ -221,6 +222,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Campus Manager"]}>
               <CategoryEventManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/history-event"
+          element={
+            <PrivateRoute allowedRoles={["Implementer"]}>
+              <HistoryEvent />
             </PrivateRoute>
           }
         />

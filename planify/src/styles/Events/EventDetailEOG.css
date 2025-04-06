@@ -1,60 +1,27 @@
-/* Animation keyframes - giữ nguyên từ trước */
+/* Animation keyframes */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(-30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* Main container */
@@ -66,41 +33,32 @@
   background-color: #fff;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
   animation: fadeIn 0.8s ease-out;
   position: relative;
   overflow: hidden;
 }
 
-.event-container:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-  transform: translateY(-5px);
-}
-
 .event-container::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
+  top: 0; left: 0;
+  width: 100%; height: 5px;
   background: linear-gradient(90deg, #9c27b0, #3f51b5, #2196f3);
   background-size: 200% 200%;
   animation: gradient 5s ease infinite;
 }
 
-/* Event header with image slider */
+/* Event header (hover retained) */
 .event-header {
   position: relative;
-  background-size: cover;
-  background-position: center;
   margin-bottom: 30px;
-  color: white;
-  border-radius: 15px;
   height: 500px;
   display: flex;
   align-items: flex-end;
+  border-radius: 15px;
   overflow: hidden;
+  background-size: cover;
+  background-position: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.4s ease;
 }
@@ -111,11 +69,11 @@
 }
 
 .event-header img {
-  transition: transform 0.7s ease;
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 15px;
+  transition: transform 0.7s ease;
 }
 
 .event-header:hover img {
@@ -125,15 +83,13 @@
 .event-header::after {
   content: "";
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 30%;
+  bottom: 0; left: 0;
+  width: 100%; height: 30%;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
   border-radius: 0 0 15px 15px;
 }
 
-.event-header .nav-button {
+.nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -142,10 +98,8 @@
   color: white;
   font-size: 24px;
   padding: 15px;
-  cursor: pointer;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 50px; height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,46 +107,35 @@
   backdrop-filter: blur(5px);
   z-index: 10;
   opacity: 0;
+  cursor: pointer;
 }
 
 .event-header:hover .nav-button {
   opacity: 1;
 }
 
-.event-header .nav-button:hover {
+.nav-button:hover {
   background: rgba(255, 255, 255, 0.4);
   transform: translateY(-50%) scale(1.1);
 }
 
-.event-header .prev-button {
-  left: 20px;
-}
+.prev-button { left: 20px; }
+.next-button { right: 20px; }
 
-.event-header .next-button {
-  right: 20px;
-}
-
-/* Event details section - CẬP NHẬT THÀNH 2 CỘT */
+/* Event details */
 .event-details {
   background: white;
   padding: 30px;
   border-radius: 15px;
   margin-top: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Thay đổi thành 2 cột thay vì 3 */
+  grid-template-columns: repeat(2, 1fr);
   gap: 25px;
-}
-
-.event-details:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .event-title-container {
-  grid-column: 1 / -1; /* Từ cột đầu đến cột cuối */
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -206,52 +149,32 @@
   font-weight: 700;
   color: #9c27b0;
   margin: 0;
-  line-height: 1.2;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
   animation: slideIn 0.5s ease-out;
 }
 
-.event-title-container h1:hover {
-  transform: translateX(5px);
-  color: #7b1fa2;
-}
-
 .event-status {
-  background: #4caf50;
-  color: white;
   padding: 8px 15px;
   border-radius: 50px;
   font-weight: 600;
   font-size: 14px;
-  letter-spacing: 0.5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  color: white;
   animation: pulse 2s infinite;
-}
-
-.event-status:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .event-status[data-status="Not Starting"] {
   background: linear-gradient(to right, #ff416c, #ff4b2b);
-  animation: pulse 2s infinite;
 }
 
 .event-status[data-status="Running"] {
   background: linear-gradient(to right, #00b09b, #96c93d);
-  animation: pulse 2s infinite;
 }
 
 .event-status[data-status="Closed"] {
   background: linear-gradient(to right, #606c88, #3f4c6b);
 }
 
+/* Sections */
 .section-title {
   font-size: 20px;
   font-weight: 600;
@@ -264,56 +187,38 @@
 .section-title::after {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 3px;
-  width: 50px;
+  left: 0; bottom: 0;
+  height: 3px; width: 50px;
   background: linear-gradient(to right, #9c27b0, #2196f3);
   border-radius: 3px;
 }
 
-.time-section {
-  grid-column: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
+.time-section,
 .basic-info-section {
-  grid-column: 2;
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+.time-section .info-item { border-left-color: #2196f3; }
+.basic-info-section .info-item { border-left-color: #4caf50; }
+
+/* Goals & Planning */
 .goals-planning-section {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  margin-top: 30px;
   background: white;
   padding: 30px;
   border-radius: 15px;
-  margin-top: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  animation: fadeIn 0.8s ease-out;
-  animation-delay: 0.3s;
-  animation-fill-mode: both;
   position: relative;
-}
-
-.goals-planning-section:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transform: translateY(-3px);
+  animation: fadeIn 0.8s ease-out;
 }
 
 .goals-planning-section::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 100%;
+  top: 0; left: 0;
+  width: 5px; height: 100%;
   background: linear-gradient(to bottom, #ff9800, #ff5722);
   border-radius: 15px 0 0 15px;
 }
@@ -325,75 +230,58 @@
   margin-top: 15px;
 }
 
+.goals-section .info-item { border-left-color: #ff9800; }
+
+/* Info item */
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   padding: 15px;
   border-radius: 10px;
   background-color: #f8f9fa;
-  transition: all 0.3s ease;
-  animation: fadeIn 0.5s ease-out;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   border-left: 3px solid transparent;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.time-section .info-item {
-  border-left-color: #2196f3;
-}
-
-.basic-info-section .info-item {
-  border-left-color: #4caf50;
-}
-
-.goals-section .info-item {
-  border-left-color: #ff9800;
-}
-
-.info-item:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  background-color: #f0f4f8;
+.info-item svg {
+  font-size: 24px;
+  color: #4a90e2;
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
 .info-item > div {
   flex: 1;
+  color: #444;
+  font-size: 0.95rem;
+  white-space: pre-line;
 }
 
-.info-item:hover svg {
-  animation: float 2s ease infinite;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.event-info-span {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+  color: #222;
 }
 
-/* Event description */
+/* Description */
 .event-description {
   background: white;
   padding: 30px;
   border-radius: 15px;
-  margin-top: 30px;
-  margin-bottom: 30px;
+  margin: 30px auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  animation: fadeIn 0.8s ease-out;
-  animation-delay: 0.5s;
-  animation-fill-mode: both;
   position: relative;
-  width: 100%;
+  animation: fadeIn 0.8s ease-out;
   max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.event-description:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .event-description::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 100%;
+  top: 0; left: 0;
+  width: 5px; height: 100%;
   background: linear-gradient(to bottom, #9c27b0, #2196f3);
   border-radius: 15px 0 0 15px;
 }
@@ -415,16 +303,11 @@
 .eventDescription span {
   font-size: 16px;
   color: #555;
-  line-height: 1.8;
   display: block;
-  transition: all 0.3s ease;
+  line-height: 1.8;
 }
 
-.eventDescription:hover span {
-  color: #333;
-}
-
-/* Event actions */
+/* Action buttons */
 .event-actions {
   display: flex;
   justify-content: center;
@@ -441,101 +324,36 @@
   padding: 12px 30px;
   border: none;
   border-radius: 50px;
-  cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.delete-event-btn::before,
-.update-event-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  transition: all 0.5s ease;
-  z-index: -1;
-}
-
-.delete-event-btn:hover::before,
-.update-event-btn:hover::before {
-  left: 0;
+  cursor: pointer;
 }
 
 .delete-event-btn {
   background: linear-gradient(to right, #ff416c, #ff4b2b);
-  color: white;
-}
-
-.delete-event-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(255, 75, 43, 0.3);
 }
 
 .update-event-btn {
   background: linear-gradient(to right, #00b09b, #96c93d);
-  color: white;
 }
 
-.update-event-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 176, 155, 0.3);
-}
-
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 992px) {
-  .event-container {
-    width: 95%;
-    padding: 20px;
-  }
-
-  .event-details {
-    grid-template-columns: 1fr;
-    padding: 20px;
-  }
-
-  .time-section,
-  .basic-info-section {
-    grid-column: 1;
-  }
-
-  .event-header {
-    height: 400px;
-  }
-
-  .goals-section {
-    grid-template-columns: 1fr;
-  }
+  .event-container { width: 95%; padding: 20px; }
+  .event-details { grid-template-columns: 1fr; padding: 20px; }
+  .event-header { height: 400px; }
 }
 
 @media (max-width: 768px) {
-  .event-container {
-    width: 100%;
-    margin: 70px auto;
-    border-radius: 0;
-  }
-
-  .event-header {
-    height: 300px;
-    border-radius: 10px;
-  }
-
-  .event-title-container h1 {
-    font-size: 24px;
-  }
-
+  .event-container { width: 100%; margin: 70px auto; border-radius: 0; }
+  .event-header { height: 300px; border-radius: 10px; }
+  .event-title-container h1 { font-size: 24px; }
   .event-actions {
     flex-direction: column;
     gap: 15px;
   }
-
   .delete-event-btn,
   .update-event-btn {
     width: 100%;

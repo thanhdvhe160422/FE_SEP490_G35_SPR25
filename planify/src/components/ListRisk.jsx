@@ -161,6 +161,7 @@ function ListRisk({ eventId, data }) {
       message.error("Không thể tạo mới rủi ro");
     }
   };
+  const userId = localStorage.getItem("userId");
 
   const columns = [
     {
@@ -190,7 +191,9 @@ function ListRisk({ eventId, data }) {
       width: "30%",
       ellipsis: true,
     },
-    {
+  ];
+  if (userId === data.createdBy.id) {
+    columns.push({
       title: "Hành động",
       key: "action",
       width: "15%",
@@ -220,8 +223,8 @@ function ListRisk({ eventId, data }) {
           </Popconfirm>
         </Space>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <div className="risk-management-container">
@@ -230,16 +233,16 @@ function ListRisk({ eventId, data }) {
           <Title level={3} className="risk-title">
             Danh sách rủi ro
           </Title>
-
-          {/* Nút thêm rủi ro mới */}
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={showCreateModal}
-            className="add-risk-button"
-          >
-            Thêm rủi ro
-          </Button>
+          {userId === data.createdBy.id && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={showCreateModal}
+              className="add-risk-button"
+            >
+              Thêm rủi ro
+            </Button>
+          )}
         </div>
 
         <Spin spinning={loading}>

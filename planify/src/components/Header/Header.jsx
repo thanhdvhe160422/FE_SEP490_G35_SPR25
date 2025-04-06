@@ -169,7 +169,7 @@ export default function Header() {
     implementer: [
       { label: "Home", path: "/home-implementer" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
-      { label: "History", path: "/history" },
+      { label: "History", path: "/history-event" },
       {
         label: "Favorite Events",
         path: "/my-favorite-events",
