@@ -551,42 +551,8 @@ function ListTask({ eventId, data }) {
 
     if (task.subTasks && Array.isArray(task.subTasks)) {
       console.log("SubTasks original:", task.subTasks);
-
-      const processedSubTasks = task.subTasks.map((subTask) => {
-        console.log("Original subtask:", subTask);
-
-        let status = 0;
-
-        if (typeof subTask.status === "number") {
-          status = subTask.status;
-        } else if (
-          subTask.status === true ||
-          subTask.status === "true" ||
-          subTask.status === "1" ||
-          subTask.status === 1
-        ) {
-          status = 1;
-        } else if (
-          subTask.completed === true ||
-          subTask.completed === "true" ||
-          subTask.completed === "1" ||
-          subTask.completed === 1
-        ) {
-          status = 1;
-        }
-
-        console.log(
-          `Subtask ID: ${subTask.id}, Original status: ${subTask.status}, Processed status: ${status}`
-        );
-
-        return {
-          ...subTask,
-          status: status,
-        };
-      });
-
-      console.log("Processed subtasks:", processedSubTasks);
-      setSubTasks(processedSubTasks);
+      setSubTasks(task.subTasks);
+      console.log("Subtasks set:", task.subTasks);
     } else {
       setSubTasks([]);
     }
@@ -744,28 +710,33 @@ function ListTask({ eventId, data }) {
               className="details-button"
             />
           </Tooltip>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => showEditModal(record)}
-            size="small"
-            className="edit-button"
-          />
-          <Popconfirm
-            title="Confirm task deletion"
-            description="Are you sure you want to delete this task?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Delete"
-            cancelText="Cancel"
-            icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-          >
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              size="small"
-              className="delete-button"
-            />
-          </Popconfirm>
+
+          {userId === data.createdBy.id && (
+            <>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => showEditModal(record)}
+                size="small"
+                className="edit-button"
+              />
+              <Popconfirm
+                title="Confirm task deletion"
+                description="Are you sure you want to delete this task?"
+                onConfirm={() => handleDelete(record.id)}
+                okText="Delete"
+                cancelText="Cancel"
+                icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
+              >
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  size="small"
+                  className="delete-button"
+                />
+              </Popconfirm>
+            </>
+          )}
         </Space>
       ),
     },
@@ -1053,13 +1024,15 @@ function ListTask({ eventId, data }) {
           onClose={() => setSubTasksVisible(false)}
           open={subTasksVisible}
           extra={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showCreateSubTaskModal}
-            >
-              Create New
-            </Button>
+            userId === data.createdBy.id && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showCreateSubTaskModal}
+              >
+                Create New Subtask
+              </Button>
+            )
           }
         >
           <Modal
@@ -1225,32 +1198,21 @@ function ListTask({ eventId, data }) {
                   itemLayout="horizontal"
                   dataSource={subTasks}
                   renderItem={(item) => (
-                    <List.Item actions={[renderSubTaskActions(item)]}>
+                    <List.Item
+                      actions={
+                        userId === data.createdBy.id
+                          ? [renderSubTaskActions(item)]
+                          : []
+                      }
+                    >
                       <div className="sub-task-item">
-                        {item.status === 1 ? (
-                          <Button
-                            type="primary"
-                            shape="circle"
-                            icon={<CheckOutlined />}
-                            size="small"
-                            style={{
-                              backgroundColor: "#52c41a",
-                              marginRight: "8px",
-                              cursor: "default",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleSubTaskStatus(item.id, false);
-                            }}
-                          />
-                        ) : (
-                          <Checkbox
-                            checked={item.status === 1}
-                            onChange={(e) =>
-                              toggleSubTaskStatus(item.id, e.target.checked)
-                            }
-                          />
-                        )}
+                        <Checkbox
+                          checked={item.status === 1}
+                          onChange={(e) =>
+                            toggleSubTaskStatus(item.id, e.target.checked)
+                          }
+                          style={{ marginRight: "8px" }}
+                        />
 
                         <div
                           className={`sub-task-content ${
