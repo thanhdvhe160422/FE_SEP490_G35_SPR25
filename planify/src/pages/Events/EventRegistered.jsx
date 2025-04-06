@@ -59,17 +59,18 @@ export default function EventRegistered() {
     return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
-  const isEventFavorited = (eventId) => {
-    console.log("is favorited: " + eventId);
-    return favoriteEvents.includes(eventId);
-  };
-
   const handleCreateFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await createFavoriteEvent(eventId);
-      setFavoriteEvents([...favoriteEvents, eventId]);
-      console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+      var response = await createFavoriteEvent(eventId);
+      if (response.status === 201) {
+        console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.eventId === eventId ? { ...event, isFavorite: true } : event
+          )
+        );
+      }
     } catch (error) {
       console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
     }
@@ -78,9 +79,15 @@ export default function EventRegistered() {
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      await deleteFavouriteEvent(eventId);
-      setFavoriteEvents(favoriteEvents.filter((id) => id !== eventId));
-      console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+      var response = await deleteFavouriteEvent(eventId);
+      if (response.status === 200) {
+        console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.eventId === eventId ? { ...event, isFavorite: false } : event
+          )
+        );
+      }
     } catch (error) {
       console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
     }
@@ -269,7 +276,7 @@ export default function EventRegistered() {
                   <Row xs={1} sm={2} md={3} lg={4} className="g-4">
                     {events.length > 0 ? (
                       events.map((event) => (
-                        <Col key={event.id}>
+                        <Col key={event.eventId}>
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
@@ -307,12 +314,12 @@ export default function EventRegistered() {
                                 cursor: "pointer",
                               }}
                               onClick={(e) =>
-                                isEventFavorited(event.eventId)
+                                event.isFavorite
                                   ? handleDeleteFavorite(event.eventId, e)
                                   : handleCreateFavorite(event.eventId, e)
                               }
                             >
-                              {isEventFavorited(event.eventId) ? (
+                              {event.isFavorite ? (
                                 <FaHeart size={20} color="red" />
                               ) : (
                                 <FaRegHeart size={20} color="red" />
