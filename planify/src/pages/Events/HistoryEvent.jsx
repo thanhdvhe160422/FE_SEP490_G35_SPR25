@@ -123,7 +123,7 @@ const EventHistory = () => {
               onChange: (page) => setCurrentPage(page),
             }}
             onRow={(record) => ({
-              onClick: () => handleRowClick(record.eventId),
+              onClick: () => handleRowClick(events.eventId),
               style: { cursor: "pointer" },
             })}
           />
