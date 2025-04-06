@@ -88,10 +88,10 @@ const EventHistory = () => {
     },
     {
       title: "Category",
-      dataIndex: "categoryViewModel",
+      dataIndex: "categoryName",
       key: "category",
-      render: (category) =>
-        category ? category.categoryEventName : "Không có danh mục",
+      render: (categoryName) =>
+        categoryName ? categoryName : "Không có danh mục",
     },
   ];
 
