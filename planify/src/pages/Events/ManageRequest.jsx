@@ -18,7 +18,6 @@ function ManageRequest() {
   const [rejectReason, setRejectReason] = useState("");
   const [approveReason, setApproveReason] = useState("");
 
-  // Hàm fetchRequests để tái sử dụng
   const fetchRequests = async () => {
     try {
       const data = await getRequest();
