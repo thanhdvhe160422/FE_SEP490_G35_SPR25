@@ -379,18 +379,6 @@ function EventSection() {
                 <div className="feature_tittle">
                   <div className="filter_container">
                     <div className="filter_list">
-                      {(userRole?.toLowerCase() === "event organizer" ||
-                        userRole?.toLowerCase() === "implementer") && (
-                        <button
-                          className={`filter_button ${
-                            eventFilter === "my" ? "active" : ""
-                          }`}
-                          onClick={handleMyEvents}
-                        >
-                          My Event
-                        </button>
-                      )}
-
                       <button
                         className={`filter_button ${
                           eventFilter === "list" ? "active" : ""
@@ -586,9 +574,9 @@ function EventSection() {
                             }
                           >
                             {event.isFavorite ? (
-                              <FaHeart size={20} color="red" />
+                              <FaHeart size={100} color="red" />
                             ) : (
-                              <FaRegHeart size={20} color="red" />
+                              <FaRegHeart size={100} color="red" />
                             )}
                           </div>
                         </div>

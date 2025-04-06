@@ -18,7 +18,6 @@ import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
   createFavoriteEvent,
   deleteFavouriteEvent,
-  getFavouriteEvents,
 } from "../../services/EventService";
 
 export default function HomeSpectator() {
@@ -42,6 +41,7 @@ export default function HomeSpectator() {
   const [isSearchMode, setIsSearchMode] = useState(false);
 
   const fixDriveUrl = (url) => {
+    console.log(url);
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
     if (!url.includes("drive.google.com/uc?id=")) return url;
@@ -445,6 +445,7 @@ export default function HomeSpectator() {
                           >
                             <Card.Img
                               variant="top"
+                              // src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               height="180"
                               className="event-image"
