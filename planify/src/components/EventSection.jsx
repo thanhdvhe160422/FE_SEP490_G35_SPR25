@@ -259,7 +259,7 @@ function EventSection() {
         console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
-            event.eventId === eventId ? { ...event, isFavorite: true } : event
+            event.id === eventId ? { ...event, isFavorite: true } : event
           )
         );
       }
@@ -276,7 +276,7 @@ function EventSection() {
         console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
-            event.eventId === eventId ? { ...event, isFavorite: false } : event
+            event.id === eventId ? { ...event, isFavorite: false } : event
           )
         );
       }
@@ -581,8 +581,8 @@ function EventSection() {
                             }}
                             onClick={(e) =>
                               event.isFavorite
-                                ? handleDeleteFavorite(event.eventId, e)
-                                : handleCreateFavorite(event.eventId, e)
+                                ? handleDeleteFavorite(event.id, e)
+                                : handleCreateFavorite(event.id, e)
                             }
                           >
                             {event.isFavorite ? (
@@ -785,8 +785,8 @@ function EventSection() {
                               }}
                               onClick={(e) =>
                                 event.isFavorite
-                                  ? handleDeleteFavorite(event.eventId, e)
-                                  : handleCreateFavorite(event.eventId, e)
+                                  ? handleDeleteFavorite(event.id, e)
+                                  : handleCreateFavorite(event.id, e)
                               }
                             >
                               {event.isFavorite ? (
@@ -931,8 +931,8 @@ function EventSection() {
                             }}
                             onClick={(e) =>
                               event.isFavorite
-                                ? handleDeleteFavorite(event.eventId, e)
-                                : handleCreateFavorite(event.eventId, e)
+                                ? handleDeleteFavorite(event.id, e)
+                                : handleCreateFavorite(event.id, e)
                             }
                           >
                             {event.isFavorite ? (
