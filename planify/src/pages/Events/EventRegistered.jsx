@@ -52,13 +52,15 @@ export default function EventRegistered() {
   };
 
   const getImageUrl = (eventMedias) => {
-    if (!eventMedias || !eventMedias.length || !eventMedias[0].mediaDTO) {
+    if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
       return "https://placehold.co/600x400?text=No+Image";
     }
-    return eventMedias[0].mediaDTO.mediaUrl;
+    console.log("sang day " + eventMedias);
+    return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   const isEventFavorited = (eventId) => {
+    console.log("is favorited: " + eventId);
     return favoriteEvents.includes(eventId);
   };
 
@@ -271,13 +273,19 @@ export default function EventRegistered() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-spec/${event.id}`)
+                              navigate(`/event-detail-spec/${event.eventId}`)
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >
                             <Card.Img
                               variant="top"
-                              src={fixDriveUrl(getImageUrl(event.eventMedias))}
+                              src={
+                                event.eventMedia &&
+                                event.eventMedia.length > 0 &&
+                                event.eventMedia[0]
+                                  ? getImageUrl(event.eventMedia)
+                                  : "https://placehold.co/600x400?text=No+Image"
+                              }
                               height="180"
                               className="event-image"
                               style={{ objectFit: "cover" }}
@@ -299,12 +307,12 @@ export default function EventRegistered() {
                                 cursor: "pointer",
                               }}
                               onClick={(e) =>
-                                isEventFavorited(event.id)
-                                  ? handleDeleteFavorite(event.id, e)
-                                  : handleCreateFavorite(event.id, e)
+                                isEventFavorited(event.eventId)
+                                  ? handleDeleteFavorite(event.eventId, e)
+                                  : handleCreateFavorite(event.eventId, e)
                               }
                             >
-                              {isEventFavorited(event.id) ? (
+                              {isEventFavorited(event.eventId) ? (
                                 <FaHeart size={20} color="red" />
                               ) : (
                                 <FaRegHeart size={20} color="red" />
