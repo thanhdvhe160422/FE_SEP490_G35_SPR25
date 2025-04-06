@@ -27,6 +27,8 @@ import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
+import MyEvent from "./pages/Events/MyEvent";
+import MyRequest from "./pages/Events/MyRequest";
 
 function App() {
   return (
@@ -160,6 +162,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/my-request"
+          element={
+            <PrivateRoute allowedRoles={["Event Organizer"]}>
+              <MyRequest />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/create-subtask/:taskId"
@@ -228,6 +238,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Implementer"]}>
               <HistoryEvent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-event"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
+              <MyEvent />
             </PrivateRoute>
           }
         />

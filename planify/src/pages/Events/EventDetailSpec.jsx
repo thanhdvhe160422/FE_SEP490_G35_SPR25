@@ -233,7 +233,7 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-location">
-            <FaMapMarkerAlt className="icon-location" />
+            <FaMapMarkerAlt style={{color:'green'}} className="icon-location" />
             <span>
               <strong> Location:</strong>{" "}
               {event?.placed || "Location not updated"}
@@ -241,7 +241,7 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-time">
-            <FaClock className="icon-time" />
+            <FaClock  className="icon-time" />
             <span>
               <strong>To:</strong>{" "}
               {event?.endTime
@@ -250,17 +250,12 @@ function EventDetailSpec() {
             </span>
           </div>
 
-          <div className="event-category">
-            <span>
-              <MdOutlineCategory
-                className="icon-category"
-                style={{ marginRight: "10px", color: "orange" }}
-              />
-              <span style={{ fontWeight: "bold" }} className="event-info-span">
-                Category:{" "}
-              </span>
-              {event?.categoryViewModel?.categoryEventName || "Not determined"}
+          <div className="event-time">
+            <MdOutlineCategory style={{color:'orange'}} className="icon-time" />
+            <span style={{ fontWeight: "bold" }} className="event-info-span">
+              Category: {" "}
             </span>
+            {event?.categoryViewModel?.categoryEventName || "Not determined"}
           </div>
 
           {/* <div style={{textAlign:'center', justifyContent:'center'}}>{event.targetAudience}</div> */}

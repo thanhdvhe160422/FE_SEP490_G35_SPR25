@@ -161,8 +161,9 @@ export default function Header() {
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/event-plan" },
       { label: "My Request", path: "/my-request" },
+      { label: "My Event", path: "/my-event" },
       {
-        label: "Favorite Events",
+        label: "My Favorite",
         path: "/my-favorite-events",
       },
     ],
@@ -178,7 +179,7 @@ export default function Header() {
     spectator: [
       { label: "Home", path: "/home-spec" },
       {
-        label: "Favorite Events",
+        label: "My Favorite",
         path: "/my-favorite-events",
       },
       {
