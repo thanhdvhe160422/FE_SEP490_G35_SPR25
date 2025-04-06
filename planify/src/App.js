@@ -40,7 +40,11 @@ function App() {
           path="/home"
           element={
             <PrivateRoute
-              allowedRoles={["Campus Manager", "Event Organizer", "Spectator"]}
+              allowedRoles={[
+                "Campus Manager",
+                "Event Organizer",
+                "Implementer",
+              ]}
             >
               <Home />
             </PrivateRoute>
@@ -124,7 +128,7 @@ function App() {
         <Route
           path="/event-detail-spec/:eventId"
           element={
-            <PrivateRoute allowedRoles={["Spectator"]}>
+            <PrivateRoute allowedRoles={["Spectator", "Implementer"]}>
               <EventDetailSpec />
             </PrivateRoute>
           }
@@ -133,13 +137,7 @@ function App() {
         <Route
           path="/event-detail-EOG/:eventId"
           element={
-            <PrivateRoute
-              allowedRoles={[
-                "Campus Manager",
-                "Event Organizer",
-                "Implementor",
-              ]}
-            >
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
               <EventDetailEOG />
             </PrivateRoute>
           }

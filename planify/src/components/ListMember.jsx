@@ -280,8 +280,7 @@ const ListMember = ({ eventId, data }) => {
       render: (text) => new Date(text).toLocaleString(),
     },
   ];
-  const userIdx = Number(localStorage.getItem("userId"));
-  // Nếu userId === createdBy, thêm cột hành động
+  const userIdx = localStorage.getItem("userId");
   if (userIdx === data.createdBy.id) {
     participantColumns.push({
       title: "Hành động",
