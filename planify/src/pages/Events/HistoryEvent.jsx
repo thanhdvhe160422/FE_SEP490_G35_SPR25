@@ -9,7 +9,7 @@ import Header from "../../components/Header/Header";
 const EventHistory = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalEvents, setTotalEvents] = useState(0); // Thêm state để lưu tổng số bản ghi
+  const [totalEvents, setTotalEvents] = useState(0);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -28,7 +28,6 @@ const EventHistory = () => {
 
       if (response.data && response.data.items) {
         setEvents(response.data.items);
-        // Giả sử API trả về total trong response.data.total
         setTotalEvents(response.data.total || response.data.items.length);
         console.log("Hehehe: ", response.data.items);
       } else {
@@ -43,8 +42,8 @@ const EventHistory = () => {
     }
   };
 
-  const handleRowClick = (record) => {
-    navigate(`/event-detail-spec/${record.id}`);
+  const handleRowClick = (eventId) => {
+    navigate(`/event-detail-spec/${eventId}`);
   };
 
   useEffect(() => {
@@ -61,7 +60,7 @@ const EventHistory = () => {
           className="event-title-link"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/event-detail-spec/${record.id}`);
+            navigate(`/event-detail-spec/${events.eventId}`);
           }}
         >
           {text}
@@ -120,11 +119,11 @@ const EventHistory = () => {
             pagination={{
               current: currentPage,
               pageSize: pageSize,
-              total: totalEvents, // Sử dụng totalEvents từ API
+              total: totalEvents,
               onChange: (page) => setCurrentPage(page),
             }}
             onRow={(record) => ({
-              onClick: () => handleRowClick(record),
+              onClick: () => handleRowClick(record.eventId),
               style: { cursor: "pointer" },
             })}
           />
