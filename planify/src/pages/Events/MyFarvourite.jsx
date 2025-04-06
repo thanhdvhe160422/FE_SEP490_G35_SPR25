@@ -25,7 +25,7 @@ export default function MyFarvourite() {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -153,8 +153,6 @@ export default function MyFarvourite() {
                                   ? fixDriveUrl(event.eventMedia[0].mediaUrl)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
-
-                              //src={getImageUrl(event.eventMedia)}
                               height="180"
                               className="event-image"
                               style={{ objectFit: "cover" }}
@@ -309,12 +307,6 @@ export default function MyFarvourite() {
                       </Pagination>
                     </div>
                   )}
-
-                  <div className="text-center mt-2 mb-4 text-muted">
-                    Page {currentPage} / {totalPages || 1}
-                    {events.length > 0 &&
-                      ` (Showing: ${events.length} / Total: ${totalEvents} events)`}
-                  </div>
                 </>
               )}
             </div>

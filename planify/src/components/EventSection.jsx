@@ -35,9 +35,6 @@ function EventSection() {
   const [campuses, setCampus] = useState([]);
   const navigate = useNavigate();
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
-
-  const userRole = localStorage.getItem("role");
   const currentUserId = localStorage.getItem("userId");
   const campus = localStorage.getItem("campus");
   useEffect(() => {
