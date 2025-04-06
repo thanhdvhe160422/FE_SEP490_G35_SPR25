@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getMyRequest } from "../../services/EventRequestService";
-import Swal from "sweetalert2";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import { useNavigate } from "react-router";
+import "../../styles/Events/MyRequest.css";
 
 function MyRequest(props) {
   const [requests, setRequests] = useState([]);
@@ -25,35 +25,38 @@ function MyRequest(props) {
   const rejectedRequests = requests.filter((req) => req.status === -1);
 
   return (
-    <>
+    <div
+      className="event-request-page"
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <Header />
-      <div className="manager-container">
+      <div
+        className="event-request-content"
+        style={{ flex: 1, padding: "20px" }}
+      >
         <h2>List Event Request</h2>
-        <div className="requests-grid">
-          <RequestColumn
-            title="Not Approved Yet"
-            requests={pendingRequests}
-          ></RequestColumn>
-
+        <div className="event-request-columns">
+          <RequestColumn title="Not Approved Yet" requests={pendingRequests} />
           <RequestColumn title="Approved" requests={approvedRequests} />
           <RequestColumn title="Rejected" requests={rejectedRequests} />
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
 function RequestColumn({ title, requests, children }) {
   const navigate = useNavigate();
   return (
-    <div className="request-column">
+    <div className="event-request-column">
       <h3>{title}</h3>
       {requests.length === 0 ? (
-        <p>No requirements.</p>
+        <p className="empty-message">No requirements.</p>
       ) : (
         requests.map((req) => (
-          <div key={req.id} className="request-card">
+          <div key={req.id} className="event-request-card">
             <h4
+              className="event-request-title"
               style={{ cursor: "pointer" }}
               onClick={() => {
                 navigate(`/event-detail-EOG/${req.eventId}`);
@@ -62,11 +65,11 @@ function RequestColumn({ title, requests, children }) {
               {req.eventTitle}
             </h4>
             {req.reason && (
-              <p>
+              <p className="event-request-reason">
                 <strong>Reason:</strong> {req.reason}
               </p>
             )}
-            <p>
+            <p className="event-request-date">
               <strong>Create At: </strong> {formatDateTime(req.createdAt)}
             </p>
             {children && children(req)}

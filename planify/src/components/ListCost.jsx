@@ -236,9 +236,8 @@ function ListCost({ eventId, data }) {
   };
 
   const getColumns = () => {
-    const showActionColumn = userId === data.createdBy.id;
+    const showActionColumn = userId === data.createdBy.id && data.status === 0;
 
-    // Điều chỉnh width dựa trên việc có hiển thị cột action hay không
     const indexWidth = showActionColumn ? "5%" : "5%";
     const nameWidth = showActionColumn ? "25%" : "30%";
     const quantityWidth = showActionColumn ? "15%" : "15%";
@@ -366,7 +365,7 @@ function ListCost({ eventId, data }) {
                 Làm mới
               </Button>
             </Tooltip>
-            {userId === data.createdBy.id && (
+            {userId === data.createdBy.id && data.status === 0 && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
