@@ -149,7 +149,7 @@ export default function Header() {
   const navItemsByRole = {
     "campus manager": [
       { label: "Home", path: "/home" },
-      { label: "Create Event Organizer", path: "/create-event-organizer" },
+      { label: "Manage Event Organizer", path: "/manage-eog" },
       { label: "Create Event", path: "/create-event" },
       { label: "Manage Requests", path: "/manage-request" },
       {
