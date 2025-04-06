@@ -927,7 +927,7 @@ function ListTask({ eventId, data }) {
             />
           </Tooltip>
 
-          {userId === data.createdBy.id && (
+          {userId === data.createdBy.id && data.status === 0 && (
             <>
               <Button
                 type="primary"
@@ -1006,7 +1006,7 @@ function ListTask({ eventId, data }) {
 
           <div className="task-actions">
             <Space>
-              {userId === data.createdBy.id && (
+              {userId === data.createdBy.id && data.status === 0 && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -1027,7 +1027,7 @@ function ListTask({ eventId, data }) {
               imageStyle={{ height: 120 }}
               description="No tasks yet"
             >
-              {userId === data.createdBy.id && (
+              {userId === data.createdBy.id && data.status === 0 && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -1240,7 +1240,8 @@ function ListTask({ eventId, data }) {
           onClose={() => setSubTasksVisible(false)}
           open={subTasksVisible}
           extra={
-            userId === data.createdBy.id && (
+            userId === data.createdBy.id &&
+            data.status === 0 && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -1416,7 +1417,7 @@ function ListTask({ eventId, data }) {
                   renderItem={(item) => (
                     <List.Item
                       actions={
-                        userId === data.createdBy.id
+                        userId === data.createdBy.id && data.status === 0
                           ? [renderSubTaskActions(item)]
                           : []
                       }
