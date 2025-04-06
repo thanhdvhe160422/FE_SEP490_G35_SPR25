@@ -150,9 +150,11 @@ export default function MyFarvourite() {
                                 event.eventMedia &&
                                 event.eventMedia.length > 0 &&
                                 event.eventMedia[0]
-                                  ? getImageUrl(event.eventMedia)
+                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
+
+                              //src={getImageUrl(event.eventMedia)}
                               height="180"
                               className="event-image"
                               style={{ objectFit: "cover" }}
