@@ -50,9 +50,8 @@ function ManageRequest() {
     }
 
     try {
-      await rejectRequest(selectedRequest.eventId, rejectReason);
+      await rejectRequest(selectedRequest.id, rejectReason);
 
-      // Quan trọng: Tải lại dữ liệu thay vì cập nhật state thủ công
       await fetchRequests();
 
       setShowPopupReject(false);
@@ -74,7 +73,6 @@ function ManageRequest() {
       console.log("Approving request ID:", selectedRequest.id);
       await approveRequest(selectedRequest.id, approveReason);
 
-      // Quan trọng: Tải lại dữ liệu thay vì cập nhật state thủ công
       await fetchRequests();
 
       setShowPopupApprove(false);
