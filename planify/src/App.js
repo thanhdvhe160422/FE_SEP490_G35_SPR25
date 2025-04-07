@@ -29,6 +29,8 @@ import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
 import MyEvent from "./pages/Events/MyEvent";
 import MyRequest from "./pages/Events/MyRequest";
+import MyDraft from "./pages/Events/MyDraft";
+import ManageCampusManager from "./pages/Admin/ManageCampusManager";
 
 function App() {
   return (
@@ -221,6 +223,22 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Campus Manager"]}>
               <CreateEventOrganizer />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-drafts"
+          element={
+            <PrivateRoute allowedRoles={["Event Organizer"]}>
+              <MyDraft />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/manage-campus-manager"
+          element={
+            <PrivateRoute allowedRoles={["Admin", "Campus Manager"]}>
+              <ManageCampusManager />
             </PrivateRoute>
           }
         />

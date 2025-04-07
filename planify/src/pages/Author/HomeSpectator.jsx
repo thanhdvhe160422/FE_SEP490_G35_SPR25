@@ -34,7 +34,7 @@ export default function HomeSpectator() {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalEvents, setTotalEvents] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -609,12 +609,6 @@ export default function HomeSpectator() {
                       </Pagination>
                     </div>
                   )}
-
-                  <div className="text-center mt-2 mb-4 text-muted">
-                    Page {currentPage} / {totalPages || 1}
-                    {events.length > 0 &&
-                      ` (Showing: ${events.length} / Total: ${totalEvents} events)`}
-                  </div>
                 </>
               )}
             </div>

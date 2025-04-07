@@ -455,12 +455,6 @@ export default function EventRegistered() {
                       </Pagination>
                     </div>
                   )}
-
-                  <div className="text-center mt-2 mb-4 text-muted">
-                    Page {currentPage} / {totalPages || 1}
-                    {events.length > 0 &&
-                      ` (Showing: ${events.length} / Total: ${totalEvents} events)`}
-                  </div>
                 </>
               )}
             </div>

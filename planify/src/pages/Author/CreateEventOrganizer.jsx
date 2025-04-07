@@ -18,7 +18,7 @@ export default function CreateEventOrganizer() {
   const [eventOrganizers, setEventOrganizers] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
-    pageSize: 2,
+    pageSize: 10,
     totalCount: 0,
     totalPages: 0,
   });
@@ -106,12 +106,19 @@ export default function CreateEventOrganizer() {
 
   const confirmDelete = async () => {
     try {
+      if (!selectedEOG?.id) {
+        throw new Error("No Event Organizer selected for deletion");
+      }
+
+      await updateEventOrganizer(selectedEOG.id);
+
       enqueueSnackbar("Event Organizer deleted successfully!", {
         variant: "success",
       });
       setIsDeleteModalVisible(false);
       fetchEOGs();
     } catch (error) {
+      console.error("Error deleting Event Organizer:", error);
       enqueueSnackbar("Error deleting Event Organizer!", { variant: "error" });
     }
   };
@@ -296,7 +303,6 @@ export default function CreateEventOrganizer() {
         <div className="eog-table-container">
           <h2>Event Organizers List</h2>{" "}
           <Button
-            type="primary"
             className="create-btn"
             onClick={() => setIsCreateModalVisible(true)}
           >
