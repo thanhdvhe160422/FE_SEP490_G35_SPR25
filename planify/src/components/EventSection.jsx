@@ -571,9 +571,9 @@ function EventSection() {
                             }
                           >
                             {event.isFavorite ? (
-                              <FaHeart size={100} color="red" />
+                              <FaHeart size={50} color="red" />
                             ) : (
-                              <FaRegHeart size={100} color="red" />
+                              <FaRegHeart size={50} color="red" />
                             )}
                           </div>
                         </div>
@@ -775,9 +775,9 @@ function EventSection() {
                               }
                             >
                               {event.isFavorite ? (
-                                <FaHeart size={20} color="red" />
+                                <FaHeart size={50} color="red" />
                               ) : (
-                                <FaRegHeart size={20} color="red" />
+                                <FaRegHeart size={50} color="red" />
                               )}
                             </div>
                           </div>
@@ -921,9 +921,9 @@ function EventSection() {
                             }
                           >
                             {event.isFavorite ? (
-                              <FaHeart size={20} color="red" />
+                              <FaHeart size={50} color="red" />
                             ) : (
-                              <FaRegHeart size={20} color="red" />
+                              <FaRegHeart size={50} color="red" />
                             )}
                           </div>
                         </div>
