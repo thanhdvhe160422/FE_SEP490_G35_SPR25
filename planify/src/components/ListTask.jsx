@@ -114,27 +114,31 @@ function ListTask({ eventId, data }) {
     const actions = [
       <Button
         type="text"
-        icon={<EditOutlined />}
-        size="small"
-        onClick={() => showEditSubTaskModal(item)}
-      />,
-      <Button
-        type="text"
         icon={<UserAddOutlined />}
         size="small"
         onClick={() => showAssignModal(item)}
       />,
-      <Popconfirm
-        title="Confirm deletion"
-        description="Are you sure you want to delete this subtask?"
-        onConfirm={() => deleteSubTask(item.id)}
-        okText="Delete"
-        cancelText="Cancel"
-        icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
-      >
-        <Button type="text" danger icon={<DeleteOutlined />} size="small" />
-      </Popconfirm>,
     ];
+    if (item.status === 0 || item.status === -1) {
+      actions.push(
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          size="small"
+          onClick={() => showEditSubTaskModal(item)}
+        />,
+        <Popconfirm
+          title="Confirm deletion"
+          description="Are you sure you want to delete this subtask?"
+          onConfirm={() => deleteSubTask(item.id)}
+          okText="Delete"
+          cancelText="Cancel"
+          icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
+        >
+          <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+        </Popconfirm>
+      );
+    }
     return actions;
   };
   const searchEventUsers = async (searchValue = "") => {
@@ -1417,7 +1421,7 @@ function ListTask({ eventId, data }) {
                   renderItem={(item) => (
                     <List.Item
                       actions={
-                        userId === data.createdBy.id && data.status === 0
+                        userId === data.createdBy.id
                           ? [renderSubTaskActions(item)]
                           : []
                       }
