@@ -29,6 +29,7 @@ import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
 import MyEvent from "./pages/Events/MyEvent";
 import MyRequest from "./pages/Events/MyRequest";
+import {ToastContainer} from "react-toastify";
 
 function App() {
   return (
@@ -273,6 +274,15 @@ function App() {
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
+        <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="light"
+        />
     </div>
   );
 }
