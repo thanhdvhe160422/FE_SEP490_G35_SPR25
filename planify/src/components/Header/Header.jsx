@@ -149,7 +149,7 @@ export default function Header() {
   const navItemsByRole = {
     "campus manager": [
       { label: "Home", path: "/home" },
-      { label: "Create Event Organizer", path: "/create-event-organizer" },
+      { label: "Manage Event Organizer", path: "/manage-eog" },
       { label: "Create Event", path: "/create-event" },
       { label: "Manage Requests", path: "/manage-request" },
       {
@@ -161,8 +161,9 @@ export default function Header() {
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/event-plan" },
       { label: "My Request", path: "/my-request" },
+      { label: "My Event", path: "/my-event" },
       {
-        label: "Favorite Events",
+        label: "My Favorite",
         path: "/my-favorite-events",
       },
     ],
@@ -178,7 +179,7 @@ export default function Header() {
     spectator: [
       { label: "Home", path: "/home-spec" },
       {
-        label: "Favorite Events",
+        label: "My Favorite",
         path: "/my-favorite-events",
       },
       {

@@ -41,29 +41,128 @@ export const updateAvatar = async (userId, image, token) => {
     throw error;
   }
 };
-export const createEventOrganizer = async (data, token) => {
+export const createEventOrganizer = async (data) => {
+  let token = localStorage.getItem("token");
+
   try {
-    return await axios.post(`${API_USER_URL}/event-organizer`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.post(
+      `https://localhost:44320/api/Users/event-organizer`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
   } catch (error) {
-    console.error("Error create event organizer:", error.response || error);
-    throw error;
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.post(
+            `https://localhost:44320/api/Users/event-organizer`,
+            data,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
   }
 };
+export const getListEOG = async (page, pageSize) => {
+  let token = localStorage.getItem("token");
 
-export const updateEventOrganizer = async (data, token) => {
   try {
-    return await axios.put(`${API_USER_URL}/event-organizer`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `https://localhost:44320/api/Users/event-organizer?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
   } catch (error) {
-    console.error("Error update event organizer:", error.response || error);
-    throw error;
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Users/event-organizer?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const updateEventOrganizer = async (data) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Users/event-organizer`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/Users/event-organizer`,
+            data,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
   }
 };
 export const getUserJoinEvent = async (eventId) => {

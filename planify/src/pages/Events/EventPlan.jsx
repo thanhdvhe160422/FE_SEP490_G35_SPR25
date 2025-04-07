@@ -374,18 +374,16 @@ export default function EventPlan() {
       formData.promotionalPlan.during,
       formData.promotionalPlan.after,
     ]
-      .filter(Boolean)
-      .join(" - ");
+        .filter(Boolean)
+        .join(" - ");
 
     return {
       EventTitle: formData.eventTitle,
       EventDescription: formData.description,
       StartTime: formData.startTime
-        ? new Date(formData.startTime).toISOString()
-        : null,
-      EndTime: formData.endTime
-        ? new Date(formData.endTime).toISOString()
-        : null,
+          ? new Date(formData.startTime).toISOString()
+          : null,
+      EndTime: formData.endTime ? new Date(formData.endTime).toISOString() : null,
       CategoryEventId: formData.categoryEventId,
       Placed: formData.placed,
       MeasuringSuccess: formData.measuringSuccess,
@@ -396,48 +394,50 @@ export default function EventPlan() {
       TargetAudience: formData.targetAudience,
       SloganEvent: formData.sloganEvent,
       Tasks: formData.tasks
-        .filter((task) => task.taskName.trim())
-        .map((task) => ({
-          TaskName: task.taskName,
-          Description: task.description,
-          StartTime: currentTime,
-          Deadline: task.deadline
-            ? new Date(task.deadline).toISOString()
-            : null,
-          Budget: task.budget,
-          SubTasks: task.subtasks
-            .filter((sub) => sub.subtaskName.trim())
-            .map((subtask) => ({
-              SubTaskName: subtask.subtaskName,
-              Description: subtask.description,
-              StartTime: currentTime,
-              Deadline: subtask.deadline
-                ? new Date(subtask.deadline).toISOString()
-                : null,
-              Budget: subtask.amount,
-            })),
-        })),
+          .filter((task) => task.taskName.trim())
+          .map((task) => ({
+            TaskName: task.taskName,
+            Description: task.description,
+            StartTime: currentTime,
+            Deadline: task.deadline ? new Date(task.deadline).toISOString() : null,
+            Budget: task.budget,
+            SubTasks: task.subtasks
+                .filter((sub) => sub.subtaskName.trim())
+                .map((subtask) => ({
+                  SubTaskName: subtask.subtaskName,
+                  Description: subtask.description,
+                  StartTime: currentTime,
+                  Deadline: subtask.deadline
+                      ? new Date(subtask.deadline).toISOString()
+                      : null,
+                  Budget: subtask.amount,
+                })),
+          })),
       Risks: formData.risks
-        .filter(
-          (risk) =>
-            risk.name.trim() &&
-            (risk.reason.trim() ||
-              risk.description.trim() ||
-              risk.solution.trim())
-        )
-        .map((risk, index) => ({
-          Name: risk.name,
-          Reason: risk.reason,
-          Solution: risk.solution,
-          Description: risk.description,
-        })),
+          .filter(
+              (risk) =>
+                  risk.name.trim() &&
+                  (risk.reason.trim() || risk.description.trim() || risk.solution.trim())
+          )
+          .map((risk) => ({
+            Name: risk.name,
+            Reason: risk.reason,
+            Solution: risk.solution,
+            Description: risk.description,
+          })),
       CostBreakdowns: formData.budgetRows
-        .filter((row) => row.name.trim() && row.quantity > 0 && row.price > 0)
-        .map((row) => ({
-          Name: row.name,
-          Quantity: row.quantity,
-          PriceByOne: row.price,
-        })),
+          .filter((row) => row.name.trim() && row.quantity > 0 && row.price > 0)
+          .map((row) => ({
+            Name: row.name,
+            Quantity: row.quantity,
+            PriceByOne: row.price,
+          })),
+      Activities: formData.activities
+          .filter((activity) => activity.name.trim())
+          .map((activity) => ({
+            Name: activity.name,
+            Content: activity.content,
+          })),
     };
   }, [formData]);
 
@@ -491,6 +491,8 @@ export default function EventPlan() {
     if (!formData.placed) return "Event location is required!";
     if (!formData.tasks.some((task) => task.taskName.trim()))
       return "At least one task is required!";
+    if (!formData.activities.some((activity) => activity.name.trim()))
+      return "At least one activity with a name is required!";
     return null;
   }, [formData]);
 
@@ -518,15 +520,16 @@ export default function EventPlan() {
     setIsLoading(true);
     try {
       const eventData = prepareEventData();
+      console.log("Payload gửi lên API:", eventData); // Kiểm tra payload
       const response = await axios.post(
-        "https://localhost:44320/api/Events/create",
-        eventData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+          "https://localhost:44320/api/Events/create",
+          eventData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
       );
 
       const eventId = response.data.result?.id || 0;
@@ -534,14 +537,14 @@ export default function EventPlan() {
 
       if (response.status === 201) {
         await axios.post(
-          "https://localhost:44320/api/SendRequest",
-          { eventId },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+            "https://localhost:44320/api/SendRequest",
+            { eventId },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
         );
 
         await Swal.fire({
@@ -556,16 +559,14 @@ export default function EventPlan() {
         navigate("/home");
       } else {
         enqueueSnackbar(
-          `Failed to create event with status code: ${response.status}`,
-          { variant: "error" }
+            `Failed to create event with status code: ${response.status}`,
+            { variant: "error" }
         );
       }
     } catch (error) {
       enqueueSnackbar(
-        error.response?.data?.message || "Error while creating event!",
-        {
-          variant: "error",
-        }
+          error.response?.data?.message || "Error while creating event!",
+          { variant: "error" }
       );
       console.error("Lỗi chi tiết:", error);
     } finally {

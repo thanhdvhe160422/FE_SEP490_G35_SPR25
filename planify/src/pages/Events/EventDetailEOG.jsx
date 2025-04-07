@@ -17,6 +17,8 @@ import {
   FaQuoteLeft,
   FaUserFriends,
   FaBullhorn,
+  FaMinus,
+  FaPlus,
 } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
@@ -37,6 +39,7 @@ const EventDetailEOG = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { eventId } = useParams();
+  const [openActivityIds, setOpenActivityIds] = useState([]);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -237,6 +240,8 @@ const EventDetailEOG = () => {
   };
   const defaultImage = "https://via.placeholder.com/1000x500?text=No+Image";
 
+  console.log("thanh123" + event.activities);
+
   return (
     <>
       <Header />
@@ -412,6 +417,44 @@ const EventDetailEOG = () => {
               <div>Description:</div>
               <div className="eventDescription">
                 <span>{event.eventDescription}</span>
+              </div>
+            </div>
+
+            <div className="event-activities">
+              <div className="activities-title">Activities in event:</div>
+              <div className="activities-list">
+                {event.activities && event.activities.length > 0 ? (
+                  event.activities.map((activity) => (
+                    <div key={activity.id} className="activity-item">
+                      <div
+                        className="activity-header"
+                        onClick={() =>
+                          setOpenActivityIds((prev) =>
+                            prev.includes(activity.id)
+                              ? prev.filter((id) => id !== activity.id)
+                              : [...prev, activity.id]
+                          )
+                        }
+                      >
+                        <strong>{activity.name}</strong>
+                        <span className="toggle-icon">
+                          {openActivityIds.includes(activity.id) ? (
+                            <FaMinus />
+                          ) : (
+                            <FaPlus />
+                          )}
+                        </span>
+                      </div>
+                      {openActivityIds.includes(activity.id) && (
+                        <div className="activity-content">
+                          {activity.content}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <span>Chưa có hoạt động nào</span>
+                )}
               </div>
             </div>
           </>

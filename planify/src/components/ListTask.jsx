@@ -38,6 +38,8 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import refreshAccessToken from "../services/refreshToken";
+import { Navigate } from "react-router";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -138,7 +140,7 @@ function ListTask({ eventId, data }) {
   const searchEventUsers = async (searchValue = "") => {
     try {
       setLoadingUsers(true);
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
 
       const params = new URLSearchParams({
         page: 1,
@@ -154,12 +156,35 @@ function ListTask({ eventId, data }) {
         }
       }
 
-      const response = await axios.get(
-        `https://localhost:44320/api/JoinProject/search-implement-joined-project?${params.toString()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      const fetchData = async (authToken) => {
+        const response = await axios.get(
+          `https://localhost:44320/api/JoinProject/search-implement-joined-project?${params.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+        return response;
+      };
+
+      let response;
+      try {
+        response = await fetchData(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await fetchData(token);
+          } else {
+            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return;
+          }
+        } else {
+          throw error;
         }
-      );
+      }
 
       if (response.data && response.data.items) {
         const users = response.data.items.map((item) => ({
@@ -172,12 +197,16 @@ function ListTask({ eventId, data }) {
         setEventUsers([]);
       }
     } catch (error) {
-      console.error("Error searching event users:", error);
-      message.error("Could not load event members");
+      console.error(
+        "Error searching event users:",
+        error.response?.data || error.message
+      );
+      message.error("Không thể tải danh sách thành viên sự kiện");
     } finally {
       setLoadingUsers(false);
     }
   };
+
   useEffect(() => {
     if (eventId) {
       searchEventUsers();
@@ -186,25 +215,60 @@ function ListTask({ eventId, data }) {
   const assignUserToSubtask = async (subtaskId, userId) => {
     try {
       setAssigningUser(true);
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
 
-      await axios.post(
-        `https://localhost:44320/api/SubTasks/assign-subtask?userId=${userId}&subtaskId=${subtaskId}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      const assign = async (authToken) => {
+        return await axios.post(
+          `https://localhost:44320/api/SubTasks/assign-subtask?userId=${userId}&subtaskId=${subtaskId}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+      };
+
+      let response;
+      try {
+        response = await assign(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await assign(token);
+          } else {
+            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return false;
+          }
+        } else {
+          throw error;
         }
-      );
+      }
 
-      return true;
+      if (response.status === 200 || response.status === 204) {
+        Swal.fire({
+          title: "Giao công việc con thành công!",
+          icon: "success",
+          draggable: true,
+        });
+        return true;
+      } else {
+        throw new Error("API returned an unexpected status");
+      }
     } catch (error) {
-      console.error("Error assigning user to subtask:", error);
-      message.error(`Failed to assign user to subtask: ${error.message}`);
+      console.error(
+        "Error assigning user to subtask:",
+        error.response?.data || error.message
+      );
+      message.error(`Không thể giao công việc con: ${error.message}`);
       return false;
     } finally {
       setAssigningUser(false);
     }
   };
+
   const handleMultipleAssignments = async (subtaskId, userIds) => {
     let successCount = 0;
     setAssigningUser(true);
@@ -243,8 +307,8 @@ function ListTask({ eventId, data }) {
   const updateSubTask = async (values) => {
     try {
       setIsEditSubTaskSubmitting(true);
+      let token = localStorage.getItem("token");
 
-      const token = localStorage.getItem("token");
       const updatedSubTaskData = {
         subTaskName: values.subTaskName,
         subTaskDescription: values.subTaskDescription,
@@ -256,37 +320,70 @@ function ListTask({ eventId, data }) {
         status: selectedSubTask.status,
       };
 
-      await axios.put(
-        `https://localhost:44320/api/SubTasks/update/${selectedSubTask.id}`,
-        updatedSubTaskData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      const update = async (authToken) => {
+        const response = await axios.put(
+          `https://localhost:44320/api/SubTasks/update/${selectedSubTask.id}`,
+          updatedSubTaskData,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+        return response;
+      };
+
+      let response;
+      try {
+        response = await update(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await update(token);
+          } else {
+            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return false;
+          }
+        } else {
+          throw error;
         }
-      );
+      }
 
-      Swal.fire({
-        title: "Update Sub-Task Successful!",
-        icon: "success",
-        draggable: true,
-      });
-      setIsEditSubTaskModalVisible(false);
+      if (response.status === 200 || response.status === 204) {
+        Swal.fire({
+          title: "Update Sub-Task Successful!",
+          icon: "success",
+          draggable: true,
+        });
+        setIsEditSubTaskModalVisible(false);
 
-      fetchTasksFromAPI().then(() => {
-        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
-        if (updatedTask) {
-          showSubTasks(updatedTask);
+        const updatedTasks = await fetchTasksFromAPI();
+        if (selectedTask) {
+          const updatedTask = updatedTasks.find(
+            (task) => task.id === selectedTask.id
+          );
+          if (updatedTask) {
+            showSubTasks(updatedTask);
+          }
         }
-      });
-
-      return true;
+        return true;
+      } else {
+        throw new Error("API returned an unexpected status");
+      }
     } catch (error) {
-      console.error("Error updating subtask:", error);
+      console.error(
+        "Error updating subtask:",
+        error.response?.data || error.message
+      );
       message.error("Không thể cập nhật công việc con");
       return false;
     } finally {
       setIsEditSubTaskSubmitting(false);
     }
   };
+
   useEffect(() => {
     if (data && data.tasks && Array.isArray(data.tasks)) {
       console.log("Using tasks data from props:", data.tasks);
@@ -327,14 +424,39 @@ function ListTask({ eventId, data }) {
   const fetchTasksFromAPI = async () => {
     setReloading(true);
     setError(null);
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      let token = localStorage.getItem("token");
+
+      const fetchData = async (authToken) => {
+        const response = await axios.get(
+          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+        return response;
+      };
+
+      let response;
+      try {
+        response = await fetchData(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await fetchData(token);
+          } else {
+            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return [];
+          }
+        } else {
+          throw error;
         }
-      );
+      }
 
       if (response.data && response.data.result) {
         const tasksData = response.data.result.tasks || [];
@@ -348,7 +470,10 @@ function ListTask({ eventId, data }) {
         return [];
       }
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.error(
+        "Error fetching tasks:",
+        error.response?.data || error.message
+      );
       message.error("Không thể tải danh sách công việc");
       setError("Không thể tải danh sách công việc");
       return [];
@@ -357,11 +482,12 @@ function ListTask({ eventId, data }) {
       setReloading(false);
     }
   };
+
   const createSubTask = async (values) => {
     try {
       setIsSubTaskSubmitting(true);
+      let token = localStorage.getItem("token");
 
-      const token = localStorage.getItem("token");
       const newSubTaskData = {
         subTaskName: values.subTaskName,
         subTaskDescription: values.subTaskDescription,
@@ -373,35 +499,66 @@ function ListTask({ eventId, data }) {
         taskId: selectedTask.id,
       };
 
-      await axios.post(
-        "https://localhost:44320/api/SubTasks/create",
-        newSubTaskData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      Swal.fire({
-        title: "Create Sub-Task Success!",
-        icon: "success",
-        draggable: true,
-      });
-      subTaskForm.resetFields();
-      setIsSubTaskModalVisible(false);
-      const updatedTasks = await fetchTasksFromAPI();
-      if (updatedTasks && updatedTasks.length > 0) {
-        const refreshedTask = updatedTasks.find(
-          (task) => task.id === selectedTask.id
+      const create = async (authToken) => {
+        return await axios.post(
+          "https://localhost:44320/api/SubTasks/create",
+          newSubTaskData,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
         );
-        if (refreshedTask) {
-          setSelectedTask(refreshedTask);
-          showSubTasks(refreshedTask);
+      };
+
+      let response;
+      try {
+        response = await create(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await create(token);
+          } else {
+            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return false;
+          }
+        } else {
+          throw error;
         }
       }
 
-      return true;
+      if (response.status === 200 || response.status === 201) {
+        Swal.fire({
+          title: "Create Sub-Task Success!",
+          icon: "success",
+          draggable: true,
+        });
+
+        subTaskForm.resetFields();
+        setIsSubTaskModalVisible(false);
+
+        const updatedTasks = await fetchTasksFromAPI();
+        if (updatedTasks && updatedTasks.length > 0) {
+          const refreshedTask = updatedTasks.find(
+            (task) => task.id === selectedTask.id
+          );
+          if (refreshedTask) {
+            setSelectedTask(refreshedTask);
+            showSubTasks(refreshedTask);
+          }
+        }
+
+        return true;
+      } else {
+        throw new Error("Unexpected response from API");
+      }
     } catch (error) {
-      console.error("Error creating subtask:", error);
+      console.error(
+        "Error creating subtask:",
+        error.response?.data || error.message
+      );
       message.error("Không thể tạo công việc con");
       return false;
     } finally {
@@ -578,60 +735,119 @@ function ListTask({ eventId, data }) {
   };
   const toggleSubTaskStatus = async (subTaskId, completed) => {
     try {
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
       const status = completed ? 1 : 0;
 
-      await axios.put(
-        `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
-        { status },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const updateStatus = async (authToken) => {
+        return await axios.put(
+          `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
+          { status },
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+      };
 
-      setSubTasks((prev) =>
-        prev.map((item) =>
-          item.id === subTaskId ? { ...item, status: status } : item
-        )
-      );
-
-      await fetchTasksFromAPI();
-
-      if (selectedTask) {
-        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
-        if (updatedTask) {
-          showSubTasks(updatedTask);
+      let response;
+      try {
+        response = await updateStatus(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await updateStatus(token);
+          } else {
+            message.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return;
+          }
+        } else {
+          throw error;
         }
       }
+
+      if (response.status === 200) {
+        setSubTasks((prev) =>
+          prev.map((item) =>
+            item.id === subTaskId ? { ...item, status: status } : item
+          )
+        );
+
+        const updatedTasks = await fetchTasksFromAPI();
+        if (selectedTask) {
+          const updatedTask = updatedTasks.find(
+            (task) => task.id === selectedTask.id
+          );
+          if (updatedTask) {
+            showSubTasks(updatedTask);
+          }
+        }
+      } else {
+        throw new Error("Unexpected response from API");
+      }
     } catch (error) {
-      console.error("Error updating subtask status:", error);
-      message.error("Không thể cập nhật trạng thái");
+      console.error(
+        "Error updating subtask status:",
+        error.response?.data || error.message
+      );
+      message.error("Không thể cập nhật trạng thái công việc con");
     }
   };
 
   const deleteSubTask = async (subTaskId) => {
     try {
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
 
-      await axios.put(
-        `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
-        { status: -1 },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      const deleteSubtask = async (authToken) => {
+        return await axios.put(
+          `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
+          { status: -1 },
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+      };
+
+      let response;
+      try {
+        response = await deleteSubtask(token);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn("Token expired, refreshing...");
+          token = await refreshAccessToken();
+          if (token) {
+            localStorage.setItem("token", token);
+            response = await deleteSubtask(token);
+          } else {
+            message.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+            Navigate("/login");
+            return;
+          }
+        } else {
+          throw error;
         }
-      );
+      }
 
-      setSubTasks((prev) => prev.filter((item) => item.id !== subTaskId));
+      if (response.status === 200) {
+        setSubTasks((prev) => prev.filter((item) => item.id !== subTaskId));
 
-      Swal.fire({
-        title: "Delete subtask successfully",
-        icon: "success",
-        draggable: true,
-      });
+        Swal.fire({
+          title: "Delete subtask successfully",
+          icon: "success",
+          draggable: true,
+        });
 
-      fetchTasksFromAPI();
+        await fetchTasksFromAPI();
+      } else {
+        throw new Error("Unexpected response from API");
+      }
     } catch (error) {
-      console.error("Error deleting subtask:", error);
+      console.error(
+        "Error deleting subtask:",
+        error.response?.data || error.message
+      );
       message.error("Không thể xóa công việc con");
     }
   };
@@ -711,7 +927,7 @@ function ListTask({ eventId, data }) {
             />
           </Tooltip>
 
-          {userId === data.createdBy.id && (
+          {userId === data.createdBy.id && data.status === 0 && (
             <>
               <Button
                 type="primary"
@@ -790,7 +1006,7 @@ function ListTask({ eventId, data }) {
 
           <div className="task-actions">
             <Space>
-              {userId === data.createdBy.id && (
+              {userId === data.createdBy.id && data.status === 0 && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -811,7 +1027,7 @@ function ListTask({ eventId, data }) {
               imageStyle={{ height: 120 }}
               description="No tasks yet"
             >
-              {userId === data.createdBy.id && (
+              {userId === data.createdBy.id && data.status === 0 && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -1024,7 +1240,8 @@ function ListTask({ eventId, data }) {
           onClose={() => setSubTasksVisible(false)}
           open={subTasksVisible}
           extra={
-            userId === data.createdBy.id && (
+            userId === data.createdBy.id &&
+            data.status === 0 && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -1200,7 +1417,7 @@ function ListTask({ eventId, data }) {
                   renderItem={(item) => (
                     <List.Item
                       actions={
-                        userId === data.createdBy.id
+                        userId === data.createdBy.id && data.status === 0
                           ? [renderSubTaskActions(item)]
                           : []
                       }
@@ -1221,10 +1438,10 @@ function ListTask({ eventId, data }) {
                         >
                           <div className="sub-task-title">
                             {item.subTaskName}
-                            {item.assignedUsers &&
-                              item.assignedUsers.length > 0 && (
+                            {item.joinSubTask &&
+                              item.joinSubTask.length > 0 && (
                                 <Tag color="green" style={{ marginLeft: 8 }}>
-                                  {item.assignedUsers.length} assigned
+                                  {item.joinSubTask.length} assigned
                                 </Tag>
                               )}
                           </div>
@@ -1238,17 +1455,18 @@ function ListTask({ eventId, data }) {
                               {item.subTaskDescription}
                             </div>
                           )}
-                          {item.assignedUsers &&
-                            item.assignedUsers.length > 0 && (
-                              <div className="assigned-users">
-                                Assigned to:{" "}
-                                {item.assignedUsers.map((user) => (
-                                  <Tag key={user.userId || user.id}>
-                                    {user.fullName || user.name || user.email}
-                                  </Tag>
-                                ))}
-                              </div>
-                            )}
+                          {item.joinSubTask && item.joinSubTask.length > 0 && (
+                            <div className="assigned-users">
+                              Assigned to:{" "}
+                              {item.joinSubTask.map((user) => (
+                                <Tag key={user.id}>
+                                  {user.firstName ||
+                                    user.lastName ||
+                                    user.email}
+                                </Tag>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         {item.priority && (
                           <Tag

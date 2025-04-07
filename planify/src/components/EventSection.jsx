@@ -35,9 +35,6 @@ function EventSection() {
   const [campuses, setCampus] = useState([]);
   const navigate = useNavigate();
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
-
-  const userRole = localStorage.getItem("role");
   const currentUserId = localStorage.getItem("userId");
   const campus = localStorage.getItem("campus");
   useEffect(() => {
@@ -379,18 +376,6 @@ function EventSection() {
                 <div className="feature_tittle">
                   <div className="filter_container">
                     <div className="filter_list">
-                      {(userRole?.toLowerCase() === "event organizer" ||
-                        userRole?.toLowerCase() === "implementer") && (
-                        <button
-                          className={`filter_button ${
-                            eventFilter === "my" ? "active" : ""
-                          }`}
-                          onClick={handleMyEvents}
-                        >
-                          My Event
-                        </button>
-                      )}
-
                       <button
                         className={`filter_button ${
                           eventFilter === "list" ? "active" : ""

@@ -1,54 +1,159 @@
+/* Container chính */
 .event-history-container {
   max-width: 1200px;
   margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
-.event-card {
-  transition: transform 0.2s;
+/* Tiêu đề */
+.event-history-container h2 {
+  font-size: 28px;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.event-card:hover {
-  transform: translateY(-5px);
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.ant-table-thead > tr > th {
+  background-color: #ff8d03 !important;
+  color: #fff !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+  padding: 12px 16px;
+  border-bottom: 2px solid #2980b9;
+}
+
+.ant-table-tbody > tr {
+  transition: all 0.3s ease;
+}
+
+.ant-table-tbody > tr:nth-child(odd) {
+  background-color: #f5f6fa;
+}
+
+.ant-table-tbody > tr:nth-child(even) {
+  background-color: #fff;
+}
+
+.ant-table-tbody > tr:hover {
+  background-color: #e8f4fd !important;
+  cursor: pointer;
+  transform: scale(1.01);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Cột tiêu đề sự kiện (link) */
+.event-title-link {
+  color: #e74c3c;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.event-title-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+/* Định dạng cho ô trong bảng */
+.ant-table-cell {
+  font-size: 14px;
+  color: #34495e;
+  padding: 14px 16px !important;
+}
+
+/* Định dạng trạng thái */
 .status-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
-  color: white;
+  color: #fff;
+  display: inline-block;
 }
 
 .status-running {
-  background-color: #52c41a; /* Green */
+  background-color: #27ae60;
 }
 
 .status-closed {
-  background-color: #f5222d; /* Red */
+  background-color: #e74c3c;
 }
 
 .status-notyet {
-  background-color: #1890ff; /* Blue */
+  background-color: #f1c40f;
 }
 
-.event-title {
-  margin-top: 10px;
-  margin-bottom: 8px;
-  height: 48px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+/* Phân trang */
+.ant-pagination {
+  margin-top: 20px;
+  text-align: center;
 }
 
-.event-image {
-  border-radius: 8px 8px 0 0;
+.ant-pagination-item {
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
-.favorite-button:hover {
-  background: rgba(255, 255, 255, 1) !important;
+.ant-pagination-item-active {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.ant-pagination-item-active a {
+  color: #000000 !important;
+}
+
+.ant-pagination-item:hover {
+  background-color: #ecf0f1;
+  border-color: #3498db;
+}
+
+.ant-pagination-prev,
+.ant-pagination-next {
+  border-radius: 50%;
+}
+
+.ant-pagination-prev:hover,
+.ant-pagination-next:hover {
+  border-color: #3498db;
+}
+
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+  border-radius: 50%;
+  color: #3498db;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .ant-table-cell {
+    padding: 10px !important;
+  }
+
+  .event-history-container {
+    padding: 10px;
+  }
 }

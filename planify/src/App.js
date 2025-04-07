@@ -27,7 +27,8 @@ import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
-import MyEvent from "./pages/Events/MyEvent"
+import MyEvent from "./pages/Events/MyEvent";
+import MyRequest from "./pages/Events/MyRequest";
 
 function App() {
   return (
@@ -41,7 +42,11 @@ function App() {
           path="/home"
           element={
             <PrivateRoute
-              allowedRoles={["Campus Manager", "Event Organizer", "Spectator"]}
+              allowedRoles={[
+                "Campus Manager",
+                "Event Organizer",
+                "Implementer",
+              ]}
             >
               <Home />
             </PrivateRoute>
@@ -125,7 +130,7 @@ function App() {
         <Route
           path="/event-detail-spec/:eventId"
           element={
-            <PrivateRoute allowedRoles={["Spectator"]}>
+            <PrivateRoute allowedRoles={["Spectator", "Implementer"]}>
               <EventDetailSpec />
             </PrivateRoute>
           }
@@ -134,13 +139,7 @@ function App() {
         <Route
           path="/event-detail-EOG/:eventId"
           element={
-            <PrivateRoute
-              allowedRoles={[
-                "Campus Manager",
-                "Event Organizer",
-                "Implementor",
-              ]}
-            >
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
               <EventDetailEOG />
             </PrivateRoute>
           }
@@ -160,6 +159,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Campus Manager"]}>
               <ManageRequest />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-request"
+          element={
+            <PrivateRoute allowedRoles={["Event Organizer"]}>
+              <MyRequest />
             </PrivateRoute>
           }
         />
@@ -210,8 +217,12 @@ function App() {
           }
         />
         <Route
-          path="/create-event-organizer"
-          element={<CreateEventOrganizer />}
+          path="/manage-eog"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager"]}>
+              <CreateEventOrganizer />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/update-event-organizer/:userId"
@@ -237,9 +248,7 @@ function App() {
         <Route
           path="/my-event"
           element={
-            <PrivateRoute allowedRoles={[
-              "Campus Manager",
-              "Event Organizer",]}>
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
               <MyEvent />
             </PrivateRoute>
           }
