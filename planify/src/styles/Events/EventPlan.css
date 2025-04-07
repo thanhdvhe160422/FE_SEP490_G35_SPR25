@@ -182,7 +182,7 @@
 .button.fixed-next.save-draft {
   position: absolute;
   bottom: 5px;
-  right: 170px;
+  right: 200px;
   height: 44px;
   background: #6c757d;
   color: white;
@@ -341,6 +341,17 @@
 .table-hover tbody tr:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+.table thead th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table td:nth-child(5) {
+  text-align: center;
+  vertical-align: middle;
+}
+
 
 /* Tối ưu Task & Subtask */
 .bg-light {

@@ -20,8 +20,8 @@ function MyRequest(props) {
   useEffect(() => {
     fetchRequests();
   }, []);
-  const pendingRequests = requests.filter((req) => req.status === 0);
-  const approvedRequests = requests.filter((req) => req.status === 1);
+  const pendingRequests = requests.filter((req) => req.status === 1);
+  const approvedRequests = requests.filter((req) => req.status === 2);
   const rejectedRequests = requests.filter((req) => req.status === -1);
 
   return (
@@ -38,7 +38,7 @@ function MyRequest(props) {
           <RequestColumn title="Rejected" requests={rejectedRequests} />
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

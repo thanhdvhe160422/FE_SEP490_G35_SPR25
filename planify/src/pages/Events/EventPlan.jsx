@@ -337,8 +337,29 @@ export default function EventPlan() {
     updateScreen(index);
   }, [index, updateScreen]);
 
+  // const handleKeyDown = useCallback(
+  //   (e) => {
+  //     if (e.key === "ArrowLeft" && index > 0)
+  //       setIndex((i) => Math.max(0, i - 1));
+  //     else if (e.key === "ArrowRight" && index < indexMax())
+  //       setIndex((i) => Math.min(i + 1, indexMax()));
+  //     else if (e.key === "ArrowUp") openModal();
+  //     else if (e.key === "ArrowDown") closeModal();
+  //   },
+  //   [index, openModal, closeModal]
+  // );
+
+
   const handleKeyDown = useCallback(
     (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      const isTyping =
+        tag === "input" ||
+        tag === "textarea" ||
+        e.target.isContentEditable;
+  
+      if (isTyping) return; // Đang gõ trong input -> không điều hướng slide
+  
       if (e.key === "ArrowLeft" && index > 0)
         setIndex((i) => Math.max(0, i - 1));
       else if (e.key === "ArrowRight" && index < indexMax())
@@ -348,6 +369,7 @@ export default function EventPlan() {
     },
     [index, openModal, closeModal]
   );
+  
 
   useEffect(() => {
     screens.current = Array.from(document.querySelectorAll(".screen"));
@@ -1103,10 +1125,10 @@ export default function EventPlan() {
                       ))}
 
                       <tr>
-                        <td colSpan="4" className="text-end fw-bold">
+                        <td colSpan="4"  className="text-end fw-bold">
                           Total:
                         </td>
-                        <td className="fw-bold text-primary">
+                        <td style={{textAlign:'center', verticalAlign:'middle'}} className="fw-bold text-primary">
                           {totalBudget.toLocaleString("vi-VN")} VNĐ
                         </td>
                         <td></td>
@@ -1152,7 +1174,7 @@ export default function EventPlan() {
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
+                  {/* <Form.Group className="mb-3">
                     <Form.Label>Plan before the event</Form.Label>
                     <Form.Control
                       as="textarea"
@@ -1163,10 +1185,10 @@ export default function EventPlan() {
                       }
                       style={{ resize: "vertical", minHeight: "100px" }}
                     />
-                  </Form.Group>
+                  </Form.Group> */}
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Plan in the even</Form.Label>
+                    <Form.Label>Promotional Plan</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
@@ -1178,7 +1200,7 @@ export default function EventPlan() {
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
+                  {/* <Form.Group className="mb-3">
                     <Form.Label>Plan after the event</Form.Label>
                     <Form.Control
                       as="textarea"
@@ -1189,7 +1211,7 @@ export default function EventPlan() {
                       }
                       style={{ resize: "vertical", minHeight: "100px" }}
                     />
-                  </Form.Group>
+                  </Form.Group> */}
                 </Form>
               </li>
 
