@@ -210,25 +210,25 @@ body {
 .username {
   font-size: 16px;
   font-weight: 500;
-  color: #34495e; /* Màu tối phù hợp với nền trắng */
+  color: #34495e;
   transition: color 0.3s ease;
 }
 
 .profile:hover .username {
-  color: #ff7b00; /* Chuyển xanh khi hover */
+  color: #ff7b00;
 }
 
 .avatar {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 3px solid #f98500; /* Viền xanh đậm hơn */
-  box-shadow: 0 0 8px rgba(232, 122, 12, 0.4); /* Ánh sáng xanh */
+  border: 3px solid #f09d21;
+  box-shadow: 0 0 8px rgba(232, 122, 12, 0.4);
   transition: transform 0.3s ease;
 }
 
 .profile:hover .avatar {
-  transform: scale(1.1); /* Phóng to avatar khi hover */
+  transform: scale(1.1);
 }
 
 .dropdown-menu {
@@ -255,7 +255,7 @@ body {
 }
 
 .dropdown-item:hover {
-  background: #ff7402;
+  background: #f09d21;
   color: #fff;
 }
 
@@ -305,4 +305,19 @@ body {
   .profile {
     margin-right: 0;
   }
+}
+.nav-item.active {
+  background: #f09d21; /* Màu xanh nổi bật */
+  color: #fff;
+}
+
+.nav-item:hover {
+  background: #f09d21; /* Màu cam khi hover */
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Đảm bảo hover không ghi đè active */
+.nav-item.active:hover {
+  background: #f09d21; /* Màu xanh đậm hơn khi hover trên active */
 }

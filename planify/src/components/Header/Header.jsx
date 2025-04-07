@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom"; // Thêm useLocation
 import "./Header.css";
 import logo from "../../assets/logo-fptu.png";
 import { getProfileById } from "../../services/userService";
@@ -10,6 +10,7 @@ import { getNotification } from "../../services/EventService";
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation(); // Lấy thông tin đường dẫn hiện tại
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -89,6 +90,7 @@ export default function Header() {
     updatedMessages[index].read = true;
     setMessages(updatedMessages);
   };
+
   useEffect(() => {
     const userId = localStorage.getItem("userId");
 
@@ -97,13 +99,11 @@ export default function Header() {
       try {
         const userData = await getProfileById(userId);
         setFullname(userData.data.firstName + " " + userData.data.lastName);
-        //setPicture(localStorage.getItem("avatar"));
         setPicture(
           convertToDirectLink(
             userData?.data?.avatar?.mediaUrl || localStorage.getItem("avatar")
           )
         );
-        //console.log("Header", userData.data);
       } catch (error) {
         console.error(error);
       }
@@ -146,58 +146,45 @@ export default function Header() {
     sessionStorage.clear();
     navigate("/login");
   };
+
   const navItemsByRole = {
     "campus manager": [
       { label: "Home", path: "/home" },
       { label: "Manage Event Organizer", path: "/manage-eog" },
       { label: "Create Event", path: "/create-event" },
       { label: "Manage Requests", path: "/manage-request" },
-      {
-        label: "Favorite Events",
-        path: "/my-favorite-events",
-      },
+      { label: "Favorite Events", path: "/my-favorite-events" },
     ],
     "event organizer": [
       { label: "Home", path: "/home" },
       { label: "Create Event", path: "/event-plan" },
       { label: "My Request", path: "/my-request" },
       { label: "My Event", path: "/my-event" },
-      {
-        label: "My Favorite",
-        path: "/my-favorite-events",
-      },
+      { label: "My Favorite", path: "/my-favorite-events" },
+      { label: "My Drafts", path: "/my-drafts" },
     ],
     implementer: [
       { label: "Home", path: "/home-implementer" },
       { label: "Assigned Tasks", path: "/assigned-tasks" },
       { label: "History", path: "/history-event" },
-      {
-        label: "Favorite Events",
-        path: "/my-favorite-events",
-      },
+      { label: "Favorite Events", path: "/my-favorite-events" },
     ],
     spectator: [
       { label: "Home", path: "/home-spec" },
-      {
-        label: "My Favorite",
-        path: "/my-favorite-events",
-      },
-      {
-        label: "Registered Events",
-        path: "/event-registered",
-      },
+      { label: "My Favorite", path: "/my-favorite-events" },
+      { label: "Registered Events", path: "/event-registered" },
     ],
   };
 
   const navItems = navItemsByRole[userRole] || [];
 
   function convertToDirectLink(googleDriveUrl) {
-    if (!googleDriveUrl.includes("drive.google.com/uc?id="))
+    if (!googleDriveUrl || !googleDriveUrl.includes("drive.google.com/uc?id="))
       return googleDriveUrl;
     const fileId = googleDriveUrl.split("id=")[1];
-
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   }
+
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/home")}>
@@ -209,7 +196,9 @@ export default function Header() {
           <span
             key={index}
             onClick={() => navigate(item.path)}
-            className="nav-item"
+            className={`nav-item ${
+              location.pathname === item.path ? "active" : ""
+            }`} // Thêm class active
           >
             {item.label}
           </span>
@@ -230,20 +219,6 @@ export default function Header() {
 
           {showPopup && (
             <div className="notification-popup">
-              {/* {notifications.length === 0 ? (
-                <p>Không có thông báo</p>
-              ) : (
-                notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    className={`notification-item ${
-                      notif.read ? "" : "unread"
-                    }`}
-                  >
-                    {notif.message}
-                  </div>
-                ))
-              )} */}
               <div className="text-center">
                 <h4 className="fw-bold">Notification</h4>
                 {messages.length === 0 ? (
