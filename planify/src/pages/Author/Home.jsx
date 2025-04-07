@@ -14,7 +14,7 @@ function Home() {
     <div>
       <Header></Header>
       <EventSection />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

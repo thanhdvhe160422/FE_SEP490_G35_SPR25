@@ -119,7 +119,7 @@ function ListTask({ eventId, data }) {
         onClick={() => showAssignModal(item)}
       />,
     ];
-    if (item.status === 0 || item.status === -1) {
+    if ( data.status === -1 || data.status === 0) {
       actions.push(
         <Button
           type="text"
