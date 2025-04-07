@@ -205,23 +205,21 @@ body {
 }
 
 .sidebar {
-  position: fixed;
   max-width: 500px;
-  height: calc(100vh - 80px);
-  position: sticky;
-  top: 0;
-  left: 0;
   background: white;
   padding: 25px;
-  z-index: 1000;
   border-right: 1px solid #eaeaea;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.08);
-  overflow-y: auto;
   transition: all 0.3s ease;
 }
 
 .sidebar:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.filter_section {
+  position: sticky;
+  top: 100px; /* chỉnh top này nếu cần cách header */
 }
 
 .filter_section h3 {
