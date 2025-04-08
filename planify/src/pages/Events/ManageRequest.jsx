@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
+import Loading from "../../components/Loading";
 
 function ManageRequest() {
   const [requests, setRequests] = useState([]);
@@ -17,6 +18,8 @@ function ManageRequest() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [approveReason, setApproveReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchRequests = async () => {
     try {
@@ -48,10 +51,10 @@ function ManageRequest() {
       Swal.fire("Error", "Please enter a reason for rejection.", "error");
       return;
     }
-
+    setIsLoading(true);
     try {
       await rejectRequest(selectedRequest.id, rejectReason);
-
+      setIsLoading(false);
       await fetchRequests();
 
       setShowPopupReject(false);
@@ -64,26 +67,37 @@ function ManageRequest() {
   };
 
   const submitApprove = async () => {
-    if (!approveReason.trim()) {
-      Swal.fire("Error", "Please enter a reason for approval.", "error");
-      return;
-    }
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
+    setIsLoading(true);
     try {
       console.log("Approving request ID:", selectedRequest.id);
       await approveRequest(selectedRequest.id, approveReason);
-
+      setIsLoading(false);
       await fetchRequests();
 
       setShowPopupApprove(false);
       setApproveReason("");
-      Swal.fire("Success", "Request approved successfully", "success");
+
+      Swal.fire({
+        title: "Success",
+        text: "Request approved successfully",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
       console.error("Error approving request:", error);
       Swal.fire("Error", "Unable to approve request.", "error");
+    } finally {
+      setIsSubmitting(false); // reset lại cho lần sau
     }
   };
 
+  if(isLoading){
+    return <Loading/>;
+  }
   const pendingRequests = requests.filter((req) => req.status === 1);
   const approvedRequests = requests.filter((req) => req.status === 2);
   const rejectedRequests = requests.filter((req) => req.status === -1);
@@ -164,7 +178,7 @@ function ManageRequest() {
           </div>
         )}
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

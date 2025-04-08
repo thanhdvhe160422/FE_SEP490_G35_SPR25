@@ -120,6 +120,7 @@ function ListTask({ eventId, data }) {
       />,
     ];
     if (data.status === 0 || data.status === -1) {
+
       actions.push(
         <Button
           type="text"

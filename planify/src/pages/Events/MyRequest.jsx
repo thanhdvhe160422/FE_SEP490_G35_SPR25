@@ -38,7 +38,7 @@ function MyRequest(props) {
           <RequestColumn title="Rejected" requests={rejectedRequests} />
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
