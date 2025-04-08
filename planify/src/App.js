@@ -24,7 +24,7 @@ import UpdateTask from "./pages/Tasks/UpdateTask";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan";
-import Dashboard from "./pages/Admin/Dashboard";
+// import Dashboard from "./pages/Admin/Dashboard";
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
@@ -98,14 +98,14 @@ function App() {
           }
         />
 
-        <Route
+        {/* <Route
           path="/dashboard"
           element={
             <PrivateRoute allowedRoles={["Admin"]}>
               <Dashboard />
             </PrivateRoute>
           }
-        />
+        /> */}
 
         <Route
           path="/favorite-events"
