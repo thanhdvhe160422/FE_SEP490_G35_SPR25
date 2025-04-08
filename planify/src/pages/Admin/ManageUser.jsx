@@ -215,7 +215,8 @@ export default function ManageUser() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
+
       <div className="create-organizer-container">
         <div className="eog-table-container">
           <h2>List Users ({pagination.totalCount})</h2>

@@ -38,13 +38,6 @@ export default function MyFarvourite() {
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   };
 
-  const getImageUrl = (eventMedias) => {
-    if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
-      return "https://placehold.co/600x400?text=No+Image";
-    }
-    return fixDriveUrl(eventMedias[0].mediaUrl);
-  };
-
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
@@ -150,7 +143,9 @@ export default function MyFarvourite() {
                                 event.eventMedia &&
                                 event.eventMedia.length > 0 &&
                                 event.eventMedia[0]
-                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
+                                  ? fixDriveUrl(
+                                      event.eventMedias[0].mediaDTO.mediaUrl
+                                    )
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"

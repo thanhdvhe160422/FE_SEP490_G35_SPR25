@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import "./customChart.css";
-import "./img/svg/Logo.svg";
-import "./css/style.min.css";
-import "./css/style.css";
+import "../../styles/Admin/customChart.css";
+import "../../assets/img/svg/Logo.svg";
+import "../../assets/css/style.min.css";
+import "../../assets/css/style.css";
 
 import {
   LineChart,
@@ -14,8 +14,8 @@ import {
   Legend,
   PieChart,
   Pie,
-  Cell,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 
 const pieData = [
@@ -93,7 +93,7 @@ export default function Dashboard() {
             <div class="sidebar-body">
               <ul class="sidebar-body-menu">
                 <li>
-                  <a className="active" href="/">
+                  <a className="active" href="/dashboard">
                     <span
                       className="icon home icon-dark"
                       aria-hidden="true"
@@ -104,7 +104,7 @@ export default function Dashboard() {
               </ul>
               <ul class="sidebar-body-menu">
                 <li>
-                  <a class="show-cat-btn" href="##">
+                  <a class="show-cat-btn" href="/manage-user">
                     <span
                       class="icon user-3 icon-dark"
                       aria-hidden="true"
