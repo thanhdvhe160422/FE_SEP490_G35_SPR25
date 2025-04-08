@@ -7,7 +7,7 @@ body {
   color: #333;
 }
 
-.container {
+.container-home {
   padding-left: 0;
   padding-top: 79px;
   max-width: 100%;
@@ -45,6 +45,11 @@ body {
   width: 50px;
   height: 3px;
   background: #f09d21;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 500px;
 }
 
 /* Status tags với hiệu ứng */
@@ -219,7 +224,7 @@ body {
 
 .filter_section {
   position: sticky;
-  top: 100px; /* chỉnh top này nếu cần cách header */
+  top: 100px; 
 }
 
 .filter_section h3 {

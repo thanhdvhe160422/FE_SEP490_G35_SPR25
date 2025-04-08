@@ -3,7 +3,7 @@ import "../../styles/Admin/customChart.css";
 import "../../assets/img/svg/Logo.svg";
 import "../../assets/css/style.min.css";
 import "../../assets/css/style.css";
-
+import { CiLogout } from "react-icons/ci";
 import {
   LineChart,
   Line,
@@ -18,10 +18,23 @@ import {
   Cell,
 } from "recharts";
 
+import {
+  FaHome,
+  FaUserAlt,
+  FaUsers,
+  FaCog,
+  FaEdit,
+  FaThLarge,
+  FaAngleDown,
+} from "react-icons/fa";
+
 const pieData = [
   { name: "Direct", value: 38, color: "#ff9f43" },
   { name: "Organic", value: 22, color: "#00cfe8" },
   { name: "Paid", value: 12, color: "#7367f0" },
+  { name: "Social", value: 28, color: "#ea5455" },
+  { name: "Social", value: 28, color: "#00cfe8" },
+  { name: "Social", value: 28, color: "#ff9f43" },
   { name: "Social", value: 28, color: "#ea5455" },
 ];
 
@@ -37,8 +50,8 @@ const data = [
 ];
 
 export default function Dashboard() {
-  const [showDoanhThu, setShowDoanhThu] = useState(true);
-  const [showChiPhi, setShowChiPhi] = useState(true);
+  const [eventOganized, setEventOganized] = useState(true);
+  const [eventRegistration, setEventRegistration] = useState(true);
   const [maxYAxisValue, setMaxYAxisValue] = useState(0);
 
   useEffect(() => {
@@ -51,8 +64,8 @@ export default function Dashboard() {
   const getMaxValue = () => {
     let max = 0;
     data.forEach((item) => {
-      if (showDoanhThu) max = Math.max(max, item.eventsOrganized);
-      if (showChiPhi) max = Math.max(max, item.eventRegistrations);
+      if (eventOganized) max = Math.max(max, item.eventsOrganized);
+      if (eventRegistration) max = Math.max(max, item.eventRegistrations);
     });
 
     const roundedMax = Math.ceil(max / 100) * 100 || 100;
@@ -75,8 +88,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <div class="layer"></div>
-
       <div class="page-flex">
         <aside class="sidebar">
           <div class="sidebar-start">
@@ -91,65 +102,52 @@ export default function Dashboard() {
               </a>
             </div>
             <div class="sidebar-body">
-              <ul class="sidebar-body-menu">
+              <ul className="sidebar-body-menu">
                 <li>
                   <a className="active" href="/dashboard">
-                    <span
-                      className="icon home icon-dark"
-                      aria-hidden="true"
-                    ></span>{" "}
+                    <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Dashboard
                   </a>
                 </li>
-              </ul>
-              <ul class="sidebar-body-menu">
                 <li>
-                  <a class="show-cat-btn" href="/manage-user">
-                    <span
-                      class="icon user-3 icon-dark"
-                      aria-hidden="true"
-                    ></span>
+                  <a className="show-cat-btn" href="/manage-user">
+                    <FaUsers
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />{" "}
                     Users
                   </a>
                 </li>
                 <li>
-                  <a href="appearance.html">
-                    <span class="icon edit icon-dark" aria-hidden="true"></span>
-                    Appearance
+                  <a href="management-campus-manager">
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    Management Campus
                   </a>
                 </li>
-                <li>
-                  <a class="show-cat-btn" href="##">
+                {/* <li>
+                  <a className="show-cat-btn" href="#">
+                    <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
                     <span
-                      class="icon category icon-dark"
-                      aria-hidden="true"
-                    ></span>
-                    Extentions
-                    <span
-                      class="category__btn transparent-btn"
+                      className="category__btn transparent-btn"
                       title="Open list"
                     >
-                      <span class="sr-only">Open list</span>
-                      <span class="icon arrow-down" aria-hidden="true"></span>
+                      <span className="sr-only">Open list</span>
+                      <FaAngleDown />
                     </span>
                   </a>
-                  <ul class="cat-sub-menu">
-                    <li>
-                      <a href="extention-01.html">Extentions-01</a>
-                    </li>
-                    <li>
-                      <a href="extention-02.html">Extentions-02</a>
-                    </li>
-                  </ul>
-                </li>
-
+                </li> */}
+                {/* <li>
+                  <a href="#">
+                    <CiLogout style={{ marginRight: "10px", fontSize:'30px', marginTop:'100%' }} /> Settings
+                  </a>
+                </li> */}
+              </ul>
+              <ul className="sidebar-body-menu logout-section">
                 <li>
-                  <a href="##">
-                    <span
-                      class="icon setting icon-dark"
-                      aria-hidden="true"
-                    ></span>
-                    Settings
+                  <a href="#">
+                    <CiLogout
+                      style={{ marginRight: "10px", fontSize: "40px" }}
+                    />{" "}
+                    Logout
                   </a>
                 </li>
               </ul>
@@ -227,12 +225,12 @@ export default function Dashboard() {
             >
               <div className="dashboard-main-grid">
                 <div className="left-column">
-                  <div className="chart-card">
+                  <div style={{ height: "46%" }} className="chart-card">
                     <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
                       Event Statistics
                     </h3>
-                    <div style={{ width: "100%", height: 300 }}>
-                      <ResponsiveContainer width="100%" height="110%">
+                    <div style={{ width: "100%", height: 400 }}>
+                      <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={data}
                           margin={{ top: 10, right: 30, left: 0, bottom: 40 }}
@@ -266,42 +264,44 @@ export default function Dashboard() {
                                 type: "line",
                                 value: (
                                   <span
-                                    className={showDoanhThu ? "" : "inactive"}
+                                    className={eventOganized ? "" : "inactive"}
                                   >
                                     Events Organized
                                   </span>
                                 ),
-                                color: showDoanhThu ? "#00c49f" : "#ccc",
+                                color: eventOganized ? "#00c49f" : "#ccc",
                               },
                               {
                                 id: "eventRegistrations",
                                 type: "line",
                                 value: (
                                   <span
-                                    className={showChiPhi ? "" : "inactive"}
+                                    className={
+                                      eventRegistration ? "" : "inactive"
+                                    }
                                   >
                                     Event Registrations
                                   </span>
                                 ),
-                                color: showChiPhi ? "#ff7300" : "#ccc",
+                                color: eventRegistration ? "#ff7300" : "#ccc",
                               },
                             ]}
                             onClick={(e) => {
                               if (e.id === "eventsOrganized") {
-                                setShowDoanhThu((prev) => !prev);
+                                setEventOganized((prev) => !prev);
                               } else if (e.id === "eventRegistrations") {
-                                setShowChiPhi((prev) => !prev);
+                                setEventRegistration((prev) => !prev);
                               }
                             }}
                           />
 
-                          {showDoanhThu && (
+                          {eventOganized && (
                             <Line
-                              key={`line-eventsOrganized-${showDoanhThu}`}
+                              key={`line-eventsOrganized-${eventOganized}`}
                               type="monotone"
                               dataKey="eventsOrganized"
                               stroke="#00c49f"
-                              strokeWidth={showDoanhThu ? 5 : 0}
+                              strokeWidth={eventOganized ? 5 : 0}
                               dot={{
                                 className: "chart-dot",
                                 r: 6,
@@ -312,13 +312,13 @@ export default function Dashboard() {
                               isAnimationActive={true}
                             />
                           )}
-                          {showChiPhi && (
+                          {eventRegistration && (
                             <Line
-                              key={`line-eventRegistrations-${showChiPhi}`}
+                              key={`line-eventRegistrations-${eventRegistration}`}
                               type="monotone"
                               dataKey="eventRegistrations"
                               stroke="#ff7300"
-                              strokeWidth={showChiPhi ? 5 : 0}
+                              strokeWidth={eventRegistration ? 5 : 0}
                               dot={false}
                               activeDot={{
                                 className: "chart-dot",
@@ -335,64 +335,113 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="card full-width">
-                    <h3 className="card-title">Top Events </h3>
+                    <h3 className="card-title">
+                      Top Events With Many Participants
+                    </h3>
                     <div className="top-product-header">
                       <input className="search-bar" placeholder="Search..." />
                     </div>
                     <table className="product-table">
                       <thead>
                         <tr>
-                          <th>Product</th>
-                          <th>Orders</th>
-                          <th>Price</th>
-                          <th>Ads Spent</th>
-                          <th>Refunds</th>
+                          <th>Name Event</th>
+                          <th>Start Time</th>
+                          <th>End Time</th>
+                          <th>Amount</th>
+                          <th>Total</th>
+                          <th>Creat By</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[
                           {
-                            img: "https://cdn-icons-png.flaticon.com/512/25/25694.png",
-                            name: "Nike v22",
-                            desc: "Running Shoes",
-                            orders: 8000,
-                            price: "$130",
-                            ads: "$9.500",
-                            refund: "> 13",
+                            name: "Event A",
+                            startTime: "2025-04-01 10:00",
+                            endTime: "2025-04-01 12:00",
+                            amount: "$500",
+                            createdBy: "Alice",
+                            totalParticipants: 120,
                           },
                           {
-                            img: "https://cdn-icons-png.flaticon.com/512/2920/2920052.png",
-                            name: "Instax Camera",
-                            desc: "Portable Camera",
-                            orders: 3000,
-                            price: "$45",
-                            ads: "$4.500",
-                            refund: "> 18",
+                            name: "Event B",
+                            startTime: "2025-04-03 14:30",
+                            endTime: "2025-04-03 17:00",
+                            amount: "$750",
+                            createdBy: "Bob",
+                            totalParticipants: 85,
                           },
                           {
-                            img: "https://cdn-icons-png.flaticon.com/512/1532/1532480.png",
-                            name: "Chair",
-                            desc: "Relaxing chair",
-                            orders: 6000,
-                            price: "$80",
-                            ads: "$5.800",
-                            refund: "< 11",
+                            name: "Event C",
+                            startTime: "2025-04-05 09:00",
+                            endTime: "2025-04-05 11:30",
+                            amount: "$300",
+                            createdBy: "Charlie",
+                            totalParticipants: 60,
+                          },
+                          {
+                            name: "Event D",
+                            startTime: "2025-04-07 13:00",
+                            endTime: "2025-04-07 16:00",
+                            amount: "$680",
+                            createdBy: "Diana",
+                            totalParticipants: 95,
+                          },
+                          {
+                            name: "Event E",
+                            startTime: "2025-04-09 08:30",
+                            endTime: "2025-04-09 10:00",
+                            amount: "$420",
+                            createdBy: "Evan",
+                            totalParticipants: 70,
+                          },
+                          {
+                            name: "Event F",
+                            startTime: "2025-04-11 15:00",
+                            endTime: "2025-04-11 17:30",
+                            amount: "$900",
+                            createdBy: "Fiona",
+                            totalParticipants: 140,
+                          },
+                          {
+                            name: "Event G",
+                            startTime: "2025-04-13 10:00",
+                            endTime: "2025-04-13 12:00",
+                            amount: "$350",
+                            createdBy: "George",
+                            totalParticipants: 55,
+                          },
+                          {
+                            name: "Event H",
+                            startTime: "2025-04-15 09:00",
+                            endTime: "2025-04-15 11:00",
+                            amount: "$600",
+                            createdBy: "Hannah",
+                            totalParticipants: 100,
+                          },
+                          {
+                            name: "Event I",
+                            startTime: "2025-04-17 14:00",
+                            endTime: "2025-04-17 16:00",
+                            amount: "$720",
+                            createdBy: "Ivan",
+                            totalParticipants: 110,
+                          },
+                          {
+                            name: "Event J",
+                            startTime: "2025-04-19 08:00",
+                            endTime: "2025-04-19 10:30",
+                            amount: "$480",
+                            createdBy: "Julia",
+                            totalParticipants: 90,
                           },
                         ].map((item, i) => (
                           <tr key={i}>
-                            <td>
-                              <div className="product-cell">
-                                <img src={item.img} alt={item.name} />
-                                <div>
-                                  <div>{item.name}</div>
-                                  <small>{item.desc}</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>{item.orders}</td>
-                            <td>{item.price}</td>
-                            <td>{item.ads}</td>
-                            <td>{item.refund}</td>
+                            <td>{item.name}</td>
+                            <td>{item.startTime}</td>
+                            <td>{item.endTime}</td>
+                            <td>{item.amount}</td>
+                            <td>{item.totalParticipants}</td>
+                            <td>{item.createdBy}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -401,26 +450,28 @@ export default function Dashboard() {
                 </div>
 
                 <div className="right-column">
-                  <div className="chart-card">
+                  <div style={{ height: "50%" }} className="chart-card">
                     <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
                       Categories Events
                     </h3>
-                    <PieChart width={200} height={200}>
+                    <PieChart width={300} height={300}>
                       <Pie
                         data={pieData}
                         dataKey="value"
                         cx="50%"
                         cy="50%"
-                        innerRadius={40}
-                        outerRadius={70}
-                        fill="#8884d8"
-                        paddingAngle={5}
+                        innerRadius={60}
+                        outerRadius={80}
+                        stroke="#fff"
+                        strokeWidth={6}
+                        cornerRadius={10}
                       >
                         {pieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
                     </PieChart>
+
                     <ul
                       style={{
                         listStyle: "none",
@@ -460,73 +511,74 @@ export default function Dashboard() {
                     </ul>
                   </div>
                   <div className="card">
-                    <h3 className="card-title">New Customers</h3>
+                    <h3 className="card-title">New Events</h3>
                     <ul className="user-list">
                       {[
-                        { name: "Roselle Ehrman", country: "Brazil" },
-                        { name: "Jone Smith", country: "Australia" },
-                        { name: "Darron Handler", country: "Pakistan" },
-                        { name: "Leatrice Kulik", country: "Moscow" },
+                        { name: "Roselle Ehrman", status: "Approve" },
+                        { name: "Jone Smith", status: "Waiting" },
+                        { name: "Darron Handler", country: "Reject" },
+                        { name: "Leatrice Kulik", country: "Approve" },
                       ].map((user, i) => (
                         <li key={i} className="user-item">
-                          <img
-                            src={`https://i.pravatar.cc/150?img=${i + 20}`}
-                            alt={user.name}
-                            className="avatar"
-                          />
                           <div className="user-info">
                             <div>{user.name}</div>
-                            <small>{user.country}</small>
+                            <small>{user.status}</small>
                           </div>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="card">
-                    <h3 className="card-title">Buyers Profile</h3>
-                    <PieChart width={180} height={180}>
-                      <Pie
-                        data={[
-                          { name: "Male", value: 50, color: "#ff9f43" },
-                          { name: "Female", value: 35, color: "#00cfe8" },
-                          { name: "Others", value: 15, color: "#ea5455" },
-                        ]}
-                        dataKey="value"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={70}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                    <ul className="legend-list">
-                      <li>
-                        <span
-                          className="legend-dot"
-                          style={{ backgroundColor: "#ff9f43" }}
-                        ></span>{" "}
-                        Male - 50%
-                      </li>
-                      <li>
-                        <span
-                          className="legend-dot"
-                          style={{ backgroundColor: "#00cfe8" }}
-                        ></span>{" "}
-                        Female - 35%
-                      </li>
-                      <li>
-                        <span
-                          className="legend-dot"
-                          style={{ backgroundColor: "#ea5455" }}
-                        ></span>{" "}
-                        Others - 15%
-                      </li>
-                    </ul>
+                  <div className="card buyers-profile">
+                    <h3 className="card-title">Profile</h3>
+                    <div className="buyers-content">
+                      <PieChart width={240} height={240}>
+                        {" "}
+                        <Pie
+                          data={[
+                            { name: "Male", value: 50, color: "#ff9f43" },
+                            { name: "Female", value: 35, color: "#00cfe8" },
+                            { name: "Others", value: 15, color: "#ea5455" },
+                          ]}
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={85}
+                          paddingAngle={5}
+                        >
+                          <Cell fill="#ff9f43" />
+                          <Cell fill="#00cfe8" />
+                          <Cell fill="#ea5455" />
+                        </Pie>
+                      </PieChart>
+
+                      <ul className="buyers-legend">
+                        <li>
+                          <span
+                            className="dot"
+                            style={{ backgroundColor: "#ff9f43" }}
+                          ></span>
+                          <span className="label">Male</span>
+                          <span className="percent">50%</span>
+                        </li>
+                        <li>
+                          <span
+                            className="dot"
+                            style={{ backgroundColor: "#00cfe8" }}
+                          ></span>
+                          <span className="label">Female</span>
+                          <span className="percent">35%</span>
+                        </li>
+                        <li>
+                          <span
+                            className="dot"
+                            style={{ backgroundColor: "#ea5455" }}
+                          ></span>
+                          <span className="label">Others</span>
+                          <span className="percent">15%</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>

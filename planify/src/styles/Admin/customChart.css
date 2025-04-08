@@ -5,6 +5,24 @@
   margin-top: 32px;
 }
 
+.icon-dark {
+  color: #000 !important; /* Màu đen */
+  fill: #000 !important;  /* Nếu SVG cần fill */
+}
+
+.sidebar-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+
+.sidebar-body-menu.logout-section {
+  margin-top: 350%;
+}
+
+
 .left-column {
   display: flex;
   flex-direction: column;
@@ -147,4 +165,110 @@
 }
 .chart-dot:hover {
   opacity: 0.8;
+}
+
+.buyers-profile {
+  padding: 24px;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.buyers-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.buyers-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  width: 100%;
+}
+
+.buyers-legend li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.buyers-legend .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.buyers-legend .label {
+  flex: 1;
+  color: #6c757d;
+}
+
+.buyers-legend .percent {
+  font-weight: 500;
+  color: #111;
+}
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.product-table thead {
+  background-color: #ff8d03; /* Cam */
+  color: #fff;
+}
+
+.product-table th,
+.product-table td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.product-table th {
+  background-color: #ff8d03; /* Cam */
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #fff;
+}
+
+.product-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.product-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.product-table td {
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.product-table td:last-child {
+  white-space: nowrap;
+}
+
+.product-table tbody tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.3s ease;
+}
+.search-bar {
+  width: 300px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
 }

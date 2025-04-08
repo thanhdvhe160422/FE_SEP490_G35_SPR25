@@ -42,9 +42,9 @@ function EventSection() {
       try {
         const campusData = await getCampuses();
         setCampus(campusData);
-        console.log("📌 Danh sách campus:", campusData);
+        console.log("Danh sách campus:", campusData);
       } catch (error) {
-        console.error("❌ Lỗi khi lấy danh sách campus:", error);
+        console.error("Lỗi khi lấy danh sách campus:", error);
         setCampus([]);
       }
     };
@@ -135,7 +135,7 @@ function EventSection() {
         );
         const currentCampus = (event) => {
           if (!Array.isArray(campuses)) {
-            console.error("❌ Lỗi: campuses không phải là mảng", campuses);
+            console.error("Lỗi: campuses không phải là mảng", campuses);
             return "Unknown";
           }
           const campus = campuses.find((cat) => cat.id === event.campusId);
@@ -147,7 +147,7 @@ function EventSection() {
         setEvents(campusEvents);
         setTotalPages(allData.totalPages);
       } catch (error) {
-        console.error("❌ Lỗi khi lấy sự kiện:", error);
+        console.error("Lỗi khi lấy sự kiện:", error);
         setEvents([]);
         setTotalPages(1);
       }
@@ -158,7 +158,7 @@ function EventSection() {
         const categoryData = await getCategories();
         setCategories(categoryData);
       } catch (error) {
-        console.error("❌ Lỗi khi lấy danh mục:", error);
+        console.error("Lỗi khi lấy danh mục:", error);
       }
     };
     fetchData();
@@ -284,7 +284,7 @@ function EventSection() {
 
   return (
     <section className="post_section news_post_2">
-      <div className="container">
+      <div className="container-home">
         <div className="post_section_inner">
           <div className="sidebar">
             <div className="filter_section">
@@ -598,10 +598,10 @@ function EventSection() {
                     <div className="empty-state-container">
                       <div className="text-center">
                         <h3 style={{ color: "#555", fontWeight: "500" }}>
-                          Không tìm thấy sự kiện nào
+                        No events found
                         </h3>
                         <p style={{ color: "#777" }}>
-                          Vui lòng thử lại với các tiêu chí tìm kiếm khác
+                        Please try again with other search criteria!
                         </p>
                       </div>
                     </div>
@@ -633,10 +633,10 @@ function EventSection() {
                         >
                           <div className="text-center">
                             <h3 style={{ color: "#555", fontWeight: "500" }}>
-                              Bạn chưa có sự kiện nào
+                            You don't have any events yet
                             </h3>
                             <p style={{ color: "#777" }}>
-                              Các sự kiện bạn tạo sẽ hiển thị ở đây
+                            The events you create will show up here
                             </p>
                           </div>
                         </div>

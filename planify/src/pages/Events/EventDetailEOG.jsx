@@ -312,7 +312,8 @@ const EventDetailEOG = () => {
     );
   };
 
-  if (isLoading || !event) {
+  if (isLoading||!event) {
+
     return <Loading />;
   }
 

@@ -2094,7 +2094,10 @@ label {
 
 .sidebar-body-menu a > .icon {
   margin-right: 10px;
+  color: #000000;
 }
+
+
 
 .sidebar-user {
   border-radius: 10px;
@@ -2182,7 +2185,7 @@ label {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  color: #fff;
+  color: #000000;
 }
 
 .logo-title {
@@ -3961,8 +3964,6 @@ label {
   .sidebar.hidden .category__btn {
     display: none;
   }
-
-  
 
   .sidebar.hidden .sidebar-body-menu a {
     -webkit-box-pack: center;

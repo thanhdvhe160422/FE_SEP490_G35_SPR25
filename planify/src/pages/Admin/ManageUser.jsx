@@ -9,12 +9,12 @@ import {
   unbanUser,
   updateCampusManager,
 } from "../../services/userService";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
 import { useSnackbar } from "notistack";
 import { Modal, Button, Table } from "antd";
 import "../../styles/Author/CreateEOG.css";
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons"; // Thêm icon cho Ban/Unban
+import { CiLogout } from "react-icons/ci";
+import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
 
 export default function ManageUser() {
   const [campuses, setCampuses] = useState([]);
@@ -215,42 +215,108 @@ export default function ManageUser() {
 
   return (
     <>
-      {/* <Header /> */}
+      <div class="page-flex">
+        <aside class="sidebar">
+          <div class="sidebar-start">
+            <div class="sidebar-head">
+              <a href="/" class="logo-wrapper" title="Home">
+                <span class="sr-only">Home</span>
+                <span class="icon logo" aria-hidden="true"></span>
+                <div class="logo-text">
+                  <span class="logo-title">Planify</span>
+                  <span class="logo-subtitle">Dashboard</span>
+                </div>
+              </a>
+            </div>
+            <div class="sidebar-body">
+              <ul className="sidebar-body-menu">
+                <li>
+                  <a className="active" href="/dashboard">
+                    <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a className="show-cat-btn" href="/manage-user">
+                    <FaUsers
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />{" "}
+                    Users
+                  </a>
+                </li>
+                <li>
+                  <a href="management-campus-manager">
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    Management Campus
+                  </a>
+                </li>
+                {/* <li>
+                        <a className="show-cat-btn" href="#">
+                          <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
+                          <span
+                            className="category__btn transparent-btn"
+                            title="Open list"
+                          >
+                            <span className="sr-only">Open list</span>
+                            <FaAngleDown />
+                          </span>
+                        </a>
+                      </li> */}
+                {/* <li>
+                        <a href="#">
+                          <CiLogout style={{ marginRight: "10px", fontSize:'30px', marginTop:'100%' }} /> Settings
+                        </a>
+                      </li> */}
+              </ul>
+              <ul className="sidebar-body-menu logout-section">
+                <li>
+                  <a href="#">
+                    <CiLogout
+                      style={{ marginRight: "10px", fontSize: "40px" }}
+                    />{" "}
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
 
-      <div className="create-organizer-container">
-        <div className="eog-table-container">
-          <h2>List Users ({pagination.totalCount})</h2>
-          <Table
-            columns={columns}
-            dataSource={campusManagers}
-            rowKey="id"
-            pagination={{
-              current: pagination.currentPage,
-              pageSize: pagination.pageSize,
-              total: pagination.totalCount,
-              totalPages: pagination.totalPages,
-              onChange: (page, pageSize) =>
-                handleTableChange({ current: page, pageSize }),
-            }}
-          />
+        <div className="create-organizer-container">
+          <div className="eog-table-container">
+            <h2>List Users ({pagination.totalCount})</h2>
+            <Table
+              columns={columns}
+              dataSource={campusManagers}
+              rowKey="id"
+              pagination={{
+                current: pagination.currentPage,
+                pageSize: pagination.pageSize,
+                total: pagination.totalCount,
+                totalPages: pagination.totalPages,
+                onChange: (page, pageSize) =>
+                  handleTableChange({ current: page, pageSize }),
+              }}
+            />
+          </div>
+
+          <Modal
+            title={selectedEOG?.status === 1 ? "Confirm Ban" : "Confirm Unban"}
+            visible={isDeleteModalVisible}
+            onOk={selectedEOG?.status === 1 ? confirmBan : confirmUnban}
+            onCancel={() => setIsDeleteModalVisible(false)}
+            okText={selectedEOG?.status === 1 ? "Ban" : "Unban"}
+            cancelText="Cancel"
+            okButtonProps={{ danger: selectedEOG?.status === 1 }}
+          >
+            <p>
+              Are you sure you want to{" "}
+              {selectedEOG?.status === 1 ? "ban" : "unban"} {selectedEOG?.email}
+              ?
+            </p>
+          </Modal>
         </div>
-
-        <Modal
-          title={selectedEOG?.status === 1 ? "Confirm Ban" : "Confirm Unban"}
-          visible={isDeleteModalVisible}
-          onOk={selectedEOG?.status === 1 ? confirmBan : confirmUnban}
-          onCancel={() => setIsDeleteModalVisible(false)}
-          okText={selectedEOG?.status === 1 ? "Ban" : "Unban"}
-          cancelText="Cancel"
-          okButtonProps={{ danger: selectedEOG?.status === 1 }}
-        >
-          <p>
-            Are you sure you want to{" "}
-            {selectedEOG?.status === 1 ? "ban" : "unban"} {selectedEOG?.email}?
-          </p>
-        </Modal>
       </div>
-      {/* <Footer /> */}
     </>
   );
 }
