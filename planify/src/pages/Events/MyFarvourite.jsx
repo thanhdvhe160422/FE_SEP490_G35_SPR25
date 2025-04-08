@@ -140,9 +140,9 @@ export default function MyFarvourite() {
                             <Card.Img
                               variant="top"
                               src={
-                                event.eventMedia &&
-                                event.eventMedia.length > 0 &&
-                                event.eventMedia[0]
+                                event.eventMedias &&
+                                event.eventMedias.length > 0 &&
+                                event.eventMedias[0]
                                   ? fixDriveUrl(
                                       event.eventMedias[0].mediaDTO.mediaUrl
                                     )
