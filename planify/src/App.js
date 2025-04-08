@@ -23,7 +23,8 @@ import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
 import UpdateTask from "./pages/Tasks/UpdateTask";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
-import EventPlan from "./pages/Events/EventPlan"; // Thêm import cho EventPlan
+import EventPlan from "./pages/Events/EventPlan"; 
+import Dashboard from "./pages/Admin/Dashboard"; 
 import MyFarvourite from "./pages/Events/MyFarvourite";
 import EventRegistered from "./pages/Events/EventRegistered";
 import HistoryEvent from "./pages/Events/HistoryEvent";
@@ -31,7 +32,7 @@ import MyEvent from "./pages/Events/MyEvent";
 import MyRequest from "./pages/Events/MyRequest";
 import MyDraft from "./pages/Events/MyDraft";
 import ManageCampusManager from "./pages/Admin/ManageCampusManager";
-import {ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -92,6 +93,15 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Spectator"]}>
               <HomeSpectator />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allowedRoles={["Admin"]}>
+              <Dashboard />
             </PrivateRoute>
           }
         />
@@ -292,15 +302,15 @@ function App() {
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
-        <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            closeOnClick
-            pauseOnHover
-            draggable
-            theme="light"
-        />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </div>
   );
 }
