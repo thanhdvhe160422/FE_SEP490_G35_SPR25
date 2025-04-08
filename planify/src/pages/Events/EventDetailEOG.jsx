@@ -310,7 +310,7 @@ const EventDetailEOG = () => {
     );
   };
 
-  if (isLoading) {
+  if (isLoading||!event) {
     return <Loading />;
   }
 
@@ -645,7 +645,7 @@ const EventDetailEOG = () => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };
