@@ -98,7 +98,6 @@ function ManageRequest() {
   if(isLoading){
     return <Loading/>;
   }
-
   const pendingRequests = requests.filter((req) => req.status === 1);
   const approvedRequests = requests.filter((req) => req.status === 2);
   const rejectedRequests = requests.filter((req) => req.status === -1);
@@ -184,7 +183,6 @@ function ManageRequest() {
   );
 }
 
-// Component RequestColumn không thay đổi
 function RequestColumn({ title, requests, children }) {
   const navigate = useNavigate();
   return (

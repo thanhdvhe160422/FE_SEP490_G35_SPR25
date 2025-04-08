@@ -63,6 +63,11 @@ export default function ManageCampusManager() {
       );
       console.log("Fetched Campus Manager: ", response.items);
       setCampusManagers(response.items);
+      setPagination({
+        ...pagination,
+        totalCount: response.totalCount,
+        totalPages: response.totalPages,
+      });
     } catch (error) {
       console.error("Error fetching Campus Manager:", error);
     }

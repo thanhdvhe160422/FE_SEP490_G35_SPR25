@@ -40,14 +40,14 @@ export default function Login() {
       console.log(decoded.picture);
 
       const res = await axios.post(
-          "https://localhost:44320/api/Auth/google-login",
-          { CampusName: campus, GoogleToken: credential }
+        "https://localhost:44320/api/Auth/google-login",
+        { CampusName: campus, GoogleToken: credential }
       );
       console.log("API Response:", res.data);
 
       axios.defaults.headers.common[
-          "Authorization"
-          ] = `Bearer ${res.data.result.accessToken}`;
+        "Authorization"
+      ] = `Bearer ${res.data.result.accessToken}`;
 
       // Lưu thông tin vào localStorage
       localStorage.setItem("fullName", res.data.result.fullName);
@@ -69,12 +69,8 @@ export default function Login() {
         theme: "light",
       });
 
-      // Delay 1 giây trước khi chuyển hướng
       setTimeout(() => {
         switch (res.data.result.role) {
-          case "Admin":
-            navigate(`/admin?campus=${campus}`);
-            break;
           case "Campus Manager":
             navigate(`/home`);
             break;
@@ -105,37 +101,37 @@ export default function Login() {
   };
 
   return (
-      <div
-          className="login-container"
-          style={{
-            background: `url(${backgroundImage}) no-repeat center center/cover`,
-          }}
-      >
-        <h1 className="university-title">FPT University</h1>
-        <div className="login-box">
-          <p className="login-title">
-            Students, Lecturers, University Staff of FPT
-          </p>
+    <div
+      className="login-container"
+      style={{
+        background: `url(${backgroundImage}) no-repeat center center/cover`,
+      }}
+    >
+      <h1 className="university-title">FPT University</h1>
+      <div className="login-box">
+        <p className="login-title">
+          Students, Lecturers, University Staff of FPT
+        </p>
 
-          {loading ? (
-              "Loading..."
-          ) : (
-              <select
-                  className="campus-select"
-                  value={campus}
-                  onChange={(e) => setCampus(e.target.value)}
-              >
-                <option value="">Select Campus</option>
-                {campusList.map((item) => (
-                    <option key={item.id} value={item.value}>
-                      {item.campusName}
-                    </option>
-                ))}
-              </select>
-          )}
+        {loading ? (
+          "Loading..."
+        ) : (
+          <select
+            className="campus-select"
+            value={campus}
+            onChange={(e) => setCampus(e.target.value)}
+          >
+            <option value="">Select Campus</option>
+            {campusList.map((item) => (
+              <option key={item.id} value={item.value}>
+                {item.campusName}
+              </option>
+            ))}
+          </select>
+        )}
 
-          <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
-        </div>
+        <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
       </div>
+    </div>
   );
 }
