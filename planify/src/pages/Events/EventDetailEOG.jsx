@@ -124,6 +124,7 @@ const EventDetailEOG = () => {
   };
 
   useEffect(() => {
+    console.log("abc");
     const fetchEventData = async () => {
       const token = localStorage.getItem("token");
       console.log(token);
@@ -176,6 +177,7 @@ const EventDetailEOG = () => {
         const data = await response.json();
         console.log("Fetched Event Data:", data);
         data.result.groups = [];
+        //console.log(JSON.stringify(data.result, null, 2));
         setEvent(data.result);
 
         if (data.result.eventMedia && data.result.eventMedia.length > 0) {
@@ -311,6 +313,7 @@ const EventDetailEOG = () => {
   };
 
   if (isLoading||!event) {
+
     return <Loading />;
   }
 
