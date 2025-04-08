@@ -281,12 +281,12 @@ export const searchEvents = async (params) => {
     return null;
   }
 };
-export const deleteMedia = async (data) => {
+export const updateMedia = async (data) => {
   let token = localStorage.getItem("token");
 
   try {
     const response = await axios.put(
-      `https://localhost:44320/api/Events/delete-event-media`,
+      `https://localhost:44320/api/Events/update-event-media`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
