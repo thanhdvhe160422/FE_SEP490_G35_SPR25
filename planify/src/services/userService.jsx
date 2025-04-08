@@ -74,7 +74,7 @@ export const createEventOrganizer = async (data) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -114,7 +114,7 @@ export const getListEOG = async (page, pageSize) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -154,7 +154,7 @@ export const updateEventOrganizer = async (userId) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -194,7 +194,7 @@ export const getUserJoinEvent = async (eventId) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -276,7 +276,7 @@ export const updateCampusManager = async (userId) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -318,7 +318,173 @@ export const createCampusManager = async (data) => {
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        // localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+
+//List Users (ADMIN)
+export const getListUser = async (page, pageSize) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Users/get-list-user?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Users/get-list-user?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        // localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const banUser = async (userId) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
+      { newStatus: 0 },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
+            { newStatus: 0 },
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        // localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const unbanUser = async (userId, status) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.put(
+      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
+      { newStatus: 1 },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
+            { newStatus: 1 },
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        // localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const searchUser = async (page, pageSize, input) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Users/get-list-user?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Users/get-list-user?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        // localStorage.removeItem("token");
         return { error: "expired" };
       }
     }

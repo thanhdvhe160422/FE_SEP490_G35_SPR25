@@ -31,7 +31,8 @@ import MyEvent from "./pages/Events/MyEvent";
 import MyRequest from "./pages/Events/MyRequest";
 import MyDraft from "./pages/Events/MyDraft";
 import ManageCampusManager from "./pages/Admin/ManageCampusManager";
-import {ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import ManageUser from "./pages/Admin/ManageUser";
 
 function App() {
   return (
@@ -236,6 +237,14 @@ function App() {
           }
         />
         <Route
+          path="/manage-user"
+          element={
+            <PrivateRoute allowedRoles={["Event Organizer"]}>
+              <ManageUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/manage-campus-manager"
           element={
             <PrivateRoute allowedRoles={["Admin", "Campus Manager"]}>
@@ -287,20 +296,20 @@ function App() {
             </PrivateRoute>
           }
         />
-
+        {/* <Route path="/manage-user" element={<ManageUser />}></Route> */}
         <Route path="*" element={<Navigate to="/login" replace />} />
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
-        <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            closeOnClick
-            pauseOnHover
-            draggable
-            theme="light"
-        />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </div>
   );
 }

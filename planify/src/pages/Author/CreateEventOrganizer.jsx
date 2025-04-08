@@ -63,6 +63,11 @@ export default function CreateEventOrganizer() {
       );
       console.log("Fetched Event Organizers: ", response.items);
       setEventOrganizers(response.items);
+      setPagination({
+        ...pagination,
+        totalCount: response.totalCount,
+        totalPages: response.totalPages,
+      });
     } catch (error) {
       console.error("Error fetching Event Organizers:", error);
     }

@@ -169,7 +169,6 @@ function ManageRequest() {
   );
 }
 
-// Component RequestColumn không thay đổi
 function RequestColumn({ title, requests, children }) {
   const navigate = useNavigate();
   return (
