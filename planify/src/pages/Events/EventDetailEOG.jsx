@@ -31,6 +31,12 @@ import ListMember from "../../components/ListMember";
 import ListRisk from "../../components/ListRisk";
 import ListCost from "../../components/ListCost";
 import ListParticipant from "../../components/ListParticipant";
+import {
+  approveRequest,
+  getRequest,
+  rejectRequest,
+} from "../../services/EventRequestService";
+import Loading from "../../components/Loading";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -39,7 +45,83 @@ const EventDetailEOG = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { eventId } = useParams();
+  const [showPopupReject, setShowPopupReject] = useState(false);
+  const [showPopupApprove, setShowPopupApprove] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [openActivityIds, setOpenActivityIds] = useState([]);
+  const role = localStorage.getItem("role");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [approveReason, setApproveReason] = useState("");
+  const [requests, setRequests] = useState([]);
+  const fetchRequests = async () => {
+    try {
+      const data = await getRequest();
+      console.log("Fetched Requests: ", data);
+      setRequests(data.result);
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+      Swal.fire("Error", "Unable to fetch requests.", "error");
+    }
+  };
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+  const handleApprove = (request) => {
+    setSelectedRequest(request);
+    setShowPopupApprove(true);
+  };
+
+  const handleReject = (request) => {
+    setSelectedRequest(request);
+    setShowPopupReject(true);
+  };
+  const submitReject = async () => {
+    if (!rejectReason.trim()) {
+      Swal.fire("Error", "Please enter a reason for rejection.", "error");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await rejectRequest(selectedRequest.id, rejectReason);
+      setIsLoading(false);
+      setShowPopupReject(false);
+      setRejectReason("");
+      Swal.fire("Success", "Request rejected successfully", "success");
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      Swal.fire("Error", "Unable to reject request.", "error");
+    }
+  };
+
+  const submitApprove = async () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setIsLoading(true);
+    try {
+      console.log("Approving request ID:", selectedRequest.id);
+      await approveRequest(selectedRequest.id, approveReason);
+      setIsLoading(false);
+
+      setShowPopupApprove(false);
+      setApproveReason("");
+
+      Swal.fire({
+        title: "Success",
+        text: "Request approved successfully",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error approving request:", error);
+      Swal.fire("Error", "Unable to approve request.", "error");
+    } finally {
+      setIsSubmitting(false); // reset lại cho lần sau
+    }
+  };
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -228,8 +310,8 @@ const EventDetailEOG = () => {
     );
   };
 
-  if (!event) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <Loading />;
   }
 
   const eventStatus = getEventStatus(event.startTime, event.endTime);
@@ -499,6 +581,68 @@ const EventDetailEOG = () => {
                 </button>
               </>
             )}
+          {event && role === "Campus Manager" && event.status === 1 && (
+            <>
+              <button
+                className="btn approve"
+                onClick={() => handleApprove(requests.id)}
+              >
+                Approve
+              </button>
+              <button
+                className="btn reject"
+                onClick={() => handleReject(requests.id)}
+              >
+                Reject
+              </button>
+              {showPopupReject && (
+                <div className="popup">
+                  <div className="popup-content">
+                    <h3>Reject Request</h3>
+                    <textarea
+                      placeholder="Enter rejection reason..."
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                    />
+                    <button
+                      className="btn cancel"
+                      onClick={() => setShowPopupReject(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button className="btn submit" onClick={submitReject}>
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              )}
+              {showPopupApprove && (
+                <div className="popup">
+                  <div className="popup-content">
+                    <h3 style={{ color: "green" }}>Approve Request</h3>
+                    <textarea
+                      placeholder="Enter reason..."
+                      value={approveReason}
+                      onChange={(e) => setApproveReason(e.target.value)}
+                    />
+                    <button
+                      className="btn cancel"
+                      onClick={() => setShowPopupApprove(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      style={{ backgroundColor: "green" }}
+                      className="btn submit"
+                      onClick={submitApprove}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
       <Footer />
