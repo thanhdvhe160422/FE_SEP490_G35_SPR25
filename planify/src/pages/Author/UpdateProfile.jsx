@@ -111,6 +111,8 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     if (!selectedDistrict) return;
+    console.log("district " + selectedDistrict);
+    console.log("ward " + selectedWard);
     fetchWards();
   }, [selectedDistrict]);
 
