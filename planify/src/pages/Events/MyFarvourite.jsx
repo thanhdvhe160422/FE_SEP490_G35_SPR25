@@ -148,9 +148,7 @@ export default function MyFarvourite() {
                                 event.eventMedia &&
                                 event.eventMedia.length > 0 &&
                                 event.eventMedia[0]
-                                  ? fixDriveUrl(
-                                      event.eventMedia[0].mediaUrl
-                                    )
+                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"
