@@ -35,6 +35,7 @@ import {
   approveRequest,
   getRequest,
   rejectRequest,
+  sendRequest,
 } from "../../services/EventRequestService";
 import Loading from "../../components/Loading";
 
@@ -55,6 +56,7 @@ const EventDetailEOG = () => {
   const [rejectReason, setRejectReason] = useState("");
   const [approveReason, setApproveReason] = useState("");
   const [requests, setRequests] = useState([]);
+  const [status, setStatus] = useState();
   const fetchRequests = async () => {
     try {
       const data = await getRequest();
@@ -84,7 +86,7 @@ const EventDetailEOG = () => {
     }
     setIsLoading(true);
     try {
-      await rejectRequest(selectedRequest.id, rejectReason);
+      await rejectRequest(event.requestId, rejectReason);
       setIsLoading(false);
       setShowPopupReject(false);
       setRejectReason("");
@@ -97,14 +99,11 @@ const EventDetailEOG = () => {
 
   const submitApprove = async () => {
     if (isSubmitting) return;
-
     setIsSubmitting(true);
     setIsLoading(true);
     try {
-      console.log("Approving request ID:", selectedRequest.id);
-      await approveRequest(selectedRequest.id, approveReason);
+      await approveRequest(event.requestId, approveReason);
       setIsLoading(false);
-
       setShowPopupApprove(false);
       setApproveReason("");
 
@@ -122,83 +121,77 @@ const EventDetailEOG = () => {
       setIsSubmitting(false);
     }
   };
+  const fetchEventData = async () => {
+    const token = localStorage.getItem("token");
+    console.log(token);
+    try {
+      let response = await fetch(
+        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === -2) {
+        navigate("/home");
+        return;
+      }
+      if (response.status === 401) {
+        const newToken = await refreshAccessToken();
 
-  useEffect(() => {
-    console.log("abc");
-    const fetchEventData = async () => {
-      const token = localStorage.getItem("token");
-      console.log(token);
-      try {
-        let response = await fetch(
-          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
+        if (newToken) {
+          response = await fetch(
+            `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${newToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch event data after token refresh`);
           }
-        );
-        if (response.status === -2) {
-          navigate("/home");
+        } else {
+          enqueueSnackbar("Your session has expired, please log in again.", {
+            variant: "error",
+          });
+          navigate("/login");
           return;
         }
-        if (response.status === 401) {
-          const newToken = await refreshAccessToken();
-
-          if (newToken) {
-            response = await fetch(
-              `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
-              {
-                method: "GET",
-                headers: {
-                  Authorization: `Bearer ${newToken}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error(`Failed to fetch event data after token refresh`);
-            }
-          } else {
-            enqueueSnackbar("Your session has expired, please log in again.", {
-              variant: "error",
-            });
-            navigate("/login");
-            return;
-          }
-        }
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch event data");
-        }
-
-        const data = await response.json();
-        console.log("Fetched Event Data:", data);
-        data.result.groups = [];
-        //console.log(JSON.stringify(data.result, null, 2));
-        setEvent(data.result);
-
-        if (data.result.eventMedia && data.result.eventMedia.length > 0) {
-          const imageUrls = data.result.eventMedia.map(
-            (media) => media.mediaUrl
-          );
-          setImages(imageUrls);
-        }
-      } catch (error) {
-        console.error("Error fetching event data:", error);
-        enqueueSnackbar(
-          `Lỗi khi lấy dữ liệu sự kiện: ${
-            error.message || "Lỗi không xác định"
-          }`,
-          { variant: "error" }
-        );
       }
-    };
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch event data");
+      }
+
+      const data = await response.json();
+      console.log("Fetched Event Data:", data);
+      data.result.groups = [];
+      setEvent(data.result);
+      setStatus(data.result.status);
+      if (data.result.eventMedia && data.result.eventMedia.length > 0) {
+        const imageUrls = data.result.eventMedia.map((media) => media.mediaUrl);
+        setImages(imageUrls);
+      }
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+      enqueueSnackbar(
+        `Lỗi khi lấy dữ liệu sự kiện: ${error.message || "Lỗi không xác định"}`,
+        { variant: "error" }
+      );
+    }
+  };
+  useEffect(() => {
+    console.log("abc");
 
     fetchEventData();
-  }, [eventId]);
+  }, [eventId, status]);
   const handleDeleteEvent = async () => {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
@@ -315,6 +308,15 @@ const EventDetailEOG = () => {
   if (isLoading || !event) {
     return <Loading />;
   }
+  const handleSendRequest = async (eventId) => {
+    try {
+      const response = await sendRequest(eventId);
+      console.log("Send request response:", response);
+      fetchEventData();
+    } catch (error) {
+      console.error("Error sending request:", error);
+    }
+  };
 
   const eventStatus = getEventStatus(event.startTime, event.endTime);
   const fixDriveUrl = (url) => {
@@ -580,6 +582,19 @@ const EventDetailEOG = () => {
                   }}
                 >
                   Update event
+                </button>
+                <button
+                  className="update-event-btn"
+                  onClick={() => handleSendRequest(event.id)}
+                  style={{
+                    opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
+                    cursor:
+                      event.status === 1 || event.status === 2
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
+                  Send Request
                 </button>
               </>
             )}

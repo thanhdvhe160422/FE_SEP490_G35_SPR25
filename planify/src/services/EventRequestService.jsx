@@ -196,3 +196,48 @@ export const getMyRequest = async (userId) => {
     return null;
   }
 };
+export const sendRequest = async (eventId) => {
+  let token = localStorage.getItem("token");
+  try {
+    const response = await axios.post(
+      `https://localhost:44320/api/SendRequest`,
+      { eventId },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.put(
+            `https://localhost:44320/api/SendRequest`,
+            { eventId },
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          Swal.fire(
+            "Error",
+            "Unable to submit approve after token refresh.",
+            "error"
+          );
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+    Swal.fire("Error", "Unable to submit approve.", "error");
+    return null;
+  }
+};

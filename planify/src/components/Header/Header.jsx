@@ -145,14 +145,13 @@ export default function Header() {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
-    
   };
 
   const navItemsByRole = {
     "campus manager": [
       { label: "Home", path: "/home" },
       { label: "Manage Event Organizer", path: "/manage-eog" },
-      // { label: "Create Event", path: "/create-event" },
+      { label: "Manage Category", path: "/category-event" },
       { label: "Manage Requests", path: "/manage-request" },
       { label: "Favorite Events", path: "/my-favorite-events" },
     ],

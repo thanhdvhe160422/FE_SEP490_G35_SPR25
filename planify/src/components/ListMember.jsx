@@ -169,7 +169,7 @@ const ListMember = ({ eventId, data }) => {
         }
         message.error("Không thể thực hiện tìm kiếm");
       } else {
-        const filteredResults = results.filter(
+        const filteredResults = results.items.filter(
           (user) => !participants.some((p) => p.userId === user.id)
         );
         setSearchResults(filteredResults || []);
