@@ -2,21 +2,22 @@ import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 import Swal from "sweetalert2";
 
-let API_URL = "";
-const role = localStorage.getItem("role");
-if (role === "Spectator") {
-  API_URL = "https://localhost:44320/api/EventForSpectators";
-} else {
-  API_URL = "https://localhost:44320/api/Events/List";
-}
 
-const getPosts = async (page, pageSize) => {
+
+
+const getPosts = async (page, pageSize, role) => {
+  let API_URL = "";
+  if (role === "Spectator") {
+    API_URL = "https://localhost:44320/api/EventForSpectators";
+  } else {
+    API_URL = "https://localhost:44320/api/Events/List";
+  }
   try {
     let hasMore = true;
     while (hasMore) {
       try {
         const token = localStorage.getItem("token");
-
+        //console.log("sang"+role);
         const response = await axios.get(
           `${API_URL}?page=${page}&pageSize=${pageSize}`,
           {

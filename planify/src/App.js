@@ -97,8 +97,8 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        {/* <Route
+{/* 
+        <Route
           path="/dashboard"
           element={
             <PrivateRoute allowedRoles={["Admin"]}>
