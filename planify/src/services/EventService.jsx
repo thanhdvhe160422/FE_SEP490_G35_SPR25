@@ -2,21 +2,19 @@ import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 import Swal from "sweetalert2";
 
-let API_URL = "";
-const role = localStorage.getItem("role");
-if (role === "Spectator") {
-  API_URL = "https://localhost:44320/api/EventForSpectators";
-} else {
-  API_URL = "https://localhost:44320/api/Events/List";
-}
-
-const getPosts = async (page, pageSize) => {
+const getPosts = async (page, pageSize, role) => {
+  let API_URL = "";
+  if (role === "Spectator") {
+    API_URL = "https://localhost:44320/api/EventForSpectators";
+  } else {
+    API_URL = "https://localhost:44320/api/Events/List";
+  }
   try {
     let hasMore = true;
     while (hasMore) {
       try {
         const token = localStorage.getItem("token");
-
+        //console.log("sang"+role);
         const response = await axios.get(
           `${API_URL}?page=${page}&pageSize=${pageSize}`,
           {
@@ -162,7 +160,7 @@ export const getEventEOGById = async (id) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get event by id after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
@@ -174,7 +172,7 @@ export const getEventEOGById = async (id) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    Swal.fire("Error", "Unable to get event by id.", "error");
     return null;
   }
 };
@@ -313,7 +311,7 @@ export const updateMedia = async (data) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to update media after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
@@ -539,7 +537,7 @@ export const getNotification = async () => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get notification after token refresh.",
             "error"
           );
           return { error: "unauthorized" };

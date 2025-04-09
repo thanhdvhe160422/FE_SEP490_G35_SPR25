@@ -18,16 +18,19 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const thanh = localStorage.getItem("userId");
-        setimage(localStorage.getItem("avatar"));
+        const userId = localStorage.getItem("userId");
         const userRes = await fetch(
-          "https://localhost:44320/api/Profiles/" + thanh
+          "https://localhost:44320/api/Profiles/" + userId
         );
         const userData = await userRes.json();
 
         setUser(userData);
-        console.log(userData);
-        setimage(userData.avatar.mediaUrl||"");
+        console.log("userData" + JSON.stringify(userData, null, 2));
+        if (userData.avatar) {
+          setimage(userData.avatar.mediaUrl || "");
+        } else {
+          setimage(localStorage.getItem("avatar"));
+        }
         setAddress(userData.addressVM.addressDetail || "");
         setProvinces(
           userData.addressVM.wardVM.districtVM.provinceVM.provinceName
@@ -70,17 +73,21 @@ const Profile = () => {
   };
 
   function convertToDirectLink(googleDriveUrl) {
-    
-    if (!googleDriveUrl.includes("drive.google.com/uc?id=")) return googleDriveUrl;
+    if (!googleDriveUrl.includes("drive.google.com/uc?id="))
+      return googleDriveUrl;
     const fileId = googleDriveUrl.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-}
+  }
   return (
     <>
       <Header />
       <div style={{ paddingTop: "100px" }} className="profile-container">
         <div className="profile-card">
-          <img src={convertToDirectLink(image)} alt="Avatar" className="profile-avatar" />
+          <img
+            src={convertToDirectLink(image)}
+            alt="Avatar"
+            className="profile-avatar"
+          />
           <h2>
             {user.firstName} {user.lastName}
           </h2>
