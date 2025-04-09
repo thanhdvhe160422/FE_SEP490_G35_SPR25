@@ -76,8 +76,6 @@ const UpdateProfile = () => {
     };
 
     fetchProvinces();
-    fetchDistricts();
-    fetchWards();
     fetchUserData();
   }, []);
 
@@ -94,6 +92,7 @@ const UpdateProfile = () => {
 
   const fetchWards = async () => {
     try {
+      //console.log("selected district: " + selectedDistrict);
       const data = await getWards(selectedDistrict);
       setWards(data.data.result || []);
     } catch (error) {
@@ -107,7 +106,6 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     if (!selectedProvince) return;
-
     fetchDistricts();
   }, [selectedProvince]);
 
