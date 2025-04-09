@@ -66,7 +66,7 @@ function App() {
                 "Campus Manager",
                 "Event Organizer",
                 "Spectator",
-                "Implementor",
+                "Implementer",
               ]}
             >
               <Profile />
@@ -82,7 +82,7 @@ function App() {
                 "Campus Manager",
                 "Event Organizer",
                 "Spectator",
-                "Implementor",
+                "Implementer",
               ]}
             >
               <UpdateProfile />
