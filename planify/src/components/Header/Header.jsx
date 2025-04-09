@@ -145,6 +145,7 @@ export default function Header() {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
+    
   };
 
   const navItemsByRole = {

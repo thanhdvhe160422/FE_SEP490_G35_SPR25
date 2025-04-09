@@ -53,6 +53,8 @@ export default function Login() {
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem("avatar", decoded.picture);
       localStorage.setItem("token", res.data.result.accessToken);
+      localStorage.removeItem("role");
+      localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
       localStorage.setItem("userId", res.data.result.userId);

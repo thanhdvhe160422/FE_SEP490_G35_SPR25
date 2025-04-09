@@ -94,8 +94,9 @@ export default function HomeSpectator() {
     try {
       setLoading(true);
       setIsSearchMode(false);
-
-      const response = await getPosts(page, pageSize);
+      const role = localStorage.getItem("role");
+      console.log("thu"+role);
+      const response = await getPosts(page, pageSize, role);
 
       if (response && response.items) {
         setEvents(response.items);
@@ -109,6 +110,7 @@ export default function HomeSpectator() {
         console.error("Unexpected API response format:", response);
         setEvents([]);
       }
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching events:", error);
       setEvents([]);
