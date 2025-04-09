@@ -29,7 +29,7 @@ function EventDetailSpec() {
   const [bannerImages, setBannerImages] = useState([]);
   const [openLightbox, setOpenLightbox] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
-
+  const currentTime = new Date();
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const fetchEventDetail = async () => {
@@ -182,7 +182,16 @@ function EventDetailSpec() {
           )}
         </div>
         <div style={{ marginRight: "70%" }}>
-          {isRegistered ? (
+          {new Date(event.endTime) <= currentTime ? (
+            <button
+              className="btn btn-secondary"
+              style={{ height: "50px" }}
+              id="btn-disabled"
+              disabled
+            >
+              Sự kiện đã đóng, không thể đăng ký
+            </button>
+          ) : isRegistered ? (
             <button
               className="btn btn-danger"
               style={{ height: "50px" }}
@@ -233,7 +242,10 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-location">
-            <FaMapMarkerAlt style={{color:'green'}} className="icon-location" />
+            <FaMapMarkerAlt
+              style={{ color: "green" }}
+              className="icon-location"
+            />
             <span>
               <strong> Location:</strong>{" "}
               {event?.placed || "Location not updated"}
@@ -241,7 +253,7 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-time">
-            <FaClock  className="icon-time" />
+            <FaClock className="icon-time" />
             <span>
               <strong>To:</strong>{" "}
               {event?.endTime
@@ -251,9 +263,12 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-time">
-            <MdOutlineCategory style={{color:'orange'}} className="icon-time" />
+            <MdOutlineCategory
+              style={{ color: "orange" }}
+              className="icon-time"
+            />
             <span style={{ fontWeight: "bold" }} className="event-info-span">
-              Category: {" "}
+              Category:{" "}
             </span>
             {event?.categoryViewModel?.categoryEventName || "Not determined"}
           </div>
