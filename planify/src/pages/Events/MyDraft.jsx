@@ -53,6 +53,7 @@ export default function MyDraft() {
         page: 1,
         pageSize: pageSize,
         status: "0",
+        createBy: localStorage.getItem("userId"),
       };
       const response = await searchEvents(params);
 
@@ -139,8 +140,12 @@ export default function MyDraft() {
                               src={
                                 event.eventMedias &&
                                 event.eventMedias.length > 0 &&
-                                event.eventMedias[0]
-                                  ? fixDriveUrl(event.eventMedias[0].mediaDTO.mediaUrl)
+                                event.eventMedias[0] &&
+                                event.eventMedias[0].mediaDTO &&
+                                event.eventMedias[0].mediaDTO.mediaUrl
+                                  ? fixDriveUrl(
+                                      event.eventMedias[0].mediaDTO.mediaUrl
+                                    )
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"
