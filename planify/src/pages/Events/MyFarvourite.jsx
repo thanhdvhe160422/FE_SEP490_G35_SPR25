@@ -29,6 +29,7 @@ export default function MyFarvourite() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [role, setRole] = useState("");
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
@@ -103,6 +104,8 @@ export default function MyFarvourite() {
 
   useEffect(() => {
     fetchEvents(1);
+    var userRole = localStorage.getItem("role");
+    setRole(userRole);
   }, []);
 
   const handlePageChange = (pageNumber) => {
@@ -133,7 +136,9 @@ export default function MyFarvourite() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-spec/${event.id}`)
+                              role === "Spectator"
+                                ? navigate(`/event-detail-spec/${event.id}`)
+                                : navigate(`/event-detail-EOG/${event.id}`)
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >
@@ -143,9 +148,7 @@ export default function MyFarvourite() {
                                 event.eventMedia &&
                                 event.eventMedia.length > 0 &&
                                 event.eventMedia[0]
-                                  ? fixDriveUrl(
-                                      event.eventMedia[0].mediaUrl
-                                    )
+                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"
