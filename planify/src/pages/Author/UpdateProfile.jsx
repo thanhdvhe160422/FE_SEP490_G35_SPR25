@@ -51,11 +51,6 @@ const UpdateProfile = () => {
             data?.data?.avatar?.mediaUrl || localStorage.getItem("avatar")
           );
         }
-        setSelectedProvince(
-          data.data.addressVM.wardVM.districtVM.provinceVM.id || 1
-        );
-        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || 1);
-        setSelectedWard(data.data.addressVM.wardVM.id || 1);
         setName(data.data.firstName + " " + data.data.lastName);
 
         setLoading(false);
@@ -101,7 +96,12 @@ const UpdateProfile = () => {
     }
   };
   useEffect(() => {
-    console.log("Updated user state:", user);
+    //console.log("user change data: " + JSON.stringify(user, null, 2));
+    if (user && user.addressVM) {
+      setSelectedProvince(user.addressVM.wardVM.districtVM.provinceVM.id || 1);
+      setSelectedDistrict(user.addressVM.wardVM.districtVM.id || 1);
+      setSelectedWard(user.addressVM.wardVM.id || 1);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -111,7 +111,6 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     if (!selectedDistrict) return;
-
     fetchWards();
   }, [selectedDistrict]);
 

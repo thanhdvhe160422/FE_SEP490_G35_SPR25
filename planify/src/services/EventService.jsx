@@ -2,9 +2,6 @@ import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 import Swal from "sweetalert2";
 
-
-
-
 const getPosts = async (page, pageSize, role) => {
   let API_URL = "";
   if (role === "Spectator") {
@@ -163,7 +160,7 @@ export const getEventEOGById = async (id) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get event by id after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
@@ -175,7 +172,7 @@ export const getEventEOGById = async (id) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    Swal.fire("Error", "Unable to get event by id.", "error");
     return null;
   }
 };
@@ -314,7 +311,7 @@ export const updateMedia = async (data) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to update media after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
@@ -540,7 +537,7 @@ export const getNotification = async () => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get notification after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
