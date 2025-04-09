@@ -152,7 +152,7 @@ export default function Header() {
     "campus manager": [
       { label: "Home", path: "/home" },
       { label: "Manage Event Organizer", path: "/manage-eog" },
-      { label: "Create Event", path: "/create-event" },
+      // { label: "Create Event", path: "/create-event" },
       { label: "Manage Requests", path: "/manage-request" },
       { label: "Favorite Events", path: "/my-favorite-events" },
     ],

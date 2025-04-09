@@ -106,7 +106,7 @@ const EventHistory = () => {
   return (
     <>
       <Header />
-      <div className="event-history-container" style={{ padding: "20px" }}>
+      <div  className="event-history-container" style={{ padding: "20px", marginTop:'100px' }}>
         <h2 style={{ marginBottom: "20px" }}>Lịch Sử Sự Kiện</h2>
 
         {events.length === 0 ? (
@@ -129,7 +129,7 @@ const EventHistory = () => {
           />
         )}
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

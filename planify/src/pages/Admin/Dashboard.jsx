@@ -347,7 +347,7 @@ export default function Dashboard() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-                  <div className="card full-width">
+                  <div className="card-admin full-width">
                     <h3 className="card-title">
                       Top Events With Many Participants
                     </h3>
@@ -523,7 +523,7 @@ export default function Dashboard() {
                       ))}
                     </ul>
                   </div>
-                  <div className="card">
+                  <div className="card-admin">
                     <h3 className="card-title">New Events</h3>
                     <ul className="user-list">
                       {[
@@ -541,7 +541,7 @@ export default function Dashboard() {
                       ))}
                     </ul>
                   </div>
-                  <div className="card buyers-profile">
+                  <div className="card-admin buyers-profile">
                     <h3 className="card-title">Profile</h3>
                     <div className="buyers-content">
                       <PieChart width={240} height={240}>
