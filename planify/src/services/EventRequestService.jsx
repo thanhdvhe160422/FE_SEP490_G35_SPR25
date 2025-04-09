@@ -129,7 +129,8 @@ export const getRequest = async () => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get request after token refresh. " +
+              error.response?.message,
             "error"
           );
           return { error: "unauthorized" };
@@ -141,7 +142,11 @@ export const getRequest = async () => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    Swal.fire(
+      "Error",
+      "Unable to get request. " + error.response?.message,
+      "error"
+    );
     return null;
   }
 };
@@ -175,7 +180,7 @@ export const getMyRequest = async (userId) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update group after token refresh.",
+            "Unable to get my request after token refresh.",
             "error"
           );
           return { error: "unauthorized" };
@@ -187,7 +192,7 @@ export const getMyRequest = async (userId) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to update group.", "error");
+    Swal.fire("Error", "Unable to get my request.", "error");
     return null;
   }
 };

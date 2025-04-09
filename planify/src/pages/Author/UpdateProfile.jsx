@@ -32,6 +32,7 @@ const UpdateProfile = () => {
   const [isChangeImage, setIsChangeImage] = useState(false);
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -45,11 +46,12 @@ const UpdateProfile = () => {
         const data = await getProfileById(userId, token);
         setUser(data.data);
         setInitialUser(data.data);
-        if(data.data.avatar) {setImage(data?.data?.avatar?.mediaUrl||localStorage.getItem("avatar"))}
-        setSelectedProvince(data.data.addressVM.wardVM.districtVM.provinceVM.id || 1);
-        setSelectedDistrict(data.data.addressVM.wardVM.districtVM.id || 1);
-        setSelectedWard(data.data.addressVM.wardVM.id || 1);
-        setName(data.data.firstName+" "+data.data.lastName);
+        if (data.data.avatar) {
+          setImage(
+            data?.data?.avatar?.mediaUrl || localStorage.getItem("avatar")
+          );
+        }
+        setName(data.data.firstName + " " + data.data.lastName);
 
         setLoading(false);
       } catch (error) {
@@ -71,41 +73,46 @@ const UpdateProfile = () => {
     fetchProvinces();
     fetchUserData();
   }, []);
+
+  const fetchDistricts = async () => {
+    try {
+      const data = await getDistricts(selectedProvince);
+      setDistricts(data.data.result || []);
+      setWards([]);
+    } catch (error) {
+      console.error("Lỗi lấy danh sách quận/huyện:", error);
+      setDistricts([]);
+    }
+  };
+
+  const fetchWards = async () => {
+    try {
+      //console.log("selected district: " + selectedDistrict);
+      const data = await getWards(selectedDistrict);
+      setWards(data.data.result || []);
+    } catch (error) {
+      console.error("Lỗi lấy danh sách phường/xã:", error);
+      setWards([]);
+    }
+  };
   useEffect(() => {
-    console.log("Updated user state:", user);
+    //console.log("user change data: " + JSON.stringify(user, null, 2));
+    if (user && user.addressVM) {
+      setSelectedProvince(user.addressVM.wardVM.districtVM.provinceVM.id || 1);
+      setSelectedDistrict(user.addressVM.wardVM.districtVM.id || 1);
+      setSelectedWard(user.addressVM.wardVM.id || 1);
+    }
   }, [user]);
 
   useEffect(() => {
     if (!selectedProvince) return;
-
-    const fetchDistricts = async () => {
-      try {
-        const data = await getDistricts(selectedProvince);
-        setDistricts(data.data.result || []);
-        setWards([]);
-      } catch (error) {
-        console.error("Lỗi lấy danh sách quận/huyện:", error);
-        setDistricts([]);
-      }
-    };
-
     fetchDistricts();
   }, [selectedProvince]);
 
   useEffect(() => {
     if (!selectedDistrict) return;
-
-    const fetchWards = async () => {
-      try {
-
-        const data = await getWards(selectedDistrict)
-        setWards(data.data .result|| []);
-      } catch (error) {
-        console.error("Lỗi lấy danh sách phường/xã:", error);
-        setWards([]);
-      }
-    };
-
+    console.log("district " + selectedDistrict);
+    console.log("ward " + selectedWard);
     fetchWards();
   }, [selectedDistrict]);
 
@@ -137,7 +144,7 @@ const UpdateProfile = () => {
         phoneNumber: user.phoneNumber,
         addressId: user.addressId,
         avatarId: user.avatarId,
-        gender: user.gender+""==='true',
+        gender: user.gender + "" === "true",
         addressVM: {
           id: user.addressVM?.id || 0,
           addressDetail: user?.addressVM?.addressDetail || "",
@@ -171,22 +178,22 @@ const UpdateProfile = () => {
         return;
       }
 
-      if (isChangeImage){
+      if (isChangeImage) {
         await handleSaveAvatar(file);
         setIsChangeImage(false);
       }
-      const response = await updateProfile(updatedUser,token);
+      const response = await updateProfile(updatedUser, token);
 
       if (response && response.status === 200) {
         enqueueSnackbar("Update profile successfully", {
           variant: "success",
-          autoHideDuration: 2500,
+          autoHideDuration: 2000,
         });
         navigate("/profile");
       } else {
         enqueueSnackbar("Failed to update profile", {
           variant: "error",
-          autoHideDuration: 2500,
+          autoHideDuration: 2000,
         });
       }
     } catch (error) {
@@ -225,7 +232,7 @@ const UpdateProfile = () => {
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
       setIsChangeImage(true);
-      setFile(file)
+      setFile(file);
     }
   };
 
@@ -248,23 +255,37 @@ const UpdateProfile = () => {
 
       localStorage.setItem("avatar", url);
 
-      setLoading(false); 
+      setLoading(false);
       return url;
     } catch (error) {
       console.error("Error updating avatar:", error);
-      setLoading(false); 
+      setLoading(false);
       throw error;
     }
   };
+  const HandlePhoneNumber = (e) => {
+    const value = e.target.value;
 
+    if (/^\d{0,10}$/.test(value)) {
+      setUser({ ...user, phoneNumber: value });
+      setPhoneError("");
+    } else {
+      setPhoneError("Vui lòng nhập đúng 10 số.");
+    }
+  };
 
   function convertToDirectLink(googleDriveUrl) {
     if (!googleDriveUrl.includes("drive.google.com/uc?id="))
       return googleDriveUrl;
     const fileId = googleDriveUrl.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-}
-  if (loading) return <div className="loader"><Loading></Loading></div>
+  }
+  if (loading)
+    return (
+      <div className="loader">
+        <Loading></Loading>
+      </div>
+    );
   if (!user) return <p>No user data found</p>;
 
   return (
@@ -355,7 +376,7 @@ const UpdateProfile = () => {
                       type="radio"
                       name="gender"
                       value="true"
-                      checked={user.gender+"" === "true"}
+                      checked={user.gender + "" === "true"}
                       onChange={(e) =>
                         setUser({ ...user, gender: e.target.value })
                       }
@@ -367,7 +388,7 @@ const UpdateProfile = () => {
                       type="radio"
                       name="gender"
                       value="false"
-                      checked={user.gender+"" === "false"}
+                      checked={user.gender + "" === "false"}
                       onChange={(e) =>
                         setUser({ ...user, gender: e.target.value })
                       }
@@ -448,10 +469,11 @@ const UpdateProfile = () => {
                 className="input-profile"
                 type="text"
                 value={user.phoneNumber}
-                onChange={(e) =>
-                  setUser({ ...user, phoneNumber: e.target.value })
-                }
+                onChange={HandlePhoneNumber}
               />
+              {phoneError && (
+                <div className="error-message text-danger">{phoneError}</div>
+              )}
             </div>
           </form>
 

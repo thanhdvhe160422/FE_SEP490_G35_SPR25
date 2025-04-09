@@ -55,23 +55,20 @@ export default function Dashboard() {
   const [maxYAxisValue, setMaxYAxisValue] = useState(0);
 
   useEffect(() => {
-    // 👉 Thêm thẻ <link> vào <head> để load CSS riêng cho Dashboard
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "./css/style.min.css"; // ⚠️ Đảm bảo đường dẫn đúng (có thể là ./ hoặc ../ tùy cấu trúc)
+    link.href = "http://localhost:3000"+"/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = process.env.PUBLIC_URL + "./css/style.css"; // ← Quan trọng: phải dùng PUBLIC_URL nếu là React project
+    link2.href = "http://localhost:3000" + "/css/style.css"; 
     document.head.appendChild(link2);
 
-    // 👉 Gọi feather icon nếu cần
     if (window.feather) {
         window.feather.replace();
     }
 
-    // 👉 Cleanup: gỡ CSS khi thoát khỏi Dashboard
     return () => {
         document.head.removeChild(link);
     };

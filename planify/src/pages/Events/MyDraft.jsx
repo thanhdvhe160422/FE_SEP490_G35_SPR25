@@ -137,10 +137,10 @@ export default function MyDraft() {
                             <Card.Img
                               variant="top"
                               src={
-                                event.eventMedia &&
-                                event.eventMedia.length > 0 &&
-                                event.eventMedia[0]
-                                  ? fixDriveUrl(event.eventMedia[0].mediaUrl)
+                                event.eventMedias &&
+                                event.eventMedias.length > 0 &&
+                                event.eventMedias[0]
+                                  ? fixDriveUrl(event.eventMedias[0].mediaDTO.mediaUrl)
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
                               height="180"
