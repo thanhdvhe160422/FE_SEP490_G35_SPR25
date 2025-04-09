@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/Admin/customChart.css";
-import "../../assets/img/svg/Logo.svg";
-import "../../assets/css/style.min.css";
-import "../../assets/css/style.css";
+// import "../../assets/img/svg/Logo.svg";
+// import "../../assets/css/style.min.css";
+// import "../../assets/css/style.css";
 import { CiLogout } from "react-icons/ci";
 import {
   LineChart,
@@ -55,11 +55,27 @@ export default function Dashboard() {
   const [maxYAxisValue, setMaxYAxisValue] = useState(0);
 
   useEffect(() => {
-    // Gọi sau khi script đã load trong index.html
+    // 👉 Thêm thẻ <link> vào <head> để load CSS riêng cho Dashboard
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "./css/style.min.css"; // ⚠️ Đảm bảo đường dẫn đúng (có thể là ./ hoặc ../ tùy cấu trúc)
+    document.head.appendChild(link);
+
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = process.env.PUBLIC_URL + "./css/style.css"; // ← Quan trọng: phải dùng PUBLIC_URL nếu là React project
+    document.head.appendChild(link2);
+
+    // 👉 Gọi feather icon nếu cần
     if (window.feather) {
-      window.feather.replace();
+        window.feather.replace();
     }
-  }, []);
+
+    // 👉 Cleanup: gỡ CSS khi thoát khỏi Dashboard
+    return () => {
+        document.head.removeChild(link);
+    };
+}, []);
 
   const getMaxValue = () => {
     let max = 0;

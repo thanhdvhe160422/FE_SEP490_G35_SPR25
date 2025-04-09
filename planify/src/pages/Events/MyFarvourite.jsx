@@ -145,11 +145,11 @@ export default function MyFarvourite() {
                             <Card.Img
                               variant="top"
                               src={
-                                event.eventMedias &&
-                                event.eventMedias.length > 0 &&
-                                event.eventMedias[0]
+                                event.eventMedia &&
+                                event.eventMedia.length > 0 &&
+                                event.eventMedia[0]
                                   ? fixDriveUrl(
-                                      event.eventMedias[0].mediaDTO.mediaUrl
+                                      event.eventMedia[0].mediaUrl
                                     )
                                   : "https://placehold.co/600x400?text=No+Image"
                               }
