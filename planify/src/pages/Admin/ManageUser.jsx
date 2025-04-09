@@ -4,15 +4,13 @@ import { getCampuses } from "../../services/campusService";
 import {
   banUser,
   createCampusManager,
-  getListManager,
   getListUser,
   unbanUser,
-  updateCampusManager,
 } from "../../services/userService";
 import { useSnackbar } from "notistack";
 import { Modal, Button, Table } from "antd";
 import "../../styles/Author/CreateEOG.css";
-import { LockOutlined, UnlockOutlined } from "@ant-design/icons"; // Thêm icon cho Ban/Unban
+import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
 import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
 
@@ -45,7 +43,25 @@ export default function ManageUser() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [selectedEOG, setSelectedEOG] = useState(null);
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "http://localhost:3000" + "/css/style.min.css";
+    document.head.appendChild(link);
 
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = "http://localhost:3000" + "/css/style.css";
+    document.head.appendChild(link2);
+
+    if (window.feather) {
+      window.feather.replace();
+    }
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
   useEffect(() => {
     const fetchCampuses = async () => {
       const campusData = await getCampuses();
@@ -167,13 +183,13 @@ export default function ManageUser() {
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     {
-      title: "Date of Birth",
+      title: "Ngày sinh",
       dataIndex: "dateOfBirth",
       key: "dateOfBirth",
       render: (text) => new Date(text).toLocaleDateString(),
     },
     {
-      title: "Gender",
+      title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
       render: (text) => (text ? "Male" : "Female"),
@@ -184,7 +200,7 @@ export default function ManageUser() {
       key: "role",
       render: (text) => (text ? "Manager" : "User"),
     },
-    { title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber" },
+    { title: "SĐT", dataIndex: "phoneNumber", key: "phoneNumber" },
     {
       title: "Actions",
       key: "actions",
@@ -216,7 +232,7 @@ export default function ManageUser() {
   return (
     <>
       <div class="page-flex">
-        <aside class="sidebar">
+        <aside class="sidebar" style={{ width: "400px" }}>
           <div class="sidebar-start">
             <div class="sidebar-head">
               <a href="/" class="logo-wrapper" title="Home">
@@ -231,23 +247,23 @@ export default function ManageUser() {
             <div class="sidebar-body">
               <ul className="sidebar-body-menu">
                 <li>
-                  <a className="active" href="/dashboard">
+                  <a className="show-cat-btn" href="/dashboard">
                     <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Dashboard
                   </a>
                 </li>
                 <li>
-                  <a className="show-cat-btn" href="/manage-user">
+                  <a className="active" href="/manage-user">
                     <FaUsers
                       style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
-                    Users
+                    Danh sách users
                   </a>
                 </li>
                 <li>
-                  <a href="management-campus-manager">
+                  <a href="manage-campus-manager">
                     <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                    Management Campus
+                    Quản lý Campus Manager
                   </a>
                 </li>
                 {/* <li>

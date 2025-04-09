@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { useSnackbar } from "notistack";
-import { toast } from "react-toastify"; // Thêm react-toastify
+import { toast } from "react-toastify";
 import backgroundImage from "../../assets/fpt-campus.jpg";
 import "../../styles/Author/Login.css";
 
@@ -15,9 +15,6 @@ export default function Login() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-
-  localStorage.clear();
-  sessionStorage.clear();
 
   useEffect(() => {
     const fetchCampuses = async () => {

@@ -59,7 +59,7 @@ function EventSection() {
         page: pageNumber,
         pageSize: EVENTS_PER_PAGE,
         title: searchTerm,
-        status: selectedStatus,
+        status: 2,
         startTime: selectedStart,
         endTime: selectedEnd,
         placed: selectedLocation,
@@ -214,38 +214,6 @@ function EventSection() {
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-  };
-  const handleMyEvents = async () => {
-    try {
-      setIsFiltered(true);
-
-      const params = {
-        page: 1,
-        pageSize: EVENTS_PER_PAGE,
-        createBy: currentUserId,
-      };
-
-      console.log("Tìm kiếm sự kiện của tôi với tham số:", params);
-      const response = await searchEvents(params);
-      console.log("Kết quả sự kiện của tôi:", response);
-
-      if (response && response.items) {
-        console.log(`Tìm thấy ${response.items.length} sự kiện của tôi`);
-        setFilteredEvents(response.items);
-        setFilteredTotalPages(response.totalPages);
-        setCurrentPage(1);
-      } else {
-        console.log("Không tìm thấy sự kiện nào của tôi");
-        setFilteredEvents([]);
-        setFilteredTotalPages(0);
-      }
-
-      setEventFilter("my");
-    } catch (error) {
-      console.error("Lỗi khi tìm kiếm sự kiện của tôi:", error);
-      setFilteredEvents([]);
-      setFilteredTotalPages(0);
-    }
   };
 
   const handleCreateFavorite = async (eventId, e) => {
@@ -602,10 +570,10 @@ function EventSection() {
                     <div className="empty-state-container">
                       <div className="text-center">
                         <h3 style={{ color: "#555", fontWeight: "500" }}>
-                        No events found
+                          No events found
                         </h3>
                         <p style={{ color: "#777" }}>
-                        Please try again with other search criteria!
+                          Please try again with other search criteria!
                         </p>
                       </div>
                     </div>
@@ -637,10 +605,10 @@ function EventSection() {
                         >
                           <div className="text-center">
                             <h3 style={{ color: "#555", fontWeight: "500" }}>
-                            You don't have any events yet
+                              You don't have any events yet
                             </h3>
                             <p style={{ color: "#777" }}>
-                            The events you create will show up here
+                              The events you create will show up here
                             </p>
                           </div>
                         </div>

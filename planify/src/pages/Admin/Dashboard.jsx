@@ -57,22 +57,22 @@ export default function Dashboard() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "http://localhost:3000"+"/css/style.min.css";
+    link.href = "http://localhost:3000" + "/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "http://localhost:3000" + "/css/style.css"; 
+    link2.href = "http://localhost:3000" + "/css/style.css";
     document.head.appendChild(link2);
 
     if (window.feather) {
-        window.feather.replace();
+      window.feather.replace();
     }
 
     return () => {
-        document.head.removeChild(link);
+      document.head.removeChild(link);
     };
-}, []);
+  }, []);
 
   const getMaxValue = () => {
     let max = 0;
@@ -102,7 +102,7 @@ export default function Dashboard() {
   return (
     <>
       <div class="page-flex">
-        <aside class="sidebar">
+        <aside class="sidebar" style={{ width: "400px" }}>
           <div class="sidebar-start">
             <div class="sidebar-head">
               <a href="/" class="logo-wrapper" title="Home">
@@ -127,13 +127,13 @@ export default function Dashboard() {
                     <FaUsers
                       style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
-                    Users
+                    Danh sách Users
                   </a>
                 </li>
                 <li>
-                  <a href="management-campus-manager">
+                  <a href="manage-campus-manager">
                     <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                    Management Campus
+                    Quản lý Campus Manager
                   </a>
                 </li>
                 {/* <li>

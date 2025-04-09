@@ -168,3 +168,25 @@
 .table-stats .table-line-plus .status-social-icon {
   color: #a75d54;
 }
+.sidebar-body-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-body-menu li a:hover {
+  background-color: #f0f0f0;
+}
+
+.sidebar-body-menu li a.active {
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.sidebar-body-menu li a.active:hover {
+  background-color: #0056b3;
+}

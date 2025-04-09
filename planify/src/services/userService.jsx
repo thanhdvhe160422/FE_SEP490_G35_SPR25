@@ -2,7 +2,6 @@ import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 
 const API_PROFILE_URL = "https://localhost:44320/api/Profiles";
-const API_USER_URL = "https://localhost:44320/api/Users";
 
 export const getProfileById = async (userId, token) => {
   try {
@@ -74,7 +73,7 @@ export const createEventOrganizer = async (data) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -114,7 +113,7 @@ export const getListEOG = async (page, pageSize) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -154,7 +153,7 @@ export const updateEventOrganizer = async (userId) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -194,7 +193,7 @@ export const getUserJoinEvent = async (eventId) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -276,7 +275,7 @@ export const updateCampusManager = async (userId) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -318,7 +317,7 @@ export const createCampusManager = async (data) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }

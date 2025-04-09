@@ -20,7 +20,6 @@ import UpdateEvent from "./pages/Events/UpdateEvent";
 import CostDetail from "./pages/Events/CostDetail";
 import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
 import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
-import UpdateTask from "./pages/Tasks/UpdateTask";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan";
@@ -305,8 +304,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        {/* <Route path="/manage-user" element={<ManageUser />}></Route> */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>

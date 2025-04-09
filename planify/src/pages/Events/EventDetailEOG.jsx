@@ -119,7 +119,7 @@ const EventDetailEOG = () => {
       console.error("Error approving request:", error);
       Swal.fire("Error", "Unable to approve request.", "error");
     } finally {
-      setIsSubmitting(false); // reset lại cho lần sau
+      setIsSubmitting(false);
     }
   };
 
@@ -312,8 +312,7 @@ const EventDetailEOG = () => {
     );
   };
 
-  if (isLoading||!event) {
-
+  if (isLoading || !event) {
     return <Loading />;
   }
 
