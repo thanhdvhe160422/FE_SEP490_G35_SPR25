@@ -1,6 +1,6 @@
 import axios from "axios";
 const refreshAccessToken = async () => {
-  const refreshToken = localStorage.getItem("reToken");
+  const refreshToken = localStorage.getItem("refreshToken");
   const accessToken = localStorage.getItem("token");
   try {
     const response = await axios.post(
@@ -12,7 +12,7 @@ const refreshAccessToken = async () => {
     );
     const newAccessToken = response.data.accessToken;
     localStorage.setItem("token", newAccessToken);
-    localStorage.setItem("reToken", response.data.refreshToken);
+    localStorage.setItem("refreshToken", response.data.refreshToken);
     console.log(newAccessToken);
     return newAccessToken;
   } catch (error) {

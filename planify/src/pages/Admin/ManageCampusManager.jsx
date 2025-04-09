@@ -6,12 +6,12 @@ import {
   getListManager,
   updateCampusManager,
 } from "../../services/userService";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
 import { useSnackbar } from "notistack";
 import { Modal, Button, Table } from "antd";
 import "../../styles/Author/CreateEOG.css";
 import { DeleteOutlined } from "@ant-design/icons";
+import { CiLogout } from "react-icons/ci";
+import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
 
 export default function ManageCampusManager() {
   const [campuses, setCampuses] = useState([]);
@@ -167,10 +167,89 @@ export default function ManageCampusManager() {
       ),
     },
   ];
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "http://localhost:3000" + "/css/style.min.css";
+    document.head.appendChild(link);
+
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = "http://localhost:3000" + "/css/style.css";
+    document.head.appendChild(link2);
+
+    if (window.feather) {
+      window.feather.replace();
+    }
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   return (
-    <>
-      <Header />
+    <div className="page-flex">
+      <aside class="sidebar" style={{ width: "400px" }}>
+        <div class="sidebar-start">
+          <div class="sidebar-head">
+            <a href="/" class="logo-wrapper" title="Home">
+              <span class="sr-only">Home</span>
+              <span class="icon logo" aria-hidden="true"></span>
+              <div class="logo-text">
+                <span class="logo-title">Planify</span>
+                <span class="logo-subtitle">Dashboard</span>
+              </div>
+            </a>
+          </div>
+          <div class="sidebar-body">
+            <ul className="sidebar-body-menu">
+              <li>
+                <a className="show-cat-btn" href="/dashboard">
+                  <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a className="show-cat-btn" href="/manage-user">
+                  <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Danh sách Users
+                </a>
+              </li>
+              <li>
+                <a className="active" href="manage-campus-manager">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus Manager
+                </a>
+              </li>
+              {/* <li>
+                        <a className="show-cat-btn" href="#">
+                          <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
+                          <span
+                            className="category__btn transparent-btn"
+                            title="Open list"
+                          >
+                            <span className="sr-only">Open list</span>
+                            <FaAngleDown />
+                          </span>
+                        </a>
+                      </li> */}
+              {/* <li>
+                        <a href="#">
+                          <CiLogout style={{ marginRight: "10px", fontSize:'30px', marginTop:'100%' }} /> Settings
+                        </a>
+                      </li> */}
+            </ul>
+            <ul className="sidebar-body-menu logout-section">
+              <li>
+                <a href="#">
+                  <CiLogout style={{ marginRight: "10px", fontSize: "40px" }} />{" "}
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
       <div className="create-organizer-container">
         <Modal
           title="Create Campus Manager"
@@ -340,7 +419,6 @@ export default function ManageCampusManager() {
           <p>Are you sure you want to delete {selectedEOG?.email}?</p>
         </Modal>
       </div>
-      <Footer />
-    </>
+    </div>
   );
 }

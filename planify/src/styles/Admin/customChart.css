@@ -6,8 +6,8 @@
 }
 
 .icon-dark {
-  color: #000 !important; /* Màu đen */
-  fill: #000 !important;  /* Nếu SVG cần fill */
+  color: #000 !important; 
+  fill: #000 !important; 
 }
 
 .sidebar-body {
