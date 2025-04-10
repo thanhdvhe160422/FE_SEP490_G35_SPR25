@@ -178,11 +178,6 @@ export const getMyRequest = async (userId) => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire(
-            "Error",
-            "Unable to get my request after token refresh.",
-            "error"
-          );
           return { error: "unauthorized" };
         }
       } else {
@@ -192,7 +187,6 @@ export const getMyRequest = async (userId) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to get my request.", "error");
     return null;
   }
 };

@@ -26,7 +26,6 @@ export default function Header() {
   const [messages, setMessages] = useState([]);
   const [connection, setConnection] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
-
   useEffect(() => {
     const fetchNotification = async () => {
       try {
@@ -146,6 +145,21 @@ export default function Header() {
     sessionStorage.clear();
     navigate("/login");
   };
+  const handleLogo = (role) => {
+    console.log("Role from handleLogo:", role);
+    if (role === "event organizer") {
+      navigate("/home");
+    }
+    if (role === "campus manager") {
+      navigate("/home");
+    }
+    if (role === "implementer") {
+      navigate("/home-implementer");
+    }
+    if (role === "spectator") {
+      navigate("/home-spec");
+    }
+  };
 
   const navItemsByRole = {
     "campus manager": [
@@ -165,7 +179,7 @@ export default function Header() {
     ],
     implementer: [
       { label: "Home", path: "/home-implementer" },
-      { label: "Assigned Tasks", path: "/assigned-tasks" },
+      { label: "List Event", path: "/home-spec" },
       { label: "History", path: "/history-event" },
       { label: "Favorite Events", path: "/my-favorite-events" },
     ],
@@ -187,7 +201,7 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="logo" onClick={() => navigate("/home")}>
+      <div className="logo" onClick={() => handleLogo(userRole)}>
         <img src={logo} alt="FPT Logo" />
       </div>
 
@@ -198,7 +212,7 @@ export default function Header() {
             onClick={() => navigate(item.path)}
             className={`nav-item ${
               location.pathname === item.path ? "active" : ""
-            }`} // Thêm class active
+            }`}
           >
             {item.label}
           </span>

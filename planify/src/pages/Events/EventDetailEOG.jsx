@@ -38,6 +38,7 @@ import {
   sendRequest,
 } from "../../services/EventRequestService";
 import Loading from "../../components/Loading";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 
 const EventDetailEOG = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -331,6 +332,7 @@ const EventDetailEOG = () => {
   return (
     <>
       <Header />
+      <Breadcrumb />
       <div className="event-container">
         {event && (
           <>

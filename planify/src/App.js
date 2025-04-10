@@ -7,14 +7,10 @@ import LoginAdmin from "./pages/Author/LoginAdmin";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Author/Home";
 import Profile from "./pages/Author/Profile";
-import CreateEvent from "./pages/Events/CreateEvent";
 import EventDetailSpec from "./pages/Events/EventDetailSpec";
 import UpdateProfile from "./pages/Author/UpdateProfile";
 import EventDetailEOG from "./pages/Events/EventDetailEOG";
-import CreateTask from "./pages/Tasks/CreateTask";
 import ManageRequest from "./pages/Events/ManageRequest";
-import CreateSubTask from "./pages/Sub-tasks/CreateSubTask";
-import DetailTask from "./pages/Tasks/DetailTask";
 import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
 import CostDetail from "./pages/Events/CostDetail";
@@ -35,6 +31,25 @@ import { ToastContainer } from "react-toastify";
 import ManageUser from "./pages/Admin/ManageUser";
 
 function App() {
+  const getRedirectPath = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return "/login";
+    }
+
+    const role = localStorage.getItem("role");
+    switch (role) {
+      case "Campus Manager":
+      case "Event Organizer":
+        return "/home";
+      case "Implementer":
+        return "/home-implementer";
+      case "Spectator":
+        return "/home-spec";
+      default:
+        return "/login";
+    }
+  };
   return (
     <div className="App">
       <Routes>
@@ -91,7 +106,7 @@ function App() {
         <Route
           path="/home-spec"
           element={
-            <PrivateRoute allowedRoles={["Spectator"]}>
+            <PrivateRoute allowedRoles={["Spectator", "Implementer"]}>
               <HomeSpectator />
             </PrivateRoute>
           }
@@ -118,14 +133,6 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Spectator"]}>
               <EventRegistered />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/create-event"
-          element={
-            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
-              <CreateEvent />
             </PrivateRoute>
           }
         />
@@ -158,15 +165,6 @@ function App() {
         />
 
         <Route
-          path="/group/:groupId/create-task"
-          element={
-            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
-              <CreateTask />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
           path="/manage-request"
           element={
             <PrivateRoute allowedRoles={["Campus Manager"]}>
@@ -183,35 +181,6 @@ function App() {
           }
         />
 
-        <Route
-          path="/create-subtask/:taskId"
-          element={
-            <PrivateRoute
-              allowedRoles={[
-                "Event Organizer",
-                "Campus Manager",
-                "Implementer",
-              ]}
-            >
-              <CreateSubTask />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/task/:id"
-          element={
-            <PrivateRoute
-              allowedRoles={[
-                "Implementer",
-                "Campus Manager",
-                "Event Organizer",
-              ]}
-            >
-              <DetailTask />
-            </PrivateRoute>
-          }
-        />
         <Route
           path="/update-event/:id"
           element={
@@ -304,7 +273,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to={getRedirectPath()} replace />} />
 
         <Route path="/cost-detail" element={<CostDetail />}></Route>
       </Routes>
