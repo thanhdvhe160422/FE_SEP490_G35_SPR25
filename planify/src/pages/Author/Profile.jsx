@@ -25,7 +25,7 @@ const Profile = () => {
         const userData = await userRes.json();
 
         setUser(userData);
-        console.log("userData" + JSON.stringify(userData, null, 2));
+        console.log("Dữ liệu người dùng: " + JSON.stringify(userData, null, 2));
         if (userData.avatar) {
           setimage(userData.avatar.mediaUrl || "");
         } else {
@@ -38,20 +38,20 @@ const Profile = () => {
         setDistricts(userData.addressVM.wardVM.districtVM.districtName || "");
         setWards(userData.addressVM.wardVM.wardName || "");
 
-        console.log("Address:", userData.addressVM.addressDetail || "");
+        console.log("Địa chỉ:", userData.addressVM.addressDetail || "");
         console.log(
-          "Province:",
+          "Tỉnh/Thành phố:",
           userData.addressVM.wardVM.districtVM.provinceVM.provinceName || ""
         );
         console.log(
-          "District:",
+          "Quận/Huyện:",
           userData.addressVM.wardVM.districtVM.districtName || ""
         );
-        console.log("Ward:", userData.addressVM.wardVM.wardName || "");
+        console.log("Phường/Xã:", userData.addressVM.wardVM.wardName || "");
 
         setLoading(false);
       } catch (error) {
-        console.error("Lỗi lấy dữ liệu người dùng:", error);
+        console.error("Lỗi khi lấy dữ liệu người dùng:", error);
         setLoading(false);
       }
     };
@@ -59,8 +59,8 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (!user) return <p>No user data found</p>;
+  if (loading) return <p>Đang tải...</p>;
+  if (!user) return <p>Không tìm thấy dữ liệu người dùng</p>;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -69,7 +69,7 @@ const Profile = () => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day} - ${month} - ${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   function convertToDirectLink(googleDriveUrl) {
@@ -78,6 +78,7 @@ const Profile = () => {
     const fileId = googleDriveUrl.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   }
+
   return (
     <>
       <Header />
@@ -85,7 +86,7 @@ const Profile = () => {
         <div className="profile-card">
           <img
             src={convertToDirectLink(image)}
-            alt="Avatar"
+            alt="Ảnh đại diện"
             className="profile-avatar"
           />
           <h2>
@@ -101,38 +102,37 @@ const Profile = () => {
               className="btn btn-info edit-profile-button"
               onClick={() => navigate("/update-profile")}
             >
-              <FaRegEdit /> Update Profile
+              <FaRegEdit /> Cập nhật hồ sơ
             </button>
           </div>
         </div>
 
         <div className="profile-form">
-          <h2>Profile Information</h2>
+          <h2>Thông tin hồ sơ</h2>
           <table className="profile-table">
             <tbody>
               <tr>
-                <td>Full Name</td>
+                <td>Họ và tên</td>
                 <td>
                   {user.firstName} {user.lastName}
                 </td>
               </tr>
               <tr>
-                <td>Date of Birth</td>
+                <td>Ngày sinh</td>
                 <td>{formatDate(user.dateOfBirth)}</td>
               </tr>
               <tr>
-                <td>Gender</td>
-                <td>{user.gender ? "Male" : "Female"}</td>
+                <td>Giới tính</td>
+                <td>{user.gender ? "Nam" : "Nữ"}</td>
               </tr>
-
               <tr>
-                <td>Address</td>
+                <td>Địa chỉ</td>
                 <td>
-                  {address},{wards}, {districts}, {provinces}
+                  {address}, {wards}, {districts}, {provinces}
                 </td>
               </tr>
               <tr>
-                <td>Phone Number</td>
+                <td>Số điện thoại</td>
                 <td>{user.phoneNumber || ""}</td>
               </tr>
               <tr>

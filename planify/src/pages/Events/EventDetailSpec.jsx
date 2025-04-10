@@ -165,7 +165,7 @@ function EventDetailSpec() {
                         marginBottom: "5px",
                       }}
                     />
-                    <strong>View All Images</strong>
+                    <strong>Tất cả ảnh</strong>
                   </button>
                 )}
               </div>
@@ -236,7 +236,7 @@ function EventDetailSpec() {
           <div className="event-time">
             <FaClock className="icon-time" />
             <span>
-              <strong> From:</strong>{" "}
+              <strong> Từ:</strong>{" "}
               {event?.startTime
                 ? formatDateTime(event.startTime)
                 : "Not updated yet"}
@@ -249,7 +249,7 @@ function EventDetailSpec() {
               className="icon-location"
             />
             <span>
-              <strong> Location:</strong>{" "}
+              <strong> Địa điểm:</strong>{" "}
               {event?.placed || "Location not updated"}
             </span>
           </div>
@@ -257,7 +257,7 @@ function EventDetailSpec() {
           <div className="event-time">
             <FaClock className="icon-time" />
             <span>
-              <strong>To:</strong>{" "}
+              <strong>Đến:</strong>{" "}
               {event?.endTime
                 ? formatDateTime(event.endTime)
                 : "Not updated yet"}
@@ -270,7 +270,7 @@ function EventDetailSpec() {
               className="icon-time"
             />
             <span style={{ fontWeight: "bold" }} className="event-info-span">
-              Category:{" "}
+              Kiểu sự kiện:{" "}
             </span>
             {event?.categoryViewModel?.categoryEventName || "Not determined"}
           </div>
@@ -284,7 +284,7 @@ function EventDetailSpec() {
           </div>
         </div>
         <div className="event-description">
-          <div>Description:</div>
+          <div>Mô tả:</div>
           <div className="eventDescription">
             <span>{event.eventDescription}</span>
           </div>

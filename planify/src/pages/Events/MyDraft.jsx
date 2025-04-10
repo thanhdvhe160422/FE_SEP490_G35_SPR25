@@ -179,27 +179,26 @@ export default function MyDraft() {
                                 <div>
                                   <small className="text-muted">
                                     {new Date(event.startTime).toLocaleString(
-                                      "en-US",
+                                      "vi",
                                       {
                                         weekday: "short",
                                         month: "short",
                                         day: "numeric",
                                         hour: "numeric",
                                         minute: "2-digit",
-                                        hour12: true,
                                       }
                                     )}
                                   </small>
                                 </div>
                                 <div>
                                   <small className="text-muted">
-                                    Location: {event.placed}
+                                    Địa điểm: {event.placed}
                                   </small>
                                 </div>
                                 {event.categoryViewModel && (
                                   <div>
                                     <small className="text-muted">
-                                      Category:{" "}
+                                      Loại sự kiện:{" "}
                                       {
                                         event.categoryViewModel
                                           .categoryEventName
@@ -220,8 +219,8 @@ export default function MyDraft() {
                         >
                           <p className="text-muted text-center">
                             {totalEvents === 0
-                              ? "No events available."
-                              : "No events found matching your criteria."}
+                              ? "Không có sự kiện nào có sẵn."
+                              : "Không tìm thấy sự kiện nào phù hợp với tiêu chí của bạn."}
                           </p>
                         </div>
                       </Col>

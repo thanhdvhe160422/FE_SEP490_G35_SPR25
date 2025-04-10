@@ -95,8 +95,8 @@ function ManageRequest() {
     }
   };
 
-  if(isLoading){
-    return <Loading/>;
+  if (isLoading) {
+    return <Loading />;
   }
   const pendingRequests = requests.filter((req) => req.status === 1);
   const approvedRequests = requests.filter((req) => req.status === 2);
@@ -106,37 +106,40 @@ function ManageRequest() {
     <>
       <Header />
       <div className="manager-container">
-        <h2>List Event Request</h2>
+        <h2>Dánh sách yêu cầu</h2>
         <div className="requests-grid">
-          <RequestColumn title="Not Approved Yet" requests={pendingRequests}>
+          <RequestColumn
+            title="Chưa được chấp thuận"
+            requests={pendingRequests}
+          >
             {(req) => (
               <>
                 <button
                   className="btn approve"
                   onClick={() => handleApprove(req)}
                 >
-                  Approve
+                  Phê duyệt
                 </button>
                 <button
                   className="btn reject"
                   onClick={() => handleReject(req)}
                 >
-                  Reject
+                  Từ chối
                 </button>
               </>
             )}
           </RequestColumn>
 
-          <RequestColumn title="Approved" requests={approvedRequests} />
-          <RequestColumn title="Rejected" requests={rejectedRequests} />
+          <RequestColumn title="Đã chấp thuận" requests={approvedRequests} />
+          <RequestColumn title="Đã từ chối" requests={rejectedRequests} />
         </div>
 
         {showPopupReject && (
           <div className="popup">
             <div className="popup-content">
-              <h3>Reject Request</h3>
+              <h3>Từ chối yêu cầu</h3>
               <textarea
-                placeholder="Enter rejection reason..."
+                placeholder="Nhập lý do từ chối..."
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
               />
@@ -155,9 +158,9 @@ function ManageRequest() {
         {showPopupApprove && (
           <div className="popup">
             <div className="popup-content">
-              <h3 style={{ color: "green" }}>Approve Request</h3>
+              <h3 style={{ color: "green" }}>Phê duyệt yêu cầu</h3>
               <textarea
-                placeholder="Enter reason..."
+                placeholder="Nhập lý do..."
                 value={approveReason}
                 onChange={(e) => setApproveReason(e.target.value)}
               />
@@ -189,7 +192,7 @@ function RequestColumn({ title, requests, children }) {
     <div className="request-column">
       <h3>{title}</h3>
       {requests.length === 0 ? (
-        <p>No requirements.</p>
+        <p>Không có yêu cầu nào</p>
       ) : (
         requests.map((req) => (
           <div key={req.id} className="request-card">
@@ -203,15 +206,15 @@ function RequestColumn({ title, requests, children }) {
             </h4>
             {req.reason && (
               <p>
-                <strong>Resaon:</strong> {req.reason}
+                <strong>Lý do:</strong> {req.reason}
               </p>
             )}
 
             <p>
-              <strong>From:</strong> {formatDateTime(req.eventStartTime)}
+              <strong>Từ:</strong> {formatDateTime(req.eventStartTime)}
             </p>
             <p>
-              <strong>To:</strong> {formatDateTime(req.eventEndTime)}
+              <strong>Đến:</strong> {formatDateTime(req.eventEndTime)}
             </p>
             {children && children(req)}
           </div>
@@ -222,7 +225,7 @@ function RequestColumn({ title, requests, children }) {
 }
 
 const formatDateTime = (dateTime) => {
-  return new Date(dateTime).toLocaleString("en", {
+  return new Date(dateTime).toLocaleString("vi", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

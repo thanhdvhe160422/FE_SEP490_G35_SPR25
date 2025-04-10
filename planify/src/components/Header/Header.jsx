@@ -163,30 +163,30 @@ export default function Header() {
 
   const navItemsByRole = {
     "campus manager": [
-      { label: "Home", path: "/home" },
-      { label: "Manage Event Organizer", path: "/manage-eog" },
-      { label: "Manage Category", path: "/category-event" },
-      { label: "Manage Requests", path: "/manage-request" },
-      { label: "Favorite Events", path: "/my-favorite-events" },
+      { label: "Trang chủ", path: "/home" },
+      { label: "Quản lý Event Organizer", path: "/manage-eog" },
+      { label: "Quản lý loại sự kiện", path: "/category-event" },
+      { label: "Quản lý yêu cầu", path: "/manage-request" },
+      { label: "Sự kiện yêu thích", path: "/my-favorite-events" },
     ],
     "event organizer": [
-      { label: "Home", path: "/home" },
-      { label: "Create Event", path: "/event-plan" },
-      { label: "My Request", path: "/my-request" },
-      { label: "My Event", path: "/my-event" },
-      { label: "My Favorite", path: "/my-favorite-events" },
-      { label: "My Drafts", path: "/my-drafts" },
+      { label: "Trang chủ", path: "/home" },
+      { label: "Tạo sự kiện", path: "/event-plan" },
+      { label: "Yêu cầu của tôi", path: "/my-request" },
+      { label: "Sự kiện của tôi", path: "/my-event" },
+      { label: "Sự kiện yêu thích", path: "/my-favorite-events" },
+      { label: "Sự kiện nháp", path: "/my-drafts" },
     ],
     implementer: [
-      { label: "Home", path: "/home-implementer" },
-      { label: "List Event", path: "/home-spec" },
-      { label: "History", path: "/history-event" },
-      { label: "Favorite Events", path: "/my-favorite-events" },
+      { label: "Trang chủ", path: "/home-implementer" },
+      { label: "Danh sách sự kiện", path: "/home-spec" },
+      { label: "Lịch sử sự kiện đã tham gia", path: "/history-event" },
+      { label: "Sự kiện yêu thích", path: "/my-favorite-events" },
     ],
     spectator: [
-      { label: "Home", path: "/home-spec" },
-      { label: "My Favorite", path: "/my-favorite-events" },
-      { label: "Registered Events", path: "/event-registered" },
+      { label: "Trang chủ", path: "/home-spec" },
+      { label: "Sự kiện yêu thích", path: "/my-favorite-events" },
+      { label: "Sự kiện đã đăng ký", path: "/event-registered" },
     ],
   };
 

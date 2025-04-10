@@ -15,7 +15,6 @@ import HomeOfImplementer from "./pages/Author/HomeOfImplementer";
 import UpdateEvent from "./pages/Events/UpdateEvent";
 import CostDetail from "./pages/Events/CostDetail";
 import CreateEventOrganizer from "./pages/Author/CreateEventOrganizer";
-import UpdateEventOrganizer from "./pages/Author/UpdateEventOrganizer";
 import CategoryEventManager from "./pages/Events/CategoryEventManager";
 import HomeSpectator from "./pages/Author/HomeSpectator";
 import EventPlan from "./pages/Events/EventPlan";
@@ -38,16 +37,14 @@ function App() {
     }
 
     const role = localStorage.getItem("role");
-    switch (role) {
-      case "Campus Manager":
-      case "Event Organizer":
-        return "/home";
-      case "Implementer":
-        return "/home-implementer";
-      case "Spectator":
-        return "/home-spec";
-      default:
-        return "/login";
+    if (role === "Campus Manager" || role === "Event Organizer") {
+      return "/home";
+    } else if (role === "Implementer") {
+      return "/home-implementer";
+    } else if (role === "Spectator") {
+      return "/home-spec";
+    } else {
+      return "/login";
     }
   };
   return (
@@ -60,13 +57,7 @@ function App() {
         <Route
           path="/home"
           element={
-            <PrivateRoute
-              allowedRoles={[
-                "Campus Manager",
-                "Event Organizer",
-                "Implementer",
-              ]}
-            >
+            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
               <Home />
             </PrivateRoute>
           }
@@ -192,7 +183,7 @@ function App() {
         <Route
           path="/home-implementer"
           element={
-            <PrivateRoute allowedRoles={["Implementer", "Event Organizer"]}>
+            <PrivateRoute allowedRoles={["Implementer"]}>
               <HomeOfImplementer />
             </PrivateRoute>
           }
@@ -229,11 +220,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/update-event-organizer/:userId"
-          element={<UpdateEventOrganizer />}
-        />
-
         <Route
           path="/category-event"
           element={
