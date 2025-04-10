@@ -375,12 +375,12 @@ const EventDetailEOG = () => {
               </div>
 
               <div className="time-section">
-                <h3 className="section-title">Timeframe</h3>
+                <h3 className="section-title">Khung thời gian</h3>
 
                 <div className="info-item">
                   <FaClock className="icon-time" />
                   <div>
-                    <span className="event-info-span">Start Time:</span>
+                    <span className="event-info-span">Thời gian bắt đầu:</span>
                     {formatDateTime(event.startTime)}
                   </div>
                 </div>
@@ -388,7 +388,7 @@ const EventDetailEOG = () => {
                 <div className="info-item">
                   <FaClock className="icon-time" />
                   <div>
-                    <span className="event-info-span">End Time:</span>
+                    <span className="event-info-span">Thời gian kết thúc:</span>
                     {formatDateTime(event.endTime)}
                   </div>
                 </div>
@@ -396,19 +396,19 @@ const EventDetailEOG = () => {
                 <div className="info-item">
                   <FaMapMarkerAlt className="icon-location" />
                   <div>
-                    <span className="event-info-span">Location:</span>
+                    <span className="event-info-span">Địa điểm:</span>
                     {event.placed}
                   </div>
                 </div>
               </div>
 
               <div className="basic-info-section">
-                <h3 className="section-title">Basic Information</h3>
+                <h3 className="section-title">Thông tin cơ bản</h3>
 
                 <div className="info-item">
                   <MdOutlineCategory className="icon-category" />
                   <div>
-                    <span className="event-info-span">Category:</span>
+                    <span className="event-info-span">Kiểu sự kiện:</span>
                     {event.categoryEventName}
                   </div>
                 </div>
@@ -416,20 +416,18 @@ const EventDetailEOG = () => {
                 <div className="info-item">
                   <FaMoneyBillAlt className="icon-price" />
                   <div>
-                    <span className="event-info-span"> Total Cost:</span>
+                    <span className="event-info-span"> Tổng chi phí:</span>
                     {event.amountBudget.toLocaleString("vi-VN")} VNĐ
                   </div>
                 </div>
 
-                {event.sizeParticipants && (
-                  <div className="info-item">
-                    <FaUsers />
-                    <div>
-                      <span className="event-info-span">Participants:</span>
-                      {event.sizeParticipants}
-                    </div>
+                <div className="info-item">
+                  <FaUsers />
+                  <div>
+                    <span className="event-info-span">Người tham gia:</span>
+                    {event.sizeParticipants}
                   </div>
-                )}
+                </div>
 
                 {event.sloganEvent && (
                   <div className="info-item">
@@ -445,7 +443,9 @@ const EventDetailEOG = () => {
                   <div className="info-item">
                     <FaUserFriends />
                     <div>
-                      <span className="event-info-span">Target Audience:</span>
+                      <span className="event-info-span">
+                        Đối tượng mục tiêu:
+                      </span>
                       {event.targetAudience}
                     </div>
                   </div>
@@ -454,14 +454,14 @@ const EventDetailEOG = () => {
             </div>
 
             <div className="goals-planning-section">
-              <h3 className="section-title">Goals & Planning</h3>
+              <h3 className="section-title">Mục tiêu & Kế hoạch</h3>
 
               <div className="goals-section">
                 {event.goals && (
                   <div className="info-item">
                     <FaBullseye />
                     <div>
-                      <span className="event-info-span">Goals:</span>
+                      <span className="event-info-span">Mục tiêu:</span>
                       {event.goals}
                     </div>
                   </div>
@@ -471,7 +471,9 @@ const EventDetailEOG = () => {
                   <div className="info-item">
                     <FaChartLine />
                     <div>
-                      <span className="event-info-span">Success Metrics:</span>
+                      <span className="event-info-span">
+                        Số liệu thành công:
+                      </span>
                       {event.measuringSuccess}
                     </div>
                   </div>
@@ -481,7 +483,9 @@ const EventDetailEOG = () => {
                   <div className="info-item">
                     <FaBullhorn />
                     <div>
-                      <span className="event-info-span">Promotional Plan:</span>
+                      <span className="event-info-span">
+                        Kế hoạch khuyến mại:
+                      </span>
                       {event.promotionalPlan}
                     </div>
                   </div>
@@ -492,7 +496,7 @@ const EventDetailEOG = () => {
                     <FaClipboardCheck />
                     <div>
                       <span className="event-info-span">
-                        Monitoring Process:
+                        Quy trình giám sát:
                       </span>
                       {event.monitoringProcess}
                     </div>
@@ -502,7 +506,7 @@ const EventDetailEOG = () => {
             </div>
 
             <div className="event-description">
-              <div>Description:</div>
+              <div>Mô tả:</div>
               <div className="eventDescription">
                 <span>{event.eventDescription}</span>
               </div>
@@ -570,7 +574,7 @@ const EventDetailEOG = () => {
                         : "pointer",
                   }}
                 >
-                  Delete event
+                  Xóa sự kiện
                 </button>
                 <button
                   className="update-event-btn"
@@ -583,7 +587,7 @@ const EventDetailEOG = () => {
                         : "pointer",
                   }}
                 >
-                  Update event
+                  Cập nhật sự kiện
                 </button>
                 <button
                   className="update-event-btn"
@@ -596,7 +600,7 @@ const EventDetailEOG = () => {
                         : "pointer",
                   }}
                 >
-                  Send Request
+                  Gửi yêu cầu
                 </button>
               </>
             )}
@@ -617,9 +621,9 @@ const EventDetailEOG = () => {
               {showPopupReject && (
                 <div className="popup">
                   <div className="popup-content">
-                    <h3>Reject Request</h3>
+                    <h3>Từ chối yêu cầu</h3>
                     <textarea
-                      placeholder="Enter rejection reason..."
+                      placeholder="Nhập lý do từ chối..."
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                     />
@@ -627,7 +631,7 @@ const EventDetailEOG = () => {
                       className="btn cancel"
                       onClick={() => setShowPopupReject(false)}
                     >
-                      Cancel
+                      Hủy
                     </button>
                     <button className="btn submit" onClick={submitReject}>
                       Submit
@@ -638,9 +642,9 @@ const EventDetailEOG = () => {
               {showPopupApprove && (
                 <div className="popup">
                   <div className="popup-content">
-                    <h3 style={{ color: "green" }}>Approve Request</h3>
+                    <h3 style={{ color: "green" }}>Phê duyệt yêu cầu</h3>
                     <textarea
-                      placeholder="Enter reason..."
+                      placeholder="Nhập lý do..."
                       value={approveReason}
                       onChange={(e) => setApproveReason(e.target.value)}
                     />
@@ -648,7 +652,7 @@ const EventDetailEOG = () => {
                       className="btn cancel"
                       onClick={() => setShowPopupApprove(false)}
                     >
-                      Cancel
+                      Hủy
                     </button>
                     <button
                       style={{ backgroundColor: "green" }}

@@ -120,7 +120,6 @@ function ListTask({ eventId, data }) {
       />,
     ];
     if (data.status === 0 || data.status === -1) {
-
       actions.push(
         <Button
           type="text"
@@ -866,7 +865,7 @@ function ListTask({ eventId, data }) {
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Title",
+      title: "Tên",
       dataIndex: "taskName",
       key: "taskName",
       width: "15%",
@@ -882,7 +881,7 @@ function ListTask({ eventId, data }) {
       ),
     },
     {
-      title: "Description",
+      title: "Mô tả",
       dataIndex: "taskDescription",
       key: "taskDescription",
       width: "25%",
@@ -890,14 +889,14 @@ function ListTask({ eventId, data }) {
       render: (text) => text || "No description",
     },
     {
-      title: "Start Time",
+      title: "Thời gian bắt đầu",
       dataIndex: "startTime",
       key: "startTime",
       width: "12%",
       render: (text) => formatDate(text),
     },
     {
-      title: "Deadline",
+      title: "Hạn chót",
       dataIndex: "deadline",
       key: "deadline",
       width: "12%",
@@ -911,14 +910,14 @@ function ListTask({ eventId, data }) {
       },
     },
     {
-      title: "Budget",
+      title: "Ngân sách",
       dataIndex: "amountBudget",
       key: "amountBudget",
       width: "13%",
       render: (text) => formatCurrency(text),
     },
     {
-      title: "Action",
+      title: "Hành động",
       key: "action",
       width: "18%",
       render: (_, record) => (
@@ -942,11 +941,11 @@ function ListTask({ eventId, data }) {
                 className="edit-button"
               />
               <Popconfirm
-                title="Confirm task deletion"
-                description="Are you sure you want to delete this task?"
+                title="Xác nhận xóa nhiệm vụ"
+                description="Bạn có chắc chắn muốn xóa tác vụ này không?"
                 onConfirm={() => handleDelete(record.id)}
-                okText="Delete"
-                cancelText="Cancel"
+                okText="Xóa"
+                cancelText="Hủy bỏ"
                 icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
               >
                 <Button
@@ -967,7 +966,7 @@ function ListTask({ eventId, data }) {
     return (
       <div style={{ textAlign: "center", padding: "50px 0" }}>
         <Spin size="large" />
-        <div style={{ marginTop: "15px" }}>Loading task list...</div>
+        <div style={{ marginTop: "15px" }}>Đang tải danh sách nhiệm vụ...</div>
       </div>
     );
   }
@@ -983,7 +982,7 @@ function ListTask({ eventId, data }) {
           icon={<SyncOutlined />}
           onClick={fetchTasksFromAPI}
         >
-          Retry
+          Thử lại
         </Button>
       </div>
     );
@@ -1006,7 +1005,7 @@ function ListTask({ eventId, data }) {
       <Card className="task-list-card">
         <div className="task-header">
           <Title level={3} className="task-title">
-            List Task ({filteredTasks.length})
+            Danh sách nhiệm vụ ({filteredTasks.length})
           </Title>
 
           <div className="task-actions">
@@ -1018,7 +1017,7 @@ function ListTask({ eventId, data }) {
                   onClick={showCreateModal}
                   className="add-task-button"
                 >
-                  Create Task
+                  Tạo nhiệm vụ
                 </Button>
               )}
             </Space>
@@ -1038,7 +1037,7 @@ function ListTask({ eventId, data }) {
                   icon={<PlusOutlined />}
                   onClick={showCreateModal}
                 >
-                  Create your first task
+                  Tạo nhiệm vụ đầu tiên của bạn
                 </Button>
               )}
             </Empty>
@@ -1094,25 +1093,25 @@ function ListTask({ eventId, data }) {
           >
             <Form.Item
               name="taskName"
-              label="Title"
+              label="Tiêu đề"
               rules={[{ required: true, message: "Please enter title!" }]}
             >
-              <Input placeholder="Enter task title" />
+              <Input placeholder="Nhập tiêu đề nhiệm vụ" />
             </Form.Item>
 
             <Form.Item
               name="taskDescription"
-              label="Description"
+              label="Mô tả"
               rules={[{ required: true, message: "Please enter description!" }]}
             >
-              <TextArea rows={3} placeholder="Enter task description" />
+              <TextArea rows={3} placeholder="Nhập mô tả!" />
             </Form.Item>
 
             <Form.Item
               name="startTime"
               label={
                 <Space>
-                  <CalendarOutlined /> Start Time
+                  <CalendarOutlined /> Bắt đầu
                 </Space>
               }
               rules={[
@@ -1147,7 +1146,7 @@ function ListTask({ eventId, data }) {
               name="deadline"
               label={
                 <Space>
-                  <ClockCircleOutlined /> Deadline
+                  <ClockCircleOutlined /> Hạn chót
                 </Space>
               }
               dependencies={["startTime"]}
@@ -1198,7 +1197,7 @@ function ListTask({ eventId, data }) {
 
             <Form.Item>
               <Space className="form-actions" style={{ float: "right" }}>
-                <Button onClick={handleCloseModal}>Cancel</Button>
+                <Button onClick={handleCloseModal}>Hủy</Button>
                 <Button type="primary" htmlType="submit" loading={isSubmitting}>
                   {isEditMode ? "Update" : "Create"}
                 </Button>
@@ -1211,30 +1210,30 @@ function ListTask({ eventId, data }) {
           title={
             <div>
               <div className="task-drawer-title">
-                <span>Task details: {selectedTask?.taskName}</span>
+                <span>Chi tiết nhiệm vụ: {selectedTask?.taskName}</span>
                 <Tag color="blue">
-                  Complete: {calculateProgress(selectedTask?.subTasks)}%
+                  Hoàn thành: {calculateProgress(selectedTask?.subTasks)}%
                 </Tag>
               </div>
               <div className="task-detail-info">
                 <div>
-                  <span className="detail-label">Start Time:</span>{" "}
+                  <span className="detail-label">Bắt đầu:</span>{" "}
                   {formatDate(selectedTask?.startTime)}
                 </div>
                 <div>
-                  <span className="detail-label">Deadline:</span>{" "}
+                  <span className="detail-label">Hạn chót:</span>{" "}
                   {formatDate(selectedTask?.deadline)}
                 </div>
                 {selectedTask?.amountBudget > 0 && (
                   <div>
-                    <span className="detail-label">Budget:</span>{" "}
+                    <span className="detail-label">Ngân sách:</span>{" "}
                     {formatCurrency(selectedTask?.amountBudget)}
                   </div>
                 )}
               </div>
               {selectedTask?.taskDescription && (
                 <div className="task-description">
-                  <span className="detail-label">Description:</span>{" "}
+                  <span className="detail-label">Mô tả:</span>{" "}
                   {selectedTask.taskDescription}
                 </div>
               )}
@@ -1252,13 +1251,13 @@ function ListTask({ eventId, data }) {
                 icon={<PlusOutlined />}
                 onClick={showCreateSubTaskModal}
               >
-                Create New Subtask
+                Tạo công việc con mới
               </Button>
             )
           }
         >
           <Modal
-            title="Add new subtask"
+            title="Thêm công việc con mới"
             open={isSubTaskModalVisible}
             onCancel={() => setIsSubTaskModalVisible(false)}
             footer={null}
@@ -1278,7 +1277,7 @@ function ListTask({ eventId, data }) {
             >
               <Form.Item
                 name="subTaskName"
-                label="Title"
+                label="Tiêu đề"
                 rules={[
                   {
                     required: true,
@@ -1286,12 +1285,12 @@ function ListTask({ eventId, data }) {
                   },
                 ]}
               >
-                <Input placeholder="Enter subtask title" />
+                <Input placeholder="Nhập tiêu đề nhiệm vụ con" />
               </Form.Item>
 
               <Form.Item
                 name="subTaskDescription"
-                label="Description"
+                label="Mô tả"
                 rules={[
                   {
                     required: true,
@@ -1299,14 +1298,15 @@ function ListTask({ eventId, data }) {
                   },
                 ]}
               >
-                <TextArea rows={2} placeholder="Enter subtask description" />
+                <TextArea rows={2} placeholder="Nhập mô tả nhiệm vụ con" />
               </Form.Item>
 
               <Form.Item
                 name="startTime"
                 label={
                   <Space>
-                    <CalendarOutlined /> Start Time
+                    <CalendarOutlined />
+                    Bắt đầu
                   </Space>
                 }
                 rules={[
@@ -1342,7 +1342,7 @@ function ListTask({ eventId, data }) {
                 label={
                   <Space>
                     <ClockCircleOutlined />
-                    Deadline
+                    Hạn chót
                   </Space>
                 }
                 rules={[
@@ -1391,14 +1391,14 @@ function ListTask({ eventId, data }) {
               <Form.Item>
                 <Space className="form-actions" style={{ float: "right" }}>
                   <Button onClick={() => setIsSubTaskModalVisible(false)}>
-                    Cancel
+                    Hủy
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
                     loading={isSubTaskSubmitting}
                   >
-                    Create
+                    Tạo
                   </Button>
                 </Space>
               </Form.Item>
@@ -1406,7 +1406,7 @@ function ListTask({ eventId, data }) {
           </Modal>
 
           <div className="sub-tasks-section">
-            <Title level={5}>List Subtask ({subTasks.length})</Title>
+            <Title level={5}>Danh sách công việc con ({subTasks.length})</Title>
 
             <Spin spinning={loadingSubTasks}>
               {!subTasks || subTasks.length === 0 ? (
@@ -1446,13 +1446,13 @@ function ListTask({ eventId, data }) {
                             {item.joinSubTask &&
                               item.joinSubTask.length > 0 && (
                                 <Tag color="green" style={{ marginLeft: 8 }}>
-                                  {item.joinSubTask.length} assigned
+                                  {item.joinSubTask.length} được giao
                                 </Tag>
                               )}
                           </div>
                           {item.deadline && (
                             <div className="sub-task-date">
-                              Deadline: {formatDate(item.deadline)}
+                              Hạn chót: {formatDate(item.deadline)}
                             </div>
                           )}
                           {item.subTaskDescription && (
@@ -1462,7 +1462,7 @@ function ListTask({ eventId, data }) {
                           )}
                           {item.joinSubTask && item.joinSubTask.length > 0 && (
                             <div className="assigned-users">
-                              Assigned to:{" "}
+                              Được giao cho:{" "}
                               {item.joinSubTask.map((user) => (
                                 <Tag key={user.id}>
                                   {user.firstName ||
@@ -1504,7 +1504,7 @@ function ListTask({ eventId, data }) {
                     key="cancel"
                     onClick={() => setIsAssignModalVisible(false)}
                   >
-                    Cancel
+                    Hủy
                   </Button>,
                   <Button
                     key="submit"
@@ -1512,7 +1512,7 @@ function ListTask({ eventId, data }) {
                     loading={assigningUser}
                     onClick={handleAssignUsers}
                   >
-                    Assign
+                    Giao phó
                   </Button>,
                 ]}
               >
@@ -1561,7 +1561,7 @@ function ListTask({ eventId, data }) {
                 </Space>
               </Modal>
               <Modal
-                title="Update Subtask"
+                title="Cập nhật nhiệm vụ con"
                 open={isEditSubTaskModalVisible}
                 onCancel={() => setIsEditSubTaskModalVisible(false)}
                 footer={null}
@@ -1581,7 +1581,7 @@ function ListTask({ eventId, data }) {
                 >
                   <Form.Item
                     name="subTaskName"
-                    label="Title"
+                    label="Tiêu đề"
                     rules={[
                       {
                         required: true,
@@ -1589,18 +1589,18 @@ function ListTask({ eventId, data }) {
                       },
                     ]}
                   >
-                    <Input placeholder="Enter subtask title" />
+                    <Input placeholder="Nhập tiêu đề nhiệm vụ con" />
                   </Form.Item>
 
-                  <Form.Item name="subTaskDescription" label="Describe">
-                    <TextArea rows={2} placeholder="Describe subtask" />
+                  <Form.Item name="subTaskDescription" label="Mô tả">
+                    <TextArea rows={2} placeholder="" />
                   </Form.Item>
 
                   <Form.Item
                     name="startTime"
                     label={
                       <Space>
-                        <CalendarOutlined /> Start Time
+                        <CalendarOutlined /> Bắt đầu
                       </Space>
                     }
                   >
@@ -1615,7 +1615,7 @@ function ListTask({ eventId, data }) {
                     name="deadline"
                     label={
                       <Space>
-                        <ClockCircleOutlined /> Deadline
+                        <ClockCircleOutlined /> Hạn chót
                       </Space>
                     }
                   >
@@ -1626,7 +1626,7 @@ function ListTask({ eventId, data }) {
                     />
                   </Form.Item>
 
-                  <Form.Item name="amountBudget" label="Budget (VND)">
+                  <Form.Item name="amountBudget" label="Ngân sách (VND)">
                     <InputNumber
                       style={{ width: "100%" }}
                       formatter={(value) =>
@@ -1642,14 +1642,14 @@ function ListTask({ eventId, data }) {
                       <Button
                         onClick={() => setIsEditSubTaskModalVisible(false)}
                       >
-                        Cancel
+                        Hủy
                       </Button>
                       <Button
                         type="primary"
                         htmlType="submit"
                         loading={isEditSubTaskSubmitting}
                       >
-                        Update
+                        Cập nhật
                       </Button>
                     </Space>
                   </Form.Item>

@@ -21,7 +21,7 @@ export default function CategoryEventManager() {
 
   const [showModal, setShowModal] = useState(false);
   const [categoryData, setCategoryData] = useState({ id: "", name: "" });
-  const [modalTitle, setModalTitle] = useState("Create Category");
+  const [modalTitle, setModalTitle] = useState("Tạo danh mục");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,13 +53,13 @@ export default function CategoryEventManager() {
 
   const handleCreate = () => {
     setCategoryData({ id: "", name: "" });
-    setModalTitle("Create Category");
+    setModalTitle("Tạo danh mục");
     setShowModal(true);
   };
 
   const handleUpdate = (category) => {
     setCategoryData({ id: category.id, name: category.categoryEventName });
-    setModalTitle("Update Category");
+    setModalTitle("Cập nhật danh mục");
     setShowModal(true);
   };
   const handleCloseModal = () => {
@@ -72,30 +72,30 @@ export default function CategoryEventManager() {
   };
   const handleDelete = async (id) => {
     try {
-      // Show confirmation dialog
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "Bạn có chắc chắn không?",
+        text: "Hành động này không thể hoàn tác!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: "Vâng, xóa nó!",
+        cancelButtonText: "Hủy",
       });
 
       if (result.isConfirmed) {
         var token = localStorage.getItem("token");
         const response = await deleteCategory(id, token);
         if (response?.error) {
-          Swal.fire("Error", response.error, "error");
+          Swal.fire("Lỗi", response.error, "error");
         } else {
           setCategories(categories.filter((category) => category.id !== id));
-          Swal.fire("Deleted!", "Your category has been deleted.", "success");
+          Swal.fire("Đã xóa!", "Danh mục đã được xóa.", "success");
         }
       }
     } catch (error) {
-      console.error("Error deleting category:", error);
-      Swal.fire("Error", "There was a problem deleting the category.", "error");
+      console.error("Lỗi khi xóa danh mục:", error);
+      Swal.fire("Lỗi", "Có sự cố xảy ra khi xóa danh mục.", "error");
     }
   };
 
@@ -103,14 +103,14 @@ export default function CategoryEventManager() {
     <>
       <Header />
       <div style={{ marginTop: "100px" }}>
-        <h1>Category Manager</h1>
+        <h1>Quản lý danh mục sự kiện</h1>
         <div className="d-flex justify-content-between me-4">
           <div>
-            <h4>Campus: {campus?.campusName || ""}</h4>
+            <h4>Cơ sở: {campus?.campusName || ""}</h4>
           </div>
           <div>
             <button onClick={handleCreate} className="btn btn-success btn-sm">
-              Create
+              Tạo mới
             </button>
           </div>
         </div>
@@ -157,8 +157,8 @@ export default function CategoryEventManager() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Action</th>
+                <th>Tên danh mục</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -171,13 +171,13 @@ export default function CategoryEventManager() {
                       onClick={() => handleUpdate(category)}
                       className="btn btn-primary btn-sm me-2"
                     >
-                      Update
+                      Cập nhật
                     </button>
                     <button
                       onClick={() => handleDelete(category.id)}
                       className="btn btn-danger btn-sm"
                     >
-                      Delete
+                      Xóa
                     </button>
                   </td>
                 </tr>

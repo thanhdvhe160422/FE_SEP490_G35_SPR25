@@ -26,7 +26,7 @@ export default function HomeSpectator() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [categoryFilter, setCategoryFilter] = useState(""); // Lưu giá trị là text mà người dùng nhập
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -37,13 +37,13 @@ export default function HomeSpectator() {
   const [totalEvents, setTotalEvents] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]); // Danh sách category từ API
+  const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
-      return "https://placehold.co/600x400?text=No+Image";
+      return "https://placehold.co/600x400?text=Không+có+hình+ảnh";
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
@@ -51,7 +51,7 @@ export default function HomeSpectator() {
 
   const getImageUrl = (eventMedias) => {
     if (!eventMedias || !eventMedias.length || !eventMedias[0].mediaDTO) {
-      return "https://placehold.co/600x400?text=No+Image";
+      return "https://placehold.co/600x400?text=Không+có+hình+ảnh";
     }
     return eventMedias[0].mediaDTO.mediaUrl;
   };
@@ -93,7 +93,7 @@ export default function HomeSpectator() {
   const fetchCategories = async () => {
     try {
       const categoryData = await getCategories();
-      console.log("Danh sách categories từ API:", categoryData);
+      console.log("Danh sách danh mục từ API:", categoryData);
       setCategories(categoryData);
     } catch (error) {
       console.error("Lỗi khi lấy danh mục:", error);
@@ -105,7 +105,7 @@ export default function HomeSpectator() {
       setLoading(true);
       setIsSearchMode(false);
       const role = localStorage.getItem("role");
-      console.log("thu" + role);
+      console.log("Vai trò: " + role);
       const response = await getPosts(currentPage, pageSize, role);
 
       if (response && response.items) {
@@ -114,11 +114,11 @@ export default function HomeSpectator() {
         setTotalPages(response.totalPages || 1);
         extractLocations(response.items);
       } else {
-        console.error("Unexpected API response format:", response);
+        console.error("Định dạng phản hồi API không mong đợi:", response);
         setEvents([]);
       }
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("Lỗi khi lấy danh sách sự kiện:", error);
       setEvents([]);
     } finally {
       setLoading(false);
@@ -142,7 +142,7 @@ export default function HomeSpectator() {
           ? getCategoryIdFromName(categoryFilter)
           : undefined;
 
-      console.log("categoryId:", categoryId);
+      console.log("Mã danh mục:", categoryId);
 
       const params = {
         page: page,
@@ -152,10 +152,10 @@ export default function HomeSpectator() {
         status: statusFilter !== "All" ? statusFilter : undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
-        categoryId: categoryId, // Gửi categoryId thay vì text
+        categoryId: categoryId,
       };
 
-      console.log("Search params:", params);
+      console.log("Tham số tìm kiếm:", params);
       const response = await searchEventsSpec(params);
 
       if (response && response.items) {
@@ -168,7 +168,7 @@ export default function HomeSpectator() {
         setTotalPages(1);
       }
     } catch (error) {
-      console.error("Error searching events:", error);
+      console.error("Lỗi khi tìm kiếm sự kiện:", error);
       setEvents([]);
       setTotalPages(1);
     } finally {
@@ -189,8 +189,8 @@ export default function HomeSpectator() {
   };
 
   useEffect(() => {
-    fetchCategories(); // Lấy danh sách category khi component mount
-    fetchEvents(); // Lấy sự kiện mặc định
+    fetchCategories();
+    fetchEvents();
   }, []);
 
   const handlePageChange = (pageNumber) => {
@@ -232,7 +232,7 @@ export default function HomeSpectator() {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US");
+    return date.toLocaleDateString("vi-VN");
   };
 
   return (
@@ -251,38 +251,38 @@ export default function HomeSpectator() {
           {sidebarOpen && (
             <div className="sidebar-content">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Filters</h5>
+                <h5 className="mb-0">Bộ lọc</h5>
                 <Button
                   variant="outline-secondary"
                   size="sm"
                   onClick={handleResetFilters}
                 >
-                  Reset
+                  Đặt lại
                 </Button>
               </div>
 
               <Form.Group className="mb-3">
-                <Form.Label>Category</Form.Label>
+                <Form.Label>Danh mục</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter category..."
+                  placeholder="Nhập danh mục..."
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
+                <Form.Label>Địa điểm</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter location..."
+                  placeholder="Nhập địa điểm..."
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Start Date</Form.Label>
+                <Form.Label>Ngày bắt đầu</Form.Label>
                 <Form.Control
                   type="date"
                   value={startDate}
@@ -291,7 +291,7 @@ export default function HomeSpectator() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>End Date</Form.Label>
+                <Form.Label>Ngày kết thúc</Form.Label>
                 <Form.Control
                   type="date"
                   value={endDate}
@@ -305,7 +305,7 @@ export default function HomeSpectator() {
                 className="w-100"
                 onClick={handleApplyFilters}
               >
-                Apply Filters
+                Áp dụng bộ lọc
               </Button>
 
               {(searchTerm.trim() !== "" ||
@@ -320,7 +320,7 @@ export default function HomeSpectator() {
                   variant="outline-primary"
                   onClick={handleResetFilters}
                 >
-                  Clear Filters
+                  Xóa bộ lọc
                 </Button>
               )}
             </div>
@@ -330,11 +330,11 @@ export default function HomeSpectator() {
         <div className="flex-grow-1 px-4" style={{ marginTop: "100px" }}>
           <Container fluid className="px-2">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="fw-bold mb-0">Events</h2>
+              <h2 className="fw-bold mb-0">Sự kiện</h2>
               <div className="d-flex" style={{ width: "50%" }}>
                 <Form.Control
                   type="text"
-                  placeholder="Search events..."
+                  placeholder="Tìm kiếm sự kiện..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => {
@@ -348,7 +348,7 @@ export default function HomeSpectator() {
                   className="ms-2"
                   onClick={handleApplyFilters}
                 >
-                  Search
+                  Tìm kiếm
                 </Button>
               </div>
             </div>
@@ -360,35 +360,40 @@ export default function HomeSpectator() {
               startDate ||
               endDate) && (
               <div className="mb-3">
-                <span className="me-2">Active filters:</span>
+                <span className="me-2">Bộ lọc đang áp dụng:</span>
                 {searchTerm && (
                   <Badge bg="info" className="me-2">
-                    Keyword: {searchTerm}
+                    Từ khóa: {searchTerm}
                   </Badge>
                 )}
                 {statusFilter !== "All" && (
                   <Badge bg="info" className="me-2">
-                    Status: {statusFilter}
+                    Trạng thái:{" "}
+                    {statusFilter === "Running"
+                      ? "Đang diễn ra"
+                      : statusFilter === "Closed"
+                      ? "Đã đóng"
+                      : "Chưa diễn ra"}
                   </Badge>
                 )}
                 {categoryFilter && (
                   <Badge bg="info" className="me-2">
-                    Category: {categoryFilter}
+                    Danh mục: {categoryFilter}
                   </Badge>
                 )}
                 {locationFilter && (
                   <Badge bg="info" className="me-2">
-                    Location: {locationFilter}
+                    Địa điểm: {locationFilter}
                   </Badge>
                 )}
                 {startDate && (
                   <Badge bg="info" className="me-2">
-                    From: {formatDate(startDate)}
+                    Từ: {formatDate(startDate)}
                   </Badge>
                 )}
                 {endDate && (
                   <Badge bg="info" className="me-2">
-                    To: {formatDate(endDate)}
+                    Đến: {formatDate(endDate)}
                   </Badge>
                 )}
               </div>
@@ -398,7 +403,7 @@ export default function HomeSpectator() {
               {loading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Đang tải...</span>
                   </div>
                 </div>
               ) : (
@@ -422,7 +427,7 @@ export default function HomeSpectator() {
                               style={{ objectFit: "cover" }}
                               onError={(e) => {
                                 e.target.src =
-                                  "https://placehold.co/600x400?text=No+Image";
+                                  "https://placehold.co/600x400?text=Không+có+hình+ảnh";
                               }}
                             />
                             <div
@@ -460,7 +465,11 @@ export default function HomeSpectator() {
                                     : "status-notyet"
                                 }`}
                               >
-                                {event.statusMessage}
+                                {event.statusMessage === "Running"
+                                  ? "Đang diễn ra"
+                                  : event.statusMessage === "Closed"
+                                  ? "Đã đóng"
+                                  : "Chưa diễn ra"}
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
@@ -472,27 +481,26 @@ export default function HomeSpectator() {
                                 <div>
                                   <small className="text-muted">
                                     {new Date(event.startTime).toLocaleString(
-                                      "en-US",
+                                      "vi-VN",
                                       {
                                         weekday: "short",
                                         month: "short",
                                         day: "numeric",
                                         hour: "numeric",
                                         minute: "2-digit",
-                                        hour12: true,
                                       }
                                     )}
                                   </small>
                                 </div>
                                 <div>
                                   <small className="text-muted">
-                                    Location: {event.placed}
+                                    Địa điểm: {event.placed}
                                   </small>
                                 </div>
                                 {event.categoryViewModel && (
                                   <div>
                                     <small className="text-muted">
-                                      Category:{" "}
+                                      Danh mục:{" "}
                                       {
                                         event.categoryViewModel
                                           .categoryEventName
@@ -513,8 +521,8 @@ export default function HomeSpectator() {
                         >
                           <p className="text-muted text-center">
                             {totalEvents === 0
-                              ? "No events available."
-                              : "No events found matching your criteria."}
+                              ? "Không có sự kiện nào."
+                              : "Không tìm thấy sự kiện phù hợp với tiêu chí của bạn."}
                           </p>
                         </div>
                       </Col>

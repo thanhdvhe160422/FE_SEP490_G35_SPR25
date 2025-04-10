@@ -31,11 +31,11 @@ function MyRequest(props) {
     >
       <Header />
       <div className="event-request-content">
-        <h2>List Event Request</h2>
+        <h2>Danh sách yêu cầu của tôi</h2>
         <div className="event-request-columns">
-          <RequestColumn title="Not Approved Yet" requests={pendingRequests} />
-          <RequestColumn title="Approved" requests={approvedRequests} />
-          <RequestColumn title="Rejected" requests={rejectedRequests} />
+          <RequestColumn title="Chưa được duyệt" requests={pendingRequests} />
+          <RequestColumn title="Đã duyệt" requests={approvedRequests} />
+          <RequestColumn title="Đã từ chối" requests={rejectedRequests} />
         </div>
       </div>
       {/* <Footer /> */}
@@ -48,7 +48,7 @@ function RequestColumn({ title, requests, children }) {
     <div className="event-request-column">
       <h3>{title}</h3>
       {requests.length === 0 ? (
-        <p className="empty-message">No requirements.</p>
+        <p className="empty-message">Không có yêu cầu nào</p>
       ) : (
         requests.map((req) => (
           <div key={req.id} className="event-request-card">
@@ -63,11 +63,11 @@ function RequestColumn({ title, requests, children }) {
             </h4>
             {req.reason && (
               <p className="event-request-reason">
-                <strong>Reason:</strong> {req.reason}
+                <strong>Lý do:</strong> {req.reason}
               </p>
             )}
             <p className="event-request-date">
-              <strong>Create At: </strong> {formatDateTime(req.createdAt)}
+              <strong>Tạo: </strong> {formatDateTime(req.createdAt)}
             </p>
             {children && children(req)}
           </div>
@@ -77,7 +77,7 @@ function RequestColumn({ title, requests, children }) {
   );
 }
 const formatDateTime = (dateTime) => {
-  return new Date(dateTime).toLocaleString("en", {
+  return new Date(dateTime).toLocaleString("vi", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

@@ -17,8 +17,8 @@ export default function Authorization() {
               </div>
 
               <div className="contant_box_404">
-                <h3 className="h2">Look like you're lost</h3>
-                <p>the page you are looking for not available!</p>
+                <h3 className="h2">Nhìn như bạn bị lạc vậy</h3>
+                <p>trang bạn đang tìm kiếm không có sẵn!</p>
                 <button
                   className="link_404"
                   onClick={() => {
@@ -35,7 +35,7 @@ export default function Authorization() {
                     }
                   }}
                 >
-                  Go to Home
+                  Trở về trang chủ
                 </button>
               </div>
             </div>

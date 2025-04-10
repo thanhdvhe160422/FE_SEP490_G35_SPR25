@@ -12,22 +12,22 @@ const WeekCalendar = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState({
-    apiResponseStatus: "Not fetched",
+    apiResponseStatus: "Chưa lấy dữ liệu",
     subtasksCount: 0,
     lastFetchTime: null,
   });
 
   const subTaskColors = [
-    "#4285F4", // Blue
-    "#EA4335", // Red
-    "#FBBC05", // Yellow
-    "#34A853", // Green
-    "#FF9800", // Orange
-    "#9C27B0", // Purple
-    "#00BCD4", // Cyan
-    "#795548", // Brown
-    "#607D8B", // Blue Grey
-    "#E91E63", // Pink
+    "#4285F4", // Xanh dương
+    "#EA4335", // Đỏ
+    "#FBBC05", // Vàng
+    "#34A853", // Xanh lá
+    "#FF9800", // Cam
+    "#9C27B0", // Tím
+    "#00BCD4", // Xanh ngọc
+    "#795548", // Nâu
+    "#607D8B", // Xám xanh
+    "#E91E63", // Hồng
   ];
 
   useEffect(() => {
@@ -241,7 +241,7 @@ const WeekCalendar = () => {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    const weekLabel = `${formatDayMonth(startOfWeek)} to ${formatDayMonth(
+    const weekLabel = `${formatDayMonth(startOfWeek)} đến ${formatDayMonth(
       endOfWeek
     )}`;
     const weekIndex = weeksInYear.findIndex((week) => week.label === weekLabel);
@@ -281,7 +281,9 @@ const WeekCalendar = () => {
       endOfWeek.setDate(startOfWeek.getDate() + 6);
 
       weeks.push({
-        label: `${formatDayMonth(startOfWeek)} to ${formatDayMonth(endOfWeek)}`,
+        label: `${formatDayMonth(startOfWeek)} đến ${formatDayMonth(
+          endOfWeek
+        )}`,
         startDate: new Date(startOfWeek),
       });
 
@@ -306,7 +308,7 @@ const WeekCalendar = () => {
       const startDate = weekDates[0].toISOString();
       const endDate = weekDates[6].toISOString();
 
-      console.log("Fetching subtasks with params:", {
+      console.log("Đang lấy danh sách nhiệm vụ phụ với tham số:", {
         implementerId,
         startDate,
         endDate,
@@ -318,23 +320,23 @@ const WeekCalendar = () => {
         endDate
       );
 
-      console.log("Raw API response:", response);
+      console.log("Phản hồi API thô:", response);
       setDebugInfo((prev) => ({
         ...prev,
-        apiResponseStatus: response ? "Success" : "Null",
-        lastFetchTime: new Date().toLocaleTimeString(),
+        apiResponseStatus: response ? "Thành công" : "Không có dữ liệu",
+        lastFetchTime: new Date().toLocaleTimeString("vi-VN"),
       }));
 
       if (!response) {
-        console.warn("API returned null");
-        setError("There are no subtasks for this week.");
+        console.warn("API trả về không có dữ liệu");
+        setError("Không có nhiệm vụ phụ nào trong tuần này.");
         setSubtasks([]);
         return;
       }
 
       if (!response.items) {
-        console.error("Invalid response format:", response);
-        setError("Invalid response format from API");
+        console.error("Định dạng phản hồi không hợp lệ:", response);
+        setError("Định dạng phản hồi từ API không hợp lệ");
         setSubtasks([]);
         return;
       }
@@ -343,8 +345,8 @@ const WeekCalendar = () => {
         (a, b) => new Date(a.deadline) - new Date(b.deadline)
       );
 
-      console.log("Sorted subtasks to be rendered:", sortedSubtasks);
-      console.log("Number of subtasks:", sortedSubtasks.length);
+      console.log("Danh sách nhiệm vụ phụ đã sắp xếp:", sortedSubtasks);
+      console.log("Số lượng nhiệm vụ phụ:", sortedSubtasks.length);
 
       setSubtasks(sortedSubtasks);
       setDebugInfo((prev) => ({
@@ -352,8 +354,8 @@ const WeekCalendar = () => {
         subtasksCount: sortedSubtasks.length,
       }));
     } catch (error) {
-      console.error("Error fetching subtasks:", error);
-      setError("Failed to fetch subtasks: " + error.message);
+      console.error("Lỗi khi lấy danh sách nhiệm vụ phụ:", error);
+      setError("Không thể lấy danh sách nhiệm vụ phụ: " + error.message);
       setSubtasks([]);
     } finally {
       setLoading(false);
@@ -365,8 +367,8 @@ const WeekCalendar = () => {
   }, [currentDate]);
 
   useEffect(() => {
-    console.log("Current subtasks in state:", subtasks);
-    console.log("Subtasks length:", subtasks.length);
+    console.log("Danh sách nhiệm vụ phụ hiện tại trong state:", subtasks);
+    console.log("Số lượng nhiệm vụ phụ:", subtasks.length);
   }, [subtasks]);
 
   const calculateTaskPosition = (task) => {
@@ -404,14 +406,15 @@ const WeekCalendar = () => {
       width: `${rightPos - leftPos}%`,
     };
   };
+
   const getStatusText = (status) => {
     switch (status) {
       case 0:
-        return "In Progress";
+        return "Đang thực hiện";
       case 1:
-        return "Completed";
+        return "Đã hoàn thành";
       default:
-        return "Unknown";
+        return "Không xác định";
     }
   };
 
@@ -450,22 +453,21 @@ const WeekCalendar = () => {
 
   const handleStatusUpdate = async (subTaskId, currentStatus) => {
     try {
-      // Only update if current status is 0 (In Progress)
       if (currentStatus === 0) {
-        // Set status to 1 (Completed)
         await updateSubtaskStatus(subTaskId, 1);
 
-        // Update the local state to reflect the change
         setSubtasks((prevSubtasks) =>
           prevSubtasks.map((task) =>
             task.id === subTaskId ? { ...task, status: 1 } : task
           )
         );
 
-        console.log(`Updated task ${subTaskId} status to Completed`);
+        console.log(
+          `Đã cập nhật trạng thái nhiệm vụ ${subTaskId} thành Đã hoàn thành`
+        );
       }
     } catch (error) {
-      console.error("Error updating task status:", error);
+      console.error("Lỗi khi cập nhật trạng thái nhiệm vụ:", error);
     }
   };
 
@@ -485,12 +487,12 @@ const WeekCalendar = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Lỗi: ${response.status}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.error("Failed to update subtask status:", error);
+      console.error("Không thể cập nhật trạng thái nhiệm vụ phụ:", error);
       throw error;
     }
   };
@@ -526,12 +528,12 @@ const WeekCalendar = () => {
     <>
       <Header />
       <div className="gantt-container">
-        {/* Calendar controls */}
+        {/* Điều khiển lịch */}
         <div className="calendar-controls">
-          <button onClick={previousWeek}>← Previous Week</button>
+          <button onClick={previousWeek}>← Tuần trước</button>
           <div className="date-selectors">
             <label>
-              Year:
+              Năm:
               <select value={selectedYear} onChange={handleYearChange}>
                 {generateYearOptions().map((year) => (
                   <option key={year} value={year}>
@@ -541,7 +543,7 @@ const WeekCalendar = () => {
               </select>
             </label>
             <label>
-              Week:
+              Tuần:
               <select value={selectedWeek} onChange={handleWeekChange}>
                 {weeksInYear?.map((week, index) => (
                   <option key={index} value={index}>
@@ -551,16 +553,16 @@ const WeekCalendar = () => {
               </select>
             </label>
           </div>
-          <button onClick={nextWeek}>Next Week →</button>
+          <button onClick={nextWeek}>Tuần sau →</button>
         </div>
 
         <div className="gantt-header">
-          <div className="task-info">SubTask Information</div>
+          <div className="task-info">Thông tin nhiệm vụ phụ</div>
           <div className="timeline-header">
             {weekDates.map((date, index) => (
               <div key={index} className="day-column">
                 <div className="day-name">
-                  {date.toLocaleDateString("en-US", { weekday: "short" })}
+                  {date.toLocaleDateString("vi-VN", { weekday: "short" })}
                 </div>
                 <div className="day-date">{formatDayMonth(date)}</div>
               </div>
@@ -570,7 +572,7 @@ const WeekCalendar = () => {
 
         <div className="gantt-body">
           {loading ? (
-            <div className="loading">Loading tasks...</div>
+            <div className="loading">Đang tải nhiệm vụ...</div>
           ) : error ? (
             <div
               className="error-message"
@@ -584,7 +586,7 @@ const WeekCalendar = () => {
               const isCompleted = task.status === 1;
               const statusStyle = getStatusStyle(task.status);
               if (task.status === 0) {
-                console.log("Found task with status 0:", task);
+                console.log("Tìm thấy nhiệm vụ với trạng thái 0:", task);
               }
               return (
                 <div key={task.id || index} className="task-row">
@@ -612,22 +614,23 @@ const WeekCalendar = () => {
                             fontSize: "12px",
                           }}
                         >
-                          Mark Complete
+                          Hoàn thành
                         </button>
                       )}
                     </div>
                     <div className="task-details">
                       <div>
-                        <span>Description:</span> {task.subTaskDescription}
+                        <span>Mô tả:</span> {task.subTaskDescription}
                       </div>
                       <div>
-                        <span>Budget:</span> {formatCurrency(task.amountBudget)}
+                        <span>Ngân sách:</span>{" "}
+                        {formatCurrency(task.amountBudget)}
                       </div>
                       <div>
-                        <span>Task:</span> {task.taskName}
+                        <span>Nhiệm vụ:</span> {task.taskName}
                       </div>
                       <div>
-                        <span>Event:</span> {task.eventTitle}
+                        <span>Sự kiện:</span> {task.eventTitle}
                       </div>
                     </div>
                   </div>
@@ -646,10 +649,10 @@ const WeekCalendar = () => {
                         padding: "5px 8px",
                       }}
                       title={`${task.subTaskName}
-Start: ${new Date(task.startTime).toLocaleString()}
-End: ${new Date(task.deadline).toLocaleString()}
-Budget: ${formatCurrency(task.amountBudget)}
-Status: ${getStatusText(task.status)}`}
+Bắt đầu: ${new Date(task.startTime).toLocaleString("vi-VN")}
+Kết thúc: ${new Date(task.deadline).toLocaleString("vi-VN")}
+Ngân sách: ${formatCurrency(task.amountBudget)}
+Trạng thái: ${getStatusText(task.status)}`}
                     >
                       <span
                         className="task-bar-label"
@@ -664,8 +667,8 @@ Status: ${getStatusText(task.status)}`}
                           opacity: 0.9,
                         }}
                       >
-                        <div>Start: {formatDateTime(task.startTime)}</div>
-                        <div>End: {formatDateTime(task.deadline)}</div>
+                        <div>Bắt đầu: {formatDateTime(task.startTime)}</div>
+                        <div>Kết thúc: {formatDateTime(task.deadline)}</div>
                       </div>
                       {task.status === 0 && (
                         <button
@@ -679,10 +682,10 @@ Status: ${getStatusText(task.status)}`}
                       )}
                       <div className="task-time-info">
                         <div className="task-time-start">
-                          Start: {formatDateTime(task.startTime)}
+                          Bắt đầu: {formatDateTime(task.startTime)}
                         </div>
                         <div className="task-time-end">
-                          End: {formatDateTime(task.deadline)}
+                          Kết thúc: {formatDateTime(task.deadline)}
                         </div>
                       </div>
                     </div>
@@ -691,7 +694,9 @@ Status: ${getStatusText(task.status)}`}
               );
             })
           ) : (
-            <div className="no-tasks">No tasks found for this week.</div>
+            <div className="no-tasks">
+              Không tìm thấy nhiệm vụ nào trong tuần này.
+            </div>
           )}
         </div>
       </div>

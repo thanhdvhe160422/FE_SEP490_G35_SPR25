@@ -61,7 +61,7 @@ export default function CreateEventOrganizer() {
         pagination.currentPage,
         pagination.pageSize
       );
-      console.log("Fetched Event Organizers: ", response.items);
+      console.log("Danh sách người tổ chức sự kiện: ", response.items);
       setEventOrganizers(response.items);
       setPagination({
         ...pagination,
@@ -69,7 +69,7 @@ export default function CreateEventOrganizer() {
         totalPages: response.totalPages,
       });
     } catch (error) {
-      console.error("Error fetching Event Organizers:", error);
+      console.error("Lỗi khi lấy danh sách người tổ chức sự kiện:", error);
     }
   };
 
@@ -82,25 +82,29 @@ export default function CreateEventOrganizer() {
   const onSubmit = async (data) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      enqueueSnackbar("No token found. Please log in.", { variant: "error" });
+      enqueueSnackbar("Không tìm thấy token. Vui lòng đăng nhập.", {
+        variant: "error",
+      });
       return;
     }
 
     if (checkEmailExists(data.email)) {
-      enqueueSnackbar("Email already exists!", { variant: "error" });
+      enqueueSnackbar("Email đã tồn tại!", { variant: "error" });
       return;
     }
 
     try {
       await createEventOrganizer(data);
-      enqueueSnackbar("Event Organizer created successfully!", {
+      enqueueSnackbar("Tạo người tổ chức sự kiện thành công!", {
         variant: "success",
       });
       reset();
       setIsCreateModalVisible(false);
       fetchEOGs();
     } catch (error) {
-      enqueueSnackbar("Error creating Event Organizer!", { variant: "error" });
+      enqueueSnackbar("Lỗi khi tạo người tổ chức sự kiện!", {
+        variant: "error",
+      });
     }
   };
 
@@ -112,21 +116,24 @@ export default function CreateEventOrganizer() {
   const confirmDelete = async () => {
     try {
       if (!selectedEOG?.id) {
-        throw new Error("No Event Organizer selected for deletion");
+        throw new Error("Không có người tổ chức sự kiện nào được chọn để xóa");
       }
 
       await updateEventOrganizer(selectedEOG.id);
 
-      enqueueSnackbar("Event Organizer deleted successfully!", {
+      enqueueSnackbar("Xóa người tổ chức sự kiện thành công!", {
         variant: "success",
       });
       setIsDeleteModalVisible(false);
       fetchEOGs();
     } catch (error) {
-      console.error("Error deleting Event Organizer:", error);
-      enqueueSnackbar("Error deleting Event Organizer!", { variant: "error" });
+      console.error("Lỗi khi xóa người tổ chức sự kiện:", error);
+      enqueueSnackbar("Lỗi khi xóa người tổ chức sự kiện!", {
+        variant: "error",
+      });
     }
   };
+
   const handleTableChange = (paginationData) => {
     setPagination({
       ...pagination,
@@ -137,23 +144,23 @@ export default function CreateEventOrganizer() {
 
   const columns = [
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "First Name", dataIndex: "firstName", key: "firstName" },
-    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+    { title: "Tên", dataIndex: "firstName", key: "firstName" },
+    { title: "Họ", dataIndex: "lastName", key: "lastName" },
     {
-      title: "Date of Birth",
+      title: "Ngày sinh",
       dataIndex: "dateOfBirth",
       key: "dateOfBirth",
-      render: (text) => new Date(text).toLocaleDateString(),
+      render: (text) => new Date(text).toLocaleDateString("vi-VN"),
     },
     {
-      title: "Gender",
+      title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
-      render: (text) => (text ? "Male" : "Female"),
+      render: (text) => (text ? "Nam" : "Nữ"),
     },
-    { title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber" },
+    { title: "Số điện thoại", dataIndex: "phoneNumber", key: "phoneNumber" },
     {
-      title: "Actions",
+      title: "Hành động",
       key: "actions",
       render: (_, record) => (
         <div>
@@ -173,7 +180,7 @@ export default function CreateEventOrganizer() {
       <Header />
       <div className="create-organizer-container">
         <Modal
-          title="Create Event Organizer"
+          title="Tạo người tổ chức sự kiện"
           visible={isCreateModalVisible}
           onCancel={() => setIsCreateModalVisible(false)}
           footer={null}
@@ -184,10 +191,10 @@ export default function CreateEventOrganizer() {
               <input
                 type="email"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Invalid email format",
+                    message: "Định dạng email không hợp lệ",
                   },
                 })}
               />
@@ -197,16 +204,16 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>First Name:</label>
+              <label>Tên:</label>
               <input
                 type="text"
                 {...register("firstName", {
-                  required: "First Name is required",
+                  required: "Tên là bắt buộc",
                   pattern: {
                     value: /^[A-Za-z\s]+$/,
-                    message: "First Name can only contain letters and spaces",
+                    message: "Tên chỉ được chứa chữ cái và khoảng trắng",
                   },
-                  maxLength: { value: 50, message: "Max 50 characters" },
+                  maxLength: { value: 50, message: "Tối đa 50 ký tự" },
                 })}
               />
               {errors.firstName && (
@@ -215,16 +222,16 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Last Name:</label>
+              <label>Họ:</label>
               <input
                 type="text"
                 {...register("lastName", {
-                  required: "Last Name is required",
+                  required: "Họ là bắt buộc",
                   pattern: {
                     value: /^[A-Za-z\s]+$/,
-                    message: "Last Name can only contain letters and spaces",
+                    message: "Họ chỉ được chứa chữ cái và khoảng trắng",
                   },
-                  maxLength: { value: 50, message: "Max 50 characters" },
+                  maxLength: { value: 50, message: "Tối đa 50 ký tự" },
                 })}
               />
               {errors.lastName && (
@@ -233,16 +240,16 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Date of Birth:</label>
+              <label>Ngày sinh:</label>
               <input
                 type="date"
                 {...register("dateOfBirth", {
-                  required: "Date of Birth is required",
+                  required: "Ngày sinh là bắt buộc",
                   validate: (value) => {
                     const dob = new Date(value);
                     const today = new Date();
                     const age = today.getFullYear() - dob.getFullYear();
-                    return age >= 18 || "You must be at least 18 years old";
+                    return age >= 18 || "Bạn phải ít nhất 18 tuổi";
                   },
                 })}
               />
@@ -252,23 +259,22 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Gender:</label>
+              <label>Giới tính:</label>
               <select {...register("gender")}>
-                <option value={true}>Male</option>
-                <option value={false}>Female</option>
+                <option value={true}>Nam</option>
+                <option value={false}>Nữ</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label>Phone Number:</label>
+              <label>Số điện thoại:</label>
               <input
                 type="text"
                 {...register("phoneNumber", {
-                  required: "Phone Number is required",
+                  required: "Số điện thoại là bắt buộc",
                   pattern: {
                     value: /^0\d{9,10}$/,
-                    message:
-                      "Phone Number must be 10-11 digits starting with 0",
+                    message: "Số điện thoại phải có 10-11 số và bắt đầu bằng 0",
                   },
                 })}
               />
@@ -278,14 +284,14 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Campus:</label>
+              <label>Cơ sở:</label>
               <select
                 {...register("campusId", {
                   validate: (value) =>
-                    value !== "0" || "Please select a campus",
+                    value !== "0" || "Vui lòng chọn một cơ sở",
                 })}
               >
-                <option value="0">Select Campus</option>
+                <option value="0">Chọn cơ sở</option>
                 {campuses.map((campus) => (
                   <option key={campus.id} value={campus.id}>
                     {campus.campusName}
@@ -299,19 +305,19 @@ export default function CreateEventOrganizer() {
 
             <div className="form-group">
               <button type="submit" className="submit-btn">
-                Create
+                Tạo
               </button>
             </div>
           </form>
         </Modal>
 
         <div className="eog-table-container">
-          <h2>Event Organizers List</h2>{" "}
+          <h2>Danh sách người tổ chức sự kiện</h2>
           <Button
             className="create-btn"
             onClick={() => setIsCreateModalVisible(true)}
           >
-            Create Event Organizer
+            Tạo người tổ chức sự kiện
           </Button>
           <Table
             columns={columns}
@@ -329,15 +335,15 @@ export default function CreateEventOrganizer() {
         </div>
 
         <Modal
-          title="Confirm Delete"
+          title="Xác nhận xóa"
           visible={isDeleteModalVisible}
           onOk={confirmDelete}
           onCancel={() => setIsDeleteModalVisible(false)}
-          okText="Delete"
-          cancelText="Cancel"
+          okText="Xóa"
+          cancelText="Hủy"
           okButtonProps={{ danger: true }}
         >
-          <p>Are you sure you want to delete {selectedEOG?.email}?</p>
+          <p>Bạn có chắc muốn xóa {selectedEOG?.email} không?</p>
         </Modal>
       </div>
       <Footer />

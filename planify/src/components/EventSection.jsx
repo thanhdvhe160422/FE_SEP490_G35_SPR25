@@ -256,13 +256,13 @@ function EventSection() {
         <div className="post_section_inner">
           <div className="sidebar">
             <div className="filter_section">
-              <h3>Filters</h3>
-              <label>Category</label>
+              <h3>Bộ lọc</h3>
+              <label>Loại sự kiện</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
-                <option value="">All Categories</option>
+                <option value="">Tất cả</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.categoryEventName}
@@ -279,21 +279,21 @@ function EventSection() {
                 <option value="not started yet">Not Started Yet</option>
                 <option value="closed">Closed</option>
               </select> */}
-              <label>Start Time</label>
+              <label>Thời gian bắt đầu</label>
               <input
                 type="datetime-local"
                 value={selectedStart}
                 onChange={(e) => setSelectedStart(e.target.value)}
               />
 
-              <label>End Time</label>
+              <label>Thời gian kết thúc</label>
               <input
                 type="datetime-local"
                 value={selectedEnd}
                 onChange={(e) => setSelectedEnd(e.target.value)}
               />
 
-              <label>Location</label>
+              <label>Địa điểm</label>
               <input
                 type="text"
                 placeholder="Enter location"
@@ -323,7 +323,7 @@ function EventSection() {
                   }}
                   style={{ flex: 1 }}
                 >
-                  Apply Filters
+                  Áp dụng bộ lọc
                 </button>
                 {isFiltered && (
                   <button
@@ -331,7 +331,7 @@ function EventSection() {
                     onClick={clearFilters}
                     style={{ flex: 1 }}
                   >
-                    Clear Filters
+                    Xóa bộ lọc
                   </button>
                 )}
               </div>
@@ -350,7 +350,7 @@ function EventSection() {
                         }`}
                         onClick={() => setEventFilter("list")}
                       >
-                        List Event
+                        Danh sách sự kiện
                       </button>
                     </div>
                     <div className="filter_other">
@@ -379,7 +379,7 @@ function EventSection() {
                           }
                         }}
                       >
-                        Search
+                        Tìm kiếm
                       </button>
                     </div>
                   </div>
@@ -390,11 +390,14 @@ function EventSection() {
                 filteredEvents.length > 0 ? (
                   filteredEvents.map((event) => (
                     <div key={event.id} className="col-12 belarus_fast">
-                      <div   style={{
-                            height: "500px",
-                            objectFit: "cover",
-                            borderRadius: "8px",
-                          }} className="belarus_items">
+                      <div
+                        style={{
+                          height: "500px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                        className="belarus_items"
+                      >
                         <img
                           src={
                             event.eventMedias?.length > 0
@@ -499,12 +502,12 @@ function EventSection() {
                           </h5>
                           <p className="event_time">
                             <FaClock className="icon-time" />
-                            <strong>From:</strong>{" "}
+                            <strong>Từ:</strong>{" "}
                             {formatDateTime(event.startTime)}
                             <br />
                             <strong>
                               <FaClock className="icon-time" />
-                              To:
+                              Đến:
                             </strong>{" "}
                             {formatDateTime(event.endTime)}
                           </p>
@@ -570,10 +573,10 @@ function EventSection() {
                     <div className="empty-state-container">
                       <div className="text-center">
                         <h3 style={{ color: "#555", fontWeight: "500" }}>
-                          No events found
+                          Không tìm thấy sự kiện nào
                         </h3>
                         <p style={{ color: "#777" }}>
-                          Please try again with other search criteria!
+                          Vui lòng thử lại với tiêu chí tìm kiếm khác!
                         </p>
                       </div>
                     </div>
@@ -704,12 +707,12 @@ function EventSection() {
                             </h5>
                             <p className="event_time">
                               <FaClock className="icon-time" />
-                              <strong>From:</strong>{" "}
+                              <strong>Từ:</strong>{" "}
                               {formatDateTime(event.startTime)}
                               <br />
                               <strong>
                                 <FaClock className="icon-time" />
-                                To:
+                                Đến:
                               </strong>{" "}
                               {formatDateTime(event.endTime)}
                             </p>
@@ -850,12 +853,12 @@ function EventSection() {
                           </h5>
                           <p className="event_time">
                             <FaClock className="icon-time" />
-                            <strong>From:</strong>{" "}
+                            <strong>Từ:</strong>{" "}
                             {formatDateTime(event.startTime)}
                             <br />
                             <strong>
                               <FaClock className="icon-time" />
-                              To:
+                              Đến:
                             </strong>{" "}
                             {formatDateTime(event.endTime)}
                           </p>
@@ -922,7 +925,7 @@ function EventSection() {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Prev
+                      Trước
                     </button>
                   </li>
                   {Array.from({
@@ -959,7 +962,7 @@ function EventSection() {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Sau
                     </button>
                   </li>
                 </ul>

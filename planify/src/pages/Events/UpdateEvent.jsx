@@ -17,6 +17,7 @@ import "yet-another-react-lightbox/styles.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 
 const UpdateEventForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -268,6 +269,7 @@ const UpdateEventForm = () => {
   return (
     <>
       <Header />
+      <Breadcrumb />
       {isLoad ? (
         <Loading></Loading>
       ) : (
