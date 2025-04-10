@@ -98,6 +98,9 @@ export default function Dashboard() {
     }
     return ticks;
   };
+  const handleLogout = () => {
+    localStorage.clear();
+  };
 
   return (
     <>
@@ -136,6 +139,14 @@ export default function Dashboard() {
                     Quản lý Campus Manager
                   </a>
                 </li>
+                <li>
+                  <a href="/loginAdmin" onClick={handleLogout}>
+                    <CiLogout
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />{" "}
+                    Logout
+                  </a>
+                </li>
                 {/* <li>
                   <a className="show-cat-btn" href="#">
                     <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
@@ -154,16 +165,7 @@ export default function Dashboard() {
                   </a>
                 </li> */}
               </ul>
-              <ul className="sidebar-body-menu logout-section">
-                <li>
-                  <a href="#">
-                    <CiLogout
-                      style={{ marginRight: "10px", fontSize: "40px" }}
-                    />{" "}
-                    Logout
-                  </a>
-                </li>
-              </ul>
+              <ul className="sidebar-body-menu logout-section"></ul>
             </div>
           </div>
         </aside>

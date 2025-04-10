@@ -12,20 +12,21 @@ import {
 import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
-import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import getPosts, { searchEventsSpec } from "../../services/EventService";
 import {
   createFavoriteEvent,
   deleteFavouriteEvent,
 } from "../../services/EventService";
+import getCategories from "../../services/CategoryService";
 
 export default function HomeSpectator() {
   const [events, setEvents] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState(""); // Lưu giá trị là text mà người dùng nhập
   const [locationFilter, setLocationFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -36,12 +37,11 @@ export default function HomeSpectator() {
   const [totalEvents, setTotalEvents] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]); // Danh sách category từ API
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
 
   const fixDriveUrl = (url) => {
-    console.log(url);
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
     if (!url.includes("drive.google.com/uc?id=")) return url;
@@ -59,7 +59,7 @@ export default function HomeSpectator() {
   const handleCreateFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      var response = await createFavoriteEvent(eventId);
+      const response = await createFavoriteEvent(eventId);
       if (response.status === 201) {
         console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
         setEvents((prevEvents) =>
@@ -76,7 +76,7 @@ export default function HomeSpectator() {
   const handleDeleteFavorite = async (eventId, e) => {
     try {
       e.stopPropagation();
-      var response = await deleteFavouriteEvent(eventId);
+      const response = await deleteFavouriteEvent(eventId);
       if (response.status === 200) {
         console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
         setEvents((prevEvents) =>
@@ -90,27 +90,33 @@ export default function HomeSpectator() {
     }
   };
 
-  const fetchEvents = async (page) => {
+  const fetchCategories = async () => {
+    try {
+      const categoryData = await getCategories();
+      console.log("Danh sách categories từ API:", categoryData);
+      setCategories(categoryData);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh mục:", error);
+    }
+  };
+
+  const fetchEvents = async () => {
     try {
       setLoading(true);
       setIsSearchMode(false);
       const role = localStorage.getItem("role");
-      console.log("thu"+role);
-      const response = await getPosts(page, pageSize, role);
+      console.log("thu" + role);
+      const response = await getPosts(currentPage, pageSize, role);
 
       if (response && response.items) {
         setEvents(response.items);
         setTotalEvents(response.totalCount || 0);
         setTotalPages(response.totalPages || 1);
-
-        if (categories.length === 0 || locations.length === 0) {
-          extractCategoriesAndLocations(response.items);
-        }
+        extractLocations(response.items);
       } else {
         console.error("Unexpected API response format:", response);
         setEvents([]);
       }
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching events:", error);
       setEvents([]);
@@ -119,27 +125,35 @@ export default function HomeSpectator() {
     }
   };
 
+  const getCategoryIdFromName = (name) => {
+    const category = categories.find(
+      (cat) => cat.categoryEventName.toLowerCase() === name.toLowerCase()
+    );
+    return category ? category.id : null;
+  };
+
   const searchEvents = async (page = 1) => {
     try {
       setLoading(true);
       setIsSearchMode(true);
 
+      const categoryId =
+        categoryFilter.trim() !== ""
+          ? getCategoryIdFromName(categoryFilter)
+          : undefined;
+
+      console.log("categoryId:", categoryId);
+
       const params = {
         page: page,
         pageSize: pageSize,
         name: searchTerm,
-        placed: locationFilter !== "" ? locationFilter : undefined,
+        placed: locationFilter.trim() !== "" ? locationFilter : undefined,
         status: statusFilter !== "All" ? statusFilter : undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
+        categoryId: categoryId, // Gửi categoryId thay vì text
       };
-
-      if (categoryFilter !== "") {
-        const categoryId = getCategoryId(categoryFilter);
-        if (categoryId) {
-          params.categoryEventId = categoryId;
-        }
-      }
 
       console.log("Search params:", params);
       const response = await searchEventsSpec(params);
@@ -148,10 +162,7 @@ export default function HomeSpectator() {
         setEvents(response.items);
         setTotalEvents(response.totalCount || 0);
         setTotalPages(response.totalPages || 1);
-
-        if (categories.length === 0 || locations.length === 0) {
-          extractCategoriesAndLocations(response.items);
-        }
+        extractLocations(response.items);
       } else {
         setEvents([]);
         setTotalPages(1);
@@ -165,45 +176,26 @@ export default function HomeSpectator() {
     }
   };
 
-  const extractCategoriesAndLocations = (eventsData) => {
+  const extractLocations = (eventsData) => {
     if (!eventsData || !Array.isArray(eventsData)) return;
 
-    const categoriesSet = new Set();
     const locationsSet = new Set();
-
     eventsData.forEach((event) => {
-      if (
-        event.categoryViewModel &&
-        event.categoryViewModel.categoryEventName
-      ) {
-        categoriesSet.add(event.categoryViewModel.categoryEventName);
-      }
       if (event.placed) {
         locationsSet.add(event.placed);
       }
     });
-
-    setCategories(Array.from(categoriesSet));
     setLocations(Array.from(locationsSet));
   };
 
-  const getCategoryId = (categoryName) => {
-    const categoryMap = {
-      "Technology Conference": 1,
-      Workshop: 2,
-    };
-
-    return categoryMap[categoryName];
-  };
-
   useEffect(() => {
-    fetchEvents(1);
+    fetchCategories(); // Lấy danh sách category khi component mount
+    fetchEvents(); // Lấy sự kiện mặc định
   }, []);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
-
     if (isSearchMode) {
       searchEvents(pageNumber);
     } else {
@@ -216,8 +208,8 @@ export default function HomeSpectator() {
     if (
       searchTerm.trim() !== "" ||
       statusFilter !== "All" ||
-      categoryFilter !== "" ||
-      locationFilter !== "" ||
+      categoryFilter.trim() !== "" ||
+      locationFilter.trim() !== "" ||
       startDate !== "" ||
       endDate !== ""
     ) {
@@ -271,32 +263,22 @@ export default function HomeSpectator() {
 
               <Form.Group className="mb-3">
                 <Form.Label>Category</Form.Label>
-                <Form.Select
+                <Form.Control
+                  type="text"
+                  placeholder="Enter category..."
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                >
-                  <option value="">All categories</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
               </Form.Group>
 
               <Form.Group className="mb-3">
                 <Form.Label>Location</Form.Label>
-                <Form.Select
+                <Form.Control
+                  type="text"
+                  placeholder="Enter location..."
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
-                >
-                  <option value="">All locations</option>
-                  {locations.map((location) => (
-                    <option key={location} value={location}>
-                      {location}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
               </Form.Group>
 
               <Form.Group className="mb-3">
@@ -318,19 +300,6 @@ export default function HomeSpectator() {
                 />
               </Form.Group>
 
-              {/* <Form.Group className="mb-3">
-                <Form.Label>Status</Form.Label>
-                <Form.Select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="All">All</option>
-                  <option value="Not Yet">Upcoming</option>
-                  <option value="Running">Ongoing</option>
-                  <option value="Closed">Completed</option>
-                </Form.Select>
-              </Form.Group> */}
-
               <Button
                 variant="primary"
                 className="w-100"
@@ -341,8 +310,8 @@ export default function HomeSpectator() {
 
               {(searchTerm.trim() !== "" ||
                 statusFilter !== "All" ||
-                categoryFilter !== "" ||
-                locationFilter !== "" ||
+                categoryFilter.trim() !== "" ||
+                locationFilter.trim() !== "" ||
                 startDate !== "" ||
                 endDate !== "") && (
                 <Button
@@ -447,7 +416,6 @@ export default function HomeSpectator() {
                           >
                             <Card.Img
                               variant="top"
-                              // src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               src={fixDriveUrl(getImageUrl(event.eventMedias))}
                               height="180"
                               className="event-image"

@@ -21,6 +21,7 @@ import {
 } from "../../services/EventService";
 import Swal from "sweetalert2";
 import Loading from "../../components/Loading";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 
 function EventDetailSpec() {
   const { eventId } = useParams();
@@ -131,6 +132,7 @@ function EventDetailSpec() {
   return (
     <>
       <Header />
+      <Breadcrumb />
       <div className="event-container">
         <div className="event-banner-gallery">
           <div className="gallery-left" onClick={() => setOpenLightbox(true)}>

@@ -6,8 +6,8 @@
 }
 
 .icon-dark {
-  color: #000 !important; 
-  fill: #000 !important; 
+  color: #000 !important;
+  fill: #000 !important;
 }
 
 .sidebar-body {
@@ -16,12 +16,9 @@
   height: 100%;
 }
 
-
-
 .sidebar-body-menu.logout-section {
   margin-top: 350%;
 }
-
 
 .left-column {
   display: flex;
@@ -100,7 +97,7 @@
 }
 
 .user-item {
-  display: flex;
+  width: 100%;
   align-items: center;
   margin-bottom: 16px;
 }
@@ -112,10 +109,16 @@
   margin-right: 12px;
   border: 2px solid #ffa726;
 }
-
+.user-info {
+  display: flex;
+  justify-content: space-between;
+}
 .user-info small {
-  color: #999;
+  color: #ffffff;
+  padding: 5px;
   font-size: 13px;
+  background-color: green;
+  border-radius: 5px;
 }
 
 .legend-list {

@@ -341,6 +341,7 @@ export const searchEventsSpec = async (params) => {
           placed: params.placed || undefined,
           startDate: params.startDate || undefined,
           endDate: params.endDate || undefined,
+          categoryId: params.categoryId || undefined,
         },
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -364,6 +365,7 @@ export const searchEventsSpec = async (params) => {
                 placed: params.placed || undefined,
                 startDate: params.startDate || undefined,
                 endDate: params.endDate || undefined,
+                categoryId: params.categoryId || undefined,
               },
               headers: { Authorization: `Bearer ${newToken}` },
             }
