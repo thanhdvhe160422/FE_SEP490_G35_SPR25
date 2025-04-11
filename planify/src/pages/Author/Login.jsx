@@ -46,7 +46,6 @@ export default function Login() {
         "Authorization"
       ] = `Bearer ${res.data.result.accessToken}`;
 
-      // Lưu thông tin vào localStorage
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem("avatar", decoded.picture);
       localStorage.setItem("token", res.data.result.accessToken);
@@ -57,7 +56,6 @@ export default function Login() {
       localStorage.setItem("userId", res.data.result.userId);
       localStorage.setItem("reToken", res.data.result.refreshToken);
 
-      // Hiển thị toast thành công
       toast.success("Đăng nhập thành công!", {
         position: "top-right",
         autoClose: 2000,
@@ -89,7 +87,7 @@ export default function Login() {
       }, 1000);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      enqueueSnackbar("Your account is not allowed to log in to the system.", {
+      enqueueSnackbar("Tài khoản của bạn không được phép đăng nhập vào hệ thống.", {
         variant: "error",
       });
     }
@@ -109,7 +107,7 @@ export default function Login() {
       <h1 className="university-title">FPT University</h1>
       <div className="login-box">
         <p className="login-title">
-          Students, Lecturers, University Staff of FPT
+          Sinh viên, Giảng viên, Cán bộ ĐH-FPT
         </p>
 
         {loading ? (
@@ -120,7 +118,7 @@ export default function Login() {
             value={campus}
             onChange={(e) => setCampus(e.target.value)}
           >
-            <option value="">Select Campus</option>
+            <option value="">Chọn Campus</option>
             {campusList.map((item) => (
               <option key={item.id} value={item.value}>
                 {item.campusName}
