@@ -359,7 +359,7 @@ export const getListUser = async (page, pageSize) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -401,7 +401,7 @@ export const banUser = async (userId) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -443,7 +443,7 @@ export const unbanUser = async (userId, status) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
@@ -483,7 +483,7 @@ export const searchUser = async (page, pageSize, input) => {
           return { error: "unauthorized" };
         }
       } else {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("token");
         return { error: "expired" };
       }
     }
