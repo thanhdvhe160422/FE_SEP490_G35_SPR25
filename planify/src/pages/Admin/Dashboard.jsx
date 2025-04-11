@@ -27,33 +27,134 @@ import {
   FaThLarge,
   FaAngleDown,
 } from "react-icons/fa";
-
-const pieData = [
-  { name: "Direct", value: 38, color: "#ff9f43" },
-  { name: "Organic", value: 22, color: "#00cfe8" },
-  { name: "Paid", value: 12, color: "#7367f0" },
-  { name: "Social", value: 28, color: "#ea5455" },
-  { name: "Social", value: 28, color: "#00cfe8" },
-  { name: "Social", value: 28, color: "#ff9f43" },
-  { name: "Social", value: 28, color: "#ea5455" },
-];
-
-const data = [
-  { name: "Jan", eventsOrganized: 150, eventRegistrations: 120 },
-  { name: "Feb", eventsOrganized: 120, eventRegistrations: 230 },
-  { name: "Mar", eventsOrganized: 140, eventRegistrations: 190 },
-  { name: "Apr", eventsOrganized: 250, eventRegistrations: 310 },
-  { name: "May", eventsOrganized: 120, eventRegistrations: 910 },
-  { name: "Jun", eventsOrganized: 170, eventRegistrations: 150 },
-  { name: "Jul", eventsOrganized: 230, eventRegistrations: 260 },
-  { name: "Aug", eventsOrganized: 190, eventRegistrations: 340 },
-];
+import {
+  getCategoryAdmin,
+  getEventByCampus,
+  getEventByParticipant,
+  getEventByYear,
+  getNewEventByCampus,
+} from "../../services/adminService";
+import { getCampuses } from "../../services/campusService";
 
 export default function Dashboard() {
   const [eventOganized, setEventOganized] = useState(true);
   const [eventRegistration, setEventRegistration] = useState(true);
   const [maxYAxisValue, setMaxYAxisValue] = useState(0);
+  const [pieDatas, setPieDatas] = useState([]);
+  const [data, setData] = useState([]);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+  const [topEvent, setTopEvent] = useState([]);
+  const [currentCampus, setCurrentCampus] = useState("Hòa Lạc");
+  const [newEvent, setNewEvent] = useState([]);
+  const [campuses, setCampuses] = useState([]);
+  const [eventCampus, setEventCampus] = useState([]);
+  const campusNames = campuses.map((campus) => campus.campusName);
+  const handleChangeCampus = (event) => {
+    setCurrentCampus(event.target.value);
+  };
+  const fetchEventByCampus = async () => {
+    try {
+      const response = await getEventByCampus();
+      setEventCampus(response);
+      console.log("Event by Campus: ", response);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
 
+  const fetchCampuss = async () => {
+    try {
+      const response = await getCampuses();
+      setCampuses(response);
+      const campusNames = campuses.map((campus) => campus.campusName);
+      console.log("Campuses: ", campuses);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchCampuss();
+  }, []);
+  useEffect(() => {
+    fetchEventByCampus();
+  }, []);
+  const fetchNewestEvent = async () => {
+    try {
+      const response = await getNewEventByCampus(currentCampus);
+      setNewEvent(response);
+      console.log("New Event: ", response);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchNewestEvent();
+  }, [currentCampus]);
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN");
+  };
+  const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null) return "-";
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+  const fetchEventParticipants = async () => {
+    try {
+      const response = await getEventByParticipant();
+      setTopEvent(response);
+      console.log("Top Event: ", response);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchEventParticipants();
+  }, []);
+  const fetchDataChart = async () => {
+    try {
+      const response = await getEventByYear(currentYear);
+      const transformedData = response.map((item) => ({
+        name: item.month,
+        eventsOrganized: item.totalEvents,
+        eventRegistrations: item.totalParticipants,
+      }));
+      setData(transformedData);
+      console.log("Data Chart: ", response);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchDataChart();
+  }, [currentYear]);
+  const handleYearChange = (event) => {
+    const selectedYear = event.target.value;
+    setCurrentYear(selectedYear);
+    fetchDataChart(selectedYear);
+  };
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+  const fetchCategory = async () => {
+    try {
+      const response = await getCategoryAdmin();
+      const transformedData = response.map((item) => ({
+        categoryEventName: item.categoryEventName,
+        value: item.totalUsed,
+        totalUsed: item.totalUsed,
+        percentage: item.percentage,
+      }));
+      setPieDatas(transformedData);
+      console.log("Pie Data: ", response);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -73,7 +174,15 @@ export default function Dashboard() {
       document.head.removeChild(link);
     };
   }, []);
-
+  const COLORS = [
+    "#0088FE", // Xanh dương
+    "#00C49F", // Xanh ngọc
+    "#FFBB28", // Vàng
+    "#FF8042", // Cam
+    "#FF6384", // Hồng
+    "#36A2EB", // Xanh nhạt
+    "#9966FF", // Tím
+  ];
   const getMaxValue = () => {
     let max = 0;
     data.forEach((item) => {
@@ -93,13 +202,19 @@ export default function Dashboard() {
   const getTicks = () => {
     const max = getMaxValue();
     const ticks = [0];
-    for (let i = 200; i <= max; i += 200) {
+    for (let i = 10; i <= max; i += 10) {
       ticks.push(i);
     }
     return ticks;
   };
   const handleLogout = () => {
     localStorage.clear();
+  };
+  const formatPercent = (value) => {
+    if (Number.isInteger(value)) {
+      return `${value}%`;
+    }
+    return `${value.toFixed(2).replace(".", ",")}%`;
   };
 
   return (
@@ -170,63 +285,9 @@ export default function Dashboard() {
           </div>
         </aside>
         <div class="main-wrapper">
-          <nav class="main-nav--bg">
-            <div class="container main-nav">
-              <div class="main-nav-start">
-                <div class="search-wrapper">
-                  <h2>Dashboard</h2>
-                </div>
-              </div>
-              <div class="main-nav-end">
-                <div class="nav-user-wrapper">
-                  <button
-                    href="##"
-                    class="nav-user-btn dropdown-btn"
-                    title="My profile"
-                    type="button"
-                  >
-                    <span class="sr-only">My profile</span>
-                    <span class="nav-user-img">
-                      <picture>
-                        <source
-                          srcset="https://i.pinimg.com/736x/3f/3c/9a/3f3c9a765bdeb8b74d1fe6c5084f6b34.jpg"
-                          type="image/webp"
-                        />
-                        <img
-                          src={
-                            "https://i.pinimg.com/736x/3f/3c/9a/3f3c9a765bdeb8b74d1fe6c5084f6b34.jpg"
-                          }
-                          alt="User name"
-                        />
-                      </picture>
-                    </span>
-                  </button>
-                  <ul class="users-item-dropdown nav-user-dropdown dropdown">
-                    <li>
-                      <a href="##">
-                        <i data-feather="user" aria-hidden="true"></i>
-                        <span>Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="##">
-                        <i data-feather="settings" aria-hidden="true"></i>
-                        <span>Account settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="danger" href="##">
-                        <i data-feather="log-out" aria-hidden="true"></i>
-                        <span>Log out</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </nav>
+          <nav class="main-nav--bg"></nav>
           <main
-            style={{ marginTop: "-20px", height: "auto" }}
+            style={{ paddingTop: "20px", height: "100%" }}
             class="main users chart-page"
             id="skip-target"
           >
@@ -242,9 +303,29 @@ export default function Dashboard() {
                 <div className="left-column">
                   <div style={{ height: "46%" }} className="chart-card">
                     <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
-                      Event Statistics
+                      Thống kê sự kiện
                     </h3>
-                    <div style={{ width: "100%", height: 400 }}>
+                    <div className="select-year"></div>
+                    <label htmlFor="year-select">Năm:</label>
+                    <select
+                      id="year-select"
+                      value={currentYear}
+                      onChange={handleYearChange}
+                      style={{
+                        marginLeft: "10px",
+                        padding: "5px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                    <div
+                      style={{ fontSize: "small", width: "100%", height: 400 }}
+                    >
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={data}
@@ -259,6 +340,10 @@ export default function Dashboard() {
                             axisLine={false}
                             tickLine={false}
                             tickMargin={40}
+                            interval={0}
+                            tickFormatter={(value) =>
+                              `Tháng ${parseInt(value.split("-")[1])}`
+                            }
                           />
                           <YAxis
                             domain={[0, getMaxValue()]}
@@ -281,7 +366,7 @@ export default function Dashboard() {
                                   <span
                                     className={eventOganized ? "" : "inactive"}
                                   >
-                                    Events Organized
+                                    Sự kiện đã tổ chức
                                   </span>
                                 ),
                                 color: eventOganized ? "#00c49f" : "#ccc",
@@ -295,7 +380,7 @@ export default function Dashboard() {
                                       eventRegistration ? "" : "inactive"
                                     }
                                   >
-                                    Event Registrations
+                                    Đăng ký sự kiện
                                   </span>
                                 ),
                                 color: eventRegistration ? "#ff7300" : "#ccc",
@@ -351,112 +436,28 @@ export default function Dashboard() {
                   </div>
                   <div className="card-admin full-width">
                     <h3 className="card-title">
-                      Top Events With Many Participants
+                      Top sự kiện có số lượng tham gia nhiều nhất
                     </h3>
-                    <div className="top-product-header">
-                      <input className="search-bar" placeholder="Search..." />
-                    </div>
                     <table className="product-table">
                       <thead>
                         <tr>
-                          <th>Name Event</th>
-                          <th>Start Time</th>
-                          <th>End Time</th>
-                          <th>Amount</th>
-                          <th>Total</th>
-                          <th>Creat By</th>
+                          <th>Tên</th>
+                          <th>Bắt đầu</th>
+                          <th>Kết thúc</th>
+                          <th>Ngân sách</th>
+                          <th>Người tham gia</th>
+                          <th>Kiểu sự kiện</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {[
-                          {
-                            name: "Event A",
-                            startTime: "2025-04-01 10:00",
-                            endTime: "2025-04-01 12:00",
-                            amount: "$500",
-                            createdBy: "Alice",
-                            totalParticipants: 120,
-                          },
-                          {
-                            name: "Event B",
-                            startTime: "2025-04-03 14:30",
-                            endTime: "2025-04-03 17:00",
-                            amount: "$750",
-                            createdBy: "Bob",
-                            totalParticipants: 85,
-                          },
-                          {
-                            name: "Event C",
-                            startTime: "2025-04-05 09:00",
-                            endTime: "2025-04-05 11:30",
-                            amount: "$300",
-                            createdBy: "Charlie",
-                            totalParticipants: 60,
-                          },
-                          {
-                            name: "Event D",
-                            startTime: "2025-04-07 13:00",
-                            endTime: "2025-04-07 16:00",
-                            amount: "$680",
-                            createdBy: "Diana",
-                            totalParticipants: 95,
-                          },
-                          {
-                            name: "Event E",
-                            startTime: "2025-04-09 08:30",
-                            endTime: "2025-04-09 10:00",
-                            amount: "$420",
-                            createdBy: "Evan",
-                            totalParticipants: 70,
-                          },
-                          {
-                            name: "Event F",
-                            startTime: "2025-04-11 15:00",
-                            endTime: "2025-04-11 17:30",
-                            amount: "$900",
-                            createdBy: "Fiona",
-                            totalParticipants: 140,
-                          },
-                          {
-                            name: "Event G",
-                            startTime: "2025-04-13 10:00",
-                            endTime: "2025-04-13 12:00",
-                            amount: "$350",
-                            createdBy: "George",
-                            totalParticipants: 55,
-                          },
-                          {
-                            name: "Event H",
-                            startTime: "2025-04-15 09:00",
-                            endTime: "2025-04-15 11:00",
-                            amount: "$600",
-                            createdBy: "Hannah",
-                            totalParticipants: 100,
-                          },
-                          {
-                            name: "Event I",
-                            startTime: "2025-04-17 14:00",
-                            endTime: "2025-04-17 16:00",
-                            amount: "$720",
-                            createdBy: "Ivan",
-                            totalParticipants: 110,
-                          },
-                          {
-                            name: "Event J",
-                            startTime: "2025-04-19 08:00",
-                            endTime: "2025-04-19 10:30",
-                            amount: "$480",
-                            createdBy: "Julia",
-                            totalParticipants: 90,
-                          },
-                        ].map((item, i) => (
+                        {topEvent.map((item, i) => (
                           <tr key={i}>
-                            <td>{item.name}</td>
-                            <td>{item.startTime}</td>
-                            <td>{item.endTime}</td>
-                            <td>{item.amount}</td>
+                            <td>{item.eventTitle}</td>
+                            <td>{formatDate(item.startTime)}</td>
+                            <td>{formatDate(item.endTime)}</td>
+                            <td>{formatCurrency(item.amountBudget)}</td>
                             <td>{item.totalParticipants}</td>
-                            <td>{item.createdBy}</td>
+                            <td>{item.categoryEventName}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -467,11 +468,11 @@ export default function Dashboard() {
                 <div className="right-column">
                   <div style={{ height: "50%" }} className="chart-card">
                     <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
-                      Categories Events
+                      Thống kê loại sự kiện
                     </h3>
                     <PieChart width={300} height={300}>
                       <Pie
-                        data={pieData}
+                        data={pieDatas}
                         dataKey="value"
                         cx="50%"
                         cy="50%"
@@ -481,10 +482,34 @@ export default function Dashboard() {
                         strokeWidth={6}
                         cornerRadius={10}
                       >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        {pieDatas.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div
+                                style={{
+                                  background: "#fff",
+                                  border: "1px solid #ccc",
+                                  padding: "10px",
+                                  borderRadius: "4px",
+                                }}
+                              >
+                                <p>{data.categoryEventName}</p>
+                                <p>{data.percentage}%</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
                     </PieChart>
 
                     <ul
@@ -496,7 +521,7 @@ export default function Dashboard() {
                         width: "100%",
                       }}
                     >
-                      {pieData.map((item, index) => (
+                      {pieDatas.map((item, index) => (
                         <li
                           key={index}
                           style={{
@@ -513,85 +538,131 @@ export default function Dashboard() {
                               style={{
                                 width: 10,
                                 height: 10,
-                                backgroundColor: item.color,
+                                backgroundColor: COLORS[index % COLORS.length],
                                 borderRadius: "50%",
                                 marginRight: 8,
                               }}
                             ></span>
-                            {item.name}
+                            {item.categoryEventName}
                           </span>
-                          <span>{item.value}%</span>
+                          <span>{formatPercent(item.percentage)}%</span>
                         </li>
                       ))}
                     </ul>
                   </div>
+
                   <div className="card-admin">
-                    <h3 className="card-title">New Events</h3>
-                    <ul className="user-list">
-                      {[
-                        { name: "Roselle Ehrman", status: "Approve" },
-                        { name: "Jone Smith", status: "Waiting" },
-                        { name: "Darron Handler", country: "Reject" },
-                        { name: "Leatrice Kulik", country: "Approve" },
-                      ].map((user, i) => (
-                        <li key={i} className="user-item">
-                          <div className="user-info">
-                            <div>{user.name}</div>
-                            <small>{user.status}</small>
-                          </div>
-                        </li>
+                    <h3 className="card-title">Sự kiện mới nhất</h3>
+                    <label htmlFor="year-select">Campus:</label>
+                    <select
+                      id="campus-select"
+                      value={currentCampus}
+                      onChange={handleChangeCampus}
+                      style={{
+                        marginLeft: "10px",
+                        padding: "5px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {campusNames.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
                       ))}
+                    </select>
+                    <ul className="user-list" style={{ paddingTop: "20px" }}>
+                      {newEvent.map((user, i) => {
+                        const now = new Date();
+                        const start = new Date(user.startTime);
+
+                        let status = "";
+                        let color = "";
+
+                        if (start > now) {
+                          status = "Sắp diễn ra";
+                          color = "green";
+                        } else if (Math.abs(now - start) < 5 * 60 * 1000) {
+                          status = "Đang diễn ra";
+                          color = "orange";
+                        } else {
+                          status = "Đã diễn ra";
+                          color = "gray";
+                        }
+
+                        return (
+                          <li key={i} className="user-item">
+                            <div className="user-info">
+                              <div>{user.eventTitle}</div>
+                              <div
+                                style={{
+                                  borderRadius: "4px",
+                                  padding: "4px 8px",
+                                  color: "white",
+                                  backgroundColor: color,
+                                  fontSize: "0.85em",
+                                  marginTop: 4,
+                                }}
+                              >
+                                {status}
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                   <div className="card-admin buyers-profile">
-                    <h3 className="card-title">Profile</h3>
+                    <h3 className="card-title">Thống kê sự kiện theo Campus</h3>
                     <div className="buyers-content">
                       <PieChart width={240} height={240}>
                         {" "}
                         <Pie
-                          data={[
-                            { name: "Male", value: 50, color: "#ff9f43" },
-                            { name: "Female", value: 35, color: "#00cfe8" },
-                            { name: "Others", value: 15, color: "#ea5455" },
-                          ]}
-                          dataKey="value"
+                          data={eventCampus}
+                          dataKey="percent"
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
                           outerRadius={85}
                           paddingAngle={5}
                         >
-                          <Cell fill="#ff9f43" />
-                          <Cell fill="#00cfe8" />
-                          <Cell fill="#ea5455" />
+                          {eventCampus.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
                         </Pie>
                       </PieChart>
 
                       <ul className="buyers-legend">
-                        <li>
-                          <span
-                            className="dot"
-                            style={{ backgroundColor: "#ff9f43" }}
-                          ></span>
-                          <span className="label">Male</span>
-                          <span className="percent">50%</span>
-                        </li>
-                        <li>
-                          <span
-                            className="dot"
-                            style={{ backgroundColor: "#00cfe8" }}
-                          ></span>
-                          <span className="label">Female</span>
-                          <span className="percent">35%</span>
-                        </li>
-                        <li>
-                          <span
-                            className="dot"
-                            style={{ backgroundColor: "#ea5455" }}
-                          ></span>
-                          <span className="label">Others</span>
-                          <span className="percent">15%</span>
-                        </li>
+                        {eventCampus.map((item, index) => (
+                          <li
+                            key={index}
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              marginBottom: "8px",
+                              padding: "0 12px",
+                            }}
+                          >
+                            <span
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <span
+                                style={{
+                                  width: 10,
+                                  height: 10,
+                                  backgroundColor:
+                                    COLORS[index % COLORS.length],
+                                  borderRadius: "50%",
+                                  marginRight: 8,
+                                }}
+                              ></span>
+                              {item.campusName}
+                            </span>
+                            <span>{formatPercent(item.percent)} %</span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
