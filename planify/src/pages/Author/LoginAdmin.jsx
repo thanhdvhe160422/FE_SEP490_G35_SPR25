@@ -15,29 +15,49 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
+
+    setUsernameError("");
+    setPasswordError("");
     setShowAlert(false);
     setErrorMessage("");
 
+    let hasError = false;
+
+    if (!inputUsername.trim()) {
+      setUsernameError("Vui lòng nhập tên người dùng");
+      hasError = true;
+    }
+
+    if (!inputPassword.trim()) {
+      setPasswordError("Vui lòng nhập mật khẩu");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    setLoading(true);
+
     try {
       const response = await axios.post(
-          "https://localhost:44320/api/Auth/admin-login",
-          {
-            username: inputUsername,
-            password: inputPassword,
+        "https://localhost:44320/api/Auth/admin-login",
+        {
+          username: inputUsername,
+          password: inputPassword,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            accept: "*/*",
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accept: "*/*",
-            },
-          }
+        }
       );
 
-      const { status, message: responseMessage, result } = response.data;
+      const { status, result } = response.data;
 
       if (status === 200) {
         localStorage.setItem("token", result.accessToken);
@@ -47,7 +67,6 @@ const Login = () => {
         localStorage.setItem("role", result.role);
         localStorage.setItem("refreshToken", result.refreshToken);
 
-        console.log("Đăng nhập thành công:", responseMessage);
         toast.success("Đăng nhập thành công!", {
           position: "top-right",
           autoClose: 2000,
@@ -65,9 +84,7 @@ const Login = () => {
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
       setShowAlert(true);
-      setErrorMessage(
-          error.response?.data?.message || "Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin."
-      );
+      setErrorMessage("Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -78,69 +95,77 @@ const Login = () => {
   };
 
   return (
-      <div
-          className="sign-in__wrapper"
-          style={{
-            background: `url(${backgroundImage}) no-repeat center center/cover`,
-          }}
+    <div
+      className="sign-in__wrapper"
+      style={{
+        background: `url(${backgroundImage}) no-repeat center center/cover`,
+      }}
+    >
+      <h1 className="university-title">FPT University</h1>
+      <div className="sign-in__backdrop"></div>
+      <Form
+        className="shadow p-4 bg-white rounded login-form"
+        onSubmit={handleSubmit}
       >
-        <h1 className="university-title">FPT University</h1>
-        <div className="sign-in__backdrop"></div>
-        <Form
-            className="shadow p-4 bg-white rounded login-form"
-            onSubmit={handleSubmit}
-        >
-          <h4 className="mb-4 text-center text-orange fw-bold">Admin Login</h4>
-          {showAlert && (
-              <Alert
-                  className="mb-3"
-                  variant="danger"
-                  onClose={() => setShowAlert(false)}
-                  dismissible
-              >
-                {errorMessage || "Thông tin đăng nhập không đúng!"}
-              </Alert>
+        <h4 className="mb-4 text-center text-orange fw-bold">
+          Đăng nhập Admin
+        </h4>
+        {showAlert && (
+          <Alert className="mb-3" variant="danger">
+            {errorMessage || "Thông tin đăng nhập không đúng!"}
+          </Alert>
+        )}
+
+        <Form.Group className="mb-3" controlId="username">
+          <Form.Label className="fw-semibold text-muted">
+            Tên người dùng
+          </Form.Label>
+          <Form.Control
+            type="text"
+            value={inputUsername}
+            placeholder="Nhập tên người dùng"
+            onChange={(e) => setInputUsername(e.target.value)}
+            className="rounded-pill"
+            isInvalid={!!usernameError}
+          />
+          {usernameError && (
+            <Form.Text className="text-danger">{usernameError}</Form.Text>
           )}
-          <Form.Group className="mb-3" controlId="username">
-            <Form.Label className="fw-semibold text-muted">Username</Form.Label>
+        </Form.Group>
+
+        <Form.Group className="mb-4" controlId="password">
+          <Form.Label className="fw-semibold text-muted">Mật khẩu</Form.Label>
+          <InputGroup>
             <Form.Control
-                type="text"
-                value={inputUsername}
-                placeholder="Enter username"
-                onChange={(e) => setInputUsername(e.target.value)}
-                required
-                className="rounded-pill"
+              type={showPassword ? "text" : "password"}
+              value={inputPassword}
+              placeholder="Nhập mật khẩu"
+              onChange={(e) => setInputPassword(e.target.value)}
+              isInvalid={!!passwordError}
+              className="rounded-pill rounded-end-0"
             />
-          </Form.Group>
-          <Form.Group className="mb-4" controlId="password">
-            <Form.Label className="fw-semibold text-muted">Password</Form.Label>
-            <InputGroup>
-              <Form.Control
-                  type={showPassword ? "text" : "password"}
-                  value={inputPassword}
-                  placeholder="Enter password"
-                  onChange={(e) => setInputPassword(e.target.value)}
-                  required
-                  className="rounded-pill rounded-end-0"
-              />
-              <InputGroup.Text
-                  onClick={togglePasswordVisibility}
-                  className="bg-white rounded-pill rounded-start-0 border-start-0 cursor-pointer"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </InputGroup.Text>
-            </InputGroup>
-          </Form.Group>
-          <Button
-              className="w-100 rounded-pill fw-semibold login-btn"
-              variant="warning"
-              type="submit"
-              disabled={loading}
-          >
-            {loading ? "Logging In..." : "Log In"}
-          </Button>
-        </Form>
-      </div>
+            <InputGroup.Text
+              onClick={togglePasswordVisibility}
+              className="bg-white rounded-pill rounded-start-0 border-start-0 cursor-pointer"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </InputGroup.Text>
+          </InputGroup>
+          {passwordError && (
+            <Form.Text className="text-danger">{passwordError}</Form.Text>
+          )}
+        </Form.Group>
+
+        <Button
+          className="w-100 rounded-pill fw-semibold login-btn text-center d-flex justify-content-center align-items-center"
+          variant="warning"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </Button>
+      </Form>
+    </div>
   );
 };
 
