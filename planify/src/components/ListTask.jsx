@@ -146,23 +146,19 @@ function ListTask({ eventId, data }) {
       setLoadingUsers(true);
       let token = localStorage.getItem("token");
 
-      const params = new URLSearchParams({
-        page: 1,
-        pageSize: 1000,
-        eventId: eventId,
-      });
+      const params = new URLSearchParams({});
 
       if (searchValue) {
         if (searchValue.includes("@")) {
-          params.append("email", searchValue);
+          params.append("input", searchValue);
         } else {
-          params.append("name", searchValue);
+          params.append("input", searchValue);
         }
       }
 
       const fetchData = async (authToken) => {
         const response = await axios.get(
-          `https://localhost:44320/api/JoinProject/search-implement-joined-project?${params.toString()}`,
+          `https://localhost:44320/api/Users/search?${params.toString()}`,
           {
             headers: { Authorization: `Bearer ${authToken}` },
           }
@@ -192,9 +188,9 @@ function ListTask({ eventId, data }) {
 
       if (response.data && response.data.items) {
         const users = response.data.items.map((item) => ({
-          userId: item.userId,
-          email: item.user.email,
-          fullName: `${item.user.firstName} ${item.user.lastName}`,
+          userId: item.id,
+          email: item.email,
+          fullName: `${item.firstName} ${item.lastName}`,
         }));
         setEventUsers(users);
       } else {
@@ -252,14 +248,21 @@ function ListTask({ eventId, data }) {
       }
 
       if (response.status === 200 || response.status === 204) {
-        Swal.fire({
-          title: "Giao công việc con thành công!",
-          icon: "success",
-          draggable: true,
-        });
-        return true;
-      } else {
-        throw new Error("API returned an unexpected status");
+        console.log("Assign successful, fetching tasks...");
+        const newTasks = await fetchTasksFromAPI();
+        if (newTasks.length > 0) {
+          // Đồng bộ selectedTask nếu cần
+          const updatedTask = newTasks.find(
+            (task) => task.id === selectedTask?.id
+          );
+          if (updatedTask) {
+            setSelectedTask(updatedTask); // Cập nhật selectedTask cho Drawer
+          }
+          message.success("Giao công việc con thành công!");
+          return true;
+        } else {
+          throw new Error("API returned an unexpected status");
+        }
       }
     } catch (error) {
       console.error(
@@ -277,24 +280,49 @@ function ListTask({ eventId, data }) {
     let successCount = 0;
     setAssigningUser(true);
 
-    for (const userId of userIds) {
-      const success = await assignUserToSubtask(subtaskId, userId);
-      if (success) successCount++;
-    }
+    try {
+      // Assign tất cả user
+      for (const userId of userIds) {
+        const success = await assignUserToSubtask(subtaskId, userId);
+        if (success) {
+          successCount++;
+        }
+      }
 
-    setAssigningUser(false);
+      // Fetch và cập nhật UI
+      if (successCount > 0) {
+        const newTasks = await fetchTasksFromAPI();
+        if (newTasks.length > 0 && selectedTask) {
+          const updatedTask = newTasks.find(
+            (task) => task.id === selectedTask.id
+          );
+          if (updatedTask) {
+            console.log("Updating selectedTask:", updatedTask);
+            setSelectedTask({ ...updatedTask }); // Deep copy
+            showSubTasks(updatedTask); // Cập nhật subTasks
+          } else {
+            console.warn("Selected task not found in new tasks");
+          }
+        }
+      }
 
-    if (successCount === userIds.length) {
-      message.success("All users assigned successfully");
-      return true;
-    } else if (successCount > 0) {
-      message.warning(
-        `Assigned ${successCount} out of ${userIds.length} users`
-      );
-      return true;
-    } else {
-      message.error("Failed to assign any users");
+      // Thông báo
+      if (successCount === userIds.length) {
+        message.success("Tất cả người dùng đã được gán thành công");
+        return true;
+      } else if (successCount > 0) {
+        message.warning(`Đã gán ${successCount}/${userIds.length} người dùng`);
+        return true;
+      } else {
+        message.error("Không thể gán bất kỳ người dùng nào");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error in handleMultipleAssignments:", error);
+      message.error("Đã xảy ra lỗi khi gán người dùng");
       return false;
+    } finally {
+      setAssigningUser(false);
     }
   };
   const showEditSubTaskModal = (subTask) => {
@@ -434,9 +462,14 @@ function ListTask({ eventId, data }) {
 
       const fetchData = async (authToken) => {
         const response = await axios.get(
-          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}&t=${Date.now()}`, // Thêm timestamp
           {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
           }
         );
         return response;
@@ -464,12 +497,22 @@ function ListTask({ eventId, data }) {
 
       if (response.data && response.data.result) {
         const tasksData = response.data.result.tasks || [];
-        setTasks(tasksData);
+        // Kiểm tra joinSubTask
+        tasksData.forEach((task) => {
+          if (task.subTasks) {
+            task.subTasks.forEach((sub) => {
+              console.log(`Subtask ${sub.id} joinSubTask:`, sub.joinSubTask);
+            });
+          }
+        });
+        console.log("Fetched tasks:", tasksData);
+        setTasks([...tasksData]); // Deep copy
         if (!loading) {
           message.success("Đã tải lại danh sách công việc thành công");
         }
         return tasksData;
       } else {
+        console.warn("No tasks found in response");
         setTasks([]);
         return [];
       }
@@ -534,12 +577,6 @@ function ListTask({ eventId, data }) {
       }
 
       if (response.status === 200 || response.status === 201) {
-        Swal.fire({
-          title: "Create Sub-Task Success!",
-          icon: "success",
-          draggable: true,
-        });
-
         subTaskForm.resetFields();
         setIsSubTaskModalVisible(false);
 
@@ -712,10 +749,11 @@ function ListTask({ eventId, data }) {
 
     if (task.subTasks && Array.isArray(task.subTasks)) {
       console.log("SubTasks original:", task.subTasks);
-      setSubTasks(task.subTasks);
-      console.log("Subtasks set:", task.subTasks);
+      setSubTasks([...task.subTasks]); // Deep copy
+      console.log("SubTasks set:", task.subTasks);
     } else {
       setSubTasks([]);
+      console.log("No subTasks found for task:", task);
     }
 
     setLoadingSubTasks(false);
@@ -1241,6 +1279,7 @@ function ListTask({ eventId, data }) {
           }
           placement="right"
           width={500}
+          zIndex={10001}
           onClose={() => setSubTasksVisible(false)}
           open={subTasksVisible}
           extra={
@@ -1421,9 +1460,10 @@ function ListTask({ eventId, data }) {
                   dataSource={subTasks}
                   renderItem={(item) => (
                     <List.Item
+                      key={`${item.id}-${Date.now()}`} // Key động
                       actions={
                         userId === data.createdBy.id
-                          ? [renderSubTaskActions(item)]
+                          ? renderSubTaskActions(item)
                           : []
                       }
                     >
@@ -1435,7 +1475,6 @@ function ListTask({ eventId, data }) {
                           }
                           style={{ marginRight: "8px" }}
                         />
-
                         <div
                           className={`sub-task-content ${
                             item.status === 1 ? "completed" : ""

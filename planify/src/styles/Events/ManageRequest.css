@@ -86,7 +86,6 @@
   color: #d35400;
 }
 
-/* Nút chung */
 .btn {
   padding: 10px 20px;
   border: none;
@@ -103,7 +102,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Nút Approve */
 .btn.approve {
   background: #27ae60;
   color: #fff;
@@ -113,7 +111,6 @@
   background: #219653;
 }
 
-/* Nút Reject */
 .btn.reject {
   background: #e74c3c;
   color: #fff;
@@ -123,7 +120,6 @@
   background: #c0392b;
 }
 
-/* Popup */
 .popup {
   position: fixed;
   top: 0;
@@ -188,7 +184,6 @@
   outline: none;
 }
 
-/* Nút Cancel trong popup */
 .btn.cancel {
   background: #95a5a6;
   color: #fff;
@@ -198,7 +193,6 @@
   background: #7f8c8d;
 }
 
-/* Nút Submit trong popup */
 .btn.submit {
   background: #f39c12;
   color: #fff;
@@ -208,7 +202,6 @@
   background: #e67e22;
 }
 
-/* Nút Submit trong Approve popup */
 .popup-content .btn.submit[style*="background-color: green"] {
   background: #27ae60 !important;
 }
@@ -217,7 +210,6 @@
   background: #219653 !important;
 }
 
-/* Thông báo khi không có yêu cầu */
 .request-column p {
   color: #e67e22;
   font-style: italic;

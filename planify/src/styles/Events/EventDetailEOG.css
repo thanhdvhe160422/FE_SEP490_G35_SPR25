@@ -51,7 +51,6 @@
   }
 }
 
-/* Main container */
 .event-container {
   width: 90%;
   max-width: 1300px;
@@ -59,7 +58,7 @@
   padding: 30px;
   background-color: #fff;
   border-radius: 15px;
-  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); */
+
   animation: fadeIn 0.8s ease-out;
   position: relative;
   overflow: hidden;
@@ -77,7 +76,6 @@
   animation: gradient 5s ease infinite;
 }
 
-/* Event header (hover retained) */
 .event-header {
   position: relative;
   margin-bottom: 30px;
@@ -88,13 +86,11 @@
   overflow: hidden;
   background-size: cover;
   background-position: center;
-  /* box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); */
   transition: all 0.4s ease;
 }
 
 .event-header:hover {
   transform: scale(1.01);
-  /* box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25); */
 }
 
 .event-header img {
@@ -279,7 +275,6 @@
   border-left-color: #ff9800;
 }
 
-/* Info item */
 .info-item {
   display: flex;
   align-items: flex-start;
@@ -288,7 +283,6 @@
   border-radius: 10px;
   background-color: #f8f9fa;
   border-left: 3px solid transparent;
-  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); */
 }
 
 .info-item svg {
@@ -356,7 +350,6 @@
   line-height: 1.8;
 }
 
-/* Action buttons */
 .event-actions {
   display: flex;
   justify-content: center;

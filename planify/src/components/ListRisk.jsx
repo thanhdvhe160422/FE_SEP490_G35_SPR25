@@ -231,7 +231,7 @@ function ListRisk({ eventId, data }) {
       <Card className="risk-list-card">
         <div className="risk-header">
           <Title level={3} className="risk-title">
-            Danh sách rủi ro
+            Danh sách rủi ro ({riskList.length})
           </Title>
           {userId === data.createdBy.id && data.status === 0 && (
             <Button

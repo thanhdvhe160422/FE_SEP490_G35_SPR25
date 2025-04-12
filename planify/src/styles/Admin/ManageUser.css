@@ -190,3 +190,6 @@
 .sidebar-body-menu li a.active:hover {
   background-color: #0056b3;
 }
+.search {
+  display: flex;
+}

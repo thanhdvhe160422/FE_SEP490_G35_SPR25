@@ -186,6 +186,9 @@ export default function ManageCampusManager() {
       document.head.removeChild(link);
     };
   }, []);
+  const handleLogout = () => {
+    localStorage.clear();
+  };
 
   return (
     <div className="page-flex">
@@ -221,6 +224,12 @@ export default function ManageCampusManager() {
                   Quản lý Campus Manager
                 </a>
               </li>
+              <li>
+                <a href="loginadmin" onClick={handleLogout}>
+                  <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Logout
+                </a>
+              </li>
               {/* <li>
                         <a className="show-cat-btn" href="#">
                           <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
@@ -239,14 +248,7 @@ export default function ManageCampusManager() {
                         </a>
                       </li> */}
             </ul>
-            <ul className="sidebar-body-menu logout-section">
-              <li>
-                <a href="#">
-                  <CiLogout style={{ marginRight: "10px", fontSize: "40px" }} />{" "}
-                  Logout
-                </a>
-              </li>
-            </ul>
+            <ul className="sidebar-body-menu logout-section"></ul>
           </div>
         </div>
       </aside>

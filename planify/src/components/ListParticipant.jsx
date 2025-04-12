@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Table, Spin } from "antd";
 import "./ListParticipant.css";
-
+import Typography from "antd/es/typography/Typography";
+const { Title } = Typography;
 function ListParticipant({ eventId }) {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,6 +11,7 @@ function ListParticipant({ eventId }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [numberOfParticipants, setNumberOfParticipants] = useState(0);
+
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return date.toLocaleString("en", {
@@ -19,6 +22,7 @@ function ListParticipant({ eventId }) {
       minute: "2-digit",
     });
   };
+
   useEffect(() => {
     if (eventId) {
       fetchParticipants();
@@ -45,56 +49,65 @@ function ListParticipant({ eventId }) {
     }
   };
 
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
+  // Định nghĩa cột cho Table
+  const columns = [
+    {
+      title: "STT",
+      key: "index",
+      render: (_, __, index) => (currentPage - 1) * 10 + index + 1,
+      width: 70,
+    },
+    {
+      title: "Tên",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (text) => text || "Unnamed",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (text) => text || "No email",
+    },
+    {
+      title: "Thời gian đăng ký",
+      dataIndex: "registrationTime",
+      key: "registrationTime",
+      render: (text) => formatDateTime(text) || "No registration time",
+    },
+  ];
+
+  // Cấu hình phân trang cho Table
+  const paginationConfig = {
+    current: currentPage,
+    pageSize: 10,
+    total: numberOfParticipants,
+    onChange: (page) => setCurrentPage(page),
+    showSizeChanger: false, // Ẩn tùy chọn thay đổi pageSize
+  };
 
   if (error) {
-    return <div className="error">{error}</div>;
+    return <div className="error">Lỗi: {error}</div>;
   }
 
   return (
     <div className="list-participant">
-      <h2>Participants List ({numberOfParticipants})</h2>
-
-      <div className="participants-container">
+      <Title level={3} className="title">
+        Danh sách người tham gia sự kiện ({numberOfParticipants})
+      </Title>
+      <Spin spinning={loading}>
         {participants.length === 0 ? (
-          <p className="no-participants">No participants found</p>
+          <p className="no-participants">Không tìm thấy người tham gia</p>
         ) : (
-          participants.map((participant) => (
-            <div key={participant.id} className="participant-card">
-              <div className="participant-details">
-                <h3>{participant.fullName || "Unnamed"}</h3>
-                <p>{participant.email || "No email"}</p>
-                <p>
-                  {formatDateTime(participant.registrationTime) ||
-                    "No registration time"}
-                </p>
-              </div>
-            </div>
-          ))
+          <Table
+            columns={columns}
+            dataSource={participants}
+            rowKey="id"
+            pagination={paginationConfig}
+            className="participants-table"
+          />
         )}
-      </div>
-
-      {totalPages > 1 && (
-        <div className=".pagination-participant">
-          <button
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+      </Spin>
     </div>
   );
 }
