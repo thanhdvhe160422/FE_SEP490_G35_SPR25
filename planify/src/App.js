@@ -28,6 +28,7 @@ import MyDraft from "./pages/Events/MyDraft";
 import ManageCampusManager from "./pages/Admin/ManageCampusManager";
 import { ToastContainer } from "react-toastify";
 import ManageUser from "./pages/Admin/ManageUser";
+import ChangePassword from "./pages/Admin/ChangePassword";
 
 function App() {
   const getRedirectPath = () => {
@@ -212,6 +213,14 @@ function App() {
             </PrivateRoute>
           }
         />
+          <Route
+              path="/change-password"
+              element={
+                  <PrivateRoute allowedRoles={["Admin"]}>
+                      <ChangePassword />
+                  </PrivateRoute>
+              }
+          />
         <Route
           path="/manage-campus-manager"
           element={
