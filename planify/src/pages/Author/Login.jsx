@@ -46,7 +46,6 @@ export default function Login() {
         "Authorization"
       ] = `Bearer ${res.data.result.accessToken}`;
 
-      // Lưu thông tin vào localStorage
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem("avatar", decoded.picture);
       localStorage.setItem("token", res.data.result.accessToken);
@@ -57,7 +56,6 @@ export default function Login() {
       localStorage.setItem("userId", res.data.result.userId);
       localStorage.setItem("reToken", res.data.result.refreshToken);
 
-      // Hiển thị toast thành công
       toast.success("Đăng nhập thành công!", {
         position: "top-right",
         autoClose: 2000,

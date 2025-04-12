@@ -220,10 +220,10 @@ export default function Dashboard() {
   return (
     <>
       <div class="page-flex">
-        <aside class="sidebar" style={{ width: "400px" }}>
+        <aside class="sidebar" style={{ width: "350px" }}>
           <div class="sidebar-start">
             <div class="sidebar-head">
-              <a href="/" class="logo-wrapper" title="Home">
+              <a href="/dashboard" class="logo-wrapper" title="Home">
                 <span class="sr-only">Home</span>
                 <span class="icon logo" aria-hidden="true"></span>
                 <div class="logo-text">
@@ -434,123 +434,6 @@ export default function Dashboard() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-                  <div className="card-admin full-width">
-                    <h3 className="card-title">
-                      Top sự kiện có số lượng tham gia nhiều nhất
-                    </h3>
-                    <table className="product-table">
-                      <thead>
-                        <tr>
-                          <th>Tên</th>
-                          <th>Bắt đầu</th>
-                          <th>Kết thúc</th>
-                          <th>Ngân sách</th>
-                          <th>Người tham gia</th>
-                          <th>Kiểu sự kiện</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {topEvent.map((item, i) => (
-                          <tr key={i}>
-                            <td>{item.eventTitle}</td>
-                            <td>{formatDate(item.startTime)}</td>
-                            <td>{formatDate(item.endTime)}</td>
-                            <td>{formatCurrency(item.amountBudget)}</td>
-                            <td>{item.totalParticipants}</td>
-                            <td>{item.categoryEventName}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="right-column">
-                  <div style={{ height: "50%" }} className="chart-card">
-                    <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
-                      Thống kê loại sự kiện
-                    </h3>
-                    <PieChart width={300} height={300}>
-                      <Pie
-                        data={pieDatas}
-                        dataKey="value"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        stroke="#fff"
-                        strokeWidth={6}
-                        cornerRadius={10}
-                      >
-                        {pieDatas.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={({ active, payload }) => {
-                          if (active && payload && payload.length) {
-                            const data = payload[0].payload;
-                            return (
-                              <div
-                                style={{
-                                  background: "#fff",
-                                  border: "1px solid #ccc",
-                                  padding: "10px",
-                                  borderRadius: "4px",
-                                }}
-                              >
-                                <p>{data.categoryEventName}</p>
-                                <p>{data.percentage}%</p>
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                    </PieChart>
-
-                    <ul
-                      style={{
-                        listStyle: "none",
-                        padding: 0,
-                        textAlign: "left",
-                        marginTop: "20px",
-                        width: "100%",
-                      }}
-                    >
-                      {pieDatas.map((item, index) => (
-                        <li
-                          key={index}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            marginBottom: "8px",
-                            padding: "0 12px",
-                          }}
-                        >
-                          <span
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <span
-                              style={{
-                                width: 10,
-                                height: 10,
-                                backgroundColor: COLORS[index % COLORS.length],
-                                borderRadius: "50%",
-                                marginRight: 8,
-                              }}
-                            ></span>
-                            {item.categoryEventName}
-                          </span>
-                          <span>{formatPercent(item.percentage)}%</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
                   <div className="card-admin">
                     <h3 className="card-title">Sự kiện mới nhất</h3>
                     <label htmlFor="year-select">Campus:</label>
@@ -611,62 +494,201 @@ export default function Dashboard() {
                       })}
                     </ul>
                   </div>
-                  <div className="card-admin buyers-profile">
-                    <h3 className="card-title">Thống kê sự kiện theo Campus</h3>
-                    <div className="buyers-content">
-                      <PieChart width={240} height={240}>
-                        {" "}
-                        <Pie
-                          data={eventCampus}
-                          dataKey="percent"
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={85}
-                          paddingAngle={5}
-                        >
-                          {eventCampus.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                      </PieChart>
+                </div>
 
-                      <ul className="buyers-legend">
-                        {eventCampus.map((item, index) => (
-                          <li
-                            key={index}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              marginBottom: "8px",
-                              padding: "0 12px",
-                            }}
+                <div className="right-column">
+                  <div style={{ height: "50%" }} className="chart-card">
+                    <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
+                      Thống kê loại sự kiện
+                    </h3>
+                    <PieChart width={300} height={300}>
+                      <Pie
+                        data={pieDatas}
+                        dataKey="value"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        stroke="#fff"
+                        strokeWidth={6}
+                        cornerRadius={10}
+                      >
+                        {pieDatas.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div
+                                style={{
+                                  background: "#fff",
+                                  border: "1px solid #ccc",
+                                  padding: "10px",
+                                  borderRadius: "4px",
+                                }}
+                              >
+                                <p>{data.categoryEventName}</p>
+                                <p>{formatPercent(data.percentage)}%</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                    </PieChart>
+
+                    <ul
+                      style={{
+                        listStyle: "none",
+                        padding: 0,
+                        textAlign: "left",
+                        marginTop: "20px",
+                        width: "100%",
+                      }}
+                    >
+                      {pieDatas.map((item, index) => (
+                        <li
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: "8px",
+                            padding: "0 12px",
+                          }}
+                        >
+                          <span
+                            style={{ display: "flex", alignItems: "center" }}
                           >
                             <span
-                              style={{ display: "flex", alignItems: "center" }}
-                            >
-                              <span
-                                style={{
-                                  width: 10,
-                                  height: 10,
-                                  backgroundColor:
-                                    COLORS[index % COLORS.length],
-                                  borderRadius: "50%",
-                                  marginRight: 8,
-                                }}
-                              ></span>
-                              {item.campusName}
-                            </span>
-                            <span>{formatPercent(item.percent)} %</span>
-                          </li>
+                              style={{
+                                width: 10,
+                                height: 10,
+                                backgroundColor: COLORS[index % COLORS.length],
+                                borderRadius: "50%",
+                                marginRight: 8,
+                              }}
+                            ></span>
+                            {item.categoryEventName}
+                          </span>
+                          <span>{formatPercent(item.percentage)}%</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="card-admin buyers-profile">
+                    <h3 className="card-title">Thống kê sự kiện theo Campus</h3>
+
+                    <PieChart width={240} height={240}>
+                      {" "}
+                      <Pie
+                        data={eventCampus}
+                        dataKey="percent"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={85}
+                        paddingAngle={5}
+                      >
+                        {eventCampus.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
-                      </ul>
-                    </div>
+                      </Pie>
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div
+                                style={{
+                                  background: "#fff",
+                                  border: "1px solid #ccc",
+                                  padding: "10px",
+                                  borderRadius: "4px",
+                                }}
+                              >
+                                <p>{data.campusName}</p>
+                                <p>{formatPercent(data.percent)}%</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                    </PieChart>
+
+                    <ul className="buyers-legend">
+                      {eventCampus.map((item, index) => (
+                        <li
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: "8px",
+                            padding: "0 12px",
+                          }}
+                        >
+                          <span
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <span
+                              style={{
+                                width: 10,
+                                height: 10,
+                                backgroundColor: COLORS[index % COLORS.length],
+                                borderRadius: "50%",
+                                marginRight: 8,
+                              }}
+                            ></span>
+                            {item.campusName}
+                          </span>
+                          <span>{formatPercent(item.percent)} %</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
+                <div className="card-admin full-width">
+                  <h3 className="card-title">
+                    Top sự kiện có số lượng tham gia nhiều nhất
+                  </h3>
+                  <table className="product-table">
+                    <thead>
+                      <tr>
+                        <th>Top</th>
+                        <th>Tên</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Ngân sách</th>
+                        <th>Người tham gia</th>
+                        <th>Kiểu sự kiện</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topEvent.map((item, i) => (
+                        <tr key={i}>
+                          <td>{i + 1}</td>
+                          <td>{item.eventTitle}</td>
+                          <td>{formatDate(item.startTime)}</td>
+                          <td>{formatDate(item.endTime)}</td>
+                          <td>{formatCurrency(item.amountBudget)}</td>
+                          <td>{item.totalParticipants}</td>
+                          <td>{item.categoryEventName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="space-3"></div>
               </div>
             </div>
           </main>

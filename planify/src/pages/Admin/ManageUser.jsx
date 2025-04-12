@@ -13,6 +13,7 @@ import "../../styles/Author/CreateEOG.css";
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
 import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
+import { searchUsers } from "../../services/adminService";
 
 export default function ManageUser() {
   const [campuses, setCampuses] = useState([]);
@@ -43,6 +44,7 @@ export default function ManageUser() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [selectedEOG, setSelectedEOG] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -89,7 +91,7 @@ export default function ManageUser() {
       });
     } catch (error) {
       console.error("Error fetching Campus Manager:", error);
-      setCampusManagers([]); // Đặt lại thành mảng rỗng nếu lỗi
+      setCampusManagers([]);
     }
   };
 
@@ -177,7 +179,8 @@ export default function ManageUser() {
       title: "#",
       dataIndex: "",
       key: "index",
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) =>
+        (pagination.currentPage - 1) * pagination.pageSize + index + 1,
     },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
@@ -196,9 +199,8 @@ export default function ManageUser() {
     },
     {
       title: "Role",
-      dataIndex: "role",
-      key: "role",
-      render: (text) => (text ? "Manager" : "User"),
+      dataIndex: "roleName",
+      key: "roleName",
     },
     { title: "SĐT", dataIndex: "phoneNumber", key: "phoneNumber" },
     {
@@ -228,11 +230,53 @@ export default function ManageUser() {
       ),
     },
   ];
+  const handleLogout = () => {
+    localStorage.clear();
+  };
+  const getSearchUsers = async () => {
+    try {
+      const params = {
+        page: pagination.currentPage,
+        pageSize: pagination.pageSize,
+        input: searchInput,
+      };
+
+      console.log("Tham số tìm kiếm:", params);
+      const response = await searchUsers(params);
+
+      if (response && response.items) {
+        setCampusManagers(response.items);
+        setPagination({
+          currentPage: response.pageNumber,
+          pageSize: response.pageSize,
+          totalCount: response.totalCount,
+          totalPages: response.totalPages,
+        });
+      } else {
+        setCampusManagers([]);
+        setPagination({
+          ...pagination,
+          currentPage: 1,
+          totalCount: 0,
+          totalPages: 1,
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm sự kiện:", error);
+      setCampusManagers([]);
+      setPagination({
+        ...pagination,
+        currentPage: 1,
+        totalCount: 0,
+        totalPages: 1,
+      });
+    }
+  };
 
   return (
     <>
       <div class="page-flex">
-        <aside class="sidebar" style={{ width: "400px" }}>
+        <aside class="sidebar" style={{ width: "350px" }}>
           <div class="sidebar-start">
             <div class="sidebar-head">
               <a href="/" class="logo-wrapper" title="Home">
@@ -266,6 +310,14 @@ export default function ManageUser() {
                     Quản lý Campus Manager
                   </a>
                 </li>
+                <li>
+                  <a href="loginadmin" onClick={handleLogout}>
+                    <CiLogout
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />{" "}
+                    Logout
+                  </a>
+                </li>
                 {/* <li>
                         <a className="show-cat-btn" href="#">
                           <FaThLarge style={{ marginRight: "10px", fontSize:'20px' }}  /> Extensions
@@ -284,23 +336,42 @@ export default function ManageUser() {
                         </a>
                       </li> */}
               </ul>
-              <ul className="sidebar-body-menu logout-section">
-                <li>
-                  <a href="#">
-                    <CiLogout
-                      style={{ marginRight: "10px", fontSize: "40px" }}
-                    />{" "}
-                    Logout
-                  </a>
-                </li>
-              </ul>
+              <ul className="sidebar-body-menu logout-section"></ul>
             </div>
           </div>
         </aside>
 
         <div className="create-organizer-container">
           <div className="eog-table-container">
-            <h2>List Users ({pagination.totalCount})</h2>
+            <div className="header-table">
+              <h2>List Users ({pagination.totalCount})</h2>
+              <div
+                className="search"
+                style={{
+                  width: "400px",
+                  display: "flex",
+                  gap: "10px",
+                  marginBottom: "20px",
+                }}
+              >
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search by email or name"
+                  value={searchInput}
+                  onChange={(e) => {
+                    setSearchInput(e.target.value);
+                    if (searchInput === "") {
+                      fetchUser();
+                    }
+                  }}
+                />
+                <button className="btn btn-primary" onClick={getSearchUsers}>
+                  Search
+                </button>
+              </div>
+            </div>
+
             <Table
               columns={columns}
               dataSource={campusManagers}

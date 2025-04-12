@@ -1,4 +1,3 @@
-/* Base styling */
 body {
   font-family: "Poppins", sans-serif;
   background: #f8f9fa;
@@ -224,7 +223,7 @@ body {
 
 .filter_section {
   position: sticky;
-  top: 100px; 
+  top: 100px;
 }
 
 .filter_section h3 {

@@ -359,7 +359,7 @@ const ListMember = ({ eventId, data }) => {
       <Card className="event-participants-card">
         <div className="event-participants-header">
           <Title level={3} className="event-participants-title">
-            <TeamOutlined /> Quản lý người tham gia sự kiện
+            <TeamOutlined /> Quản lý người tham gia sự kiện ({totalCount})
           </Title>
           {userId === data.createdBy.id && data.status === 0 && (
             <Button
