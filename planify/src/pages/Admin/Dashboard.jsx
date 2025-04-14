@@ -3,6 +3,8 @@ import "../../styles/Admin/customChart.css";
 // import "../../assets/img/svg/Logo.svg";
 // import "../../assets/css/style.min.css";
 // import "../../assets/css/style.css";
+import "../../styles/Admin/css/style.min.css";
+import "../../styles/Admin/css/style.css";
 import { CiLogout } from "react-icons/ci";
 import {
   LineChart,
@@ -236,34 +238,34 @@ export default function Dashboard() {
               <ul className="sidebar-body-menu">
                 <li>
                   <a className="active" href="/dashboard">
-                    <FaHome style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                    <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Dashboard
                   </a>
                 </li>
                 <li>
                   <a className="show-cat-btn" href="/manage-user">
                     <FaUsers
-                        style={{marginRight: "10px", fontSize: "20px"}}
+                      style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
                     Danh sách Users
                   </a>
                 </li>
                 <li>
                   <a href="manage-campus-manager">
-                    <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Quản lý Campus Manager
                   </a>
                 </li>
                 <li>
                   <a href="/change-password">
-                    <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Đổi mật khẩu
                   </a>
                 </li>
                 <li>
                   <a href="/loginAdmin" onClick={handleLogout}>
                     <CiLogout
-                        style={{marginRight: "10px", fontSize: "20px"}}
+                      style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
                     Logout
                   </a>
