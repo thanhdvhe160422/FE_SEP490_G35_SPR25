@@ -3,8 +3,6 @@ import "../../styles/Admin/customChart.css";
 // import "../../assets/img/svg/Logo.svg";
 // import "../../assets/css/style.min.css";
 // import "../../assets/css/style.css";
-import "../../styles/Admin/css/style.min.css";
-import "../../styles/Admin/css/style.css";
 import { CiLogout } from "react-icons/ci";
 import {
   LineChart,
@@ -20,15 +18,7 @@ import {
   Cell,
 } from "recharts";
 
-import {
-  FaHome,
-  FaUserAlt,
-  FaUsers,
-  FaCog,
-  FaEdit,
-  FaThLarge,
-  FaAngleDown,
-} from "react-icons/fa";
+import { FaHome, FaUsers, FaEdit } from "react-icons/fa";
 import {
   getCategoryAdmin,
   getEventByCampus,
