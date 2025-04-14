@@ -51,14 +51,18 @@ function RequestColumn({ title, requests, children }) {
         <p className="empty-message">Không có yêu cầu nào</p>
       ) : (
         requests.map((req) => (
-          <div key={req.id} className="event-request-card">
-            <h4
-              className="event-request-title"
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                navigate(`/event-detail-EOG/${req.eventId}`);
-              }}
-            >
+          <div
+            key={req.id}
+            className="event-request-card"
+            onClick={() => {
+              navigate(`/event-detail-EOG/${req.eventId}`, {
+                state: {
+                  from: "my-request",
+                },
+              });
+            }}
+          >
+            <h4 className="event-request-title" style={{ cursor: "pointer" }}>
               {req.eventTitle}
             </h4>
             {req.reason && (

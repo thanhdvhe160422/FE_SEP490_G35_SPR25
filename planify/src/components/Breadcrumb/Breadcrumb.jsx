@@ -5,9 +5,10 @@ import "./Breadcrumb.css";
 const Breadcrumb = () => {
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter((x) => x);
+  const { state } = location;
+
   const isNumeric = (str) => /^\d+$/.test(str);
   const lastIsNumeric = isNumeric(pathnames[pathnames.length - 1]);
-  const { state } = location; // Lấy state từ useLocation
 
   const getHomePath = () => {
     const role = localStorage.getItem("role");
@@ -22,15 +23,41 @@ const Breadcrumb = () => {
     }
   };
 
-  // Logic tùy chỉnh cho update-event
-  const isUpdateEvent = pathnames[0] === "update-event" && lastIsNumeric;
-  let customPathnames = isUpdateEvent
-    ? ["event-detail-spec", "update-event"]
-    : pathnames.filter((x) => !isNumeric(x));
+  const sourceMap = {
+    "my-favorite-events": "Sự kiện yêu thích",
+    "my-drafts": "Sự kiện nháp",
+    "my-event": "Sự kiện của tôi",
+    "my-request": "Yêu cầu của tôi",
+    "manage-request": "Quản lý yêu cầu",
+    "event-detail-EOG": "Chi tiết sự kiện",
+    "event-detail-spec": "Chi tiết sự kiện",
+    "update-event": "Cập nhật sự kiện",
+    "event-registered": "Sự kiện đã đăng ký",
+    "history-event": "Sự kiện đã tham gia",
+  };
 
-  // Nếu có state.from, thêm nguồn vào customPathnames
-  if (state?.from && location.pathname === "/event-detail-EOG") {
-    customPathnames = [state.from, ...customPathnames];
+  const isUpdateEvent = pathnames[0] === "update-event" && lastIsNumeric;
+  let customPathnames = pathnames.filter((x) => !isNumeric(x));
+
+  // Kiểm tra cả event-detail-EOG và event-detail-spec
+  const isEventDetailPage =
+    location.pathname.toLowerCase().startsWith("/event-detail-eog") ||
+    location.pathname.toLowerCase().startsWith("/event-detail-spec");
+
+  const isFromRecognizedSource =
+    (isEventDetailPage || isUpdateEvent) &&
+    state?.from &&
+    sourceMap[state.from];
+
+  // Xác định trang chi tiết sự kiện trước đó cho update-event
+  const previousDetailPage = state?.previousDetailPage || "event-detail-EOG"; // Mặc định là EOG nếu không có thông tin
+
+  if (isFromRecognizedSource) {
+    customPathnames = isUpdateEvent
+      ? [state.from, previousDetailPage, "update-event"]
+      : [state.from, ...customPathnames];
+  } else if (isUpdateEvent) {
+    customPathnames = [previousDetailPage, "update-event"];
   }
 
   return (
@@ -39,32 +66,31 @@ const Breadcrumb = () => {
         <li>
           <Link to={getHomePath()}>Trang chủ</Link>
         </li>
+
         {customPathnames.map((value, index) => {
           const isLast = index === customPathnames.length - 1;
-          let to;
+          let to = "";
 
-          if (
-            index === 0 &&
-            state?.from &&
-            location.pathname === "/event-detail-EOG"
-          ) {
-            // Trang nguồn (My Request hoặc Manage Request)
+          if (index === 0 && isFromRecognizedSource) {
             to = `/${state.from}`;
-          } else if (index === 0 && isUpdateEvent) {
-            to = `/event-detail-eog/${pathnames[1]}`;
+          } else if (index === 0 && isUpdateEvent && !isFromRecognizedSource) {
+            to = `/${previousDetailPage}/${pathnames[1]}`;
+          } else if (
+            index === 1 &&
+            isUpdateEvent &&
+            customPathnames[1] === previousDetailPage
+          ) {
+            to = `/${previousDetailPage}/${pathnames[1]}`;
           } else {
-            to = `/${pathnames
-              .slice(0, pathnames.indexOf(value) + 1)
-              .join("/")}`;
+            const nonIdPath = pathnames.filter((x) => !isNumeric(x));
+            const sliceIndex = nonIdPath.indexOf(value);
+            to = `/${nonIdPath.slice(0, sliceIndex + 1).join("/")}`;
           }
 
-          // Lấy displayName từ state nếu có
           const displayName =
-            index === 0 &&
-            state?.displayName &&
-            location.pathname === "/event-detail-EOG"
-              ? state.displayName
-              : value;
+            (index === 0 && isFromRecognizedSource && sourceMap[state.from]) ||
+            sourceMap[value] ||
+            value;
 
           return isLast ? (
             <li key={to} className="active" aria-current="page">

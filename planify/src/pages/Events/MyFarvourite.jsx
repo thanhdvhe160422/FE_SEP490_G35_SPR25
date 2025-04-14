@@ -136,9 +136,13 @@ export default function MyFarvourite() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              role === "Spectator"
-                                ? navigate(`/event-detail-spec/${event.id}`)
-                                : navigate(`/event-detail-EOG/${event.id}`)
+                              role === "Spectator" || role === "Implementer"
+                                ? navigate(`/event-detail-spec/${event.id}`, {
+                                    state: { from: "my-favorite-events" },
+                                  })
+                                : navigate(`/event-detail-EOG/${event.id}`, {
+                                    state: { from: "my-favorite-events" },
+                                  })
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >

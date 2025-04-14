@@ -131,7 +131,9 @@ export default function MyEvent() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-EOG/${event.id}`)
+                              navigate(`/event-detail-EOG/${event.id}`, {
+                                state: { from: "my-event" },
+                              })
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >
