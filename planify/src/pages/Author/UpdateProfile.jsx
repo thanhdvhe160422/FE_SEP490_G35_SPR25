@@ -15,6 +15,7 @@ import {
 } from "../../services/addressService";
 // import "../../styles/Author/LoadingImage.css"
 import Loading from "../../components/Loading";
+import Swal from "sweetalert2";
 
 const UpdateProfile = () => {
   const [user, setUser] = useState(null);
@@ -32,7 +33,7 @@ const UpdateProfile = () => {
   const [isChangeImage, setIsChangeImage] = useState(false);
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [errors, setErrors] = useState();
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -52,6 +53,15 @@ const UpdateProfile = () => {
           );
         }
         setName(data.data.firstName + " " + data.data.lastName);
+        if (data.data && data.data.addressVM) {
+          setSelectedProvince(
+            data.data?.addressVM?.wardVM?.districtVM?.provinceVM.id || ""
+          );
+          setSelectedDistrict(
+            data.data?.addressVM?.wardVM?.districtVM.id || ""
+          );
+          setSelectedWard(data.data?.addressVM?.wardVM?.id || "");
+        }
 
         setLoading(false);
       } catch (error) {
@@ -60,19 +70,19 @@ const UpdateProfile = () => {
       }
     };
 
-    const fetchProvinces = async () => {
-      try {
-        const data = await getProvinces();
-        setProvinces(data.data.result || []);
-      } catch (error) {
-        console.error("Lỗi lấy danh sách tỉnh:", error);
-        setProvinces([]);
-      }
-    };
-
     fetchProvinces();
     fetchUserData();
   }, []);
+
+  const fetchProvinces = async () => {
+    try {
+      const data = await getProvinces();
+      setProvinces(data.data.result || []);
+    } catch (error) {
+      console.error("Lỗi lấy danh sách tỉnh:", error);
+      setProvinces([]);
+    }
+  };
 
   const fetchDistricts = async () => {
     try {
@@ -97,11 +107,6 @@ const UpdateProfile = () => {
   };
   useEffect(() => {
     //console.log("user change data: " + JSON.stringify(user, null, 2));
-    if (user && user.addressVM) {
-      setSelectedProvince(user.addressVM.wardVM.districtVM.provinceVM.id || 1);
-      setSelectedDistrict(user.addressVM.wardVM.districtVM.id || 1);
-      setSelectedWard(user.addressVM.wardVM.id || 1);
-    }
   }, [user]);
 
   useEffect(() => {
@@ -111,8 +116,6 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     if (!selectedDistrict) return;
-    console.log("district " + selectedDistrict);
-    console.log("ward " + selectedWard);
     fetchWards();
   }, [selectedDistrict]);
 
@@ -136,6 +139,22 @@ const UpdateProfile = () => {
 
   const handleUpdate = async () => {
     try {
+      if (
+        validateNameField(user.firstName) !== "" ||
+        validateNameField(user.lastName) !== "" ||
+        validateDateOfBirth(user.dateOfBirth) !== "" ||
+        validateAddress(user?.addressVM?.addressDetail) !== "" ||
+        validatePhoneField(user.phoneNumber) !== "" ||
+        selectedWard === ""
+      ) {
+        Swal.fire({
+          title: "Error",
+          text: "Nhập đúng dữ liệu hợp lệ",
+          icon: "error",
+          timer: 2000,
+        });
+        return;
+      }
       const updatedUser = {
         id: user.id,
         firstName: user.firstName,
@@ -263,15 +282,72 @@ const UpdateProfile = () => {
       throw error;
     }
   };
+
+  const validateNameField = (value) => {
+    const strValue = String(value || "").trim();
+    if (!strValue) {
+      return `Không được để trống.`;
+    } else if (value.length > 30) {
+      return `Không được vượt quá 30 ký tự.`;
+    }
+    return "";
+  };
+  const validatePhoneField = (value) => {
+    const cleanedValue = String(value).replace(/\s/g, "");
+
+    if (!/^\d+$/.test(cleanedValue)) {
+      return "Số điện thoại chỉ được chứa chữ số.";
+    }
+
+    if (cleanedValue.length !== 10) {
+      return "Vui lòng nhập đúng 10 chữ số.";
+    }
+
+    return "";
+  };
+
+  const validateAddress = (value) => {
+    const strValue = String(value || "").trim();
+    if (!strValue) return "Địa chỉ không được để trống.";
+    if (value.length > 255) return "Địa chỉ không được vượt quá 255 ký tự.";
+    return "";
+  };
+
+  const handleFirstNameChange = (e) => {
+    const value = e.target.value;
+    const error = validateNameField(value);
+    setUser({ ...user, firstName: value });
+    setErrors({ ...errors, firstName: error });
+  };
+  const handleLastNameChange = (e) => {
+    const value = e.target.value;
+    const error = validateNameField(value);
+    setUser({ ...user, lastName: value });
+    setErrors({ ...errors, lastName: error });
+  };
+  const validateDateOfBirth = (value) => {
+    if (!value) return "Ngày sinh không được để trống.";
+    if (new Date(value) > new Date())
+      return "Ngày sinh không được ở tương lai.";
+    return "";
+  };
   const HandlePhoneNumber = (e) => {
     const value = e.target.value;
-
-    if (/^\d{0,10}$/.test(value)) {
-      setUser({ ...user, phoneNumber: value });
-      setPhoneError("");
-    } else {
-      setPhoneError("Vui lòng nhập đúng 10 số.");
-    }
+    const error = validatePhoneField(value);
+    setUser({ ...user, phoneNumber: value });
+    setErrors({ ...errors, phone: error });
+  };
+  const HandleAddress = (e) => {
+    const value = e.target.value;
+    const error = validateAddress(value);
+    setUser({
+      ...user,
+      addressVM: {
+        ...(user.addressVM || {}),
+        addressDetail: value,
+      },
+    });
+    setErrors({ ...errors, address: error });
   };
 
   function convertToDirectLink(googleDriveUrl) {
@@ -295,7 +371,7 @@ const UpdateProfile = () => {
         <div className="profile-card">
           <img
             src={convertToDirectLink(image)}
-            alt="Avatar"
+            alt="Ảnh đại diện"
             className="profile-avatar"
           />
 
@@ -305,7 +381,7 @@ const UpdateProfile = () => {
               className="file-input-button"
               onClick={() => document.getElementById("avatar-upload").click()}
             >
-              Change Image
+              Đổi ảnh
             </button>
             {/* <button className="btn" onClick={handleSaveAvatar}>
               Save Image
@@ -326,50 +402,58 @@ const UpdateProfile = () => {
         </div>
 
         <div className="profile-form">
-          <h2>Update Profile Information</h2>
+          <h2>Cập nhật hồ sơ</h2>
           <form>
             <div className="input-group">
               <div className="input-field">
-                <label>First Name</label>
+                <label>Họ</label>
                 <input
                   className="input-profile"
                   type="text"
                   value={user.firstName}
-                  onChange={(e) =>
-                    setUser({ ...user, firstName: e.target.value })
-                  }
+                  onChange={handleFirstNameChange}
                 />
+                {errors?.firstName && (
+                  <div className="text-danger">{errors?.firstName}</div>
+                )}
               </div>
 
               <div className="input-field">
-                <label>Last Name</label>
+                <label>Tên</label>
                 <input
                   className="input-profile"
                   type="text"
                   value={user.lastName}
-                  onChange={(e) =>
-                    setUser({ ...user, lastName: e.target.value })
-                  }
+                  onChange={handleLastNameChange}
                 />
+                {errors?.lastName && (
+                  <div className="text-danger">{errors?.lastName}</div>
+                )}
               </div>
 
               <div className="input-field">
-                <label>Date of Birth</label>
+                <label>Ngày sinh</label>
                 <input
                   className="input-profile"
                   type="date"
+                  max={new Date().toISOString().split("T")[0]}
                   value={user.dateOfBirth ? user.dateOfBirth.split("T")[0] : ""}
-                  onChange={(e) =>
-                    setUser({
-                      ...user,
-                      dateOfBirth: e.target.value,
-                    })
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setUser({ ...user, dateOfBirth: value });
+                    setErrors({
+                      ...errors,
+                      dateOfBirth: validateDateOfBirth(value),
+                    });
+                  }}
                 />
+                {errors?.dateOfBirth && (
+                  <div className="text-danger">{errors?.dateOfBirth}</div>
+                )}
               </div>
 
               <div className="input-field">
-                <label>Gender</label>
+                <label>Giới tính</label>
                 <div className="gender-radio">
                   <label style={{ marginRight: "10%" }}>
                     <input
@@ -381,7 +465,7 @@ const UpdateProfile = () => {
                         setUser({ ...user, gender: e.target.value })
                       }
                     />
-                    Male
+                    Nam
                   </label>
                   <label>
                     <input
@@ -393,7 +477,7 @@ const UpdateProfile = () => {
                         setUser({ ...user, gender: e.target.value })
                       }
                     />
-                    Female
+                    Nữ
                   </label>
                 </div>
               </div>
@@ -401,12 +485,16 @@ const UpdateProfile = () => {
 
             <div className="address-group">
               <div className="address-field">
-                <label>Province</label>
+                <label>Tỉnh</label>
                 <select
                   className="input-profile"
                   value={selectedProvince}
-                  onChange={(e) => setSelectedProvince(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedProvince(e.target.value);
+                    setSelectedDistrict("");
+                  }}
                 >
+                  <option value="">-- Chọn tỉnh --</option>
                   {provinces.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.provinceName}
@@ -416,12 +504,16 @@ const UpdateProfile = () => {
               </div>
 
               <div className="address-field">
-                <label>District</label>
+                <label>Huyện</label>
                 <select
                   className="input-profile"
                   value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedDistrict(e.target.value);
+                    setSelectedWard("");
+                  }}
                 >
+                  <option value="">-- Chọn huyện --</option>
                   {districts.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.districtName}
@@ -431,58 +523,57 @@ const UpdateProfile = () => {
               </div>
 
               <div className="address-field">
-                <label>Ward</label>
+                <label>Xã</label>
                 <select
                   className="input-profile"
                   value={selectedWard}
                   onChange={(e) => setSelectedWard(e.target.value)}
                 >
+                  <option value="">-- Chọn xã --</option>
                   {wards.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.wardName}
                     </option>
                   ))}
                 </select>
+                {selectedWard === "" && (
+                  <div className="text-danger">Chọn nơi ở</div>
+                )}
               </div>
             </div>
             <div className="input-field">
-              <label>Address</label>
+              <label>Địa chỉ</label>
               <input
                 className="input-profile"
                 type="text"
                 value={user?.addressVM?.addressDetail || ""}
-                onChange={(e) =>
-                  setUser({
-                    ...user,
-                    addressVM: {
-                      ...user.addressVM,
-                      addressDetail: e.target.value,
-                    },
-                  })
-                }
+                onChange={HandleAddress}
               />
+              {errors?.address && (
+                <div className="error-message">{errors?.address}</div>
+              )}
             </div>
 
             <div className="input-field">
-              <label>Phone Number</label>
+              <label>Số điện thoại</label>
               <input
                 className="input-profile"
                 type="text"
                 value={user.phoneNumber}
                 onChange={HandlePhoneNumber}
               />
-              {phoneError && (
-                <div className="error-message text-danger">{phoneError}</div>
+              {errors?.phone && (
+                <div className="text-danger">{errors.phone}</div>
               )}
             </div>
           </form>
 
           <div className="button-group">
             <button className="btn btn-danger" onClick={handleCancel}>
-              Cancel
+              Hủy
             </button>
             <button className="btn btn-success" onClick={handleUpdate}>
-              Save
+              Lưu
             </button>
           </div>
         </div>
