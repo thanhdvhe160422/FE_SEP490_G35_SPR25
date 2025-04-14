@@ -131,7 +131,9 @@ export default function MyDraft() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-eog/${event.id}`)
+                              navigate(`/event-detail-EOG/${event.id}`, {
+                                state: { from: "my-drafts" },
+                              })
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >

@@ -43,7 +43,9 @@ const EventHistory = () => {
   };
 
   const handleRowClick = (eventId) => {
-    navigate(`/event-detail-spec/${eventId}`);
+    navigate(`/event-detail-spec/${eventId}`, {
+      state: { from: "history-event" },
+    });
   };
 
   useEffect(() => {
@@ -60,7 +62,9 @@ const EventHistory = () => {
           className="event-title-link"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/event-detail-spec/${events.eventId}`);
+            navigate(`/event-detail-spec/${record.eventId}`, {
+              state: { from: "history-event" },
+            });
           }}
         >
           {text}
@@ -106,7 +110,10 @@ const EventHistory = () => {
   return (
     <>
       <Header />
-      <div  className="event-history-container" style={{ padding: "20px", marginTop:'100px' }}>
+      <div
+        className="event-history-container"
+        style={{ padding: "20px", marginTop: "100px" }}
+      >
         <h2 style={{ marginBottom: "20px" }}>Lịch Sử Sự Kiện</h2>
 
         {events.length === 0 ? (
@@ -123,7 +130,7 @@ const EventHistory = () => {
               onChange: (page) => setCurrentPage(page),
             }}
             onRow={(record) => ({
-              onClick: () => handleRowClick(events.eventId),
+              onClick: () => handleRowClick(record.eventId),
               style: { cursor: "pointer" },
             })}
           />

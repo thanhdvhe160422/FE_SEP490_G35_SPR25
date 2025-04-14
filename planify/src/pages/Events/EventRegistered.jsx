@@ -280,7 +280,9 @@ export default function EventRegistered() {
                           <Card
                             className="h-100 shadow-sm event-card"
                             onClick={() =>
-                              navigate(`/event-detail-spec/${event.eventId}`)
+                              navigate(`/event-detail-spec/${event.eventId}`, {
+                                state: { from: "event-registered" },
+                              })
                             }
                             style={{ cursor: "pointer", position: "relative" }}
                           >

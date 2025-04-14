@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -41,6 +41,7 @@ import Loading from "../../components/Loading";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 
 const EventDetailEOG = () => {
+  const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
@@ -578,7 +579,11 @@ const EventDetailEOG = () => {
                 </button>
                 <button
                   className="update-event-btn"
-                  onClick={() => navigate(`/update-event/${eventId}`)}
+                  onClick={() =>
+                    navigate(`/update-event/${eventId}`, {
+                      state: { from: location.state?.from || "my-drafts" },
+                    })
+                  }
                   style={{
                     opacity: event.status === 1 || event.status === 2 ? 0.5 : 1,
                     cursor:
