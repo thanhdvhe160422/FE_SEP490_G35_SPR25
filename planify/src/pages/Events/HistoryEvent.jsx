@@ -76,13 +76,13 @@ const EventHistory = () => {
       dataIndex: "startTime",
       key: "startTime",
       render: (text) =>
-        new Date(text).toLocaleString("en-US", {
+        new Date(text).toLocaleString("vi-VN", {
           weekday: "short",
           month: "short",
           day: "numeric",
           hour: "numeric",
           minute: "2-digit",
-          hour12: true,
+          // hour12: true,
         }),
     },
     {

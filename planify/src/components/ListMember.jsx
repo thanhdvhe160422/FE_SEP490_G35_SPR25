@@ -253,7 +253,16 @@ const ListMember = ({ eventId, data }) => {
       fetchParticipants();
     }
   }, [eventId, fetchParticipants, refreshKey]);
-
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString("vi", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
   useEffect(() => {
     if (data?.joinProjects?.length && !refreshKey) {
       console.log("Using data from props:", data.joinProjects);
@@ -277,7 +286,7 @@ const ListMember = ({ eventId, data }) => {
       title: "Thời gian tham gia",
       dataIndex: "timeJoinProject",
       key: "timeJoinProject",
-      render: (text) => new Date(text).toLocaleString(),
+      render: (text) => formatDateTime(text),
     },
   ];
   const userIdx = localStorage.getItem("userId");

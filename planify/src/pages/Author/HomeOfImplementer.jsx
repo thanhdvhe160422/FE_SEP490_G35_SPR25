@@ -51,7 +51,7 @@ const WeekCalendar = () => {
         padding-top: 130px;
         position: relative;
         width: 100%;
-        height: calc(100vh - 120px);
+        height:100vh;
         overflow-x: hidden;
       }
       

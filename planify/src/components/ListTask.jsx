@@ -927,7 +927,7 @@ function ListTask({ eventId, data }) {
       render: (text) => text || "No description",
     },
     {
-      title: "Thời gian bắt đầu",
+      title: "Bắt đầu",
       dataIndex: "startTime",
       key: "startTime",
       width: "12%",
