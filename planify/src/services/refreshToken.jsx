@@ -1,6 +1,6 @@
 import axios from "axios";
 const refreshAccessToken = async () => {
-  const refreshToken = localStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem("reToken");
   const accessToken = localStorage.getItem("token");
   try {
     const response = await axios.post(
