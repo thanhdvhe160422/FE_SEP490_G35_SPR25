@@ -1160,7 +1160,7 @@ function ListTask({ eventId, data }) {
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY HH:mm"
                 showTime={{ format: "HH:mm" }}
-                placeholder="Choose a start time"
+                placeholder="Chọn thời gian bắt đầu"
                 disabledDate={(current) =>
                   current && current < dayjs().startOf("day")
                 }
@@ -1320,7 +1320,7 @@ function ListTask({ eventId, data }) {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter a subtask title!",
+                    message: "Vui lòng nhập tiêu đề!",
                   },
                 ]}
               >
@@ -1333,7 +1333,7 @@ function ListTask({ eventId, data }) {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter a subtask description!",
+                    message: "Vui lòng nhập mô tả!",
                   },
                 ]}
               >
@@ -1349,30 +1349,33 @@ function ListTask({ eventId, data }) {
                   </Space>
                 }
                 rules={[
-                  { required: true, message: "Please choose a start time!" },
+                  {
+                    required: true,
+                    message: "Vui lòng chọn thời gian bắt đầu!",
+                  },
                 ]}
-                disabledDate={(current) =>
-                  current && current < dayjs().startOf("day")
-                }
-                disabledTime={(selectedDate) => {
-                  if (!selectedDate) return {};
-                  const now = dayjs();
-                  return selectedDate.isSame(now, "day")
-                    ? {
-                        disabledHours: () => [...Array(now.hour()).keys()],
-                        disabledMinutes: (hour) =>
-                          hour === now.hour()
-                            ? [...Array(now.minute()).keys()]
-                            : [],
-                      }
-                    : {};
-                }}
               >
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD/MM/YYYY HH:mm"
                   showTime={{ format: "HH:mm" }}
-                  placeholder="Choose a start time"
+                  placeholder="Chọn thời gian bắt đầu nhiệm vụ con"
+                  disabledDate={(current) =>
+                    current && current < dayjs().startOf("day")
+                  }
+                  disabledTime={(selectedDate) => {
+                    if (!selectedDate) return {};
+                    const now = dayjs();
+                    return selectedDate.isSame(now, "day")
+                      ? {
+                          disabledHours: () => [...Array(now.hour()).keys()],
+                          disabledMinutes: (hour) =>
+                            hour === now.hour()
+                              ? [...Array(now.minute()).keys()]
+                              : [],
+                        }
+                      : {};
+                  }}
                 />
               </Form.Item>
 
@@ -1387,31 +1390,34 @@ function ListTask({ eventId, data }) {
                 rules={[
                   {
                     required: true,
-                    message: "Please choose a deadline!",
+                    message: "Vui lòng nhập hạn chót !",
                   },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      const startTime = getFieldValue("startTime");
-                      if (!value || !startTime || value.isAfter(startTime)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error("Deadline must be after the start time")
-                      );
-                    },
-                  }),
                 ]}
               >
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD/MM/YYYY HH:mm"
                   showTime={{ format: "HH:mm" }}
-                  placeholder="Choose a deadline"
+                  placeholder="Chọn hạn chót"
                   disabledDate={(current) => {
-                    const startTime = form.getFieldValue("startTime");
+                    const startTime = subTaskForm.getFieldValue("startTime");
                     return startTime
-                      ? current && current <= startTime.startOf("day")
+                      ? current && current.isBefore(startTime.startOf("day"))
                       : false;
+                  }}
+                  disabledTime={(selectedDate) => {
+                    const startTime = subTaskForm.getFieldValue("startTime");
+                    if (!selectedDate || !startTime) return {};
+                    const now = dayjs();
+                    return selectedDate.isSame(now, "day")
+                      ? {
+                          disabledHours: () => [...Array(now.hour()).keys()],
+                          disabledMinutes: (hour) =>
+                            hour === now.hour()
+                              ? [...Array(now.minute()).keys()]
+                              : [],
+                        }
+                      : {};
                   }}
                 />
               </Form.Item>

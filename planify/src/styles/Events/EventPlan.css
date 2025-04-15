@@ -1,3 +1,6 @@
+.event-plan-container {
+  height: 100vh;
+}
 .working-container {
   background: linear-gradient(150deg, #fff, #ccc);
   color: white;
@@ -7,16 +10,23 @@
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
+  margin-top: 90px;
 }
 
+.go1671063245 {
+  z-index: 9999999 !important;
+  margin-top: 80px !important;
+  width: 300px !important;
+  right: 20px !important;
+}
 .walkthrough {
   display: flex;
   flex-direction: column;
   width: 1500px;
   height: 700px;
-  background: linear-gradient(to right bottom, #f68b1f, #ed6c00); /* FPT orange */
+  background: linear-gradient(to right bottom, #f68b1f, #ed6c00);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.23), 0 10px 40px rgba(0, 0, 0, 0.19);
   overflow: hidden;
   font-size: 14px;
@@ -352,7 +362,6 @@
   vertical-align: middle;
 }
 
-
 /* Tối ưu Task & Subtask */
 .bg-light {
   background: rgba(255, 255, 255, 0.15) !important;
@@ -364,7 +373,8 @@
 }
 
 /* Button trong Task/Subtask */
-.btn-danger, .btn-outline-primary {
+.btn-danger,
+.btn-outline-primary {
   border-radius: 6px;
   font-weight: 500;
 }
@@ -402,7 +412,11 @@
   position: fixed;
   bottom: 30px; /* Slightly higher for better visibility */
   right: 30px; /* Adjusted for better spacing */
-  background: linear-gradient(135deg, #6b48ff, #00ddeb); /* Keep the gradient consistent with the app theme */
+  background: linear-gradient(
+    135deg,
+    #6b48ff,
+    #00ddeb
+  ); /* Keep the gradient consistent with the app theme */
   color: white;
   padding: 18px; /* Slightly larger for better proportions */
   border-radius: 50%;
@@ -421,7 +435,11 @@
 .chatbot-icon:hover {
   transform: scale(1.1) rotate(10deg); /* Add a slight rotation on hover for a playful effect */
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(107, 72, 255, 0.3); /* Enhanced shadow and glow on hover */
-  background: linear-gradient(135deg, #8a63ff, #00eaff); /* Brighter gradient on hover */
+  background: linear-gradient(
+    135deg,
+    #8a63ff,
+    #00eaff
+  ); /* Brighter gradient on hover */
 }
 
 .chatbot-icon svg {
@@ -439,15 +457,18 @@
 @keyframes pulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(107, 72, 255, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25),
+      0 0 0 4px rgba(107, 72, 255, 0.2);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 8px rgba(107, 72, 255, 0.25);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+      0 0 0 8px rgba(107, 72, 255, 0.25);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(107, 72, 255, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25),
+      0 0 0 4px rgba(107, 72, 255, 0.2);
   }
 }
 
@@ -568,14 +589,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.category-buttons, .confirmation-buttons {
+.category-buttons,
+.confirmation-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 12px;
 }
 
-.category-buttons button, .confirmation-buttons button {
+.category-buttons button,
+.confirmation-buttons button {
   background: linear-gradient(135deg, #6b48ff, #00ddeb);
   color: white;
   padding: 10px 20px;
@@ -586,7 +609,8 @@
   transition: transform 0.2s ease, background 0.3s ease;
 }
 
-.category-buttons button:hover, .confirmation-buttons button:hover {
+.category-buttons button:hover,
+.confirmation-buttons button:hover {
   background: linear-gradient(135deg, #8a63ff, #00eaff);
   transform: translateY(-3px);
 }
@@ -685,21 +709,41 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateY(60px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes messageSlide {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
