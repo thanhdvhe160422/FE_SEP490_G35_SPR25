@@ -234,9 +234,9 @@ export default function Header() {
           {showPopup && (
             <div className="notification-popup">
               <div className="text-center">
-                <h4 className="fw-bold">Notification</h4>
+                <h4 className="fw-bold">Thông báo</h4>
                 {messages.length === 0 ? (
-                  <p>No notification found!</p>
+                  <p>Không tìm thấy thông báo nào!</p>
                 ) : (
                   <table className="table table-hover mx-auto">
                     <tbody>
@@ -293,10 +293,10 @@ export default function Header() {
                 className="dropdown-item"
                 onClick={() => navigate("/profile")}
               >
-                Profile
+                Hồ sơ
               </div>
               <div className="dropdown-item-logout" onClick={handleLogout}>
-                Logout
+                Đăng xuất
               </div>
             </div>
           )}
