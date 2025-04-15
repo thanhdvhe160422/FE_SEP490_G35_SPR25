@@ -28,12 +28,10 @@ function ListRisk({ eventId, data }) {
   const [riskList, setRiskList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
-  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // State mới cho modal tạo
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState(null);
   const [form] = Form.useForm();
-  const [createForm] = Form.useForm(); // Form riêng cho việc tạo mới
-
-  // Inicialización de datos desde props o API
+  const [createForm] = Form.useForm();
   useEffect(() => {
     if (data && data.risks && Array.isArray(data.risks)) {
       console.log("Usando datos de riesgos desde props:", data.risks);
@@ -47,7 +45,6 @@ function ListRisk({ eventId, data }) {
     }
   }, [eventId, data]);
 
-  // Función para obtener datos del servidor
   const fetchRisks = async () => {
     setLoading(true);
     try {
@@ -70,7 +67,6 @@ function ListRisk({ eventId, data }) {
     }
   };
 
-  // Xóa rủi ro
   const handleDelete = async (riskId) => {
     try {
       const token = localStorage.getItem("token");
@@ -80,7 +76,6 @@ function ListRisk({ eventId, data }) {
 
       message.success("Đã xóa rủi ro thành công");
 
-      // Tải lại danh sách rủi ro
       fetchRisks();
     } catch (error) {
       console.error("Error deleting risk:", error);
@@ -88,7 +83,6 @@ function ListRisk({ eventId, data }) {
     }
   };
 
-  // Hiển thị modal cập nhật
   const showUpdateModal = (risk) => {
     setSelectedRisk(risk);
     form.setFieldsValue({
@@ -100,13 +94,11 @@ function ListRisk({ eventId, data }) {
     setIsUpdateModalVisible(true);
   };
 
-  // Hiển thị modal tạo mới
   const showCreateModal = () => {
-    createForm.resetFields(); // Reset form khi mở modal
+    createForm.resetFields();
     setIsCreateModalVisible(true);
   };
 
-  // Xử lý cập nhật rủi ro
   const handleUpdate = async (values) => {
     try {
       const token = localStorage.getItem("token");
@@ -126,7 +118,6 @@ function ListRisk({ eventId, data }) {
       message.success("Cập nhật rủi ro thành công");
       setIsUpdateModalVisible(false);
 
-      // Tải lại danh sách rủi ro
       fetchRisks();
     } catch (error) {
       console.error("Error updating risk:", error);
@@ -134,7 +125,6 @@ function ListRisk({ eventId, data }) {
     }
   };
 
-  // Hàm xử lý tạo mới rủi ro
   const handleCreate = async (values) => {
     try {
       const token = localStorage.getItem("token");
@@ -154,7 +144,6 @@ function ListRisk({ eventId, data }) {
       message.success("Tạo mới rủi ro thành công");
       setIsCreateModalVisible(false);
 
-      // Tải lại danh sách rủi ro
       fetchRisks();
     } catch (error) {
       console.error("Error creating risk:", error);
