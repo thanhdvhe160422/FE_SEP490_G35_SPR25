@@ -61,7 +61,9 @@ export default function ManageUser() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      enqueueSnackbar("Không tìm thấy token. Vui lòng đăng nhập.", { variant: "error" });
+      enqueueSnackbar("Không tìm thấy token. Vui lòng đăng nhập.", {
+        variant: "error",
+      });
       navigate("/loginadmin");
       return;
     }
@@ -78,7 +80,10 @@ export default function ManageUser() {
         return;
       }
 
-      const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      const userRole =
+        decodedToken[
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+        ];
       if (userRole === "Admin") {
         setIsAdmin(true);
       } else {
@@ -158,8 +163,8 @@ export default function ManageUser() {
     const fetchUser = async () => {
       try {
         const response = await getListUser(
-            pagination.currentPage,
-            pagination.pageSize
+          pagination.currentPage,
+          pagination.pageSize
         );
         setCampusManagers(response.items || []);
         setPagination({
@@ -178,7 +183,7 @@ export default function ManageUser() {
 
   const checkEmailExists = (email, excludeId = null) => {
     return campusManagers.some(
-        (eog) => eog.email === email && (!excludeId || eog.id !== excludeId)
+      (eog) => eog.email === email && (!excludeId || eog.id !== excludeId)
     );
   };
 
@@ -282,6 +287,13 @@ export default function ManageUser() {
       pageSize: paginationData.pageSize,
     });
   };
+  const fixDriveUrl = (url) => {
+    if (!url) return null;
+    if (url.includes("drive.google.com/uc?id=")) {
+      const fileId = url.split("id=")[1];
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+    }
+  };
 
   const columns = [
     {
@@ -289,7 +301,19 @@ export default function ManageUser() {
       dataIndex: "",
       key: "index",
       render: (_, __, index) =>
-          (pagination.currentPage - 1) * pagination.pageSize + index + 1,
+        (pagination.currentPage - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: "Ảnh đại diện",
+      dataIndex: "",
+      key: "avatar",
+      render: (text, record) => (
+        <img
+          src={fixDriveUrl(record.avatar.mediaUrl)}
+          alt="avatar"
+          style={{ width: "50px", height: "50px", borderRadius: "50%" }}
+        />
+      ),
     },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Họ", dataIndex: "firstName", key: "firstName" },
@@ -316,26 +340,26 @@ export default function ManageUser() {
       title: "Hành động",
       key: "actions",
       render: (_, record) => (
-          <div>
-            {record.status === 1 ? (
-                <Button
-                    icon={<LockOutlined />}
-                    type="link"
-                    danger
-                    onClick={() => handleBan(record)}
-                >
-                  Cấm
-                </Button>
-            ) : (
-                <Button
-                    icon={<UnlockOutlined />}
-                    type="link"
-                    onClick={() => handleUnban(record)}
-                >
-                  Bỏ cấm
-                </Button>
-            )}
-          </div>
+        <div>
+          {record.status === 1 ? (
+            <Button
+              icon={<LockOutlined />}
+              type="link"
+              danger
+              onClick={() => handleBan(record)}
+            >
+              Cấm
+            </Button>
+          ) : (
+            <Button
+              icon={<UnlockOutlined />}
+              type="link"
+              onClick={() => handleUnban(record)}
+            >
+              Bỏ cấm
+            </Button>
+          )}
+        </div>
       ),
     },
   ];
@@ -392,7 +416,9 @@ export default function ManageUser() {
 
   const handleImport = async () => {
     if (!isAdmin) {
-      enqueueSnackbar("Bạn không có quyền thực hiện hành động này!", { variant: "error" });
+      enqueueSnackbar("Bạn không có quyền thực hiện hành động này!", {
+        variant: "error",
+      });
       return;
     }
 
@@ -402,7 +428,9 @@ export default function ManageUser() {
     }
 
     if (fileList.length === 0 || !fileList[0]?.originFileObj) {
-      enqueueSnackbar("Vui lòng chọn một file Excel hợp lệ!", { variant: "error" });
+      enqueueSnackbar("Vui lòng chọn một file Excel hợp lệ!", {
+        variant: "error",
+      });
       return;
     }
 
@@ -417,39 +445,47 @@ export default function ManageUser() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-          `https://localhost:44320/api/Users/import?campusId=${selectedCampusId}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-          }
+        `https://localhost:44320/api/Users/import?campusId=${selectedCampusId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
       );
 
       const result = await response.json();
       if (response.ok) {
-        enqueueSnackbar(result.message || "Nhập users thành công!", { variant: "success" });
+        enqueueSnackbar(result.message || "Nhập users thành công!", {
+          variant: "success",
+        });
         setIsImportModalVisible(false);
         setFileList([]);
         setSelectedCampusId(null);
         fetchUser();
       } else {
         if (result.errors) {
-          Object.values(result.errors).flat().forEach((error) => {
-            enqueueSnackbar(error, { variant: "error" });
-          });
+          Object.values(result.errors)
+            .flat()
+            .forEach((error) => {
+              enqueueSnackbar(error, { variant: "error" });
+            });
         } else if (result.result && Array.isArray(result.result)) {
           result.result.forEach((error) => {
             enqueueSnackbar(error, { variant: "error" });
           });
         } else {
-          enqueueSnackbar(result.message || "Lỗi khi nhập user!", { variant: "error" });
+          enqueueSnackbar(result.message || "Lỗi khi nhập user!", {
+            variant: "error",
+          });
         }
       }
     } catch (error) {
       console.error("Lỗi khi nhập user:", error);
-      enqueueSnackbar("Lỗi hệ thống khi nhập user. Vui lòng thử lại!", { variant: "error" });
+      enqueueSnackbar("Lỗi hệ thống khi nhập user. Vui lòng thử lại!", {
+        variant: "error",
+      });
     } finally {
       setIsImporting(false);
     }
@@ -461,8 +497,9 @@ export default function ManageUser() {
     },
     beforeUpload: (file) => {
       const isExcel =
-          file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-          file.type === "application/vnd.ms-excel";
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.type === "application/vnd.ms-excel";
       if (!isExcel) {
         message.error("Chỉ được tải lên file Excel (.xlsx hoặc .xls)!");
         return Upload.LIST_IGNORE;
@@ -480,9 +517,7 @@ export default function ManageUser() {
     fileList,
   };
 
-  // Hàm tạo và tải file mẫu động
   const handleDownloadSample = () => {
-    // Dữ liệu mẫu
     const sampleData = [
       {
         Email: "example@domain.com",
@@ -494,7 +529,6 @@ export default function ManageUser() {
       },
     ];
 
-    // Tạo worksheet từ dữ liệu
     const ws = XLSX.utils.json_to_sheet(sampleData);
     // Tạo workbook và thêm worksheet
     const wb = XLSX.utils.book_new();
@@ -502,12 +536,50 @@ export default function ManageUser() {
     // Xuất file Excel
     XLSX.writeFile(wb, "sample-users.xlsx");
   };
+  const fetchUserByRole = async (role) => {
+    try {
+      const params = {
+        page: pagination.currentPage,
+        pageSize: pagination.pageSize,
+        input: searchInput,
+        roleName: role,
+      };
+      const response = await searchUsers(params);
+      if (response && response.items) {
+        setCampusManagers(response.items);
+        setPagination({
+          currentPage: response.pageNumber,
+          pageSize: response.pageSize,
+          totalCount: response.totalCount,
+          totalPages: response.totalPages,
+        });
+      } else {
+        setCampusManagers([]);
+        setPagination({
+          ...pagination,
+          currentPage: 1,
+          totalCount: 0,
+          totalPages: 1,
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm user:", error);
+      setCampusManagers([]);
+      setPagination({
+        ...pagination,
+        currentPage: 1,
+        totalCount: 0,
+        totalPages: 1,
+      });
+      enqueueSnackbar("Không tìm kiếm được user", { variant: "error" });
+    }
+  };
 
   const fetchUser = async () => {
     try {
       const response = await getListUser(
-          pagination.currentPage,
-          pagination.pageSize
+        pagination.currentPage,
+        pagination.pageSize
       );
       setCampusManagers(response.items || []);
       setPagination({
@@ -523,197 +595,212 @@ export default function ManageUser() {
   };
 
   return (
-      <div className="page-flex">
-        <aside className="sidebar" style={{ width: "350px" }}>
-          <div className="sidebar-start">
-            <div className="sidebar-head">
-              <a href="/" className="logo-wrapper" title="Home">
-                <span className="sr-only">Home</span>
-                <span className="icon logo" aria-hidden="true"></span>
-                <div className="logo-text">
-                  <span className="logo-title">Planify</span>
-                  <span className="logo-subtitle">Dashboard</span>
-                </div>
-              </a>
-            </div>
-            <div className="sidebar-body">
-              <ul className="sidebar-body-menu">
-                <li>
-                  <a className="show-cat-btn" href="/dashboard">
-                    <FaHome style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
-                    Dashboard
-                  </a>
-                </li>
-                <li>
-                  <a className="active" href="/manage-user">
-                    <FaUsers style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
-                    Danh sách users
-                  </a>
-                </li>
-                <li>
-                  <a href="/manage-campus-manager">
-                    <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
-                    Quản lý Campus Manager
-                  </a>
-                </li>
-                <li>
-                  <a href="/change-password">
-                    <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
-                    Đổi mật khẩu
-                  </a>
-                </li>
-                <li>
-                  <a href="/loginadmin" onClick={handleLogout}>
-                    <CiLogout style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
-                    Logout
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </aside>
-
-        <div className="create-organizer-container">
-          <div className="eog-table-container">
-            <div className="header-table">
-              <h2>Danh sách Users ({pagination.totalCount})</h2>
-              <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    alignItems: "center",
-                    marginBottom: "20px",
-                  }}
-              >
-                <div
-                    className="search"
-                    style={{
-                      width: "400px",
-                      display: "flex",
-                      gap: "10px",
-                    }}
-                >
-                  <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Tìm kiếm theo email hoặc tên"
-                      value={searchInput}
-                      onChange={(e) => {
-                        setSearchInput(e.target.value);
-                        if (e.target.value === "") {
-                          fetchUser();
-                        }
-                      }}
-                  />
-                  <button className="btn btn-primary" onClick={getSearchUsers}>
-                    Tìm kiếm
-                  </button>
-                </div>
-                <Button
-                    type="primary"
-                    icon={<FaFileExcel />}
-                    onClick={() => setIsImportModalVisible(true)}
-                >
-                  Nhập Users
-                </Button>
+    <div className="page-flex">
+      <aside className="sidebar" style={{ width: "350px" }}>
+        <div className="sidebar-start">
+          <div className="sidebar-head">
+            <a href="/dashboard" className="logo-wrapper" title="Home">
+              <span className="sr-only">Home</span>
+              <span className="icon logo" aria-hidden="true"></span>
+              <div className="logo-text">
+                <span className="logo-title">Planify</span>
+                <span className="logo-subtitle">Dashboard</span>
               </div>
-            </div>
+            </a>
+          </div>
+          <div className="sidebar-body">
+            <ul className="sidebar-body-menu">
+              <li>
+                <a className="show-cat-btn" href="/dashboard">
+                  <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a className="active" href="/manage-user">
+                  <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Danh sách users
+                </a>
+              </li>
+              <li>
+                <a href="/manage-campus-manager">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus Manager
+                </a>
+              </li>
+              <li>
+                <a href="/change-password">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Đổi mật khẩu
+                </a>
+              </li>
+              <li>
+                <a href="/loginadmin" onClick={handleLogout}>
+                  <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
 
-            <Table
-                columns={columns}
-                dataSource={campusManagers}
-                rowKey="id"
-                pagination={{
-                  current: pagination.currentPage,
-                  pageSize: pagination.pageSize,
-                  total: pagination.totalCount,
-                  onChange: (page, pageSize) =>
-                      handleTableChange({ current: page, pageSize }),
+      <div className="create-organizer-container">
+        <div className="eog-table-container">
+          <div className="header-table">
+            <h2>Danh sách Users ({pagination.totalCount})</h2>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <div
+                className="search"
+                style={{
+                  width: "400px",
+                  display: "flex",
+                  gap: "10px",
                 }}
-            />
+              >
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Tìm kiếm theo email hoặc tên"
+                  value={searchInput}
+                  onChange={(e) => {
+                    setSearchInput(e.target.value);
+                    if (e.target.value === "") {
+                      fetchUser();
+                    }
+                  }}
+                />
+                <button className="btn btn-primary" onClick={getSearchUsers}>
+                  Tìm kiếm
+                </button>
+              </div>
+              <Button
+                type="primary"
+                icon={<FaFileExcel />}
+                onClick={() => setIsImportModalVisible(true)}
+              >
+                Nhập Users
+              </Button>
+              <select
+                name="roleName"
+                id="roleName"
+                onChange={(e) => fetchUserByRole(e.target.value)}
+              >
+                <option value="">-- Chọn vai trò --</option>
+                <option value="Admin">Admin</option>
+                <option value="Campus Manager">Campus Manager</option>
+                <option value="Event Organizer">Event Organizer</option>
+                <option value="Implementer">Implementer</option>
+                <option value="Spectator">Spectator</option>
+              </select>
+            </div>
           </div>
 
-          <Modal
-              title={selectedEOG?.status === 1 ? "Xác nhận cấm" : "Xác nhận bỏ cấm"}
-              visible={isDeleteModalVisible}
-              onOk={selectedEOG?.status === 1 ? confirmBan : confirmUnban}
-              onCancel={() => setIsDeleteModalVisible(false)}
-              okText={selectedEOG?.status === 1 ? "Cấm" : "Bỏ cấm"}
-              cancelText="Hủy"
-              okButtonProps={{ danger: selectedEOG?.status === 1 }}
-          >
-            <p>
-              Bạn có chắc muốn {selectedEOG?.status === 1 ? "cấm" : "bỏ cấm"}{" "}
-              {selectedEOG?.email}?
-            </p>
-          </Modal>
-
-          <Modal
-              title="Nhập Users từ Excel"
-              open={isImportModalVisible}
-              onOk={handleImport}
-              onCancel={() => {
-                setIsImportModalVisible(false);
-                setFileList([]);
-                setSelectedCampusId(null);
-              }}
-              okText="Nhập"
-              cancelText="Hủy"
-              okButtonProps={{ loading: isImporting }}
-              className="import-users-modal"
-          >
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", marginBottom: "5px" }}>
-                Chọn Campus:
-              </label>
-              {loadingCampuses ? (
-                  <p>Đang tải campus...</p>
-              ) : campuses.length > 0 ? (
-                  <select
-                      value={selectedCampusId || ""}
-                      onChange={(e) => setSelectedCampusId(e.target.value)}
-                      className="campus-select"
-                      disabled={loadingCampuses}
-                  >
-                    <option value="" disabled>
-                      Chọn một campus
-                    </option>
-                    {campuses.map((campus) => (
-                        <option key={campus.id} value={campus.id}>
-                          {campus.campusName}
-                        </option>
-                    ))}
-                  </select>
-              ) : (
-                  <p>Không có campus nào</p>
-              )}
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: "5px" }}>
-                Tải lên file Excel:
-              </label>
-              <Upload {...uploadProps}>
-                <Button icon={<FaFileExcel />}>Chọn file</Button>
-              </Upload>
-              {fileList.length > 0 && (
-                  <p style={{ marginTop: "10px" }}>File đã chọn: {fileList[0].name}</p>
-              )}
-              <Button
-                  type="link"
-                  icon={<FaFileExcel />}
-                  onClick={handleDownloadSample}
-                  style={{ marginTop: "10px" }}
-              >
-                Tải file mẫu
-              </Button>
-              <p style={{ marginTop: "10px", color: "#888" }}>
-                Lưu ý: File Excel phải có các cột: Email, FirstName, LastName, DateOfBirth
-                (dd/MM/yyyy hoặc yyyy-MM-dd, ví dụ: 15/03/2000), PhoneNumber (10 chữ số,
-                bắt đầu bằng 03|05|07|08|09, ví dụ: 0912345678), Gender (Male/Female).
-              </p>
-            </div>
-          </Modal>
+          <Table
+            columns={columns}
+            dataSource={campusManagers}
+            rowKey="id"
+            pagination={{
+              current: pagination.currentPage,
+              pageSize: pagination.pageSize,
+              total: pagination.totalCount,
+              onChange: (page, pageSize) =>
+                handleTableChange({ current: page, pageSize }),
+            }}
+          />
         </div>
+
+        <Modal
+          title={selectedEOG?.status === 1 ? "Xác nhận cấm" : "Xác nhận bỏ cấm"}
+          visible={isDeleteModalVisible}
+          onOk={selectedEOG?.status === 1 ? confirmBan : confirmUnban}
+          onCancel={() => setIsDeleteModalVisible(false)}
+          okText={selectedEOG?.status === 1 ? "Cấm" : "Bỏ cấm"}
+          cancelText="Hủy"
+          okButtonProps={{ danger: selectedEOG?.status === 1 }}
+        >
+          <p>
+            Bạn có chắc muốn {selectedEOG?.status === 1 ? "cấm" : "bỏ cấm"}{" "}
+            {selectedEOG?.email}?
+          </p>
+        </Modal>
+
+        <Modal
+          title="Nhập Users từ Excel"
+          open={isImportModalVisible}
+          onOk={handleImport}
+          onCancel={() => {
+            setIsImportModalVisible(false);
+            setFileList([]);
+            setSelectedCampusId(null);
+          }}
+          okText="Nhập"
+          cancelText="Hủy"
+          okButtonProps={{ loading: isImporting }}
+          className="import-users-modal"
+        >
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Chọn Campus:
+            </label>
+            {loadingCampuses ? (
+              <p>Đang tải campus...</p>
+            ) : campuses.length > 0 ? (
+              <select
+                value={selectedCampusId || ""}
+                onChange={(e) => setSelectedCampusId(e.target.value)}
+                className="campus-select"
+                disabled={loadingCampuses}
+              >
+                <option value="" disabled>
+                  Chọn một campus
+                </option>
+                {campuses.map((campus) => (
+                  <option key={campus.id} value={campus.id}>
+                    {campus.campusName}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p>Không có campus nào</p>
+            )}
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Tải lên file Excel:
+            </label>
+            <Upload {...uploadProps}>
+              <Button icon={<FaFileExcel />}>Chọn file</Button>
+            </Upload>
+            {fileList.length > 0 && (
+              <p style={{ marginTop: "10px" }}>
+                File đã chọn: {fileList[0].name}
+              </p>
+            )}
+            <Button
+              type="link"
+              icon={<FaFileExcel />}
+              onClick={handleDownloadSample}
+              style={{ marginTop: "10px" }}
+            >
+              Tải file mẫu
+            </Button>
+            <p style={{ marginTop: "10px", color: "#888" }}>
+              Lưu ý: File Excel phải có các cột: Email, FirstName, LastName,
+              DateOfBirth (dd/MM/yyyy hoặc yyyy-MM-dd, ví dụ: 15/03/2000),
+              PhoneNumber (10 chữ số, bắt đầu bằng 03|05|07|08|09, ví dụ:
+              0912345678), Gender (Male/Female).
+            </p>
+          </div>
+        </Modal>
       </div>
+    </div>
   );
 }

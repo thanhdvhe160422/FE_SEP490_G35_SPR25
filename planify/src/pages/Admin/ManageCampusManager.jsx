@@ -192,10 +192,13 @@ export default function ManageCampusManager() {
 
   return (
     <div className="page-flex">
-      <aside class="sidebar" style={{ width: "400px" }}>
+      <aside
+        class="sidebar"
+        style={{ width: "350px", position: "fixed", top: "0px" }}
+      >
         <div class="sidebar-start">
           <div class="sidebar-head">
-            <a href="/" class="logo-wrapper" title="Home">
+            <a href="/dashboard" class="logo-wrapper" title="Home">
               <span class="sr-only">Home</span>
               <span class="icon logo" aria-hidden="true"></span>
               <div class="logo-text">
@@ -208,31 +211,31 @@ export default function ManageCampusManager() {
             <ul className="sidebar-body-menu">
               <li>
                 <a className="show-cat-btn" href="/dashboard">
-                  <FaHome style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                  <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Dashboard
                 </a>
               </li>
               <li>
                 <a className="show-cat-btn" href="/manage-user">
-                  <FaUsers style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                  <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Danh sách Users
                 </a>
               </li>
               <li>
                 <a className="active" href="manage-campus-manager">
-                  <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Quản lý Campus Manager
                 </a>
               </li>
               <li>
                 <a href="/change-password">
-                  <FaEdit style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Đổi mật khẩu
                 </a>
               </li>
               <li>
                 <a href="loginadmin" onClick={handleLogout}>
-                  <CiLogout style={{marginRight: "10px", fontSize: "20px"}}/>{" "}
+                  <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Logout
                 </a>
               </li>
@@ -258,9 +261,12 @@ export default function ManageCampusManager() {
           </div>
         </div>
       </aside>
-      <div className="create-organizer-container">
+      <div
+        className="create-organizer-container"
+        style={{ marginLeft: "350px" }}
+      >
         <Modal
-            title="Create Campus Manager"
+          title="Create Campus Manager"
           visible={isCreateModalVisible}
           onCancel={() => setIsCreateModalVisible(false)}
           footer={null}

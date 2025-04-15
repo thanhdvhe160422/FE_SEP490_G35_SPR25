@@ -26,6 +26,9 @@
   cursor: pointer;
   margin-top: 2%;
 }
+.yarl__root {
+  z-index: 999999 !important;
+}
 
 .main-banner-img {
   width: 100%;

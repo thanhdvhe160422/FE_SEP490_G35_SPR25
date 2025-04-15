@@ -212,7 +212,10 @@ export default function Dashboard() {
   return (
     <>
       <div class="page-flex">
-        <aside class="sidebar" style={{ width: "350px" }}>
+        <aside
+          class="sidebar"
+          style={{ width: "350px", position: "fixed", top: "0" }}
+        >
           <div class="sidebar-start">
             <div class="sidebar-head">
               <a href="/dashboard" class="logo-wrapper" title="Home">
@@ -282,7 +285,7 @@ export default function Dashboard() {
             </div>
           </div>
         </aside>
-        <div class="main-wrapper">
+        <div class="main-wrapper" style={{ marginLeft: "350px" }}>
           <nav class="main-nav--bg"></nav>
           <main
             style={{ paddingTop: "20px", height: "100%" }}

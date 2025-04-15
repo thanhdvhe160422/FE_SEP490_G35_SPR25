@@ -50,195 +50,212 @@ const customStyles = `
 `;
 
 const ChangePassword = () => {
-    const { enqueueSnackbar } = useSnackbar();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [form] = Form.useForm();
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
 
-    // Thêm các file CSS giống ManageCampusManager
-    useEffect(() => {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = "http://localhost:3000/css/style.min.css";
-        document.head.appendChild(link);
+  // Thêm các file CSS giống ManageCampusManager
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "http://localhost:3000/css/style.min.css";
+    document.head.appendChild(link);
 
-        const link2 = document.createElement("link");
-        link2.rel = "stylesheet";
-        link2.href = "http://localhost:3000/css/style.css";
-        document.head.appendChild(link2);
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = "http://localhost:3000/css/style.css";
+    document.head.appendChild(link2);
 
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = customStyles;
-        document.head.appendChild(styleSheet);
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = customStyles;
+    document.head.appendChild(styleSheet);
 
-        if (window.feather) {
-            window.feather.replace();
-        }
+    if (window.feather) {
+      window.feather.replace();
+    }
 
-        return () => {
-            document.head.removeChild(link);
-            document.head.removeChild(link2);
-            document.head.removeChild(styleSheet);
-        };
-    }, []);
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(link2);
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
 
-    const handleLogout = () => {
-        localStorage.clear();
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/loginadmin");
+  };
+
+  const handleChangePassword = async (values) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        enqueueSnackbar("Bạn cần đăng nhập để đổi mật khẩu.", {
+          variant: "error",
+        });
         navigate("/loginadmin");
-    };
+        return;
+      }
 
-    const handleChangePassword = async (values) => {
-        setLoading(true);
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                enqueueSnackbar("Bạn cần đăng nhập để đổi mật khẩu.", { variant: "error" });
-                navigate("/loginadmin");
-                return;
-            }
-
-            const response = await fetch("https://localhost:44320/api/Users/change-password", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    oldPassword: values.oldPassword,
-                    newPassword: values.newPassword,
-                    confirmNewPassword: values.confirmNewPassword,
-                }),
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                enqueueSnackbar(result.message || "Đổi mật khẩu thành công!", { variant: "success" });
-                form.resetFields();
-            } else {
-                enqueueSnackbar(result.message || "Lỗi khi đổi mật khẩu.", { variant: "error" });
-            }
-        } catch (error) {
-            console.error("Lỗi khi đổi mật khẩu:", error);
-            enqueueSnackbar("Lỗi hệ thống. Vui lòng thử lại.", { variant: "error" });
-        } finally {
-            setLoading(false);
+      const response = await fetch(
+        "https://localhost:44320/api/Users/change-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            oldPassword: values.oldPassword,
+            newPassword: values.newPassword,
+            confirmNewPassword: values.confirmNewPassword,
+          }),
         }
-    };
+      );
 
-    return (
-        <div className="page-flex">
-            {/* Sidebar bên trái - Đồng bộ với ManageCampusManager */}
-            <aside className="sidebar" style={{ width: "400px" }}>
-                <div className="sidebar-start">
-                    <div className="sidebar-head">
-                        <a href="/" className="logo-wrapper" title="Home">
-                            <span className="sr-only">Home</span>
-                            <span className="icon logo" aria-hidden="true"></span>
-                            <div className="logo-text">
-                                <span className="logo-title">Planify</span>
-                                <span className="logo-subtitle">Dashboard</span>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="sidebar-body">
-                        <ul className="sidebar-body-menu">
-                            <li>
-                                <a className="show-cat-btn" href="/dashboard">
-                                    <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li>
-                                <a className="show-cat-btn" href="/manage-user">
-                                    <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                                    Danh sách Users
-                                </a>
-                            </li>
-                            <li>
-                                <a className="show-cat-btn" href="/manage-campus-manager">
-                                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                                    Quản lý Campus Manager
-                                </a>
-                            </li>
-                            <li>
-                                <a className="active" href="/change-password">
-                                    <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                                    Đổi mật khẩu
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/loginadmin" onClick={handleLogout}>
-                                    <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                                    Logout
-                                </a>
-                            </li>
-                        </ul>
-                        <ul className="sidebar-body-menu logout-section"></ul>
-                    </div>
-                </div>
-            </aside>
+      const result = await response.json();
+      if (response.ok) {
+        enqueueSnackbar(result.message || "Đổi mật khẩu thành công!", {
+          variant: "success",
+        });
+        form.resetFields();
+      } else {
+        enqueueSnackbar(result.message || "Lỗi khi đổi mật khẩu.", {
+          variant: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi đổi mật khẩu:", error);
+      enqueueSnackbar("Lỗi hệ thống. Vui lòng thử lại.", { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {/* Nội dung chính */}
-            <div className="create-organizer-container">
-                <div className="content-container">
-                    <h2>Đổi mật khẩu</h2>
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={handleChangePassword}
-                        className="change-password-form"
-                    >
-                        <Form.Item
-                            label="Mật khẩu cũ"
-                            name="oldPassword"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ!" }]}
-                        >
-                            <Input.Password placeholder="Nhập mật khẩu cũ" />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Mật khẩu mới"
-                            name="newPassword"
-                            rules={[
-                                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
-                                { min: 6, message: "Mật khẩu mới phải có ít nhất 6 ký tự!" },
-                            ]}
-                        >
-                            <Input.Password placeholder="Nhập mật khẩu mới" />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Xác nhận mật khẩu mới"
-                            name="confirmNewPassword"
-                            dependencies={["newPassword"]}
-                            rules={[
-                                { required: true, message: "Vui lòng xác nhận mật khẩu mới!" },
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue("newPassword") === value) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
-                                    },
-                                }),
-                            ]}
-                        >
-                            <Input.Password placeholder="Xác nhận mật khẩu mới" />
-                        </Form.Item>
-
-                        <div className="form-actions">
-                            <Button type="primary" htmlType="submit" loading={loading}>
-                                Đổi mật khẩu
-                            </Button>
-                            <Button onClick={() => form.resetFields()}>
-                                Hủy
-                            </Button>
-                        </div>
-                    </Form>
-                </div>
-            </div>
+  return (
+    <div className="page-flex">
+      {/* Sidebar bên trái - Đồng bộ với ManageCampusManager */}
+      <aside
+        className="sidebar"
+        style={{ width: "350px", position: "fixed", top: "0" }}
+      >
+        <div className="sidebar-start">
+          <div className="sidebar-head">
+            <a href="/dashboard" className="logo-wrapper" title="Home">
+              <span className="sr-only">Home</span>
+              <span className="icon logo" aria-hidden="true"></span>
+              <div className="logo-text">
+                <span className="logo-title">Planify</span>
+                <span className="logo-subtitle">Dashboard</span>
+              </div>
+            </a>
+          </div>
+          <div className="sidebar-body">
+            <ul className="sidebar-body-menu">
+              <li>
+                <a className="show-cat-btn" href="/dashboard">
+                  <FaHome style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a className="show-cat-btn" href="/manage-user">
+                  <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Danh sách Users
+                </a>
+              </li>
+              <li>
+                <a className="show-cat-btn" href="/manage-campus-manager">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus Manager
+                </a>
+              </li>
+              <li>
+                <a className="active" href="/change-password">
+                  <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Đổi mật khẩu
+                </a>
+              </li>
+              <li>
+                <a href="/loginadmin" onClick={handleLogout}>
+                  <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Logout
+                </a>
+              </li>
+            </ul>
+            <ul className="sidebar-body-menu logout-section"></ul>
+          </div>
         </div>
-    );
+      </aside>
+
+      {/* Nội dung chính */}
+      <div
+        className="create-organizer-container"
+        style={{ marginLeft: "350px" }}
+      >
+        <div className="content-container">
+          <h2>Đổi mật khẩu</h2>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleChangePassword}
+            className="change-password-form"
+          >
+            <Form.Item
+              label="Mật khẩu cũ"
+              name="oldPassword"
+              rules={[
+                { required: true, message: "Vui lòng nhập mật khẩu cũ!" },
+              ]}
+            >
+              <Input.Password placeholder="Nhập mật khẩu cũ" />
+            </Form.Item>
+
+            <Form.Item
+              label="Mật khẩu mới"
+              name="newPassword"
+              rules={[
+                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
+                { min: 6, message: "Mật khẩu mới phải có ít nhất 6 ký tự!" },
+              ]}
+            >
+              <Input.Password placeholder="Nhập mật khẩu mới" />
+            </Form.Item>
+
+            <Form.Item
+              label="Xác nhận mật khẩu mới"
+              name="confirmNewPassword"
+              dependencies={["newPassword"]}
+              rules={[
+                { required: true, message: "Vui lòng xác nhận mật khẩu mới!" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("newPassword") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Mật khẩu xác nhận không khớp!")
+                    );
+                  },
+                }),
+              ]}
+            >
+              <Input.Password placeholder="Xác nhận mật khẩu mới" />
+            </Form.Item>
+
+            <div className="form-actions">
+              <Button type="primary" htmlType="submit" loading={loading}>
+                Đổi mật khẩu
+              </Button>
+              <Button onClick={() => form.resetFields()}>Hủy</Button>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ChangePassword;
