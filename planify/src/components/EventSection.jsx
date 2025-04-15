@@ -166,7 +166,7 @@ function EventSection() {
   }, [currentPage, campuses, campus]);
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
-    return date.toLocaleString("en", {
+    return date.toLocaleString("vi", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",

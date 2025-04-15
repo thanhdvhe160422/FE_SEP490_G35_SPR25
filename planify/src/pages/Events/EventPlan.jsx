@@ -593,12 +593,17 @@ export default function EventPlan() {
 
   useEffect(() => {
     const now = new Date();
-    setMinDateTime(now.toISOString().slice(0, 16));
+    const twoMonthsLater = new Date(now.setMonth(now.getMonth() + 2));
+    setMinDateTime(twoMonthsLater.toISOString().slice(0, 16));
+    if (formData.startTime && new Date(formData.startTime) < twoMonthsLater) {
+      setFormData((prev) => ({ ...prev, startTime: "" }));
+      enqueueSnackbar("Thời gian bắt đầu phải từ 2 tháng sau ngày hiện tại!", {
+        variant: "warning",
+      });
+    }
   }, []);
 
-  // Hàm áp dụng dữ liệu từ chatbot vào form (Cập nhật để áp dụng toàn bộ dữ liệu)
   const handleApplyEventData = (eventData) => {
-    // Xử lý SizeParticipants để cập nhật selectedOption và customValue
     const sizeParticipants = eventData.SizeParticipants || 0;
     let newSelectedOption = "";
     let newCustomValue = "";
@@ -934,7 +939,6 @@ export default function EventPlan() {
     if (error) toast.error(error);
   }, [error]);
 
-  // Chuẩn bị dữ liệu gửi lên server
   const prepareEventData = useCallback(() => {
     const currentTime = new Date().toISOString();
 
@@ -953,7 +957,7 @@ export default function EventPlan() {
       Goals: formData.goals,
       MonitoringProcess: formData.monitoringProcess,
       SizeParticipants: formData.sizeParticipants,
-      PromotionalPlan: formData.promotionalPlan, // Sử dụng trực tiếp promotionalPlan
+      PromotionalPlan: formData.promotionalPlan,
       TargetAudience: formData.targetAudience,
       SloganEvent: formData.sloganEvent,
       Tasks: formData.tasks
@@ -1042,19 +1046,18 @@ export default function EventPlan() {
     }
   };
 
-  // Validation chung
   const validateForm = useCallback(() => {
-    if (!formData.eventTitle) return "Event title is required!";
+    if (!formData.eventTitle) return "Vui lòng nhập tên sự kiện!";
     if (!formData.startTime || !formData.endTime)
-      return "Start time and end time are required!";
+      return "Vui lòng nhập thời gian bắt đầu và kết thúc !";
     if (new Date(formData.startTime) >= new Date(formData.endTime))
-      return "Start time must be earlier than end time!";
-    if (!formData.categoryEventId) return "Event category is required!";
-    if (!formData.placed) return "Event location is required!";
+      return "Thời gian bắt đầu phải trước thời gian kết thúc!";
+    if (!formData.categoryEventId) return "Vui lòng chọn loại sự kiện!";
+    if (!formData.placed) return "Vui lòng chọn địa điểm!";
     if (!formData.tasks.some((task) => task.taskName.trim()))
-      return "At least one task is required!";
+      return "Phải có ít nhất một nhiệm vụ!";
     if (!formData.activities.some((activity) => activity.name.trim()))
-      return "At least one activity with a name is required!";
+      return "Cần có ít nhất một hoạt động có tên!";
     return null;
   }, [formData]);
 
@@ -1067,14 +1070,14 @@ export default function EventPlan() {
     }
 
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "This event will be sent to the Campus Manager for approval.",
+      title: "Bạn có chắc không?",
+      text: "Sự kiện này sẽ được gửi đến Campus Manager để phê duyệt.",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#28a745",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, create it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "Vâng, tạo sự kiện!",
+      cancelButtonText: "Hủy",
     });
 
     if (!result.isConfirmed) return;
@@ -1135,13 +1138,12 @@ export default function EventPlan() {
     }
   }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
-  // Gửi yêu cầu lưu bản nháp
   const handleSaveDraft = useCallback(() => {
     Swal.fire({
-      title: "Do you want to save the changes?",
+      title: "Bạn có muốn lưu những thay đổi không?",
       showDenyButton: true,
-      confirmButtonText: "Save",
-      denyButtonText: `Don't save`,
+      confirmButtonText: "Lưu",
+      denyButtonText: `Hủy`,
     }).then(async (result) => {
       if (result.isConfirmed) {
         const validationError = validateForm();
@@ -1170,7 +1172,7 @@ export default function EventPlan() {
           );
 
           Swal.fire({
-            title: "Saved!",
+            title: "Đã lưu!",
             icon: "success",
             timer: 2000,
             showConfirmButton: false,
@@ -1190,7 +1192,7 @@ export default function EventPlan() {
         }
       } else if (result.isDenied) {
         Swal.fire({
-          title: "Changes are not saved",
+          title: "Những thay đổi chưa được lưu",
           icon: "info",
           timer: 2000,
           showConfirmButton: false,
@@ -1205,19 +1207,23 @@ export default function EventPlan() {
   );
 
   return (
-    <>
+    <div className="event-plan-container">
       <Header />
       <div className="working-container">
-        <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          style={{ zIndex: 9999999, top: "70px", width: "400px" }}
+        />
         <div className="walkthrough show reveal" ref={modalRef}>
           <div className="walkthrough-body">
             <ul style={{ marginTop: "30px" }} className="screens animate">
               <li className="screen active">
-                <h3 className="text-primary">General Information</h3>
+                <h3 className="text-primary">Thông tin chung</h3>
                 <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
                   <Form.Group className="mb-3">
                     <Form.Label>
-                      Event name<span className="text-danger">*</span>
+                      Tên sự kiện<span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                       type="text"
@@ -1231,7 +1237,7 @@ export default function EventPlan() {
 
                   <Form.Group className="mb-3 position-relative">
                     <Form.Label>
-                      Event type <span className="text-danger">*</span>
+                      Loại sự kiện <span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                       as="select"
@@ -1244,7 +1250,7 @@ export default function EventPlan() {
                       }
                     >
                       <option value={0} disabled>
-                        Select type
+                        Chọn loại sự kiện
                       </option>
                       {categories.map((category) => (
                         <option key={category.id} value={category.id}>
@@ -1256,7 +1262,8 @@ export default function EventPlan() {
 
                   <Form.Group className="mb-3">
                     <Form.Label>
-                      Start Time <span className="text-danger">*</span>
+                      Bắt đầu (Thời gian bắt đầu phải trước hiện tại 2 tháng){" "}
+                      <span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                       type="datetime-local"
@@ -1270,7 +1277,7 @@ export default function EventPlan() {
 
                   <Form.Group className="mb-3">
                     <Form.Label>
-                      End Time <span className="text-danger">*</span>
+                      Kết thúc <span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                       type="datetime-local"
@@ -1284,7 +1291,7 @@ export default function EventPlan() {
 
                   <Form.Group className="mb-3">
                     <Form.Label>
-                      Place <span className="text-danger">*</span>
+                      Địa điểm <span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                       type="text"
@@ -1311,7 +1318,7 @@ export default function EventPlan() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
+                    <Form.Label>Mô tả</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
@@ -1327,10 +1334,10 @@ export default function EventPlan() {
               </li>
 
               <li className="screen">
-                <h3 className="text-primary">Goals</h3>
+                <h3 className="text-primary">Mục tiêu</h3>
                 <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
                   <Form.Group className="mb-3">
-                    <Form.Label>Goals</Form.Label>
+                    <Form.Label>Mục tiêu</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
@@ -1344,7 +1351,7 @@ export default function EventPlan() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Target Audience</Form.Label>
+                    <Form.Label>Đối tượng mục tiêu</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
@@ -1358,16 +1365,16 @@ export default function EventPlan() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Number of participants</Form.Label>
+                    <Form.Label>Ước tính số lượng người tham gia</Form.Label>
                     <Form.Select
                       value={selectedOption}
                       onChange={handleSelectChange}
                     >
-                      <option value="">Select number</option>
+                      <option value="">Chọn</option>
                       <option value="500">500 người</option>
                       <option value="1000">1000 người</option>
                       <option value="2000">2000 người</option>
-                      <option value="other">Others</option>
+                      <option value="other">Khác</option>
                     </Form.Select>
                     {selectedOption === "other" && (
                       <Form.Control
@@ -1381,7 +1388,7 @@ export default function EventPlan() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Measuring success</Form.Label>
+                    <Form.Label>Đo lường thành công</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={5}
@@ -1399,7 +1406,7 @@ export default function EventPlan() {
               <li className="screen">
                 <h3 className="text-primary">Task & Sub-task</h3>
                 <Button variant="outline-primary mb-3" onClick={handleAddTask}>
-                  + Create Task
+                  + Tạo nhiệm vụ
                 </Button>
                 <div className="w-100 mt-3">
                   {formData.tasks.map((task, i) => (
@@ -1426,7 +1433,7 @@ export default function EventPlan() {
                             onChange={(e) =>
                               handleTaskChange(i, "taskName", e.target.value)
                             }
-                            placeholder="Task name"
+                            placeholder="Tên nhiệm vụ"
                             className="fw-bold"
                           />
                         </div>
@@ -1442,7 +1449,7 @@ export default function EventPlan() {
                       <div className="row">
                         <Form.Group className="col-md-4 mb-3">
                           <Form.Label>
-                            Deadline <span className="text-danger">*</span>
+                            Hạn chót <span className="text-danger">*</span>
                           </Form.Label>
                           <Form.Control
                             type="datetime-local"
@@ -1454,7 +1461,7 @@ export default function EventPlan() {
                           />
                         </Form.Group>
                         <Form.Group className="col-md-4 mb-3">
-                          <Form.Label>Budget</Form.Label>
+                          <Form.Label>Ngân sách</Form.Label>
                           <Form.Control
                             type="text"
                             value={task.budget.toLocaleString("vi-VN")}
@@ -1468,7 +1475,7 @@ export default function EventPlan() {
                           />
                         </Form.Group>
                         <Form.Group className="col-md-4 mb-3">
-                          <Form.Label>Description</Form.Label>
+                          <Form.Label>Mô tả</Form.Label>
                           <Form.Control
                             as="textarea"
                             rows={2}
@@ -1483,11 +1490,11 @@ export default function EventPlan() {
 
                       {task.expanded && (
                         <div className="mt-3 border-top pt-3">
-                          <h6 className="text-danger">Subtasks</h6>
+                          <h6 className="text-danger">Nhiệm vụ con</h6>
                           {task.subtasks.map((sub, j) => (
                             <div key={j} className="row mb-3 align-items-start">
                               <Form.Group className="col-md-3">
-                                <Form.Label>Subtask name</Form.Label>
+                                <Form.Label>Tên nhiệm vụ con</Form.Label>
                                 <Form.Control
                                   value={sub.subtaskName}
                                   onChange={(e) =>
@@ -1502,7 +1509,7 @@ export default function EventPlan() {
                                 />
                               </Form.Group>
                               <Form.Group className="col-md-3">
-                                <Form.Label>Deadline</Form.Label>
+                                <Form.Label>Hạn chót</Form.Label>
                                 <Form.Control
                                   type="datetime-local"
                                   value={sub.deadline}
@@ -1518,7 +1525,7 @@ export default function EventPlan() {
                                 />
                               </Form.Group>
                               <Form.Group className="col-md-2">
-                                <Form.Label>Budget</Form.Label>
+                                <Form.Label>Ngân sách</Form.Label>
                                 <Form.Control
                                   value={sub.amount.toLocaleString("vi-VN")}
                                   onChange={(e) =>
@@ -1532,7 +1539,7 @@ export default function EventPlan() {
                                 />
                               </Form.Group>
                               <Form.Group className="col-md-3">
-                                <Form.Label>Description</Form.Label>
+                                <Form.Label>Mô tả</Form.Label>
                                 <Form.Control
                                   as="textarea"
                                   rows={2}
@@ -1567,7 +1574,7 @@ export default function EventPlan() {
                             size="sm"
                             onClick={() => handleAddSubtask(i)}
                           >
-                            + Create Sub-task
+                            + Tạo nhiệm vụ con
                           </Button>
                         </div>
                       )}
@@ -1577,16 +1584,16 @@ export default function EventPlan() {
               </li>
 
               <li className="screen">
-                <h3 className="text-primary">Estimated costs</h3>
+                <h3 className="text-primary">Chi phí ước tính</h3>
                 <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
                   <table className="table table-bordered table-hover">
                     <thead className="table-primary">
                       <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Unit Price (VNĐ)</th>
-                        <th>Quantity</th>
-                        <th>Total (VNĐ)</th>
+                        <th>Tên</th>
+                        <th>Đơn giá (VNĐ)</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền (VNĐ)</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -1600,7 +1607,7 @@ export default function EventPlan() {
                               onChange={(e) =>
                                 handleBudgetChange(i, "name", e.target.value)
                               }
-                              placeholder="Enter name"
+                              placeholder="Tên"
                             />
                           </td>
                           <td>
@@ -1664,7 +1671,7 @@ export default function EventPlan() {
                       ))}
                       <tr>
                         <td colSpan="4" className="text-end fw-bold">
-                          Total:
+                          Tổng cộng:
                         </td>
                         <td
                           style={{
@@ -1691,7 +1698,7 @@ export default function EventPlan() {
                               }))
                             }
                           >
-                            + Create Extra Cost
+                            + Tạo thêm chi phí
                           </Button>
                         </td>
                       </tr>
@@ -1880,7 +1887,7 @@ export default function EventPlan() {
               </li>
 
               <li className="screen">
-                <h3 className="text-primary">Image</h3>
+                <h3 className="text-primary">Ảnh</h3>
                 <div className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
                   <Form.Group className="mt-3">
                     <Row>
@@ -1981,7 +1988,7 @@ export default function EventPlan() {
             onClick={handleSaveDraft}
             disabled={isLoading}
           >
-            {isLoading ? "Saving..." : "Save Draft"}
+            {isLoading ? "Đang lưu..." : "Lưu bản nháp"}
           </Button>
 
           <Button
@@ -1993,10 +2000,10 @@ export default function EventPlan() {
             disabled={isLoading}
           >
             {isLoading
-              ? "Processing..."
+              ? "Đang tạo..."
               : index === indexMax()
-              ? "Create Event"
-              : "Next"}
+              ? "Tạo Sự Kiện"
+              : "Tiếp"}
           </Button>
         </div>
         <div className="shade" ref={shadeRef} onClick={closeModal}></div>
@@ -2005,6 +2012,6 @@ export default function EventPlan() {
         onApplyEventData={handleApplyEventData}
         token={localStorage.getItem("token")}
       />
-    </>
+    </div>
   );
 }

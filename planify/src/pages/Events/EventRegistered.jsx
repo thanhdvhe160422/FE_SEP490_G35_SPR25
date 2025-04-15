@@ -255,7 +255,7 @@ export default function EventRegistered() {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US");
+    return date.toLocaleDateString("vi-VN");
   };
 
   return (
@@ -350,14 +350,13 @@ export default function EventRegistered() {
                                 <div>
                                   <small className="text-muted">
                                     {new Date(event.startTime).toLocaleString(
-                                      "en-US",
+                                      "vi-VN",
                                       {
                                         weekday: "short",
                                         month: "short",
                                         day: "numeric",
                                         hour: "numeric",
                                         minute: "2-digit",
-                                        hour12: true,
                                       }
                                     )}
                                   </small>

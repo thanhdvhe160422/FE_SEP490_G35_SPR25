@@ -1,12 +1,8 @@
-/* Header.css */
-
-/* Đảm bảo toàn bộ trang không bị ảnh hưởng bởi header cố định */
 body {
   margin: 0;
   padding: 0;
 }
 
-/* Header chính */
 .header {
   position: fixed;
   top: 0;
@@ -16,14 +12,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px; /* Tăng padding cho thoáng */
-  background: #ffffff; /* Background trắng */
-  border-bottom: 1px solid #ecf0f1; /* Viền dưới nhẹ */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Bóng đổ nhẹ */
-  animation: slideDown 0.5s ease-out forwards; /* Header trượt xuống */
+  padding: 15px 30px;
+  background: #ffffff;
+  border-bottom: 1px solid #ecf0f1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.5s ease-out forwards;
 }
 
-/* Animation cho header */
 @keyframes slideDown {
   0% {
     transform: translateY(-100%);
@@ -35,7 +30,6 @@ body {
   }
 }
 
-/* Logo */
 .logo img {
   height: 50px;
   cursor: pointer;
@@ -43,31 +37,28 @@ body {
 }
 
 .logo img:hover {
-  transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  transform: scale(1.1);
 }
 
-/* Navbar */
 .navbar {
   display: flex;
-  gap: 25px; /* Tăng khoảng cách giữa các nav-item */
+  gap: 25px;
 }
 
-/* Nav Item */
 .nav-item {
   cursor: pointer;
   font-size: 16px;
   padding: 8px 16px;
-  border-radius: 25px; /* Bo tròn hơn */
+  border-radius: 25px;
   transition: all 0.3s ease;
-  font-family: "Poppins", sans-serif; /* Font hiện đại */
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   text-transform: uppercase;
-  color: #2c3e50; /* Màu chữ tối */
-  opacity: 0; /* Ẩn ban đầu để animation */
-  animation: slideIn 0.5s ease-out forwards; /* Animation trượt từ trái */
+  color: #2c3e50;
+  opacity: 0;
+  animation: slideIn 0.5s ease-out forwards;
 }
 
-/* Animation cho từng nav-item với delay tăng dần */
 .nav-item:nth-child(1) {
   animation-delay: 0.1s;
 }
@@ -98,51 +89,48 @@ body {
 .nav-item:hover {
   background: linear-gradient(135deg, #eba25d, #f58906);
   color: #fff;
-  transform: translateY(-2px); /* Nâng nhẹ khi hover */
-  box-shadow: 0 4px 10px rgba(255, 72, 0, 0.3); /* Bóng đổ xanh */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 72, 0, 0.3);
 }
 
-/* User Info */
 .user-info {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-/* Notification */
 .notification {
   position: relative;
   cursor: pointer;
 }
 
 .bell {
-  font-size: 26px; /* Tăng kích thước chuông */
-  color: #34495e; /* Màu tối phù hợp với nền trắng */
+  font-size: 26px;
+  color: #34495e;
   transition: transform 0.3s ease;
 }
 
 .notification:hover .bell {
-  transform: scale(1.2); /* Phóng to chuông khi hover */
+  transform: scale(1.2);
 }
 
 .badge {
   position: absolute;
   top: -10px;
   right: -10px;
-  background: #e74c3c; /* Màu đỏ nổi bật */
+  background: #e74c3c;
   color: #fff;
   font-size: 12px;
   font-weight: bold;
   padding: 4px 8px;
   border-radius: 50%;
-  border: 2px solid #fff; /* Viền trắng để nổi trên nền */
+  border: 2px solid #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Notification Popup */
 .notification-popup {
   position: absolute;
-  top: 55px; /* Đẩy xuống một chút để không đè lên chuông */
+  top: 55px;
   right: 0;
   background: #fff;
   color: #333;
@@ -152,8 +140,8 @@ body {
   min-width: 450px;
   max-height: 350px;
   overflow-y: auto;
-  border: 1px solid #ecf0f1; /* Viền nhẹ */
-  animation: fadeInSlide 0.3s ease-out forwards; /* Animation khi hiển thị */
+  border: 1px solid #ecf0f1;
+  animation: fadeInSlide 0.3s ease-out forwards;
 }
 
 @keyframes fadeInSlide {
@@ -184,7 +172,7 @@ body {
 }
 
 .notification-popup .table tr:hover {
-  background: #f4f7fa; /* Màu hover nhẹ */
+  background: #f4f7fa;
 }
 
 .notification-popup .table td {
@@ -194,10 +182,9 @@ body {
 }
 
 .notification-popup .table-secondary {
-  background: #dfe6e9; /* Màu cho thông báo chưa đọc */
+  background: #dfe6e9;
 }
 
-/* Profile */
 .profile {
   margin-right: 40px;
   position: relative;
@@ -291,7 +278,7 @@ body {
   }
 
   .notification-popup {
-    min-width: 90vw; /* Chiếm gần hết chiều rộng trên mobile */
+    min-width: 90vw;
     right: 5px;
     top: 45px;
   }
@@ -307,17 +294,16 @@ body {
   }
 }
 .nav-item.active {
-  background: #f09d21; /* Màu xanh nổi bật */
+  background: #f09d21;
   color: #fff;
 }
 
 .nav-item:hover {
-  background: #f09d21; /* Màu cam khi hover */
+  background: #f09d21;
   color: #fff;
   transform: translateY(-2px);
 }
 
-/* Đảm bảo hover không ghi đè active */
 .nav-item.active:hover {
-  background: #f09d21; /* Màu xanh đậm hơn khi hover trên active */
+  background: #f09d21;
 }

@@ -3,7 +3,10 @@ import "../styles/Author/Authorization.css";
 
 export default function Authorization() {
   const navigate = useNavigate();
-
+  const role = localStorage.getItem("role");
+  if (!role) {
+    navigate("/login");
+  }
   return (
     <section className="page_404 full-width-container">
       <div className="container-fluid">
@@ -22,7 +25,6 @@ export default function Authorization() {
                 <button
                   className="link_404"
                   onClick={() => {
-                    const role = localStorage.getItem("role");
                     if (
                       role === "Event Organizer" ||
                       role === "Campus Manager"
@@ -32,6 +34,8 @@ export default function Authorization() {
                       navigate("/home-implementer");
                     } else if (role === "Spectator") {
                       navigate("/home-spec");
+                    } else {
+                      navigate("/login");
                     }
                   }}
                 >
