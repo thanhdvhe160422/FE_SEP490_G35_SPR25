@@ -550,7 +550,7 @@ const UpdateProfile = () => {
                 onChange={HandleAddress}
               />
               {errors?.address && (
-                <div className="error-message">{errors?.address}</div>
+                <div className="text-danger">{errors?.address}</div>
               )}
             </div>
 
