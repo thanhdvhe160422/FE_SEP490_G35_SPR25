@@ -1020,7 +1020,7 @@ function ListTask({ eventId, data }) {
         </Spin>
 
         <Modal
-          title={isEditMode ? "Update Task" : "Create New Task"}
+          title={isEditMode ? "Cập nhật nhiệm vụ" : "Tạo nhiệm vụ"}
           open={isTaskModalVisible}
           onCancel={handleCloseModal}
           footer={null}
@@ -1041,7 +1041,7 @@ function ListTask({ eventId, data }) {
             <Form.Item
               name="taskName"
               label="Tiêu đề"
-              rules={[{ required: true, message: "Please enter title!" }]}
+              rules={[{ required: true, message: "Vui lòng điền tiêu đề!" }]}
             >
               <Input placeholder="Nhập tiêu đề nhiệm vụ" />
             </Form.Item>
@@ -1049,7 +1049,7 @@ function ListTask({ eventId, data }) {
             <Form.Item
               name="taskDescription"
               label="Mô tả"
-              rules={[{ required: true, message: "Please enter description!" }]}
+              rules={[{ required: true, message: "Vui lòng điền mô tả!" }]}
             >
               <TextArea rows={3} placeholder="Nhập mô tả!" />
             </Form.Item>
@@ -1062,7 +1062,7 @@ function ListTask({ eventId, data }) {
                 </Space>
               }
               rules={[
-                { required: true, message: "Please choose a start time!" },
+                { required: true, message: "Hãy chọn ngày bắt đầu nhiệm vụ!" },
               ]}
             >
               <DatePicker
@@ -1098,7 +1098,7 @@ function ListTask({ eventId, data }) {
               }
               dependencies={["startTime"]}
               rules={[
-                { required: true, message: "Please choose a deadline!" },
+                { required: true, message: "Hãy chọn hạn chót nhiệm vụ!" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     const startTime = getFieldValue("startTime");
@@ -1107,7 +1107,7 @@ function ListTask({ eventId, data }) {
                     }
                     if (value.isBefore(startTime)) {
                       return Promise.reject(
-                        new Error("Deadline must be after Start Time!")
+                        new Error("Hạn chót phải lớn hơn thời gian bắt đầu!")
                       );
                     }
                     return Promise.resolve();
@@ -1146,7 +1146,7 @@ function ListTask({ eventId, data }) {
               <Space className="form-actions" style={{ float: "right" }}>
                 <Button onClick={handleCloseModal}>Hủy</Button>
                 <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                  {isEditMode ? "Update" : "Create"}
+                  {isEditMode ? "Cập nhật" : "Tạo"}
                 </Button>
               </Space>
             </Form.Item>
@@ -1365,7 +1365,7 @@ function ListTask({ eventId, data }) {
             <Spin spinning={loadingSubTasks}>
               {!subTasks || subTasks.length === 0 ? (
                 <Empty
-                  description="No subtasks yet"
+                  description="Hiện không có nhiệm vụ con nào"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               ) : (

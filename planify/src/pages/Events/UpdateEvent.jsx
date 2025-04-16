@@ -149,7 +149,7 @@ const UpdateEventForm = () => {
         }
 
         Swal.fire({
-          title: "Event Updated Successfully",
+          title: "Cập nhật thành công",
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -165,7 +165,7 @@ const UpdateEventForm = () => {
         console.error("Update failed:", response);
         Swal.fire({
           title: "Error",
-          text: response?.message || "There was an error updating the event.",
+          text: response?.message || "Có lỗi xảy ra khi cập nhật",
           icon: "error",
         });
       }
@@ -173,7 +173,7 @@ const UpdateEventForm = () => {
       console.error("Error updating event:", error);
       Swal.fire({
         title: "Error",
-        text: "There was an error updating the event.",
+        text: "Lỗi khi cập nhật",
         icon: "error",
       });
     }
@@ -191,14 +191,14 @@ const UpdateEventForm = () => {
   const handleDeleteImage = (index, item) => {
     try {
       Swal.fire({
-        title: "Are you sure you want to delete this image?",
-        text: "This image will be removed from the list.",
+        title: "Bạn có chắc chắn muốn xóa ảnh này không?",
+        text: "Ảnh sẽ bị xóa khỏi danh sách",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
       }).then((result) => {
         if (result.isConfirmed) {
           const _newImages = [...images];
@@ -275,7 +275,7 @@ const UpdateEventForm = () => {
       ) : (
         <div style={{ marginTop: "70px" }} className="update-event-container">
           <h2 style={{ paddingBottom: "30px" }} className="form-title">
-            Update Event
+            Cập nhật sự kiện
           </h2>
           <form onSubmit={handleSubmit} className="update-event-form">
             <div className="form-floating-group">
@@ -288,7 +288,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Event Title"
               />
-              <label className="floating-label">Event Title</label>
+              <label className="floating-label">Tiêu đề</label>
             </div>
 
             <div className="form-floating-group">
@@ -301,7 +301,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Location"
               />
-              <label className="floating-label">Location</label>
+              <label className="floating-label">Vị trí</label>
             </div>
 
             <div className="form-floating-group">
@@ -314,7 +314,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Start Time"
               />
-              <label className="floating-label">Start Time</label>
+              <label className="floating-label">Ngày bắt đầu</label>
             </div>
 
             <div className="form-floating-group">
@@ -327,7 +327,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="End Time"
               />
-              <label className="floating-label">End Time</label>
+              <label className="floating-label">Ngày kết thúc</label>
             </div>
 
             <div className="form-floating-group">
@@ -340,7 +340,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Budget Amount"
               />
-              <label className="floating-label">Budget Amount</label>
+              <label className="floating-label">Ngân sách</label>
             </div>
 
             <div className="form-floating-group">
@@ -357,7 +357,7 @@ const UpdateEventForm = () => {
                   </option>
                 ))}
               </select>
-              <label className="floating-label">Category Event</label>
+              <label className="floating-label">Loại</label>
             </div>
 
             <div className="form-floating-group">
@@ -370,7 +370,7 @@ const UpdateEventForm = () => {
                 placeholder="Event Description"
                 rows={3}
               />
-              <label className="floating-label">Event Description</label>
+              <label className="floating-label">Mô tả</label>
             </div>
 
             <div className="form-floating-group">
@@ -383,7 +383,7 @@ const UpdateEventForm = () => {
                 placeholder="Measuring Success"
                 rows={2}
               />
-              <label className="floating-label">Measuring Success</label>
+              <label className="floating-label">Thước đo thành công</label>
             </div>
 
             <div className="form-floating-group">
@@ -396,7 +396,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Number of Participants"
               />
-              <label className="floating-label">Number of Participants</label>
+              <label className="floating-label">Số lượng người tham gia</label>
             </div>
 
             <div className="form-floating-group">
@@ -409,7 +409,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Event Slogan"
               />
-              <label className="floating-label">Slogan</label>
+              <label className="floating-label">Khẩu hiệu</label>
             </div>
             <div className="form-floating-group">
               <textarea
@@ -421,7 +421,7 @@ const UpdateEventForm = () => {
                 placeholder="Event Goals"
                 rows={2}
               />
-              <label className="floating-label">Goals</label>
+              <label className="floating-label">Mục tiêu</label>
             </div>
 
             <div className="form-floating-group">
@@ -434,7 +434,7 @@ const UpdateEventForm = () => {
                 placeholder="Promotional Plan"
                 rows={2}
               />
-              <label className="floating-label">Promotional Plan</label>
+              <label className="floating-label">Kế hoạch quảng cáo</label>
             </div>
 
             <div className="form-floating-group">
@@ -447,7 +447,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Target Audience"
               />
-              <label className="floating-label">Target Audience</label>
+              <label className="floating-label">Đối tượng</label>
             </div>
 
             <div className="form-floating-group">
@@ -460,7 +460,7 @@ const UpdateEventForm = () => {
                 placeholder="Monitoring Process"
                 rows={2}
               />
-              <label className="floating-label">Monitoring Process</label>
+              <label className="floating-label">Quá trình giám sát</label>
             </div>
 
             <div className="text-end">
@@ -521,7 +521,7 @@ const UpdateEventForm = () => {
               <div style={{ marginTop: "30px" }}>
                 {" "}
                 <button type="submit" className="btn-submit">
-                  Update Event
+                  Cập nhật
                 </button>
               </div>
             </div>

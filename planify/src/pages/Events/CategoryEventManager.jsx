@@ -39,7 +39,7 @@ export default function CategoryEventManager() {
         var response = await getCategoryByCampusId(campus.id);
 
         if (response?.error === "expired") {
-          Swal.fire("Login session expired", "Please log in again.", "error");
+          Swal.fire("Hết phiên đăng nhập", "Hãy đăng nhập lại", "error");
           navigate("/login");
           return;
         }
@@ -124,28 +124,30 @@ export default function CategoryEventManager() {
               aria-labelledby="categoryModalLabel"
               aria-hidden="true"
             >
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title" id="categoryModalLabel">
-                      {modalTitle}
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      onClick={handleCloseModal}
-                    ></button>
-                  </div>
-                  <div className="modal-body">
-                    <CategoryForm
-                      title={modalTitle}
-                      campusId={campus.id}
-                      id={categoryData.id}
-                      name={categoryData.name}
-                      onClose={handleCloseModal}
-                      onSave={handleSave}
-                    />
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-dialog">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title" id="categoryModalLabel">
+                        {modalTitle}
+                      </h5>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="modal"
+                        onClick={handleCloseModal}
+                      ></button>
+                    </div>
+                    <div className="modal-body">
+                      <CategoryForm
+                        title={modalTitle}
+                        campusId={campus.id}
+                        id={categoryData.id}
+                        name={categoryData.name}
+                        onClose={handleCloseModal}
+                        onSave={handleSave}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -156,17 +158,17 @@ export default function CategoryEventManager() {
           <table className="table table-striped table-bordered m-1">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Tên danh mục</th>
-                <th>Hành động</th>
+                <th className="text-black">ID</th>
+                <th className="text-black">Tên danh mục</th>
+                <th className="text-black">Hành động</th>
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <tr key={category.id}>
-                  <td>{category.id}</td>
-                  <td>{category.categoryEventName}</td>
-                  <td>
+                  <td className="text-black">{index + 1}</td>
+                  <td className="text-black">{category.categoryEventName}</td>
+                  <td className="d-flex justify-content-center">
                     <button
                       onClick={() => handleUpdate(category)}
                       className="btn btn-primary btn-sm me-2"
