@@ -50,7 +50,7 @@ export default function MyDraft() {
     try {
       setLoading(true);
       const params = {
-        page: 1,
+        page: currentPage,
         pageSize: pageSize,
         status: "0",
         createBy: localStorage.getItem("userId"),
@@ -101,12 +101,11 @@ export default function MyDraft() {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [currentPage]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
-    fetchEvents(pageNumber);
   };
 
   return (

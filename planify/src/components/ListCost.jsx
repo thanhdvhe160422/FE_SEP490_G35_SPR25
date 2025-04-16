@@ -25,7 +25,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import "../styles/Author/ListCost.css";
-import ExcelJS from "exceljs"; // Thay SheetJS bằng ExcelJS
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 const { Title } = Typography;
@@ -476,15 +476,6 @@ function ListCost({ eventId, data }) {
           <Title level={3}>Danh sách chi phí ({costs.length})</Title>
 
           <Space>
-            <Tooltip title="Tải lại dữ liệu">
-              <Button
-                icon={<ReloadOutlined spin={reloading} />}
-                onClick={handleManualReload}
-                loading={reloading}
-              >
-                Làm mới
-              </Button>
-            </Tooltip>
             <Tooltip title="Xuất danh sách chi phí ra Excel">
               <Button
                 type="primary"
