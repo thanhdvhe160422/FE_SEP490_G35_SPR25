@@ -876,7 +876,7 @@ function ListTask({ eventId, data }) {
         setSubTasks((prev) => prev.filter((item) => item.id !== subTaskId));
 
         Swal.fire({
-          title: "Delete subtask successfully",
+          title: "Xóa nhiệm vụ con thành công",
           icon: "success",
           draggable: true,
         });
@@ -1456,7 +1456,7 @@ function ListTask({ eventId, data }) {
             <Spin spinning={loadingSubTasks}>
               {!subTasks || subTasks.length === 0 ? (
                 <Empty
-                  description="No subtasks yet"
+                  description="Hiện không có nhiệm vụ con nào"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               ) : (
