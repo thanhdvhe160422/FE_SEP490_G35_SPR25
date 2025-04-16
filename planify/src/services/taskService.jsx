@@ -164,13 +164,18 @@ export const updateTask = async (taskId, data) => {
 export const deleteTask = async (taskId, status) => {
   let token = localStorage.getItem("token");
 
-  try {
-    const response = await axios.put(
+  const updateTaskStatus = async (authToken) => {
+    return await axios.put(
       `https://localhost:44320/api/Tasks/${taskId}/status/${status}`,
+      {},
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${authToken}` },
       }
     );
+  };
+
+  try {
+    const response = await updateTaskStatus(token);
     return response.data;
   } catch (error) {
     if (error.response?.status === 401) {
@@ -180,26 +185,35 @@ export const deleteTask = async (taskId, status) => {
       if (newToken) {
         localStorage.setItem("token", newToken);
         try {
-          const retryResponse = await axios.put(
-            `https://localhost:44320/api/Tasks/${taskId}/status/${status}`,
-            {
-              headers: { Authorization: `Bearer ${newToken}` },
-            }
-          );
+          const retryResponse = await updateTaskStatus(newToken);
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire("Error", "Not found any tasks.", "error");
+          Swal.fire(
+            "Phiên đăng nhập đã hết",
+            "Vui lòng đăng nhập lại.",
+            "warning"
+          ).then(() => {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+          });
           return { error: "unauthorized" };
         }
       } else {
-        localStorage.removeItem("token");
+        Swal.fire(
+          "Phiên đăng nhập đã hết",
+          "Vui lòng đăng nhập lại.",
+          "warning"
+        ).then(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        });
         return { error: "expired" };
       }
     }
 
-    console.error("Error updating group:", error);
-    Swal.fire("Error", "Not found any tasks.", "error");
+    console.error("Lỗi cập nhật task:", error);
+    Swal.fire("Lỗi", "Không tìm thấy nhiệm vụ.", "error");
     return null;
   }
 };

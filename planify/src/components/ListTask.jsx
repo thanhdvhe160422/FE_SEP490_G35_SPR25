@@ -36,7 +36,6 @@ import "../styles/Tasks/ListTask.css";
 import { createTaskAPI, updateTask, deleteTask } from "../services/taskService";
 import axios from "axios";
 import moment from "moment";
-import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import refreshAccessToken from "../services/refreshToken";
 import { Navigate } from "react-router";
@@ -47,7 +46,8 @@ const { TextArea } = Input;
 function ListTask({ eventId, data }) {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [displayedTasks, setDisplayedTasks] = useState([]);
+  const [displayedTasks, setDisplayedTasks] = useState([...data.tasks]);
+  console.log("List tasks: ", displayedTasks);
   const [loading, setLoading] = useState(true);
   const [reloading, setReloading] = useState(false);
   const [error, setError] = useState(null);
@@ -90,24 +90,39 @@ function ListTask({ eventId, data }) {
   const userId = localStorage.getItem("userId");
   const handleAssignUsers = async () => {
     if (!selectedSubTaskForAssign || assignedUsers.length === 0) {
-      message.warning("Please select at least one user to assign");
+      message.warning("Vui lòng chọn ít nhất một người dùng để giao");
       return;
     }
 
-    const userIds = assignedUsers.map((user) => user.userId || user.id);
-    const success = await handleMultipleAssignments(
-      selectedSubTaskForAssign.id,
-      userIds
-    );
+    try {
+      setAssigningUser(true);
+      const userIds = assignedUsers.map((user) => user.userId || user.id);
+      const success = await handleMultipleAssignments(
+        selectedSubTaskForAssign.id,
+        userIds
+      );
 
-    if (success) {
-      setIsAssignModalVisible(false);
-      fetchTasksFromAPI().then(() => {
-        const updatedTask = tasks.find((task) => task.id === selectedTask.id);
-        if (updatedTask) {
-          showSubTasks(updatedTask);
+      if (success) {
+        const newTasks = await fetchTasksFromAPI();
+        if (newTasks.length > 0 && selectedTask) {
+          const updatedTask = newTasks.find(
+            (task) => task.id === selectedTask.id
+          );
+          if (updatedTask) {
+            setSelectedTask(updatedTask);
+            showSubTasks(updatedTask);
+            message.success("Giao công việc thành công");
+          } else {
+            message.warning("Không tìm thấy nhiệm vụ đã cập nhật");
+          }
         }
-      });
+        setIsAssignModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Error assigning users:", error);
+      message.error("Không thể giao công việc");
+    } finally {
+      setAssigningUser(false);
     }
   };
   const renderSubTaskActions = (item) => {
@@ -206,15 +221,32 @@ function ListTask({ eventId, data }) {
       setLoadingUsers(false);
     }
   };
-
   useEffect(() => {
     if (eventId) {
-      searchEventUsers();
+      fetchTasksFromAPI();
+    } else {
+      setTasks([]);
+      setLoading(false);
     }
   }, [eventId]);
+  useEffect(() => {
+    const activeTasksOnly = tasks.filter((task) => task.status !== 0);
+    setFilteredTasks(activeTasksOnly);
+    setPagination((prev) => ({
+      ...prev,
+      total: activeTasksOnly.length,
+    }));
+    console.log("Updated filteredTasks:", activeTasksOnly);
+  }, [tasks]);
+  useEffect(() => {
+    const startIndex = (pagination.current - 1) * pagination.pageSize;
+    const endIndex = startIndex + pagination.pageSize;
+    const paginatedTasks = filteredTasks.slice(startIndex, endIndex);
+    setDisplayedTasks(paginatedTasks);
+    console.log("Updated displayedTasks:", paginatedTasks);
+  }, [filteredTasks, pagination.current, pagination.pageSize]);
   const assignUserToSubtask = async (subtaskId, userId) => {
     try {
-      setAssigningUser(true);
       let token = localStorage.getItem("token");
 
       const assign = async (authToken) => {
@@ -248,40 +280,22 @@ function ListTask({ eventId, data }) {
       }
 
       if (response.status === 200 || response.status === 204) {
-        console.log("Assign successful, fetching tasks...");
-        const newTasks = await fetchTasksFromAPI();
-        if (newTasks.length > 0) {
-          // Đồng bộ selectedTask nếu cần
-          const updatedTask = newTasks.find(
-            (task) => task.id === selectedTask?.id
-          );
-          if (updatedTask) {
-            setSelectedTask(updatedTask); // Cập nhật selectedTask cho Drawer
-          }
-          message.success("Giao công việc con thành công!");
-          return true;
-        } else {
-          throw new Error("API returned an unexpected status");
-        }
+        return true;
       }
+      return false;
     } catch (error) {
       console.error(
         "Error assigning user to subtask:",
         error.response?.data || error.message
       );
-      message.error(`Không thể giao công việc con: ${error.message}`);
       return false;
-    } finally {
-      setAssigningUser(false);
     }
   };
 
   const handleMultipleAssignments = async (subtaskId, userIds) => {
     let successCount = 0;
-    setAssigningUser(true);
 
     try {
-      // Assign tất cả user
       for (const userId of userIds) {
         const success = await assignUserToSubtask(subtaskId, userId);
         if (success) {
@@ -289,29 +303,7 @@ function ListTask({ eventId, data }) {
         }
       }
 
-      // Fetch và cập nhật UI
       if (successCount > 0) {
-        const newTasks = await fetchTasksFromAPI();
-        if (newTasks.length > 0 && selectedTask) {
-          const updatedTask = newTasks.find(
-            (task) => task.id === selectedTask.id
-          );
-          if (updatedTask) {
-            console.log("Updating selectedTask:", updatedTask);
-            setSelectedTask({ ...updatedTask }); // Deep copy
-            showSubTasks(updatedTask); // Cập nhật subTasks
-          } else {
-            console.warn("Selected task not found in new tasks");
-          }
-        }
-      }
-
-      // Thông báo
-      if (successCount === userIds.length) {
-        message.success("Tất cả người dùng đã được gán thành công");
-        return true;
-      } else if (successCount > 0) {
-        message.warning(`Đã gán ${successCount}/${userIds.length} người dùng`);
         return true;
       } else {
         message.error("Không thể gán bất kỳ người dùng nào");
@@ -321,8 +313,6 @@ function ListTask({ eventId, data }) {
       console.error("Error in handleMultipleAssignments:", error);
       message.error("Đã xảy ra lỗi khi gán người dùng");
       return false;
-    } finally {
-      setAssigningUser(false);
     }
   };
   const showEditSubTaskModal = (subTask) => {
@@ -384,11 +374,6 @@ function ListTask({ eventId, data }) {
       }
 
       if (response.status === 200 || response.status === 204) {
-        Swal.fire({
-          title: "Update Sub-Task Successful!",
-          icon: "success",
-          draggable: true,
-        });
         setIsEditSubTaskModalVisible(false);
 
         const updatedTasks = await fetchTasksFromAPI();
@@ -416,114 +401,42 @@ function ListTask({ eventId, data }) {
     }
   };
 
-  useEffect(() => {
-    if (data && data.tasks && Array.isArray(data.tasks)) {
-      console.log("Using tasks data from props:", data.tasks);
-      setTasks(data.tasks);
-      setLoading(false);
-    } else if (eventId) {
-      fetchTasksFromAPI();
-    } else {
-      setLoading(false);
-      setTasks([]);
-    }
-  }, [eventId, data]);
-
-  useEffect(() => {
-    if (tasks && tasks.length > 0) {
-      const activeTasksOnly = tasks.filter((task) => task.status !== 0);
-      setFilteredTasks(activeTasksOnly);
-      setPagination((prev) => ({
-        ...prev,
-        total: activeTasksOnly.length,
-      }));
-    } else {
-      setFilteredTasks([]);
-      setPagination((prev) => ({
-        ...prev,
-        total: 0,
-      }));
-    }
-  }, [tasks]);
-
-  useEffect(() => {
-    const startIndex = (pagination.current - 1) * pagination.pageSize;
-    const endIndex = startIndex + pagination.pageSize;
-    const paginatedTasks = filteredTasks.slice(startIndex, endIndex);
-    setDisplayedTasks(paginatedTasks);
-  }, [filteredTasks, pagination.current, pagination.pageSize]);
-
   const fetchTasksFromAPI = async () => {
-    setReloading(true);
-    setError(null);
-
     try {
-      let token = localStorage.getItem("token");
+      setLoading(true);
+      setReloading(true);
+      const token = localStorage.getItem("token");
 
-      const fetchData = async (authToken) => {
-        const response = await axios.get(
-          `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}&t=${Date.now()}`, // Thêm timestamp
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              Pragma: "no-cache",
-              Expires: "0",
-            },
-          }
-        );
-        return response;
-      };
-
-      let response;
-      try {
-        response = await fetchData(token);
-      } catch (error) {
-        if (error.response?.status === 401) {
-          console.warn("Token expired, refreshing...");
-          token = await refreshAccessToken();
-          if (token) {
-            localStorage.setItem("token", token);
-            response = await fetchData(token);
-          } else {
-            message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
-            Navigate("/login");
-            return [];
-          }
-        } else {
-          throw error;
+      const response = await axios.get(
+        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      }
+      );
 
-      if (response.data && response.data.result) {
-        const tasksData = response.data.result.tasks || [];
-        // Kiểm tra joinSubTask
-        tasksData.forEach((task) => {
-          if (task.subTasks) {
-            task.subTasks.forEach((sub) => {
-              console.log(`Subtask ${sub.id} joinSubTask:`, sub.joinSubTask);
-            });
-          }
-        });
-        console.log("Fetched tasks:", tasksData);
-        setTasks([...tasksData]); // Deep copy
-        if (!loading) {
-          message.success("Đã tải lại danh sách công việc thành công");
-        }
-        return tasksData;
-      } else {
-        console.warn("No tasks found in response");
-        setTasks([]);
-        return [];
-      }
+      const tasks = response.data.result?.tasks || [];
+      setDisplayedTasks(tasks);
+      setError(null);
+      console.log("Fetched tasks:", tasks);
+      return tasks;
     } catch (error) {
       console.error(
         "Error fetching tasks:",
         error.response?.data || error.message
       );
-      message.error("Không thể tải danh sách công việc");
-      setError("Không thể tải danh sách công việc");
-      return [];
+      if (error.response?.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          localStorage.setItem("token", newToken);
+          return fetchTasksFromAPI();
+        } else {
+          message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+          Navigate("/login");
+        }
+      } else {
+        message.error("Không thể tải danh sách nhiệm vụ");
+      }
+      return tasks;
     } finally {
       setLoading(false);
       setReloading(false);
@@ -657,23 +570,29 @@ function ListTask({ eventId, data }) {
         status: 1,
       };
 
-      await createTaskAPI(newTaskData);
-      Swal.fire({
-        title: "Tạo nhiệm vụ thành công!",
-        icon: "success",
-        draggable: true,
-      });
-      handleCloseModal();
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "https://localhost:44320/api/Tasks/create",
+        newTaskData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      fetchTasksFromAPI();
+      await fetchTasksFromAPI();
+      message.success("Tạo nhiệm vụ thành công");
+      handleCloseModal();
       return true;
     } catch (error) {
-      console.error("Error creating task:", error);
-      message.error("Không thể tạo công việc mới");
-      setReloading(false);
+      console.error(
+        "Error creating task:",
+        error.response?.data || error.message
+      );
+      message.error("Không thể tạo nhiệm vụ");
       return false;
     } finally {
       setIsSubmitting(false);
+      setReloading(false);
     }
   };
 
@@ -693,44 +612,41 @@ function ListTask({ eventId, data }) {
         eventId: eventId,
         status: 1,
       };
-
       await updateTask(selectedTask.id, updatedTaskData);
-      Swal.fire({
-        title: "Cập nhật nhiệm vụ thành công!",
-        icon: "success",
-        draggable: true,
-      });
-      handleCloseModal();
 
-      fetchTasksFromAPI();
+      await fetchTasksFromAPI();
+      message.success("Cập nhật nhiệm vụ thành công");
+      handleCloseModal();
       return true;
     } catch (error) {
-      console.error("Error updating task:", error);
-      message.error("Không thể cập nhật công việc");
-      setReloading(false);
+      console.error(
+        "Error updating task:",
+        error.response?.data || error.message
+      );
+      message.error("Không thể cập nhật nhiệm vụ");
       return false;
     } finally {
       setIsSubmitting(false);
+      setReloading(false);
     }
   };
   const handleDelete = async (taskId) => {
     try {
       setReloading(true);
-
       await deleteTask(taskId, -1);
-      Swal.fire({
-        title: "Xóa nhiệm vụ thành công!",
-        icon: "success",
-        draggable: true,
-      });
 
-      fetchTasksFromAPI();
+      await fetchTasksFromAPI();
+      message.success("Xóa nhiệm vụ thành công");
       return true;
     } catch (error) {
-      console.error("Error deleting task:", error);
-      message.error("Không thể xóa công việc");
-      setReloading(false);
+      console.error(
+        "Error deleting task:",
+        error.response?.data || error.message
+      );
+      message.error("Không thể xóa nhiệm vụ");
       return false;
+    } finally {
+      setReloading(false);
     }
   };
 
@@ -748,12 +664,11 @@ function ListTask({ eventId, data }) {
     setSubTasksVisible(true);
 
     if (task.subTasks && Array.isArray(task.subTasks)) {
-      console.log("SubTasks original:", task.subTasks);
-      setSubTasks([...task.subTasks]); // Deep copy
-      console.log("SubTasks set:", task.subTasks);
+      console.log("SubTasks loaded:", task.subTasks);
+      setSubTasks([...task.subTasks]);
     } else {
-      setSubTasks([]);
       console.log("No subTasks found for task:", task);
+      setSubTasks([]);
     }
 
     setLoadingSubTasks(false);
@@ -874,12 +789,6 @@ function ListTask({ eventId, data }) {
 
       if (response.status === 200) {
         setSubTasks((prev) => prev.filter((item) => item.id !== subTaskId));
-
-        Swal.fire({
-          title: "Xóa nhiệm vụ con thành công",
-          icon: "success",
-          draggable: true,
-        });
 
         await fetchTasksFromAPI();
       } else {
@@ -1062,8 +971,8 @@ function ListTask({ eventId, data }) {
           </div>
         </div>
 
-        <Spin spinning={reloading} tip="Loading data...">
-          {displayedTasks.length === 0 ? (
+        <Spin spinning={loading || reloading}>
+          {data.tasks === 0 ? (
             <Empty
               image="https://cdn-icons-png.flaticon.com/512/7486/7486754.png"
               imageStyle={{ height: 120 }}
@@ -1466,7 +1375,7 @@ function ListTask({ eventId, data }) {
                   dataSource={subTasks}
                   renderItem={(item) => (
                     <List.Item
-                      key={`${item.id}-${Date.now()}`} // Key động
+                      key={`${item.id}-${Date.now()}`}
                       actions={
                         userId === data.createdBy.id
                           ? renderSubTaskActions(item)
