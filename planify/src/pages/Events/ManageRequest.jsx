@@ -113,7 +113,7 @@ function ManageRequest() {
             requests={pendingRequests}
           >
             {(req) => (
-              <>
+              <div className="d-flex justify-content-between">
                 <button
                   className="btn approve"
                   onClick={() => handleApprove(req)}
@@ -126,7 +126,7 @@ function ManageRequest() {
                 >
                   Từ chối
                 </button>
-              </>
+              </div>
             )}
           </RequestColumn>
 
