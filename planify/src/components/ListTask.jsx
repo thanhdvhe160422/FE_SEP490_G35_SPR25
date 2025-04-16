@@ -952,7 +952,7 @@ function ListTask({ eventId, data }) {
       <Card className="task-list-card">
         <div className="task-header">
           <Title level={3} className="task-title">
-            Danh sách nhiệm vụ ({filteredTasks.length})
+            Danh sách nhiệm vụ ({displayedTasks.length})
           </Title>
 
           <div className="task-actions">
