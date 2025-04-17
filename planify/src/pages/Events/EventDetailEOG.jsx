@@ -85,23 +85,34 @@ const EventDetailEOG = () => {
     setSelectedRequest(request);
     setShowPopupReject(true);
   };
-  const submitReject = async () => {
-    if (!rejectReason.trim()) {
-      Swal.fire("Error", "Please enter a reason for rejection.", "error");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await rejectRequest(event.requestId, rejectReason);
-      setIsLoading(false);
-      setShowPopupReject(false);
-      setRejectReason("");
-      Swal.fire("Success", "Request rejected successfully", "success");
-    } catch (error) {
-      console.error("Error rejecting request:", error);
-      Swal.fire("Error", "Unable to reject request.", "error");
-    }
-  };
+
+
+ const submitReject = async () => {
+  if (!rejectReason.trim()) {
+    Swal.fire("Lỗi", "Vui lòng nhập lý do từ chối yêu cầu.", "error");
+    return;
+  }
+  setIsLoading(true);
+  try {
+    await rejectRequest(event.requestId, rejectReason);
+    setIsLoading(false);
+    setShowPopupReject(false);
+    setRejectReason("");
+    await fetchEventData();
+    
+    Swal.fire({
+      title: "Từ chối thành công",
+      text: "Yêu cầu đã bị từ chối và cập nhật hệ thống.",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error("Lỗi khi từ chối yêu cầu:", error);
+    Swal.fire("Lỗi", "Không thể thực hiện từ chối yêu cầu.", "error");
+  }
+};
+
 
   const submitApprove = async () => {
     if (isSubmitting) return;
@@ -112,21 +123,22 @@ const EventDetailEOG = () => {
       setIsLoading(false);
       setShowPopupApprove(false);
       setApproveReason("");
-
+      await fetchEventData();
       Swal.fire({
-        title: "Success",
-        text: "Request approved successfully",
+        title: "Phê duyệt thành công",
+        text: "Yêu cầu đã được xử lý và phê duyệt thành công.",
         icon: "success",
-        timer: 2000,
+        timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("Error approving request:", error);
-      Swal.fire("Error", "Unable to approve request.", "error");
+      console.error("Lỗi khi phê duyệt yêu cầu:", error);
+      Swal.fire("Lỗi", "Không thể phê duyệt yêu cầu.", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const fetchEventData = async () => {
     const token = localStorage.getItem("token");
     console.log(token);
@@ -630,13 +642,13 @@ const EventDetailEOG = () => {
                 className="btn approve"
                 onClick={() => handleApprove(requests.id)}
               >
-                Approve
+                Chấp nhận yêu cầu
               </button>
               <button
                 className="btn reject"
                 onClick={() => handleReject(requests.id)}
               >
-                Reject
+                Hủy yêu cầu
               </button>
               {showPopupReject && (
                 <div className="popup">
@@ -654,7 +666,7 @@ const EventDetailEOG = () => {
                       Hủy
                     </button>
                     <button className="btn submit" onClick={submitReject}>
-                      Submit
+                      Hủy yêu cầu
                     </button>
                   </div>
                 </div>
@@ -679,7 +691,7 @@ const EventDetailEOG = () => {
                       className="btn submit"
                       onClick={submitApprove}
                     >
-                      Submit
+                      Duyệt yêu cầu
                     </button>
                   </div>
                 </div>
