@@ -29,6 +29,7 @@ import ManageCampusManager from "./pages/Admin/ManageCampusManager";
 import { ToastContainer } from "react-toastify";
 import ManageUser from "./pages/Admin/ManageUser";
 import ChangePassword from "./pages/Admin/ChangePassword";
+import ListPermissionEventOrganizer from "./pages/Author/ListPermissionEventOrganizer";
 
 function App() {
   const getRedirectPath = () => {
@@ -194,6 +195,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Campus Manager"]}>
               <CreateEventOrganizer />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/manage-permission"
+          element={
+            <PrivateRoute allowedRoles={["Campus Manager"]}>
+              <ListPermissionEventOrganizer />
             </PrivateRoute>
           }
         />
