@@ -32,6 +32,7 @@ const UpdateEventForm = () => {
   const [isChangeImage, setIsChangeImage] = useState(0);
   const [isDeleteImage, setIsDeleteImage] = useState(0);
   const [isLoad, setIsLoad] = useState(false);
+  const [errors, setErrors] = useState();
   const navigate = useNavigate();
 
   const openLightbox = (index) => {
@@ -92,22 +93,143 @@ const UpdateEventForm = () => {
   }, [id]);
   const handleChange = (e) => {
     const { name, value } = e.target;
+    var errorName;
+    var error;
+    if (name === "startTime") {
+      errorName = "ngày bắt đầu";
+      error = validateStartDate(value);
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: value,
+      }));
+      setErrors({ ...errors, [name]: error });
+      error = validateEndDate(event.endTime);
+      setErrors({ ...errors, endTime: error });
+      return;
+    }
+    if (name === "endTime") {
+      errorName = "ngày kết thúc";
+      error = validateEndDate(value);
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: value,
+      }));
+      setErrors({ ...errors, [name]: error });
+      return;
+    }
+    if (name === "amountBudget") {
+      errorName = "ngân sách";
+      const unformatted = value.replace(/\./g, "");
+      if (!/^\d*$/.test(unformatted)) {
+        return;
+      }
+      const parsedNumber = parseFormattedNumber(value);
+      const formatted = formatNumber(parsedNumber);
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: formatted,
+      }));
+      error = validateNull(value, errorName);
+      if (error !== "") {
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
+      error = validateNumber(parsedNumber, errorName, 1_000_000_000_000);
+      setErrors({ ...errors, [name]: error });
+      return;
+    }
+    if (name === "sizeParticipants") {
+      errorName = "số lượng người tham gia";
+      const unformatted = value.replace(/\./g, "");
+
+      if (!/^\d*$/.test(unformatted)) {
+        return;
+      }
+
+      const parsedNumber = parseFormattedNumber(value);
+      const formatted = formatNumber(parsedNumber);
+
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: formatted,
+      }));
+
+      error = validateNull(parsedNumber, errorName);
+      if (error !== "") {
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
+
+      error = validateNumber(parsedNumber, errorName, 4_294_967_295);
+      setErrors({ ...errors, [name]: error });
+      return;
+    }
+    var max;
+    if (name === "eventTitle") {
+      max = 50;
+      errorName = "tiêu đề";
+    }
+    if (name === "placed") {
+      max = 255;
+      errorName = "vị trí";
+    }
+    if (name === "eventDescription") {
+      max = 2000;
+      errorName = "mô tả";
+    }
+    if (name === "sloganEvent") {
+      max = 255;
+      errorName = "khẩu hiệu";
+    }
+    if (name === "measuringSuccess") {
+      max = 1000;
+      errorName = "thước đo thành công";
+    }
+    if (name === "goals") {
+      max = 1000;
+      errorName = "mục tiêu";
+    }
+    if (name === "promotionalPlan") {
+      max = 1500;
+      errorName = "kế hoạch truyền thông";
+    }
+    if (name === "targetAudience") {
+      max = 800;
+      errorName = "đối tượng";
+    }
+    if (name === "monitoringProcess") {
+      max = 1000;
+      errorName = "quá trình giám sát";
+    }
+    error = validateMax(value, max, errorName);
+    if (error !== "") {
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: value.substring(0, max),
+      }));
+      setErrors({ ...errors, [name]: error });
+      return;
+    }
+    error = validateNull(value, errorName);
+
     setEvent((prevEvent) => ({
       ...prevEvent,
       [name]: value,
     }));
+    setErrors({ ...errors, [name]: error });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(selectedCategory);
+    const amountBudgetParsed = parseFormattedNumber(event.amountBudget);
+    const sizeParticipantsParsed = parseFormattedNumber(event.sizeParticipants);
     const eventData = {
       id: event.id,
       eventTitle: event.eventTitle,
       eventDescription: event.eventDescription,
       startTime: event.startTime,
       endTime: event.endTime,
-      amountBudget: event.amountBudget,
+      amountBudget: amountBudgetParsed,
       status: event.status,
       managerId: event?.manager?.id ?? null,
       campusId: 1,
@@ -118,12 +240,20 @@ const UpdateEventForm = () => {
       measuringSuccess: event?.measuringSuccess || "",
       goals: event?.goals || "",
       monitoringProcess: event?.monitoringProcess || "",
-      sizeParticipants: event?.sizeParticipants || 0,
+      sizeParticipants: sizeParticipantsParsed,
       promotionalPlan: event?.promotionalPlan || "",
       targetAudience: event?.targetAudience || "",
       sloganEvent: event?.sloganEvent || "",
     };
-
+    const hasError = Object.values(errors).some((err) => err && err !== "");
+    if (hasError) {
+      Swal.fire({
+        title: "Thông tin không hợp lệ",
+        icon: "error",
+        timer: 2000,
+      });
+      return;
+    }
     try {
       setIsLoad(true);
       const response = await updateEvent(event.id, eventData);
@@ -206,22 +336,12 @@ const UpdateEventForm = () => {
           setImages(_newImages);
           if (item.id !== 0) {
             setIsDeleteImage(1);
-            //setDeleteImages((deleteImages) => [...deleteImages, item])
-            // setDeleteImages((deleteImages) => {
-            //   const updatedDeleteImages = [...deleteImages, item];
-            //   console.log(
-            //     "delete image: " + JSON.stringify(updatedDeleteImages, null, 2)
-            //   );
-            //   return updatedDeleteImages;
-            // });
-            //console.log("delete image: "+JSON.stringify(deleteImages,null,2));
           }
-          // Swal.fire({
-          //   icon: "success",
-          //   title: "Deleted successfully!",
-          //   showConfirmButton: false,
-          //   timer: 2000,
-          // });
+          if (_newImages.length === 0) {
+            setErrors({ ...errors, image: "Vui lòng upload hình ảnh sự kiện" });
+          } else {
+            setErrors({ ...errors, image: "" });
+          }
         }
       });
     } catch (error) {
@@ -238,34 +358,88 @@ const UpdateEventForm = () => {
     setImages((prevImages) => [...prevImages, ..._newImages]);
     setNewImages((prevNewImages) => [...prevNewImages, ...selectedFiles]);
     setIsChangeImage(1);
+    setErrors({ ...errors, image: "" });
   };
-  // const handleUploadImages = async (eventId, token) => {
-  //   //console.log("call api " + images.length);
 
-  //   if (newImages.length === 0) return;
+  const validateMax = (value, max, name) => {
+    if (value.length > max) {
+      return `Không được vượt quá ${max} ký tự.`;
+    }
+    return "";
+  };
+  const validateNull = (value, name) => {
+    if (!value) {
+      return `Vui lòng nhập ${name}`;
+    }
+    return "";
+  };
+  const validateNumber = (value, name, max) => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return `${name} không phải là số hợp lệ`;
+    }
 
-  //   const formData = new FormData();
-  //   newImages.forEach((file) => formData.append("EventMediaFiles", file));
-  //   formData.append("eventId", eventId);
-  //   try {
-  //     await axios.post(
-  //       "https://localhost:44320/api/Events/upload-image",
-  //       formData,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.error("Image upload failed:", error.response?.data);
-  //     enqueueSnackbar("Image upload failed. You can try uploading manually.", {
-  //       variant: "warning",
-  //     });
-  //     throw new error();
-  //   }
-  // };
+    if (value < 0) {
+      return `${name} phải là số dương`;
+    }
+
+    const integerPartLength = Math.floor(value).toString().length;
+    if (integerPartLength > 15) {
+      return `${name} quá lớn – vui lòng nhập giá trị hợp lý`;
+    }
+
+    if (max !== undefined && value > max) {
+      return `${name} không được vượt quá ${max.toLocaleString("vi-VN")}`;
+    }
+
+    return "";
+  };
+
+  const formatNumber = (value) => {
+    if (!value || isNaN(value)) return "";
+    return Number(value).toLocaleString("vi-VN");
+  };
+
+  const parseFormattedNumber = (formatted) => {
+    formatted = String(formatted);
+    if (!formatted) return 0;
+    return Number(formatted.replace(/\./g, ""));
+  };
+
+  const validateStartDate = (value) => {
+    const startDate = new Date(value);
+    const currentDate = new Date();
+
+    currentDate.setDate(1);
+
+    const minStartDate = new Date(
+      currentDate.setMonth(currentDate.getMonth() + 2)
+    );
+    if (startDate < minStartDate)
+      return `Thời gian bắt đầu phải cách thời gian hiện tại 2 tháng`;
+    return "";
+  };
+
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMonth(now.getMonth() + 2);
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+  const validateEndDate = () => {
+    const start = new Date(event.startTime);
+    const end = new Date(event.endTime);
+    if (end <= start) {
+      return `Ngày kết thúc phải lớn hơn ngày bắt đầu`;
+    }
+    return "";
+  };
+
   return (
     <>
       <Header />
@@ -288,6 +462,9 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Event Title"
               />
+              {errors?.eventTitle && (
+                <span className="text-danger">{errors?.eventTitle}</span>
+              )}
               <label className="floating-label">Tiêu đề</label>
             </div>
 
@@ -301,6 +478,9 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Location"
               />
+              {errors?.placed && (
+                <span className="text-danger">{errors?.placed}</span>
+              )}
               <label className="floating-label">Vị trí</label>
             </div>
 
@@ -313,7 +493,11 @@ const UpdateEventForm = () => {
                 value={event?.startTime}
                 onChange={handleChange}
                 placeholder="Start Time"
+                min={getMinDateTime()}
               />
+              {errors?.startTime && (
+                <span className="text-danger">{errors?.startTime}</span>
+              )}
               <label className="floating-label">Ngày bắt đầu</label>
             </div>
 
@@ -327,12 +511,15 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="End Time"
               />
+              {errors?.endTime && (
+                <span className="text-danger">{errors?.endTime}</span>
+              )}
               <label className="floating-label">Ngày kết thúc</label>
             </div>
 
             <div className="form-floating-group">
               <input
-                type="number"
+                type="text"
                 name="amountBudget"
                 id="AmountBudget"
                 className="floating-input"
@@ -340,6 +527,9 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Budget Amount"
               />
+              {errors?.amountBudget && (
+                <span className="text-danger">{errors?.amountBudget}</span>
+              )}
               <label className="floating-label">Ngân sách</label>
             </div>
 
@@ -370,6 +560,9 @@ const UpdateEventForm = () => {
                 placeholder="Event Description"
                 rows={3}
               />
+              {errors?.eventDescription && (
+                <span className="text-danger">{errors?.eventDescription}</span>
+              )}
               <label className="floating-label">Mô tả</label>
             </div>
 
@@ -383,12 +576,15 @@ const UpdateEventForm = () => {
                 placeholder="Measuring Success"
                 rows={2}
               />
+              {errors?.measuringSuccess && (
+                <span className="text-danger">{errors?.measuringSuccess}</span>
+              )}
               <label className="floating-label">Thước đo thành công</label>
             </div>
 
             <div className="form-floating-group">
               <input
-                type="number"
+                type="text"
                 name="sizeParticipants"
                 id="SizeParticipants"
                 className="floating-input"
@@ -396,6 +592,9 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Number of Participants"
               />
+              {errors?.sizeParticipants && (
+                <span className="text-danger">{errors?.sizeParticipants}</span>
+              )}
               <label className="floating-label">Số lượng người tham gia</label>
             </div>
 
@@ -409,7 +608,11 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Event Slogan"
               />
-              <label className="floating-label">Slogan</label>
+              {errors?.sloganEvent && (
+                <span className="text-danger">{errors?.sloganEvent}</span>
+              )}
+              <label className="floating-label">Khẩu hiệu</label>
+
             </div>
             <div className="form-floating-group">
               <textarea
@@ -421,6 +624,9 @@ const UpdateEventForm = () => {
                 placeholder="Event Goals"
                 rows={2}
               />
+              {errors?.goals && (
+                <span className="text-danger">{errors?.goals}</span>
+              )}
               <label className="floating-label">Mục tiêu</label>
             </div>
 
@@ -434,7 +640,10 @@ const UpdateEventForm = () => {
                 placeholder="Promotional Plan"
                 rows={2}
               />
-              <label className="floating-label">Kế hoạch quảng cáo</label>
+              {errors?.promotionalPlan && (
+                <span className="text-danger">{errors?.promotionalPlan}</span>
+              )}
+              <label className="floating-label">Kế hoạch truyền thông</label>
             </div>
 
             <div className="form-floating-group">
@@ -447,6 +656,9 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Target Audience"
               />
+              {errors?.targetAudience && (
+                <span className="text-danger">{errors?.targetAudience}</span>
+              )}
               <label className="floating-label">Đối tượng</label>
             </div>
 
@@ -460,10 +672,16 @@ const UpdateEventForm = () => {
                 placeholder="Monitoring Process"
                 rows={2}
               />
+              {errors?.monitoringProcess && (
+                <span className="text-danger">{errors?.monitoringProcess}</span>
+              )}
               <label className="floating-label">Quá trình giám sát</label>
             </div>
 
             <div className="text-end">
+              {errors?.image && (
+                <span className="text-danger">{errors?.image}</span>
+              )}
               <div className="custom-image-grid">
                 <div
                   className="grid-image add-image-btn"
@@ -520,7 +738,11 @@ const UpdateEventForm = () => {
 
               <div style={{ marginTop: "30px" }}>
                 {" "}
-                <button type="submit" className="btn-submit">
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  onClick={handleSubmit}
+                >
                   Cập nhật
                 </button>
               </div>

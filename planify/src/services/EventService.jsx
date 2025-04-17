@@ -537,11 +537,6 @@ export const getNotification = async () => {
           return retryResponse.data;
         } catch (retryError) {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          Swal.fire(
-            "Error",
-            "Unable to get notification after token refresh.",
-            "error"
-          );
           return { error: "unauthorized" };
         }
       } else {
@@ -551,7 +546,6 @@ export const getNotification = async () => {
     }
 
     console.error("Error get notification:", error);
-    Swal.fire("Error", "Unable to get notification.", "error");
     return null;
   }
 };
