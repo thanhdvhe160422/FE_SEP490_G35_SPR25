@@ -214,7 +214,7 @@ export default function CreateEventOrganizer() {
                   required: "Tên là bắt buộc",
                   pattern: {
                     value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
-                    message: "Chỉ được chứa chữ cái có dấu và khoảng trắng",
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Tên",
                   },
                   maxLength: { value: 50, message: "Tối đa 50 ký tự" },
                 })}
@@ -232,7 +232,7 @@ export default function CreateEventOrganizer() {
                   required: "Họ là bắt buộc",
                   pattern: {
                     value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
-                    message: "Chỉ được chứa chữ cái có dấu và khoảng trắng",
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Họ",
                   },
                   maxLength: { value: 50, message: "Tối đa 50 ký tự" },
                 })}
