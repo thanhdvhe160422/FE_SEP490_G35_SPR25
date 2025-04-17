@@ -178,7 +178,10 @@ export default function CreateEventOrganizer() {
   return (
     <>
       <Header />
-      <div style={{marginTop:'100px'}} className="create-organizer-container">
+      <div
+        style={{ marginTop: "100px" }}
+        className="create-organizer-container"
+      >
         <Modal
           title="Tạo người tổ chức sự kiện"
           visible={isCreateModalVisible}
