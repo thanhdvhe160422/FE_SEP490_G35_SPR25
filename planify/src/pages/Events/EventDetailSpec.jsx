@@ -32,6 +32,7 @@ function EventDetailSpec() {
   const [isRegistered, setIsRegistered] = useState(false);
   const currentTime = new Date();
   const [currentIndex, setCurrentIndex] = useState(0);
+
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
@@ -151,12 +152,18 @@ function EventDetailSpec() {
                   src={fixDriveUrl(img)}
                   alt={`Thumbnail ${index + 1}`}
                   className="thumbnail-img"
-                  onClick={() => setOpenLightbox(true)}
+                  onClick={() => {
+                    setCurrentIndex(index + 1);
+                    setOpenLightbox(true);
+                  }}
                 />
                 {index === 1 && bannerImages.length > 3 && (
                   <button
                     className="view-all-btn"
-                    onClick={() => setOpenLightbox(true)}
+                    onClick={() => {
+                      setCurrentIndex(0);
+                      setOpenLightbox(true);
+                    }}
                   >
                     <BiGridAlt
                       style={{
@@ -174,13 +181,18 @@ function EventDetailSpec() {
 
           {openLightbox && (
             <Lightbox
-              open={openLightbox}
-              close={() => setOpenLightbox(false)}
-              slides={bannerImages.map((url) => ({
-                src: fixDriveUrl(url),
-              }))}
-              plugins={[Thumbnails]}
-            />
+  open={openLightbox}
+  close={() => setOpenLightbox(false)}
+  index={currentIndex}
+  on={{
+    view: ({ index }) => setCurrentIndex(index), 
+  }}
+  slides={bannerImages.map((url) => ({
+    src: fixDriveUrl(url),
+  }))}
+  plugins={[Thumbnails]}
+/>
+
           )}
         </div>
         <div style={{ marginRight: "70%" }}>

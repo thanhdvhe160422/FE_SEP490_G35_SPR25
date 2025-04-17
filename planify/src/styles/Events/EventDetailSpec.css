@@ -171,3 +171,7 @@
 .eventDescription span {
   white-space: pre-line;
 }
+
+.yarl__thumbnails_thumbnail_active {
+  border: 2px solid red !important;
+}
