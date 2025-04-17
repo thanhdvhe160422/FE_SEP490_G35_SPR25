@@ -48,7 +48,7 @@ function ManageRequest() {
 
   const submitReject = async () => {
     if (!rejectReason.trim()) {
-      Swal.fire("Error", "Please enter a reason for rejection.", "error");
+      Swal.fire("Lỗi", "Vui lòng nhập lý do từ chối yêu cầu.", "error");
       return;
     }
     setIsLoading(true);
@@ -56,44 +56,47 @@ function ManageRequest() {
       await rejectRequest(selectedRequest.id, rejectReason);
       setIsLoading(false);
       await fetchRequests();
-
+  
       setShowPopupReject(false);
       setRejectReason("");
-      Swal.fire("Success", "Request rejected successfully", "success");
+  
+      Swal.fire("Từ chối thành công", "Yêu cầu đã được xử lý và từ chối thành công.", "success");
     } catch (error) {
-      console.error("Error rejecting request:", error);
-      Swal.fire("Error", "Unable to reject request.", "error");
+      console.error("Lỗi khi từ chối yêu cầu:", error);
+      Swal.fire("Lỗi", "Không thể xử lý từ chối yêu cầu. Vui lòng thử lại sau.", "error");
     }
   };
+  
 
   const submitApprove = async () => {
     if (isSubmitting) return;
-
+  
     setIsSubmitting(true);
     setIsLoading(true);
     try {
-      console.log("Approving request ID:", selectedRequest.id);
+      console.log("Phê duyệt yêu cầu với ID:", selectedRequest.id);
       await approveRequest(selectedRequest.id, approveReason);
       setIsLoading(false);
       await fetchRequests();
-
+  
       setShowPopupApprove(false);
       setApproveReason("");
-
+  
       Swal.fire({
-        title: "Success",
-        text: "Request approved successfully",
+        title: "Phê duyệt thành công",
+        text: "Yêu cầu đã được xử lý và phê duyệt thành công.",
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("Error approving request:", error);
-      Swal.fire("Error", "Unable to approve request.", "error");
+      console.error("Lỗi khi phê duyệt yêu cầu:", error);
+      Swal.fire("Lỗi", "Không thể phê duyệt yêu cầu. Vui lòng thử lại sau.", "error");
     } finally {
-      setIsSubmitting(false); // reset lại cho lần sau
+      setIsSubmitting(false); 
     }
   };
+  
 
   if (isLoading) {
     return <Loading />;
