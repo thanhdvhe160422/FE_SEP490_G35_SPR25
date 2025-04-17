@@ -409,7 +409,7 @@ const UpdateEventForm = () => {
                 onChange={handleChange}
                 placeholder="Event Slogan"
               />
-              <label className="floating-label">Khẩu hiệu</label>
+              <label className="floating-label">Slogan</label>
             </div>
             <div className="form-floating-group">
               <textarea
