@@ -39,6 +39,11 @@ import {
 } from "../../services/EventRequestService";
 import Loading from "../../components/Loading";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import { Thumbnails } from "yet-another-react-lightbox/plugins";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { BiGridAlt } from "react-icons/bi";
 
 const EventDetailEOG = () => {
   const location = useLocation();
@@ -59,6 +64,8 @@ const EventDetailEOG = () => {
   const [approveReason, setApproveReason] = useState("");
   const [requests, setRequests] = useState([]);
   const [status, setStatus] = useState();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   const fetchRequests = async () => {
     try {
       const data = await getRequest();
@@ -295,17 +302,7 @@ const EventDetailEOG = () => {
     }
   };
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
+  
 
   if (isLoading || !event) {
     return <Loading />;
@@ -337,35 +334,44 @@ const EventDetailEOG = () => {
       <div className="event-container">
         {event && (
           <>
-            <div className="event-header">
-              <img
-                src={fixDriveUrl(images[currentImageIndex] || defaultImage)}
-                alt="Event"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-                referrerPolicy="no-referrer"
-              />
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="nav-button prev-button"
-                    onClick={handlePrevImage}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="nav-button next-button"
-                    onClick={handleNextImage}
-                  >
-                    <FaChevronRight />
-                  </button>
-                </>
-              )}
-            </div>
+          <div className="event-banner-gallery">
+  <div className="gallery-left" onClick={() => setLightboxOpen(true)}>
+    {images[0] ? (
+      <img
+        src={fixDriveUrl(images[0])}
+        alt="Main Event"
+        className="main-banner-img"
+        style={{ cursor: "pointer" }}
+      />
+    ) : (
+      <img
+        src={defaultImage}
+        alt="Default"
+        className="main-banner-img"
+        style={{ cursor: "pointer" }}
+      />
+    )}
+  </div>
+  <div className="gallery-right">
+    {images.slice(1, 3).map((img, index) => (
+      <div className="thumbnail-wrapper" key={index}>
+        <img
+          src={fixDriveUrl(img)}
+          alt={`Thumbnail ${index + 1}`}
+          className="thumbnail-img"
+          onClick={() => setLightboxOpen(true)}
+        />
+        {index === 1 && images.length > 3 && (
+          <button className="view-all-btn" onClick={() => setLightboxOpen(true)}>
+            <BiGridAlt style={{ marginRight: 6 }} />
+            <strong>Xem tất cả</strong>
+          </button>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
 
             <div className="event-details">
               <div className="event-title-container">
@@ -673,7 +679,14 @@ const EventDetailEOG = () => {
           )}
         </div>
       </div>
-      {/* <Footer /> */}
+      {lightboxOpen && (
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          slides={images.map((url) => ({ src: fixDriveUrl(url) }))}
+          plugins={[Thumbnails]}
+        />
+      )}
     </>
   );
 };

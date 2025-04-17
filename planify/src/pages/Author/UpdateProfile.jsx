@@ -561,6 +561,7 @@ const UpdateProfile = () => {
                 type="text"
                 value={user.phoneNumber}
                 onChange={HandlePhoneNumber}
+                maxLength={10}
               />
               {errors?.phone && (
                 <div className="text-danger">{errors.phone}</div>
