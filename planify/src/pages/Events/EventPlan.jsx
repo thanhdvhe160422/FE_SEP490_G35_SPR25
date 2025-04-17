@@ -1205,7 +1205,7 @@ export default function EventPlan() {
         });
 
         closeModal();
-        navigate("/event-detail-eog/" + eventId);
+        navigate("/event-detail-EOG/" + eventId);
       } else {
         enqueueSnackbar(
             `Không thể tạo sự kiện với mã trạng thái: ${response.status}`,

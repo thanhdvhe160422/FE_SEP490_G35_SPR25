@@ -11,8 +11,6 @@ import {
   FaUsers,
   FaClock,
   FaMapMarkerAlt,
-  FaChevronLeft,
-  FaChevronRight,
   FaMoneyBillAlt,
   FaQuoteLeft,
   FaUserFriends,
@@ -24,7 +22,6 @@ import { MdOutlineCategory } from "react-icons/md";
 import "../../styles/Events/EventDetailEOG.css";
 import { useSnackbar } from "notistack";
 import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
 import Swal from "sweetalert2";
 import ListTask from "../../components/ListTask";
 import ListMember from "../../components/ListMember";
@@ -39,13 +36,17 @@ import {
 } from "../../services/EventRequestService";
 import Loading from "../../components/Loading";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import { Thumbnails } from "yet-another-react-lightbox/plugins";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { BiGridAlt } from "react-icons/bi";
 
 const EventDetailEOG = () => {
   const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const [event, setEvent] = useState(null);
   const [images, setImages] = useState([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { eventId } = useParams();
   const [showPopupReject, setShowPopupReject] = useState(false);
@@ -59,6 +60,9 @@ const EventDetailEOG = () => {
   const [approveReason, setApproveReason] = useState("");
   const [requests, setRequests] = useState([]);
   const [status, setStatus] = useState();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   const fetchRequests = async () => {
     try {
       const data = await getRequest();
@@ -204,12 +208,12 @@ const EventDetailEOG = () => {
     });
 
     const result = await swalWithBootstrapButtons.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: "Xác nhận xóa?",
+      text: "Bạn sẽ không thể khôi phục lại dữ liệu này!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
+      confirmButtonText: "Vâng, hãy xóa!",
+      cancelButtonText: "Hủy bỏ",
       reverseButtons: true,
     });
 
@@ -253,23 +257,26 @@ const EventDetailEOG = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to delete event");
+          throw new Error(errorData.message || "Xóa sự kiện thất bại");
         }
 
         swalWithBootstrapButtons
           .fire({
-            title: "Deleted!",
-            text: "Your event has been deleted.",
+            title: "Đã xóa!",
+            text: "Sự kiện của bạn đã được xóa thành công.",
             icon: "success",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
           })
           .then(() => {
             navigate("/home");
           });
       } catch (error) {
-        console.error("Error deleting event:", error);
+        console.error("Lỗi khi xóa sự kiện:", error);
         swalWithBootstrapButtons.fire({
-          title: "Error!",
-          text: error.message || "Failed to delete event. Please try again!",
+          title: "Lỗi!",
+          text: error.message || "Xóa sự kiện thất bại. Vui lòng thử lại!",
           icon: "error",
         });
       }
@@ -293,18 +300,6 @@ const EventDetailEOG = () => {
     } else {
       return { status: "Closed", color: "gray" };
     }
-  };
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
   };
 
   if (isLoading || !event) {
@@ -337,34 +332,54 @@ const EventDetailEOG = () => {
       <div className="event-container">
         {event && (
           <>
-            <div className="event-header">
-              <img
-                src={fixDriveUrl(images[currentImageIndex] || defaultImage)}
-                alt="Event"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-                referrerPolicy="no-referrer"
-              />
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="nav-button prev-button"
-                    onClick={handlePrevImage}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="nav-button next-button"
-                    onClick={handleNextImage}
-                  >
-                    <FaChevronRight />
-                  </button>
-                </>
-              )}
+            <div className="event-banner-gallery">
+              <div
+                className="gallery-left"
+                onClick={() => setLightboxOpen(true)}
+              >
+                {images[0] ? (
+                  <img
+                    src={fixDriveUrl(images[0])}
+                    alt="Main Event"
+                    className="main-banner-img"
+                    style={{ cursor: "pointer" }}
+                  />
+                ) : (
+                  <img
+                    src={defaultImage}
+                    alt="Default"
+                    className="main-banner-img"
+                    style={{ cursor: "pointer" }}
+                  />
+                )}
+              </div>
+              <div className="gallery-right">
+                {images.slice(1, 3).map((img, index) => (
+                  <div className="thumbnail-wrapper" key={index}>
+                    <img
+                      src={fixDriveUrl(img)}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="thumbnail-img"
+                      onClick={() => {
+                        setLightboxIndex(index + 1);
+                        setLightboxOpen(true);
+                      }}
+                    />
+                    {index === 1 && images.length > 3 && (
+                      <button
+                        className="view-all-btn"
+                        onClick={() => {
+                          setLightboxIndex(0);
+                          setLightboxOpen(true);
+                        }}
+                      >
+                        <BiGridAlt style={{ marginRight: 6 }} />
+                        <strong>Xem tất cả</strong>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="event-details">
@@ -673,7 +688,18 @@ const EventDetailEOG = () => {
           )}
         </div>
       </div>
-      {/* <Footer /> */}
+      {lightboxOpen && (
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={lightboxIndex}
+          on={{
+            view: ({ index }) => setLightboxIndex(index),
+          }}
+          slides={images.map((url) => ({ src: fixDriveUrl(url) }))}
+          plugins={[Thumbnails]}
+        />
+      )}
     </>
   );
 };

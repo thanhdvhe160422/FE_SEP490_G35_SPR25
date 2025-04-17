@@ -612,6 +612,7 @@ const UpdateEventForm = () => {
                 <span className="text-danger">{errors?.sloganEvent}</span>
               )}
               <label className="floating-label">Khẩu hiệu</label>
+
             </div>
             <div className="form-floating-group">
               <textarea
