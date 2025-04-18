@@ -390,8 +390,8 @@ export default function EventRegistered() {
                         >
                           <p className="text-muted text-center">
                             {totalEvents === 0
-                              ? "No events available."
-                              : "No events found matching your criteria."}
+                              ? "Bạn chưa đăng kí sự kiện nào"
+                              : "Không tìm thấy sự kiện nào đúng yêu cầu"}
                           </p>
                         </div>
                       </Col>
