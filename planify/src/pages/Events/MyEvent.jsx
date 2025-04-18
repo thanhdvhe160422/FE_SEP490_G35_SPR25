@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Pagination,
-  Button,
-  Badge,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
-import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
-import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
   createFavoriteEvent,
@@ -29,19 +19,24 @@ export default function MyEvent() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
+  const getStatusEvent = (statusNumber) => {
+    if (statusNumber === 0) {
+      return "Đang nháp";
+    } else if (statusNumber === 1) {
+      return "Chưa được duyệt";
+    } else if (statusNumber === 2) {
+      return "Đã được duyệt";
+    } else if (statusNumber === -1) {
+      return "Đã bị từ chối";
+    }
+  };
+
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
     if (!url.includes("drive.google.com/uc?id=")) return url;
     const fileId = url.split("id=")[1];
     return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-  };
-
-  const getImageUrl = (eventMedias) => {
-    if (!eventMedias || !eventMedias.length || !eventMedias[0]) {
-      return "https://placehold.co/600x400?text=No+Image";
-    }
-    return fixDriveUrl(eventMedias[0].mediaUrl);
   };
 
   const handleCreateFavorite = async (eventId, e) => {
@@ -154,6 +149,11 @@ export default function MyEvent() {
                                   "https://placehold.co/600x400?text=No+Image";
                               }}
                             />
+                            <div
+                              className={`event-status-tag status-${event.status}`}
+                            >
+                              {getStatusEvent(event.status)}
+                            </div>
                             <div
                               className="favorite-button"
                               style={{
