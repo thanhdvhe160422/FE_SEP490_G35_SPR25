@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Pagination,
-  Button,
-  Badge,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import "../../styles/Author/HomeSpectator.css";
 import Header from "../../components/Header/Header";
-import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
-import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import heart icons
+import { FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
   deleteFavouriteEvent,
@@ -74,7 +64,6 @@ export default function MyFarvourite() {
         setEvents(response.items);
         setTotalEvents(response.totalCount || 0);
         setTotalPages(response.totalPages || 1);
-
         if (categories.length === 0 || locations.length === 0) {
           extractCategoriesAndLocations(response.items);
         }
@@ -174,9 +163,9 @@ export default function MyFarvourite() {
                               }}
                             />
                             <div
-                              className={`event-status-tag status-${events.status}`}
+                              className={`event-status-tag status-${event.status}`}
                             >
-                              {getStatusEvent(events.status)}
+                              {getStatusEvent(event.status)}
                             </div>
                             <div
                               className="favorite-button"
