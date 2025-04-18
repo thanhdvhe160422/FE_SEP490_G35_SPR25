@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { getCampuses } from "../../services/campusService";
 import {
@@ -30,6 +31,7 @@ export default function CreateEventOrganizer() {
     reset,
   } = useForm({
     defaultValues: {
+      id: "",
       email: "",
       firstName: "",
       lastName: "",
@@ -42,6 +44,7 @@ export default function CreateEventOrganizer() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [selectedEOG, setSelectedEOG] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCampuses = async () => {
@@ -94,7 +97,15 @@ export default function CreateEventOrganizer() {
     }
 
     try {
-      await createEventOrganizer(data);
+      data.id = "00000000-0000-0000-0000-000000000000";
+
+      const response = await createEventOrganizer(data);
+      if (!response) {
+        enqueueSnackbar("Lỗi khi tạo người tổ chức sự kiện!", {
+          variant: "error",
+        });
+        return;
+      }
       enqueueSnackbar("Tạo người tổ chức sự kiện thành công!", {
         variant: "success",
       });
@@ -119,8 +130,12 @@ export default function CreateEventOrganizer() {
         throw new Error("Không có người tổ chức sự kiện nào được chọn để xóa");
       }
 
-      await updateEventOrganizer(selectedEOG.id);
-
+      const response = await updateEventOrganizer(selectedEOG.id);
+      if (response === null) {
+        enqueueSnackbar("Lỗi khi xóa người tổ chức sự kiện!", {
+          variant: "error",
+        });
+      }
       enqueueSnackbar("Xóa người tổ chức sự kiện thành công!", {
         variant: "success",
       });
@@ -178,7 +193,10 @@ export default function CreateEventOrganizer() {
   return (
     <>
       <Header />
-      <div className="create-organizer-container">
+      <div
+        style={{ marginTop: "100px" }}
+        className="create-organizer-container"
+      >
         <Modal
           title="Tạo người tổ chức sự kiện"
           visible={isCreateModalVisible}
@@ -192,6 +210,7 @@ export default function CreateEventOrganizer() {
                 type="email"
                 {...register("email", {
                   required: "Email là bắt buộc",
+                  maxLength: { value: 255, message: "Tối đa 255 ký tự" },
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     message: "Định dạng email không hợp lệ",
@@ -204,16 +223,20 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Tên:</label>
+              <label>Họ:</label>
               <input
                 type="text"
+                maxLength={30}
+                onInput={(e) => {
+                  e.target.value = e.target.value.slice(0, 30);
+                }}
                 {...register("firstName", {
-                  required: "Tên là bắt buộc",
+                  required: "Họ là bắt buộc",
                   pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message: "Tên chỉ được chứa chữ cái và khoảng trắng",
+                    value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Tên",
                   },
-                  maxLength: { value: 50, message: "Tối đa 50 ký tự" },
+                  maxLength: { value: 30, message: "Tối đa 30 ký tự" },
                 })}
               />
               {errors.firstName && (
@@ -222,16 +245,20 @@ export default function CreateEventOrganizer() {
             </div>
 
             <div className="form-group">
-              <label>Họ:</label>
+              <label>Tên:</label>
               <input
                 type="text"
+                maxLength={30}
+                onInput={(e) => {
+                  e.target.value = e.target.value.slice(0, 30);
+                }}
                 {...register("lastName", {
-                  required: "Họ là bắt buộc",
+                  required: "Tên là bắt buộc",
                   pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message: "Họ chỉ được chứa chữ cái và khoảng trắng",
+                    value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Họ",
                   },
-                  maxLength: { value: 50, message: "Tối đa 50 ký tự" },
+                  maxLength: { value: 30, message: "Tối đa 30 ký tự" },
                 })}
               />
               {errors.lastName && (
@@ -243,6 +270,7 @@ export default function CreateEventOrganizer() {
               <label>Ngày sinh:</label>
               <input
                 type="date"
+                max={new Date().toISOString().split("T")[0]}
                 {...register("dateOfBirth", {
                   required: "Ngày sinh là bắt buộc",
                   validate: (value) => {
@@ -270,10 +298,14 @@ export default function CreateEventOrganizer() {
               <label>Số điện thoại:</label>
               <input
                 type="text"
+                onInput={(e) => {
+                  const onlyNums = e.target.value.replace(/\D/g, "");
+                  e.target.value = onlyNums.slice(0, 10);
+                }}
                 {...register("phoneNumber", {
                   required: "Số điện thoại là bắt buộc",
                   pattern: {
-                    value: /^0\d{9,10}$/,
+                    value: /^0\d{9}$/,
                     message: "Số điện thoại phải có 10-11 số và bắt đầu bằng 0",
                   },
                 })}
@@ -313,12 +345,20 @@ export default function CreateEventOrganizer() {
 
         <div className="eog-table-container">
           <h2>Danh sách người tổ chức sự kiện</h2>
-          <Button
-            className="create-btn"
-            onClick={() => setIsCreateModalVisible(true)}
-          >
-            Tạo người tổ chức sự kiện
-          </Button>
+          <div className="d-flex">
+            <Button
+              className="create-btn"
+              onClick={() => setIsCreateModalVisible(true)}
+            >
+              Tạo người tổ chức sự kiện
+            </Button>
+            <Button
+              className="ms-2"
+              onClick={() => navigate("/manage-permission")}
+            >
+              Danh sách cấp quyền
+            </Button>
+          </div>
           <Table
             columns={columns}
             dataSource={eventOrganizers}

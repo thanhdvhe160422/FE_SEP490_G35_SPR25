@@ -78,7 +78,7 @@ export const createEventOrganizer = async (data) => {
       }
     }
 
-    console.error("Error updating group:", error);
+    console.error("Error create event organizer:", error);
     return null;
   }
 };
@@ -118,7 +118,7 @@ export const getListEOG = async (page, pageSize) => {
       }
     }
 
-    console.error("Error updating group:", error);
+    console.error("Error get list eog:", error);
     return null;
   }
 };
@@ -158,7 +158,7 @@ export const updateEventOrganizer = async (userId) => {
       }
     }
 
-    console.error("Error updating group:", error);
+    console.error("Error update event organizer:", error);
     return null;
   }
 };
@@ -368,13 +368,13 @@ export const getListUser = async (page, pageSize) => {
     return null;
   }
 };
-export const banUser = async (userId) => {
+export const banUser = async (Id) => {
   let token = localStorage.getItem("token");
 
   try {
     const response = await axios.put(
-      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
-      { newStatus: 0 },
+      `https://localhost:44320/api/Users/ban/unban-users/${Id}`,
+      null,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -389,8 +389,8 @@ export const banUser = async (userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
-            { newStatus: 0 },
+            `hhttps://localhost:44320/api/Users/ban/unban-users/${Id}`,
+            null,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -410,48 +410,7 @@ export const banUser = async (userId) => {
     return null;
   }
 };
-export const unbanUser = async (userId, status) => {
-  const token = localStorage.getItem("token");
 
-  try {
-    const response = await axios.put(
-      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
-      { newStatus: 1 },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    if (error.response?.status === 401) {
-      console.warn("Token expired, refreshing...");
-      const newToken = await refreshAccessToken();
-
-      if (newToken) {
-        localStorage.setItem("token", newToken);
-        try {
-          const retryResponse = await axios.put(
-            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
-            { newStatus: 1 },
-            {
-              headers: { Authorization: `Bearer ${newToken}` },
-            }
-          );
-          return retryResponse.data;
-        } catch (retryError) {
-          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          return { error: "unauthorized" };
-        }
-      } else {
-        localStorage.removeItem("token");
-        return { error: "expired" };
-      }
-    }
-
-    console.error("Error updating group:", error);
-    return null;
-  }
-};
 export const searchUser = async (page, pageSize, input) => {
   let token = localStorage.getItem("token");
 
@@ -473,6 +432,95 @@ export const searchUser = async (page, pageSize, input) => {
         try {
           const retryResponse = await axios.get(
             `https://localhost:44320/api/Users/get-list-user?page=${page}&pageSize=${pageSize}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+
+    console.error("Error updating group:", error);
+    return null;
+  }
+};
+export const getSpectatorAndImplementer = async (page, pageSize, input) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Users/get-implementer-and-spectator?page=${page}&pageSize=${pageSize}&input=${input}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Users/get-implementer-and-spectator?page=${page}&pageSize=${pageSize}&input=${input}`,
+            {
+              headers: { Authorization: `Bearer ${newToken}` },
+            }
+          );
+          return retryResponse.data;
+        } catch (retryError) {
+          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
+          return { error: "unauthorized" };
+        }
+      } else {
+        localStorage.removeItem("token");
+        return { error: "expired" };
+      }
+    }
+    if (error.response?.status === 404) {
+      return {
+        items: [],
+        totalCount: 0,
+        page: { page },
+        pageSize: { pageSize },
+      };
+    }
+
+    console.error("Error get spectator and implementer:", error);
+    return null;
+  }
+};
+
+export const setEOG = async (userid) => {
+  let token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.get(
+      `https://localhost:44320/api/Users/set-event-organizer?id=${userid}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      console.warn("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+        try {
+          const retryResponse = await axios.get(
+            `https://localhost:44320/api/Users/set-event-organizer?id=${userid}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }

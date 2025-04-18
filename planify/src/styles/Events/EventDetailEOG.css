@@ -1,4 +1,3 @@
-/* Animation keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -75,7 +74,6 @@
   background-size: 200% 200%;
   animation: gradient 5s ease infinite;
 }
-
 .event-header {
   position: relative;
   margin-bottom: 30px;
@@ -204,7 +202,6 @@
   background: linear-gradient(to right, #606c88, #3f4c6b);
 }
 
-/* Sections */
 .section-title {
   font-size: 20px;
   font-weight: 600;
@@ -515,4 +512,9 @@
 .detail-user-modal .ant-btn:hover {
   background-color: #40a9ff;
   color: white;
+}
+
+.yarl__thumbnails_thumbnail_active {
+  border: 2px solid red !important;
+  box-shadow: 0 0 5px red;
 }

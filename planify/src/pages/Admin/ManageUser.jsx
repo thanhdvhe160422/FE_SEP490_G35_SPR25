@@ -7,7 +7,6 @@ import {
   banUser,
   createCampusManager,
   getListUser,
-  unbanUser,
 } from "../../services/userService";
 import { useSnackbar } from "notistack";
 import { Modal, Button, Table, Upload, message } from "antd";
@@ -269,7 +268,7 @@ export default function ManageUser() {
       if (!selectedEOG?.id) {
         throw new Error("Không có user được chọn để bỏ cấm");
       }
-      await unbanUser(selectedEOG.id, 1);
+      await banUser(selectedEOG.id);
       enqueueSnackbar("Bỏ cấm user thành công!", { variant: "success" });
       setIsDeleteModalVisible(false);
       fetchUser();
@@ -339,7 +338,7 @@ export default function ManageUser() {
       title: "Hành động",
       key: "actions",
       render: (_, record) => (
-        <div>
+        <div onClick={(e) => e.stopPropagation()}>
           {record.status === 1 ? (
             <Button
               icon={<LockOutlined />}

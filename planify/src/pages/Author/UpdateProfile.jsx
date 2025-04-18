@@ -286,7 +286,7 @@ const UpdateProfile = () => {
   const validateNameField = (value) => {
     const strValue = String(value || "").trim();
     if (!strValue) {
-      return `Không được để trống.`;
+      return `Vui lòng nhập họ tên`;
     } else if (value.length > 30) {
       return `Không được vượt quá 30 ký tự.`;
     }
@@ -296,11 +296,11 @@ const UpdateProfile = () => {
     const cleanedValue = String(value).replace(/\s/g, "");
 
     if (!/^\d+$/.test(cleanedValue)) {
-      return "Số điện thoại chỉ được chứa chữ số.";
+      return "Số điện thoại chỉ được chứa chữ số";
     }
 
     if (cleanedValue.length !== 10) {
-      return "Vui lòng nhập đúng 10 chữ số.";
+      return "Vui lòng nhập đúng 10 chữ số";
     }
 
     return "";
@@ -308,33 +308,32 @@ const UpdateProfile = () => {
 
   const validateAddress = (value) => {
     const strValue = String(value || "").trim();
-    if (!strValue) return "Địa chỉ không được để trống.";
-    if (value.length > 255) return "Địa chỉ không được vượt quá 255 ký tự.";
+    if (!strValue) return "Vui lòng nhập địa chỉ";
+    if (value.length > 255) return "Địa chỉ không được vượt quá 255 ký tự";
     return "";
   };
 
   const handleFirstNameChange = (e) => {
     const value = e.target.value;
     const error = validateNameField(value);
-    setUser({ ...user, firstName: value });
+    setUser({ ...user, firstName: value.substring(0, 30) });
     setErrors({ ...errors, firstName: error });
   };
   const handleLastNameChange = (e) => {
     const value = e.target.value;
     const error = validateNameField(value);
-    setUser({ ...user, lastName: value });
+    setUser({ ...user, lastName: value.substring(0, 30) });
     setErrors({ ...errors, lastName: error });
   };
   const validateDateOfBirth = (value) => {
-    if (!value) return "Ngày sinh không được để trống.";
-    if (new Date(value) > new Date())
-      return "Ngày sinh không được ở tương lai.";
+    if (!value) return "Vui lòng nhập ngày sinh";
+    if (new Date(value) > new Date()) return "Ngày sinh không được ở tương lai";
     return "";
   };
   const HandlePhoneNumber = (e) => {
     const value = e.target.value;
     const error = validatePhoneField(value);
-    setUser({ ...user, phoneNumber: value });
+    setUser({ ...user, phoneNumber: value.substring(0, 10) });
     setErrors({ ...errors, phone: error });
   };
   const HandleAddress = (e) => {
@@ -344,7 +343,7 @@ const UpdateProfile = () => {
       ...user,
       addressVM: {
         ...(user.addressVM || {}),
-        addressDetail: value,
+        addressDetail: value.substring(0, 255),
       },
     });
     setErrors({ ...errors, address: error });
@@ -412,6 +411,7 @@ const UpdateProfile = () => {
                   type="text"
                   value={user.firstName}
                   onChange={handleFirstNameChange}
+                  maxLength="30"
                 />
                 {errors?.firstName && (
                   <div className="text-danger">{errors?.firstName}</div>
@@ -425,6 +425,7 @@ const UpdateProfile = () => {
                   type="text"
                   value={user.lastName}
                   onChange={handleLastNameChange}
+                  maxLength="30"
                 />
                 {errors?.lastName && (
                   <div className="text-danger">{errors?.lastName}</div>
@@ -548,6 +549,7 @@ const UpdateProfile = () => {
                 type="text"
                 value={user?.addressVM?.addressDetail || ""}
                 onChange={HandleAddress}
+                maxLength="255"
               />
               {errors?.address && (
                 <div className="text-danger">{errors?.address}</div>
@@ -561,6 +563,7 @@ const UpdateProfile = () => {
                 type="text"
                 value={user.phoneNumber}
                 onChange={HandlePhoneNumber}
+                maxLength={10}
               />
               {errors?.phone && (
                 <div className="text-danger">{errors.phone}</div>

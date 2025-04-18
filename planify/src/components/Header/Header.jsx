@@ -30,11 +30,13 @@ export default function Header() {
     const fetchNotification = async () => {
       try {
         await getNotification();
+        localStorage.setItem("getNotification", 1);
       } catch (error) {
         console.error("error while load incoming event notification: " + error);
       }
     };
     var token = localStorage.getItem("token");
+    var isGetNotification = localStorage.getItem("getNotification");
     const savedMessages = JSON.parse(localStorage.getItem("messages")) || [];
     setMessages(savedMessages);
 
@@ -47,7 +49,7 @@ export default function Header() {
       .start()
       .then(() => {
         console.log("Connected to SignalR");
-        fetchNotification();
+        if (isGetNotification !== "1") fetchNotification();
       })
       .catch((err) => console.error("Error while starting connection: " + err));
 
@@ -260,7 +262,7 @@ export default function Header() {
                                 {msg.message}
                                 <span> </span>
                                 <span className="text-decoration-underline">
-                                  Detail!
+                                  Chi tiết!
                                 </span>
                               </a>
                             </td>
