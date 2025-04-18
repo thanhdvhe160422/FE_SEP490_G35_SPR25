@@ -16,7 +16,6 @@ import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
 import { FaEdit, FaHome, FaUsers, FaFileExcel } from "react-icons/fa";
 import { searchUsers } from "../../services/adminService";
-// Import xlsx
 import * as XLSX from "xlsx";
 
 export default function ManageUser() {
@@ -56,8 +55,8 @@ export default function ManageUser() {
   const [searchInput, setSearchInput] = useState("");
   const [selectedCampusId, setSelectedCampusId] = useState(null);
   const [fileList, setFileList] = useState([]);
-
-  // Check token for admin access
+  const [isOpenPopup, setIsOpenPopup] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -593,6 +592,10 @@ export default function ManageUser() {
       enqueueSnackbar("Không tải được danh sách user", { variant: "error" });
     }
   };
+  const handleRowClick = (record) => {
+    setSelectedUser(record);
+    setIsOpenPopup(true);
+  };
 
   return (
     <div className="page-flex">
@@ -714,6 +717,9 @@ export default function ManageUser() {
               onChange: (page, pageSize) =>
                 handleTableChange({ current: page, pageSize }),
             }}
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+            })}
           />
         </div>
 
@@ -730,6 +736,66 @@ export default function ManageUser() {
             Bạn có chắc muốn {selectedEOG?.status === 1 ? "cấm" : "bỏ cấm"}{" "}
             {selectedEOG?.email}?
           </p>
+        </Modal>
+        <Modal
+          title="Chi tiết người dùng"
+          open={isOpenPopup}
+          onCancel={() => {
+            setIsOpenPopup(false);
+            setSelectedUser(null);
+          }}
+          footer={[
+            <Button key="close" onClick={() => setIsOpenPopup(false)}>
+              Đóng
+            </Button>,
+          ]}
+          className="detail-user-modal"
+        >
+          {selectedUser ? (
+            <div style={{ padding: "10px 0" }}>
+              <p>
+                <strong>Ảnh đại diện:</strong>{" "}
+                <img
+                  src={fixDriveUrl(selectedUser.avatar?.mediaUrl)}
+                  alt="avatar"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50%",
+                    marginTop: "8px",
+                  }}
+                />
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedUser.email}
+              </p>
+              <p>
+                <strong>Họ:</strong> {selectedUser.firstName}
+              </p>
+              <p>
+                <strong>Tên:</strong> {selectedUser.lastName}
+              </p>
+              <p>
+                <strong>Ngày sinh:</strong>{" "}
+                {new Date(selectedUser.dateOfBirth).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Giới tính:</strong> {selectedUser.gender ? "Nam" : "Nữ"}
+              </p>
+              <p>
+                <strong>Vai trò:</strong> {selectedUser.roleName}
+              </p>
+              <p>
+                <strong>SĐT:</strong> {selectedUser.phoneNumber}
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>{" "}
+                {selectedUser.status === 1 ? "Hoạt động" : "Bị cấm"}
+              </p>
+            </div>
+          ) : (
+            <p>Không có thông tin người dùng</p>
+          )}
         </Modal>
 
         <Modal

@@ -137,35 +137,21 @@ export default function ManageCampusManager() {
 
   const columns = [
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "First Name", dataIndex: "firstName", key: "firstName" },
-    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+    { title: "Họ", dataIndex: "firstName", key: "firstName" },
+    { title: "Tên", dataIndex: "lastName", key: "lastName" },
     {
-      title: "Date of Birth",
+      title: "Ngày sinh",
       dataIndex: "dateOfBirth",
       key: "dateOfBirth",
       render: (text) => new Date(text).toLocaleDateString(),
     },
     {
-      title: "Gender",
+      title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
       render: (text) => (text ? "Male" : "Female"),
     },
-    { title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber" },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <div>
-          <Button
-            icon={<DeleteOutlined />}
-            type="link"
-            danger
-            onClick={() => handleDelete(record)}
-          ></Button>
-        </div>
-      ),
-    },
+    { title: "SĐT", dataIndex: "phoneNumber", key: "phoneNumber" },
   ];
   useEffect(() => {
     const link = document.createElement("link");
@@ -290,7 +276,7 @@ export default function ManageCampusManager() {
             </div>
 
             <div className="form-group">
-              <label>First Name:</label>
+              <label>Họ:</label>
               <input
                 type="text"
                 {...register("firstName", {
@@ -308,7 +294,7 @@ export default function ManageCampusManager() {
             </div>
 
             <div className="form-group">
-              <label>Last Name:</label>
+              <label>Tên:</label>
               <input
                 type="text"
                 {...register("lastName", {
@@ -326,7 +312,7 @@ export default function ManageCampusManager() {
             </div>
 
             <div className="form-group">
-              <label>Date of Birth:</label>
+              <label>Ngày sinh:</label>
               <input
                 type="date"
                 {...register("dateOfBirth", {
@@ -345,15 +331,15 @@ export default function ManageCampusManager() {
             </div>
 
             <div className="form-group">
-              <label>Gender:</label>
+              <label>Giới tính:</label>
               <select {...register("gender")}>
-                <option value={true}>Male</option>
-                <option value={false}>Female</option>
+                <option value={true}>Nam</option>
+                <option value={false}>Nữ</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label>Phone Number:</label>
+              <label>SĐT:</label>
               <input
                 type="text"
                 {...register("phoneNumber", {
@@ -378,7 +364,7 @@ export default function ManageCampusManager() {
                     value !== "0" || "Please select a campus",
                 })}
               >
-                <option value="0">Select Campus</option>
+                <option value="0">Chọn Campus</option>
                 {campuses.map((campus) => (
                   <option key={campus.id} value={campus.id}>
                     {campus.campusName}
@@ -392,19 +378,19 @@ export default function ManageCampusManager() {
 
             <div className="form-group">
               <button type="submit" className="submit-btn">
-                Create
+                Tạo
               </button>
             </div>
           </form>
         </Modal>
 
         <div className="eog-table-container">
-          <h2>Campus Manager List</h2>{" "}
+          <h2>Danh sách Campus Manager</h2>{" "}
           <Button
             className="create-btn"
             onClick={() => setIsCreateModalVisible(true)}
           >
-            Create Campus Manager
+            Tạo Campus Manager
           </Button>
           <Table
             columns={columns}
@@ -420,18 +406,6 @@ export default function ManageCampusManager() {
             }}
           />
         </div>
-
-        <Modal
-          title="Confirm Delete"
-          visible={isDeleteModalVisible}
-          onOk={confirmDelete}
-          onCancel={() => setIsDeleteModalVisible(false)}
-          okText="Delete"
-          cancelText="Cancel"
-          okButtonProps={{ danger: true }}
-        >
-          <p>Are you sure you want to delete {selectedEOG?.email}?</p>
-        </Modal>
       </div>
     </div>
   );
