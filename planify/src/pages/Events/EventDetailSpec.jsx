@@ -106,7 +106,7 @@ function EventDetailSpec() {
       console.log(JSON.stringify(response, null, 2));
       if (response.status === 201) {
         setIsRegistered(true);
-        Swal.fire("Success", "Register successfully", "success");
+        Swal.fire("Success", "Đăng ký thành công", "success");
       } else {
         Swal.fire("Error", response?.message, "error");
       }
@@ -122,7 +122,7 @@ function EventDetailSpec() {
       console.log(JSON.stringify(response, null, 2));
       if (response.status === 200) {
         setIsRegistered(false);
-        Swal.fire("Success", "Cancel register successfully", "success");
+        Swal.fire("Success", "Hủy đăng ký thành công", "success");
       } else {
         Swal.fire("Error", response?.message, "error");
       }
