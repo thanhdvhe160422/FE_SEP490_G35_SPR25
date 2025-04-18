@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from "sweetalert2";
 const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem("reToken");
   const accessToken = localStorage.getItem("token");
@@ -21,7 +22,16 @@ const refreshAccessToken = async () => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("reToken");
 
-    window.location.href = "/login";
+    Swal.fire({
+      title: "Error",
+      text: "Lỗi refresh token! Hãy đăng nhập lại",
+      icon: "error",
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 3000);
     return null;
   }
 };

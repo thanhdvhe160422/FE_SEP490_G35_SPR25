@@ -114,7 +114,7 @@ export const updateEvent = async (id, data) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update event after token refresh.",
+            "Lỗi xảy ra khi cập nhật sự kiện sau khi refresh token.",
             "error"
           );
           return { error: "unauthorized" };
@@ -126,7 +126,7 @@ export const updateEvent = async (id, data) => {
     }
 
     console.error("Error updating event:", error);
-    Swal.fire("Error", "Unable to update event.", "error");
+    Swal.fire("Error", "Lỗi xảy ra khi cập nhật sự kiện.", "error");
     return null;
   }
 };
@@ -160,7 +160,7 @@ export const getEventEOGById = async (id) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to get event by id after token refresh.",
+            "Lỗi lấy dữ liệu xảy ra sau khi refresh token.",
             "error"
           );
           return { error: "unauthorized" };
@@ -172,7 +172,7 @@ export const getEventEOGById = async (id) => {
     }
 
     console.error("Error updating group:", error);
-    Swal.fire("Error", "Unable to get event by id.", "error");
+    Swal.fire("Error", "Lỗi xảy ra khi lấy dữ liệu.", "error");
     return null;
   }
 };
@@ -311,7 +311,7 @@ export const updateMedia = async (data) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to update media after token refresh.",
+            "Lỗi xảy ra khi xóa ảnh sau khi refresh token.",
             "error"
           );
           return { error: "unauthorized" };
@@ -323,7 +323,7 @@ export const updateMedia = async (data) => {
     }
 
     console.error("Error delete media event:", error);
-    Swal.fire("Error", "Unable to delete media event.", "error");
+    Swal.fire("Error", "Lỗi xảy ra khi xóa ảnh.", "error");
     return null;
   }
 };
@@ -585,7 +585,7 @@ export const RegisterParticipant = async (eventId, userId) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to register participant after token refresh.\n" +
+            "Không thể đăng ký sau khi refresh token.\n" +
               retryError.response?.data?.message,
             "error"
           );
@@ -600,7 +600,7 @@ export const RegisterParticipant = async (eventId, userId) => {
     console.error("Error register participant:", error);
     Swal.fire(
       "Error",
-      "Unable to register participant.\n" + error.response?.data?.message,
+      "Không thể đăng ký.\n" + error.response?.data?.message,
       "error"
     );
     return null;
@@ -684,7 +684,7 @@ export const DeleteRegisterParticipant = async (eventId, userId) => {
           console.error("Lỗi từ API sau refresh:", retryError.response?.data);
           Swal.fire(
             "Error",
-            "Unable to unregister participant after token refresh.\n" +
+            "Không thể hủy đăng ký sau khi refresh token\n" +
               retryError.response?.data?.message,
             "error"
           );
@@ -699,7 +699,7 @@ export const DeleteRegisterParticipant = async (eventId, userId) => {
     console.error("Error register participant:", error);
     Swal.fire(
       "Error",
-      "Unable to unregister participant.\n" + error.response?.data?.message,
+      "Không thể đăng ký tham gia. \n" + error.response?.data?.message,
       "error"
     );
     return null;
