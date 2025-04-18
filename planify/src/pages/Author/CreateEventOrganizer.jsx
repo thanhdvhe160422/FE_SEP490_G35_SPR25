@@ -106,6 +106,12 @@ export default function CreateEventOrganizer() {
         });
         return;
       }
+      if (!response.message === "Email exists!") {
+        enqueueSnackbar("Email đã tồn tại!", {
+          variant: "error",
+        });
+        return;
+      }
       enqueueSnackbar("Tạo người tổ chức sự kiện thành công!", {
         variant: "success",
       });
