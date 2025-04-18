@@ -306,11 +306,11 @@ const EventDetailEOG = () => {
     const end = new Date(endTime);
 
     if (now < start) {
-      return { status: "Not Starting", color: "red" };
+      return { status: "Chưa bắt đầu", color: "red" };
     } else if (now >= start && now <= end) {
-      return { status: "Running", color: "green" };
+      return { status: "Đang diễn ra", color: "green" };
     } else {
-      return { status: "Closed", color: "gray" };
+      return { status: "Đã kết thúc", color: "gray" };
     }
   };
 
@@ -541,7 +541,7 @@ const EventDetailEOG = () => {
             </div>
 
             <div className="event-activities">
-              <div className="activities-title">Activities in event:</div>
+              <div className="activities-title">Hoạt động:</div>
               <div className="activities-list">
                 {event.activities && event.activities.length > 0 ? (
                   event.activities.map((activity) => (

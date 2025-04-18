@@ -43,6 +43,9 @@ body {
 .navbar {
   display: flex;
   gap: 25px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .nav-item {

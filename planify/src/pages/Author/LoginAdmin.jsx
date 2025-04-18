@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Alert, InputGroup } from "react-bootstrap";
 import "../../styles/Author/LoginAdmin.css";
 import axios from "axios";
@@ -17,7 +17,9 @@ const Login = () => {
   const navigate = useNavigate();
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
   const handleSubmit = async (event) => {
     event.preventDefault();
 

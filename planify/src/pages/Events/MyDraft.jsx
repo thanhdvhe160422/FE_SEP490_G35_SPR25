@@ -15,6 +15,7 @@ import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
+  createFavoriteEvent,
   deleteFavouriteEvent,
   getMyFavouriteEvents,
   searchEvents,
@@ -45,7 +46,39 @@ export default function MyDraft() {
     }
     return fixDriveUrl(eventMedias[0].mediaUrl);
   };
+  const handleCreateFavorite = async (eventId, e) => {
+    try {
+      e.stopPropagation();
+      var response = await createFavoriteEvent(eventId);
+      if (response.status === 201) {
+        console.log("Đã thêm sự kiện vào danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, isFavorite: true } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm sự kiện vào yêu thích:", error);
+    }
+  };
 
+  const handleDeleteFavorite = async (eventId, e) => {
+    try {
+      e.stopPropagation();
+      var response = await deleteFavouriteEvent(eventId);
+      if (response.status === 200) {
+        console.log("Đã xóa sự kiện khỏi danh sách yêu thích:", eventId);
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, isFavorite: false } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa sự kiện khỏi yêu thích:", error);
+    }
+  };
   const fetchEvents = async () => {
     try {
       setLoading(true);
@@ -157,6 +190,30 @@ export default function MyDraft() {
                                   "https://placehold.co/600x400?text=No+Image";
                               }}
                             />
+                            <div
+                              className="favorite-button"
+                              style={{
+                                position: "absolute",
+                                top: "190px",
+                                right: "20px",
+                                zIndex: 10,
+                                // background: "rgba(255,255,255,0.7)",
+                                borderRadius: "50%",
+                                padding: "5px",
+                                cursor: "pointer",
+                              }}
+                              onClick={(e) =>
+                                event.isFavorite
+                                  ? handleDeleteFavorite(event.id, e)
+                                  : handleCreateFavorite(event.id, e)
+                              }
+                            >
+                              {event.isFavorite ? (
+                                <FaHeart size={20} color="red" />
+                              ) : (
+                                <FaRegHeart size={20} color="red" />
+                              )}
+                            </div>
 
                             <Card.Body>
                               <span

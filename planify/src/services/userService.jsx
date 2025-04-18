@@ -368,13 +368,13 @@ export const getListUser = async (page, pageSize) => {
     return null;
   }
 };
-export const banUser = async (userId) => {
+export const banUser = async (Id) => {
   let token = localStorage.getItem("token");
 
   try {
     const response = await axios.put(
-      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
-      { newStatus: 0 },
+      `https://localhost:44320/api/Users/ban/unban-users/${Id}`,
+      null,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -389,8 +389,8 @@ export const banUser = async (userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
-            { newStatus: 0 },
+            `hhttps://localhost:44320/api/Users/ban/unban-users/${Id}`,
+            null,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -410,48 +410,7 @@ export const banUser = async (userId) => {
     return null;
   }
 };
-export const unbanUser = async (userId, status) => {
-  const token = localStorage.getItem("token");
 
-  try {
-    const response = await axios.put(
-      `https://localhost:44320/api/Users/ban/unban-users/${userId}`,
-      { newStatus: 1 },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    if (error.response?.status === 401) {
-      console.warn("Token expired, refreshing...");
-      const newToken = await refreshAccessToken();
-
-      if (newToken) {
-        localStorage.setItem("token", newToken);
-        try {
-          const retryResponse = await axios.put(
-            `hhttps://localhost:44320/api/Users/ban/unban-users/${userId}`,
-            { newStatus: 1 },
-            {
-              headers: { Authorization: `Bearer ${newToken}` },
-            }
-          );
-          return retryResponse.data;
-        } catch (retryError) {
-          console.error("Lỗi từ API sau refresh:", retryError.response?.data);
-          return { error: "unauthorized" };
-        }
-      } else {
-        localStorage.removeItem("token");
-        return { error: "expired" };
-      }
-    }
-
-    console.error("Error updating group:", error);
-    return null;
-  }
-};
 export const searchUser = async (page, pageSize, input) => {
   let token = localStorage.getItem("token");
 

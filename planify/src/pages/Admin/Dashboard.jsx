@@ -182,7 +182,7 @@ export default function Dashboard() {
       if (eventRegistration) max = Math.max(max, item.eventRegistrations);
     });
 
-    const roundedMax = Math.ceil(max / 100) * 100 || 100;
+    const roundedMax = Math.ceil(max / 50) * 50 || 50;
 
     if (roundedMax > maxYAxisValue) {
       setMaxYAxisValue(roundedMax);

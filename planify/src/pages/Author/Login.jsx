@@ -15,7 +15,9 @@ export default function Login() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
   useEffect(() => {
     const fetchCampuses = async () => {
       try {
@@ -49,8 +51,6 @@ export default function Login() {
       localStorage.setItem("fullName", res.data.result.fullName);
       localStorage.setItem("avatar", decoded.picture);
       localStorage.setItem("token", res.data.result.accessToken);
-      localStorage.removeItem("role");
-      localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("role", res.data.result.role);
       localStorage.setItem("campus", campus);
       localStorage.setItem("userId", res.data.result.userId);
@@ -87,9 +87,12 @@ export default function Login() {
       }, 1000);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      enqueueSnackbar("Tài khoản của bạn không được phép đăng nhập vào hệ thống.", {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        "Tài khoản của bạn không được phép đăng nhập vào hệ thống.",
+        {
+          variant: "error",
+        }
+      );
     }
   };
 
@@ -106,9 +109,7 @@ export default function Login() {
     >
       <h1 className="university-title">FPT University</h1>
       <div className="login-box">
-        <p className="login-title">
-          Sinh viên, Giảng viên, Cán bộ ĐH-FPT
-        </p>
+        <p className="login-title">Sinh viên, Giảng viên, Cán bộ ĐH-FPT</p>
 
         {loading ? (
           "Loading..."
