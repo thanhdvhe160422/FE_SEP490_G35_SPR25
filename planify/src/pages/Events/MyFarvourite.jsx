@@ -30,7 +30,17 @@ export default function MyFarvourite() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [role, setRole] = useState("");
-
+  const getStatusEvent = (statusNumber) => {
+    if (statusNumber === 0) {
+      return "Đang nháp";
+    } else if (statusNumber === 1) {
+      return "Chưa được duyệt";
+    } else if (statusNumber === 2) {
+      return "Đã được duyệt";
+    } else if (statusNumber === -1) {
+      return "Đã bị từ chối";
+    }
+  };
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
@@ -163,6 +173,11 @@ export default function MyFarvourite() {
                                   "https://placehold.co/600x400?text=No+Image";
                               }}
                             />
+                            <div
+                              className={`event-status-tag status-${events.status}`}
+                            >
+                              {getStatusEvent(events.status)}
+                            </div>
                             <div
                               className="favorite-button"
                               style={{

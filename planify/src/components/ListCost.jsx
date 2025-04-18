@@ -581,9 +581,9 @@ function ListCost({ eventId, data }) {
               <InputNumber
                 style={{ width: "100%" }}
                 formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
                 }
-                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                parser={(value) => value.replace(/[^0-9]/g, "")}
                 placeholder="Nhập đơn giá"
                 min={0}
               />

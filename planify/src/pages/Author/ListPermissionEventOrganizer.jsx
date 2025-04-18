@@ -114,7 +114,10 @@ export default function ListPermissionEventOrganizer() {
   return (
     <>
       <Header />
-      <div style={{ marginTop: "150px" }} className="user-container">
+      <div
+        style={{ marginTop: "100px", padding: "20px" }}
+        className="user-container"
+      >
         <div className="user-table-container">
           <h2>Danh sách người có thể cấp quyền</h2>
           <div>
@@ -137,7 +140,7 @@ export default function ListPermissionEventOrganizer() {
           />
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

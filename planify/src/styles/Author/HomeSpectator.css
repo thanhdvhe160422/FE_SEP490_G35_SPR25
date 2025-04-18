@@ -100,8 +100,6 @@
   margin-bottom: 8px;
 }
 
-
-
 .status-badge {
   font-size: 0.75rem;
   padding: 2px 8px;
@@ -124,4 +122,33 @@
 .status-closed {
   background-color: #e2e3e5;
   color: #41464b;
+}
+.event-status-tag {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 10;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: gray;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.status-0 {
+  background-color: #6c757d;
+}
+
+.status-1 {
+  background-color: #ffc107;
+}
+
+.status-2 {
+  background-color: #28a745;
+}
+
+.status--1 {
+  background-color: #dc3545;
 }

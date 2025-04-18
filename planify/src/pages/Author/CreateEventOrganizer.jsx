@@ -165,8 +165,11 @@ export default function CreateEventOrganizer() {
 
   const columns = [
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Tên", dataIndex: "firstName", key: "firstName" },
-    { title: "Họ", dataIndex: "lastName", key: "lastName" },
+    {
+      title: "Họ Tên",
+      key: "fullName",
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
+    },
     {
       title: "Ngày sinh",
       dataIndex: "dateOfBirth",
