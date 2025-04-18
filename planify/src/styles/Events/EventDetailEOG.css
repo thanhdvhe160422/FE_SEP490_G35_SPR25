@@ -62,7 +62,12 @@
   position: relative;
   overflow: hidden;
 }
-
+.go1475592160 {
+  position: absolute;
+  top: 90px;
+}
+.go1671063245 {
+}
 .event-container::before {
   content: "";
   position: absolute;

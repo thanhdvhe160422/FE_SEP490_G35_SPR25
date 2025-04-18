@@ -124,25 +124,10 @@ export default function HomeSpectator() {
       setLoading(false);
     }
   };
-
-  const getCategoryIdFromName = (name) => {
-    const category = categories.find(
-      (cat) => cat.categoryEventName.toLowerCase() === name.toLowerCase()
-    );
-    return category ? category.id : null;
-  };
-
   const searchEvents = async (page = 1) => {
     try {
       setLoading(true);
       setIsSearchMode(true);
-
-      const categoryId =
-        categoryFilter.trim() !== ""
-          ? getCategoryIdFromName(categoryFilter)
-          : undefined;
-
-      console.log("Mã danh mục:", categoryId);
 
       const params = {
         page: page,
@@ -152,7 +137,7 @@ export default function HomeSpectator() {
         status: statusFilter !== "All" ? statusFilter : undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
-        categoryId: categoryId,
+        categoryId: categoryFilter,
       };
 
       console.log("Tham số tìm kiếm:", params);
@@ -262,13 +247,19 @@ export default function HomeSpectator() {
               </div>
 
               <Form.Group className="mb-3">
-                <Form.Label>Danh mục</Form.Label>
+                <Form.Label>Kiểu sự kiện</Form.Label>
                 <Form.Control
-                  type="text"
-                  placeholder="Nhập danh mục..."
+                  as="select"
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                />
+                >
+                  <option value="">Tất cả</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.categoryEventName}
+                    </option>
+                  ))}
+                </Form.Control>
               </Form.Group>
 
               <Form.Group className="mb-3">
@@ -317,7 +308,6 @@ export default function HomeSpectator() {
                 <Button
                   style={{ backgroundColor: "red", marginTop: "10px" }}
                   className="w-100"
-                  variant="outline-primary"
                   onClick={handleResetFilters}
                 >
                   Xóa bộ lọc
@@ -378,7 +368,7 @@ export default function HomeSpectator() {
                 )}
                 {categoryFilter && (
                   <Badge bg="info" className="me-2">
-                    Danh mục: {categoryFilter}
+                    Kiểu sự kiện: {categoryFilter}
                   </Badge>
                 )}
                 {locationFilter && (
@@ -500,7 +490,7 @@ export default function HomeSpectator() {
                                 {event.categoryViewModel && (
                                   <div>
                                     <small className="text-muted">
-                                      Danh mục:{" "}
+                                      Kiểu sự kiện:{" "}
                                       {
                                         event.categoryViewModel
                                           .categoryEventName
