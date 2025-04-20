@@ -160,6 +160,12 @@ export function CategoryForm({ title, campusId, id, name, onClose, onSave }) {
         });
       });
   };
+
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   useEffect(() => {
     setCategoryName(name);
   }, [name]);
@@ -176,7 +182,11 @@ export function CategoryForm({ title, campusId, id, name, onClose, onSave }) {
             required
           />
           <br></br>
-          {errors?.name && <span className="text-danger">{errors?.name}</span>}
+          {errors?.name && (
+            <span className="text-danger">
+              {capitalizeFirstLetter(errors?.name)}
+            </span>
+          )}
         </form>
       </div>
       <div className="m-2 d-flex justify-content-between">
