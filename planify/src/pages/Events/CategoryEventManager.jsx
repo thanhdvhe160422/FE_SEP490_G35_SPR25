@@ -127,8 +127,12 @@ export default function CategoryEventManager() {
               tabIndex="-1"
               aria-labelledby="categoryModalLabel"
               aria-hidden="true"
+              onClick={handleCloseModal}
             >
-              <div className="modal-dialog modal-dialog-centered">
+              <div
+                className="modal-dialog modal-dialog-centered"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="modal-dialog">
                   <div className="modal-content">
                     <div className="modal-header">
