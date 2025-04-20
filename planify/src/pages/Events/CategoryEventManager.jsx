@@ -66,7 +66,6 @@ export default function CategoryEventManager() {
     setShowModal(false);
   };
   const handleSave = (category) => {
-    console.log("Category saved:", category);
     setShowModal(false);
     window.location.reload();
   };
@@ -82,20 +81,25 @@ export default function CategoryEventManager() {
         confirmButtonText: "Vâng, xóa nó!",
         cancelButtonText: "Hủy",
       });
-
+      var response;
       if (result.isConfirmed) {
         var token = localStorage.getItem("token");
-        const response = await deleteCategory(id, token);
+        response = await deleteCategory(id, token);
+        if (response?.status === 400) {
+          Swal.fire("Lỗi", response.message, "error");
+          return;
+        }
         if (response?.error) {
           Swal.fire("Lỗi", response.error, "error");
+          return;
         } else {
           setCategories(categories.filter((category) => category.id !== id));
-          Swal.fire("Đã xóa!", "Danh mục đã được xóa.", "success");
+          Swal.fire("Đã xóa!", "Xóa thành công!", "success");
         }
       }
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
-      Swal.fire("Lỗi", "Có sự cố xảy ra khi xóa danh mục.", "error");
+      Swal.fire("Lỗi", response.message, "error");
     }
   };
 
