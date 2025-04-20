@@ -315,7 +315,7 @@ export default function CreateEventOrganizer() {
                   required: "Số điện thoại là bắt buộc",
                   pattern: {
                     value: /^0\d{9}$/,
-                    message: "Số điện thoại phải có 10-11 số và bắt đầu bằng 0",
+                    message: "Số điện thoại phải có 10 số và bắt đầu bằng 0",
                   },
                 })}
               />

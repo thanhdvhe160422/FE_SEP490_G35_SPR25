@@ -82,25 +82,49 @@ export default function ManageCampusManager() {
   const onSubmit = async (data) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      enqueueSnackbar("No token found. Please log in.", { variant: "error" });
+      enqueueSnackbar("Không tìm thấy token. Hãy đăng nhập lại.", {
+        variant: "error",
+      });
       return;
     }
 
     if (checkEmailExists(data.email)) {
-      enqueueSnackbar("Email already exists!", { variant: "error" });
+      enqueueSnackbar("Email đã tồn tại!", { variant: "error" });
       return;
     }
 
     try {
-      await createCampusManager(data);
-      enqueueSnackbar("Campus Manager created successfully!", {
+      data.id = "00000000-0000-0000-0000-000000000000";
+      data.gender = data.gender === "true";
+
+      if (!data.campusId || data.campusId === 0) {
+        enqueueSnackbar("Lỗi chưa chọn campus", {
+          variant: "error",
+        });
+        return;
+      }
+      const response = await createCampusManager(data);
+      console.log("response: " + JSON.stringify(response, null, 2));
+      if (response.status !== 201) {
+        enqueueSnackbar("Lỗi khi tạo Campus Manager!", {
+          variant: "error",
+        });
+        return;
+      }
+      if (response?.message === "Email exists!") {
+        enqueueSnackbar("Email đã tồn tại!", {
+          variant: "error",
+        });
+        return;
+      }
+      enqueueSnackbar("Tạo Campus Manager thành công!", {
         variant: "success",
       });
       reset();
       setIsCreateModalVisible(false);
       fetchManagers();
     } catch (error) {
-      enqueueSnackbar("Error creating Campus Manager!", { variant: "error" });
+      enqueueSnackbar("Lỗi khi tạo Campus Manager!", { variant: "error" });
     }
   };
 
@@ -115,16 +139,21 @@ export default function ManageCampusManager() {
         throw new Error("No Campus Manager selected for deletion");
       }
 
-      await updateCampusManager(selectedEOG.id);
+      const response = await updateCampusManager(selectedEOG.id);
+      if (response.status !== 200) {
+        enqueueSnackbar("Lỗi khi xóa Campus Manager!", {
+          variant: "error",
+        });
+      }
 
-      enqueueSnackbar("Campus Manager deleted successfully!", {
+      enqueueSnackbar("Xóa thành công Campus Manager!", {
         variant: "success",
       });
       setIsDeleteModalVisible(false);
       fetchManagers();
     } catch (error) {
       console.error("Error deleting Campus Manager:", error);
-      enqueueSnackbar("Error deleting Campus Manager!", { variant: "error" });
+      enqueueSnackbar("Lỗi khi xóa Campus Manager!", { variant: "error" });
     }
   };
   const handleTableChange = (paginationData) => {
@@ -158,16 +187,13 @@ export default function ManageCampusManager() {
     link.rel = "stylesheet";
     link.href = "http://localhost:3000" + "/css/style.min.css";
     document.head.appendChild(link);
-
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
     link2.href = "http://localhost:3000" + "/css/style.css";
     document.head.appendChild(link2);
-
     if (window.feather) {
       window.feather.replace();
     }
-
     return () => {
       document.head.removeChild(link);
     };
@@ -252,7 +278,7 @@ export default function ManageCampusManager() {
         style={{ marginLeft: "350px" }}
       >
         <Modal
-          title="Create Campus Manager"
+          title="Tạo Campus Manager"
           visible={isCreateModalVisible}
           onCancel={() => setIsCreateModalVisible(false)}
           footer={null}
@@ -263,10 +289,11 @@ export default function ManageCampusManager() {
               <input
                 type="email"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email không được để trống",
+                  maxLength: { value: 255, message: "Tối đa 255 ký tự" },
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Invalid email format",
+                    message: "Định dạng email không hợp lệ",
                   },
                 })}
               />
@@ -279,13 +306,14 @@ export default function ManageCampusManager() {
               <label>Họ:</label>
               <input
                 type="text"
+                maxLength={30}
                 {...register("firstName", {
-                  required: "First Name is required",
+                  required: "Họ không được để trống",
                   pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message: "First Name can only contain letters and spaces",
+                    value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Tên",
                   },
-                  maxLength: { value: 50, message: "Max 50 characters" },
+                  maxLength: { value: 30, message: "Tối đa 30 ký tự" },
                 })}
               />
               {errors.firstName && (
@@ -297,13 +325,14 @@ export default function ManageCampusManager() {
               <label>Tên:</label>
               <input
                 type="text"
+                maxLength={30}
                 {...register("lastName", {
-                  required: "Last Name is required",
+                  required: "Tên không được để trống",
                   pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message: "Last Name can only contain letters and spaces",
+                    value: /^[A-Za-zÀ-ỹà-ỹĐđ\s]+$/,
+                    message: "Không được nhập số hoặc ký tự đặc biệt trong Họ",
                   },
-                  maxLength: { value: 50, message: "Max 50 characters" },
+                  maxLength: { value: 30, message: "Tối đa 30 ký tự" },
                 })}
               />
               {errors.lastName && (
@@ -315,13 +344,14 @@ export default function ManageCampusManager() {
               <label>Ngày sinh:</label>
               <input
                 type="date"
+                max={new Date().toISOString().split("T")[0]}
                 {...register("dateOfBirth", {
-                  required: "Date of Birth is required",
+                  required: "Ngày sinh không được để trống",
                   validate: (value) => {
                     const dob = new Date(value);
                     const today = new Date();
                     const age = today.getFullYear() - dob.getFullYear();
-                    return age >= 18 || "You must be at least 18 years old";
+                    return age >= 18 || "Bạn phải ít nhất 18 tuổi";
                   },
                 })}
               />
@@ -342,12 +372,15 @@ export default function ManageCampusManager() {
               <label>SĐT:</label>
               <input
                 type="text"
+                onInput={(e) => {
+                  const onlyNums = e.target.value.replace(/\D/g, "");
+                  e.target.value = onlyNums.slice(0, 10);
+                }}
                 {...register("phoneNumber", {
-                  required: "Phone Number is required",
+                  required: "Số điện thoại không được để trống",
                   pattern: {
-                    value: /^0\d{9,10}$/,
-                    message:
-                      "Phone Number must be 10-11 digits starting with 0",
+                    value: /^0\d{9}$/,
+                    message: "Số điện thoại phải có 10 số và bắt đầu bằng 0",
                   },
                 })}
               />
@@ -360,8 +393,7 @@ export default function ManageCampusManager() {
               <label>Campus:</label>
               <select
                 {...register("campusId", {
-                  validate: (value) =>
-                    value !== "0" || "Please select a campus",
+                  validate: (value) => value !== "0" || "Vui lòng chọn campus",
                 })}
               >
                 <option value="0">Chọn Campus</option>
@@ -406,6 +438,17 @@ export default function ManageCampusManager() {
             }}
           />
         </div>
+        <Modal
+          title="Xác nhận xóa"
+          visible={isDeleteModalVisible}
+          onOk={confirmDelete}
+          onCancel={() => setIsDeleteModalVisible(false)}
+          okText="Xóa"
+          cancelText="Hủy"
+          okButtonProps={{ danger: true }}
+        >
+          <p>Bạn có chắc muốn xóa {selectedEOG?.email} không?</p>
+        </Modal>
       </div>
     </div>
   );
