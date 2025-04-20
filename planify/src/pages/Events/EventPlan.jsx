@@ -1381,11 +1381,11 @@ export default function EventPlan() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Khẩu hiệu</Form.Label>
+                <Form.Label>Slogan</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
-                  placeholder="Nhập khẩu hiệu"
+                  placeholder="Nhập slogan"
                   value={formData.sloganEvent}
                   onChange={(e) =>
                     handleFormChange("sloganEvent", e.target.value)
@@ -1424,11 +1424,11 @@ export default function EventPlan() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Đối tượng mục tiêu</Form.Label>
+                <Form.Label>Đối tượng hướng tới</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
-                  placeholder="Nhập đối tượng mục tiêu"
+                  placeholder="Nhập đối tượng hướng tới"
                   value={formData.targetAudience}
                   onChange={(e) =>
                     handleFormChange("targetAudience", e.target.value)

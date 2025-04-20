@@ -621,7 +621,7 @@ export default function ManageUser() {
               <li>
                 <a className="active" href="/manage-user">
                   <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Danh sách users
+                  Quản lý người dùng
                 </a>
               </li>
               <li>
@@ -650,7 +650,7 @@ export default function ManageUser() {
       <div className="create-organizer-container">
         <div className="eog-table-container">
           <div className="header-table">
-            <h2>Danh sách Users ({pagination.totalCount})</h2>
+            <h2>Danh sách người dùng ({pagination.totalCount})</h2>
             <div
               style={{
                 display: "flex",
@@ -695,7 +695,7 @@ export default function ManageUser() {
                 id="roleName"
                 onChange={(e) => fetchUserByRole(e.target.value)}
               >
-                <option value="">-- Chọn vai trò --</option>
+                <option value="">Chọn vai trò</option>
                 <option value="Admin">Admin</option>
                 <option value="Campus Manager">Campus Manager</option>
                 <option value="Event Organizer">Event Organizer</option>
