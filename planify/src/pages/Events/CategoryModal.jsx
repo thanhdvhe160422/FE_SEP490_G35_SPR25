@@ -179,6 +179,7 @@ export function CategoryForm({ title, campusId, id, name, onClose, onSave }) {
             type="text"
             value={categoryName}
             onChange={handleInputChange}
+            style={{ width: "400px" }}
             required
           />
           <br></br>
