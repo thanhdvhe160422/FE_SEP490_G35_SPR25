@@ -36,45 +36,50 @@ const getCategories = async () => {
 
 export default getCategories;
 
-export const getCategoryByCampusId = async(campusId) =>{
-  try{
+export const getCategoryByCampusId = async (campusId) => {
+  try {
     return axios.get(`${API_URL}/${campusId}`);
-  }catch(error){
-    console.error('Error get campus:', error.response || error);
+  } catch (error) {
+    console.error("Error get campus:", error.response || error);
     return [];
   }
-}
-export const createCategory = async(data,token) =>{
-  try{
-    return axios.post(`${API_URL}`,data,{
-      headers:{
+};
+export const createCategory = async (data, token) => {
+  try {
+    const response = await axios.post(`${API_URL}`, data, {
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-  }catch(error){
-    console.error('Error create category:', error.response || error);
+    return response.data;
+  } catch (error) {
+    console.error("Error create category:", error.response || error);
+    return error?.response?.data;
   }
-}
-export const updateCategory = async(data,token) =>{
-  try{
-    return axios.put(`${API_URL}`,data,{
-      headers:{
+};
+export const updateCategory = async (data, token) => {
+  try {
+    const response = await axios.put(`${API_URL}`, data, {
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-  }catch(error){
-    console.error('Error update category:', error.response || error);
+    return response.data;
+  } catch (error) {
+    console.error("Error update category:", error.response || error);
+    return error?.response?.data;
   }
-}
-export const deleteCategory = async(categoryId,token) =>{
-  try{
-    return axios.delete(`${API_URL}/${categoryId}`,{
-      headers:{
+};
+export const deleteCategory = async (categoryId, token) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${categoryId}`, {
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-  }catch(error){
-    console.error('Error delete category:', error.response || error);
-    return null;
+    return response.data;
+  } catch (error) {
+    console.error("Error delete category:", error.response || error);
+    return error?.response?.data;
   }
-}
+};
