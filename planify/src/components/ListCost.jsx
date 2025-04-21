@@ -570,6 +570,10 @@ function ListCost({ eventId, data }) {
                 min={1}
                 style={{ width: "100%" }}
                 placeholder="Nhập số lượng"
+                formatter={(value) =>
+                  value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+                }
+                parser={(value) => value.replace(/[^0-9]/g, "")}
               />
             </Form.Item>
 

@@ -204,9 +204,9 @@ export default function Dashboard() {
   };
   const formatPercent = (value) => {
     if (Number.isInteger(value)) {
-      return `${value}%`;
+      return `${value}`;
     }
-    return `${value.toFixed(2).replace(".", ",")}%`;
+    return `${value.toFixed(2).replace(".", ",")}`;
   };
 
   return (

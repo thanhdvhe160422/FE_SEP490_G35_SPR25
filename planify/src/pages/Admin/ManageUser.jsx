@@ -314,8 +314,12 @@ export default function ManageUser() {
       ),
     },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Họ", dataIndex: "firstName", key: "firstName" },
-    { title: "Tên", dataIndex: "lastName", key: "lastName" },
+    {
+      title: "Họ Tên",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
+    },
     {
       title: "Ngày sinh",
       dataIndex: "dateOfBirth",
@@ -696,7 +700,6 @@ export default function ManageUser() {
                 onChange={(e) => fetchUserByRole(e.target.value)}
               >
                 <option value="">Chọn vai trò</option>
-                <option value="Admin">Admin</option>
                 <option value="Campus Manager">Campus Manager</option>
                 <option value="Event Organizer">Event Organizer</option>
                 <option value="Implementer">Implementer</option>
