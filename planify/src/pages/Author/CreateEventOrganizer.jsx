@@ -363,7 +363,11 @@ export default function CreateEventOrganizer() {
             </Button>
             <Button
               className="ms-2"
-              onClick={() => navigate("/manage-permission")}
+              onClick={() =>
+                navigate("/manage-permission", {
+                  state: { from: "manage-eog" },
+                })
+              }
             >
               Danh sách cấp quyền
             </Button>

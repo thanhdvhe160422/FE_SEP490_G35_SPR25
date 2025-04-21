@@ -7,6 +7,7 @@ import Footer from "../../components/Footer/Footer";
 import { useSnackbar } from "notistack";
 import { Button, Table } from "antd";
 import "../../styles/Author/CreateEOG.css";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 
 export default function ListPermissionEventOrganizer() {
   const [campuses, setCampuses] = useState([]);
@@ -114,10 +115,8 @@ export default function ListPermissionEventOrganizer() {
   return (
     <>
       <Header />
-      <div
-        style={{ marginTop: "100px", padding: "20px" }}
-        className="user-container"
-      >
+      <Breadcrumb />
+      <div style={{ padding: "20px" }} className="user-container">
         <div className="user-table-container">
           <h2>Danh sách người có thể cấp quyền</h2>
           <div>

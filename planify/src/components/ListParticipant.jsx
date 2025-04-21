@@ -93,7 +93,7 @@ function ListParticipant({ eventId }) {
   return (
     <div className="list-participant">
       <Title level={3} className="title">
-        Danh sách người tham gia sự kiện ({numberOfParticipants})
+        Danh sách người đăng ký sự kiện ({numberOfParticipants})
       </Title>
       <Spin spinning={loading}>
         {participants.length === 0 ? (

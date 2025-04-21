@@ -34,6 +34,8 @@ const Breadcrumb = () => {
     "update-event": "Cập nhật sự kiện",
     "event-registered": "Sự kiện đã đăng ký",
     "history-event": "Sự kiện đã tham gia",
+    "manage-permission": "Quản lý quyền hạn",
+    "manage-eog": "Quản lý Event Organizer",
   };
 
   const isUpdateEvent = pathnames[0] === "update-event" && lastIsNumeric;
@@ -43,9 +45,11 @@ const Breadcrumb = () => {
   const isEventDetailPage =
     location.pathname.toLowerCase().startsWith("/event-detail-eog") ||
     location.pathname.toLowerCase().startsWith("/event-detail-spec");
-
+  const isManagePermissionPage = location.pathname
+    .toLowerCase()
+    .startsWith("/manage-permission");
   const isFromRecognizedSource =
-    (isEventDetailPage || isUpdateEvent) &&
+    (isEventDetailPage || isUpdateEvent || isManagePermissionPage) &&
     state?.from &&
     sourceMap[state.from];
 
