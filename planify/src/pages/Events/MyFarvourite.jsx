@@ -31,6 +31,7 @@ export default function MyFarvourite() {
       return "Đã bị từ chối";
     }
   };
+
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=No+Image";
@@ -162,11 +163,14 @@ export default function MyFarvourite() {
                                   "https://placehold.co/600x400?text=No+Image";
                               }}
                             />
-                            <div
-                              className={`event-status-tag status-${event.status}`}
-                            >
-                              {getStatusEvent(event.status)}
-                            </div>
+                            {role === "Event Organizer" && (
+                              <div
+                                className={`event-status-tag status-${event.status}`}
+                              >
+                                {getStatusEvent(event.status)}
+                              </div>
+                            )}
+
                             <div
                               className="favorite-button"
                               style={{
