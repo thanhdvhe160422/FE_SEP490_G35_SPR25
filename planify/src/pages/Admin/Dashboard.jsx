@@ -256,6 +256,12 @@ export default function Dashboard() {
                   </a>
                 </li>
                 <li>
+                  <a href="/manage-campus">
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    Quản lý Campus
+                  </a>
+                </li>
+                <li>
                   <a href="/loginAdmin" onClick={handleLogout}>
                     <CiLogout
                       style={{ marginRight: "10px", fontSize: "20px" }}

@@ -250,6 +250,12 @@ export default function ManageCampusManager() {
                 </a>
               </li>
               <li>
+                <a href="/manage-campus">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus
+                </a>
+              </li>
+              <li>
                 <a href="loginadmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Logout
