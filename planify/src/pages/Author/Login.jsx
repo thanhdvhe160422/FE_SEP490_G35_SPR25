@@ -115,6 +115,7 @@ export default function Login() {
           "Loading..."
         ) : (
           <select
+            style={{ width: "230px", margin: "5px" }}
             className="campus-select"
             value={campus}
             onChange={(e) => setCampus(e.target.value)}
