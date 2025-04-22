@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getCampuses } from "../../services/campusService";
 import { CiLogout } from "react-icons/ci";
-import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
+import { FaEdit, FaHome, FaLock, FaUsers } from "react-icons/fa";
 import "../../styles/Admin/manageCampus.css";
 import { Button, Modal, Table } from "antd";
 import axios from "axios";
@@ -127,7 +127,7 @@ function ManageCampus(props) {
               </li>
               <li>
                 <a href="/change-password">
-                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Đổi mật khẩu
                 </a>
               </li>

@@ -13,7 +13,7 @@ import { Modal, Button, Table, Upload, message } from "antd";
 import "../../styles/Author/CreateEOG.css";
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
-import { FaEdit, FaHome, FaUsers, FaFileExcel } from "react-icons/fa";
+import { FaEdit, FaHome, FaUsers, FaFileExcel, FaLock } from "react-icons/fa";
 import { searchUsers } from "../../services/adminService";
 import * as XLSX from "xlsx";
 
@@ -674,7 +674,7 @@ export default function ManageUser() {
               </li>
               <li>
                 <a href="/change-password">
-                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Đổi mật khẩu
                 </a>
               </li>
