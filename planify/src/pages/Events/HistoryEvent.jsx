@@ -28,7 +28,7 @@ const EventHistory = () => {
 
       if (response.data && response.data.items) {
         setEvents(response.data.items);
-        setTotalEvents(response.data.total || response.data.items.length);
+        setTotalEvents(response.data.totalCount);
         console.log("Hehehe: ", response.data.items);
       } else {
         setEvents([]);

@@ -7,7 +7,6 @@
 
 .working-container {
   flex: 1;
-  overflow-y: auto;
   padding: 20px;
 }
 .title-create {
@@ -45,7 +44,7 @@
   text-align: center;
 }
 .save-draft {
-  background-color: #b4b4b4;
+  background-color: #a0a0a0;
   color: #ffffff;
 }
 

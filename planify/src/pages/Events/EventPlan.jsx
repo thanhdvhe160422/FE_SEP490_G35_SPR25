@@ -598,7 +598,8 @@ export default function EventPlan() {
   const [minDateTime, setMinDateTime] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [customValue, setCustomValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const { categories, error } = useCategories();
   const [selectedImages, setSelectedImages] = useState([]);
   const selectedImagesRef = useRef([]);
@@ -1168,7 +1169,7 @@ export default function EventPlan() {
 
     if (!result.isConfirmed) return;
 
-    setIsLoading(true);
+    setIsCreatingEvent(true);
     try {
       const eventData = prepareEventData();
       const response = await axios.post(
@@ -1219,7 +1220,7 @@ export default function EventPlan() {
       });
       console.error("Lỗi chi tiết:", error);
     } finally {
-      setIsLoading(false);
+      setIsCreatingEvent(false);
     }
   }, [prepareEventData, closeModal, validateForm, navigate, enqueueSnackbar]);
 
@@ -1237,7 +1238,7 @@ export default function EventPlan() {
           return;
         }
 
-        setIsLoading(true);
+        setIsSavingDraft(true);
         try {
           const eventData = prepareEventData();
           const response = await axios.post(
@@ -1273,7 +1274,7 @@ export default function EventPlan() {
           );
           console.error("Lỗi chi tiết:", error);
         } finally {
-          setIsLoading(false);
+          setIsSavingDraft(false);
         }
       } else if (result.isDenied) {
         Swal.fire({
@@ -1300,11 +1301,15 @@ export default function EventPlan() {
           autoClose={3000}
           style={{ zIndex: 9999999, top: "70px", width: "400px" }}
         />
-        <div className="walkthrough show reveal" ref={modalRef}>
+        <div
+          className="walkthrough show reveal"
+          ref={modalRef}
+          style={{ overflowY: "auto" }}
+        >
           <h2 className="title-create">Tạo sự kiện</h2>
           <div className="walkthrough-body">
             <h3 className="text-primary">Thông tin chung</h3>
-            <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+            <Form className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
               <Form.Group className="mb-3">
                 <Form.Label>
                   Tên sự kiện<span className="text-danger">*</span>
@@ -1343,7 +1348,7 @@ export default function EventPlan() {
 
               <Form.Group className="mb-3">
                 <Form.Label>
-                  Bắt đầu (Thời gian bắt đầu phải trước hiện tại 2 tháng){" "}
+                  Bắt đầu (Thời gian bắt đầu phải sau hiện tại 2 tháng){" "}
                   <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
@@ -1410,7 +1415,7 @@ export default function EventPlan() {
             </Form>
 
             <h3 className="text-primary">Mục tiêu</h3>
-            <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+            <Form className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
               <Form.Group className="mb-3">
                 <Form.Label>Mục tiêu</Form.Label>
                 <Form.Control
@@ -1768,7 +1773,7 @@ export default function EventPlan() {
             </div>
 
             <h3 className="text-primary">Kế hoạch</h3>
-            <Form className="w-75 mx-auto text-start shadow p-4 rounded bg-light">
+            <Form className="w-100 mx-auto text-start shadow p-4 rounded bg-light">
               <Form.Group className="mb-3">
                 <Form.Label>Quy trình giám sát</Form.Label>
                 <Form.Control
@@ -1989,21 +1994,20 @@ export default function EventPlan() {
           </div>
           <div className="action-create">
             <Button
-              variant="outline-success"
               className="save-draft"
               onClick={handleSaveDraft}
-              disabled={isLoading}
+              disabled={isSavingDraft || isCreatingEvent}
             >
-              {isLoading ? "Đang lưu..." : "Lưu bản nháp"}
+              {isSavingDraft ? "Đang lưu..." : "Lưu bản nháp"}
             </Button>
 
             <Button
               variant="success"
               className="create-event"
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isCreatingEvent || isSavingDraft}
             >
-              {isLoading ? "Đang tạo..." : "Tạo Sự Kiện"}
+              {isCreatingEvent ? "Đang tạo..." : "Tạo Sự Kiện"}
             </Button>
           </div>
         </div>
