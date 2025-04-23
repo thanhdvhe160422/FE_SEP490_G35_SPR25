@@ -86,33 +86,31 @@ const EventDetailEOG = () => {
     setShowPopupReject(true);
   };
 
+  const submitReject = async () => {
+    if (!rejectReason.trim()) {
+      Swal.fire("Lỗi", "Vui lòng nhập lý do từ chối yêu cầu.", "error");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await rejectRequest(event.requestId, rejectReason);
+      setIsLoading(false);
+      setShowPopupReject(false);
+      setRejectReason("");
+      await fetchEventData();
 
- const submitReject = async () => {
-  if (!rejectReason.trim()) {
-    Swal.fire("Lỗi", "Vui lòng nhập lý do từ chối yêu cầu.", "error");
-    return;
-  }
-  setIsLoading(true);
-  try {
-    await rejectRequest(event.requestId, rejectReason);
-    setIsLoading(false);
-    setShowPopupReject(false);
-    setRejectReason("");
-    await fetchEventData();
-    
-    Swal.fire({
-      title: "Từ chối thành công",
-      text: "Yêu cầu đã bị từ chối và cập nhật hệ thống.",
-      icon: "success",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    console.error("Lỗi khi từ chối yêu cầu:", error);
-    Swal.fire("Lỗi", "Không thể thực hiện từ chối yêu cầu.", "error");
-  }
-};
-
+      Swal.fire({
+        title: "Từ chối thành công",
+        text: "Yêu cầu đã bị từ chối và cập nhật hệ thống.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Lỗi khi từ chối yêu cầu:", error);
+      Swal.fire("Lỗi", "Không thể thực hiện từ chối yêu cầu.", "error");
+    }
+  };
 
   const submitApprove = async () => {
     if (isSubmitting) return;
@@ -322,6 +320,13 @@ const EventDetailEOG = () => {
       const response = await sendRequest(eventId);
       console.log("Send request response:", response);
       fetchEventData();
+      Swal.fire({
+        title: "Gửi yêu cầu",
+        text: "Yêu cầu của bạn đã gửi thành công.",
+        icon: "success",
+        confirmButtonText: "OK",
+        showCloseButton: false,
+      });
     } catch (error) {
       console.error("Error sending request:", error);
     }

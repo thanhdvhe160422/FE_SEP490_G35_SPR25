@@ -1450,7 +1450,7 @@ function ListTask({ eventId, data }) {
                 />
               )}
               <Modal
-                title={`Assign Users to ${selectedSubTaskForAssign?.subTaskName}`}
+                title={`Giao công việc con ${selectedSubTaskForAssign?.subTaskName}`}
                 open={isAssignModalVisible}
                 onCancel={() => setIsAssignModalVisible(false)}
                 footer={[
@@ -1472,7 +1472,7 @@ function ListTask({ eventId, data }) {
               >
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <Input
-                    placeholder="Search by name or email"
+                    placeholder="Tìm kiếm bằng email và tên"
                     value={userSearchValue}
                     onChange={(e) => {
                       setUserSearchValue(e.target.value);
@@ -1539,7 +1539,7 @@ function ListTask({ eventId, data }) {
                     rules={[
                       {
                         required: true,
-                        message: "Please enter a subtask title!",
+                        message: "Vui lòng nhập tiêu đề!",
                       },
                     ]}
                   >

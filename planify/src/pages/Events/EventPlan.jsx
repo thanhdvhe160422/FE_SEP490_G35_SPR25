@@ -1348,7 +1348,7 @@ export default function EventPlan() {
 
               <Form.Group className="mb-3">
                 <Form.Label>
-                  Bắt đầu (Thời gian bắt đầu phải trước hiện tại 2 tháng){" "}
+                  Bắt đầu (Thời gian bắt đầu phải sau hiện tại 2 tháng){" "}
                   <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
