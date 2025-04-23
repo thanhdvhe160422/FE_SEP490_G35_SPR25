@@ -1,6 +1,5 @@
 import EventSection from "../../components/EventSection";
 import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
 import "../../styles/Author/Home.css";
 import { Navigate } from "react-router-dom";
 function Home() {

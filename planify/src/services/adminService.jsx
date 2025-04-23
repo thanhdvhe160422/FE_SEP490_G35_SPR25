@@ -212,6 +212,7 @@ export const searchUsers = async (params) => {
           pageSize: params.pageSize || undefined,
           input: params.input || undefined,
           roleName: params.roleName || undefined,
+          campusId: params.campusId || undefined,
         },
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -233,6 +234,7 @@ export const searchUsers = async (params) => {
                 pageSize: params.pageSize || undefined,
                 input: params.input || undefined,
                 roleName: params.roleName || undefined,
+                campusId: params.campusId || undefined,
               },
               headers: { Authorization: `Bearer ${newToken}` },
             }

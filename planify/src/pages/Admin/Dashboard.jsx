@@ -18,7 +18,7 @@ import {
   Cell,
 } from "recharts";
 
-import { FaHome, FaUsers, FaEdit } from "react-icons/fa";
+import { FaHome, FaUsers, FaEdit, FaLock } from "react-icons/fa";
 import {
   getCategoryAdmin,
   getEventByCampus,
@@ -251,8 +251,14 @@ export default function Dashboard() {
                 </li>
                 <li>
                   <a href="/change-password">
-                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                     Đổi mật khẩu
+                  </a>
+                </li>
+                <li>
+                  <a href="/manage-campus">
+                    <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                    Quản lý Campus
                   </a>
                 </li>
                 <li>

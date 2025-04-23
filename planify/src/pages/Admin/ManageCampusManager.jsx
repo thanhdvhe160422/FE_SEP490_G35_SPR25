@@ -11,7 +11,7 @@ import { Modal, Button, Table } from "antd";
 import "../../styles/Author/CreateEOG.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
-import { FaEdit, FaHome, FaUsers } from "react-icons/fa";
+import { FaEdit, FaHome, FaLock, FaUsers } from "react-icons/fa";
 
 export default function ManageCampusManager() {
   const [campuses, setCampuses] = useState([]);
@@ -245,8 +245,14 @@ export default function ManageCampusManager() {
               </li>
               <li>
                 <a href="/change-password">
-                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Đổi mật khẩu
+                </a>
+              </li>
+              <li>
+                <a href="/manage-campus">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus
                 </a>
               </li>
               <li>

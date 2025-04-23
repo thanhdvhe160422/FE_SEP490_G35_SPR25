@@ -13,7 +13,7 @@ import { Modal, Button, Table, Upload, message } from "antd";
 import "../../styles/Author/CreateEOG.css";
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
-import { FaEdit, FaHome, FaUsers, FaFileExcel } from "react-icons/fa";
+import { FaEdit, FaHome, FaUsers, FaFileExcel, FaLock } from "react-icons/fa";
 import { searchUsers } from "../../services/adminService";
 import * as XLSX from "xlsx";
 
@@ -538,6 +538,44 @@ export default function ManageUser() {
     // Xuất file Excel
     XLSX.writeFile(wb, "sample-users.xlsx");
   };
+  const fetchUserByCampus = async (campusId) => {
+    try {
+      const params = {
+        page: pagination.currentPage,
+        pageSize: pagination.pageSize,
+        input: searchInput,
+        campusId: campusId,
+      };
+      const response = await searchUsers(params);
+      if (response && response.items) {
+        setCampusManagers(response.items);
+        setPagination({
+          currentPage: response.pageNumber,
+          pageSize: response.pageSize,
+          totalCount: response.totalCount,
+          totalPages: response.totalPages,
+        });
+      } else {
+        setCampusManagers([]);
+        setPagination({
+          ...pagination,
+          currentPage: 1,
+          totalCount: 0,
+          totalPages: 1,
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm user:", error);
+      setCampusManagers([]);
+      setPagination({
+        ...pagination,
+        currentPage: 1,
+        totalCount: 0,
+        totalPages: 1,
+      });
+      enqueueSnackbar("Không tìm kiếm được user", { variant: "error" });
+    }
+  };
   const fetchUserByRole = async (role) => {
     try {
       const params = {
@@ -636,8 +674,14 @@ export default function ManageUser() {
               </li>
               <li>
                 <a href="/change-password">
-                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  <FaLock style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
                   Đổi mật khẩu
+                </a>
+              </li>
+              <li>
+                <a href="/manage-campus">
+                  <FaEdit style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
+                  Quản lý Campus
                 </a>
               </li>
               <li>
@@ -704,6 +748,19 @@ export default function ManageUser() {
                 <option value="Event Organizer">Event Organizer</option>
                 <option value="Implementer">Implementer</option>
                 <option value="Spectator">Spectator</option>
+              </select>
+
+              <select
+                value={""}
+                onChange={(e) => fetchUserByCampus(e.target.value)}
+                style={{ width: "200px", height: "32px" }}
+              >
+                <option value="">Tất cả campus</option>
+                {campuses.map((campus) => (
+                  <option key={campus.id} value={campus.id}>
+                    {campus.campusName}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
