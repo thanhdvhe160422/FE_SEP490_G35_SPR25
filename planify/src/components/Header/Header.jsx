@@ -182,7 +182,7 @@ export default function Header() {
     implementer: [
       { label: "Trang chủ", path: "/home-implementer" },
       { label: "Danh sách sự kiện", path: "/home-spec" },
-      { label: "Lịch sử sự kiện đã tham gia", path: "/history-event" },
+      { label: "Sự kiện đã tham gia", path: "/history-event" },
       { label: "Sự kiện yêu thích", path: "/my-favorite-events" },
     ],
     spectator: [

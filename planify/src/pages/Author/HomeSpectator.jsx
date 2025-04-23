@@ -176,7 +176,7 @@ export default function HomeSpectator() {
   useEffect(() => {
     fetchCategories();
     fetchEvents();
-  }, []);
+  }, [currentPage]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -334,6 +334,7 @@ export default function HomeSpectator() {
                   }}
                 />
                 <Button
+                  style={{ width: "100px", padding: "6px" }}
                   variant="primary"
                   className="ms-2"
                   onClick={handleApplyFilters}

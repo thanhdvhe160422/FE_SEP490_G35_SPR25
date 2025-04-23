@@ -296,7 +296,7 @@ function EventSection() {
               <label>Địa điểm</label>
               <input
                 type="text"
-                placeholder="Enter location"
+                placeholder="Nhập địa điểm"
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
               />
@@ -305,7 +305,7 @@ function EventSection() {
                 style={{ marginTop: "20px", display: "flex", gap: "10px" }}
               >
                 <button
-                  className="btn btn-primary"
+                  className="btn-primary"
                   onClick={() => {
                     setCurrentPage(1);
                     if (
@@ -321,7 +321,12 @@ function EventSection() {
                       handleSearch(1);
                     }
                   }}
-                  style={{ flex: 1 }}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    padding: "6px",
+                    borderRadius: "5px",
+                  }}
                 >
                   Áp dụng bộ lọc
                 </button>
@@ -329,7 +334,7 @@ function EventSection() {
                   <button
                     className="btn btn-secondary"
                     onClick={clearFilters}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, textAlign: "center" }}
                   >
                     Xóa bộ lọc
                   </button>
@@ -358,7 +363,7 @@ function EventSection() {
                         style={{ width: "300px" }}
                         type="text"
                         className="search_input"
-                        placeholder="Search event..."
+                        placeholder="Tìm kiếm sự kiện..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
