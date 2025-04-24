@@ -73,6 +73,14 @@ export default function ListPermissionEventOrganizer() {
         });
       }
     } catch (error) {
+      enqueueSnackbar("Có lỗi xảy ra!", {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "right",
+        },
+        autoHideDuration: 3000,
+      });
       console.error("Lỗi khi đổi quyền:", error);
     }
   };
