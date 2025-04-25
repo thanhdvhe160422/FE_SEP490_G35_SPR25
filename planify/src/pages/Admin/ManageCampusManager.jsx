@@ -234,7 +234,7 @@ export default function ManageCampusManager() {
               <li>
                 <a className="show-cat-btn" href="/manage-user">
                   <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Danh sách Users
+                  Quản lý người dùng
                 </a>
               </li>
               <li>
@@ -258,7 +258,7 @@ export default function ManageCampusManager() {
               <li>
                 <a href="loginadmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Logout
+                  Đăng xuất
                 </a>
               </li>
               {/* <li>

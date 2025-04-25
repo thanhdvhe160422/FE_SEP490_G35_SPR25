@@ -56,21 +56,28 @@ function ManageRequest() {
       await rejectRequest(selectedRequest.id, rejectReason);
       setIsLoading(false);
       await fetchRequests();
-  
+
       setShowPopupReject(false);
       setRejectReason("");
-  
-      Swal.fire("Từ chối thành công", "Yêu cầu đã được xử lý và từ chối thành công.", "success");
+
+      Swal.fire(
+        "Từ chối thành công",
+        "Yêu cầu đã được xử lý và từ chối thành công.",
+        "success"
+      );
     } catch (error) {
       console.error("Lỗi khi từ chối yêu cầu:", error);
-      Swal.fire("Lỗi", "Không thể xử lý từ chối yêu cầu. Vui lòng thử lại sau.", "error");
+      Swal.fire(
+        "Lỗi",
+        "Không thể xử lý từ chối yêu cầu. Vui lòng thử lại sau.",
+        "error"
+      );
     }
   };
-  
 
   const submitApprove = async () => {
     if (isSubmitting) return;
-  
+
     setIsSubmitting(true);
     setIsLoading(true);
     try {
@@ -78,10 +85,10 @@ function ManageRequest() {
       await approveRequest(selectedRequest.id, approveReason);
       setIsLoading(false);
       await fetchRequests();
-  
+
       setShowPopupApprove(false);
       setApproveReason("");
-  
+
       Swal.fire({
         title: "Phê duyệt thành công",
         text: "Yêu cầu đã được xử lý và phê duyệt thành công.",
@@ -91,12 +98,15 @@ function ManageRequest() {
       });
     } catch (error) {
       console.error("Lỗi khi phê duyệt yêu cầu:", error);
-      Swal.fire("Lỗi", "Không thể phê duyệt yêu cầu. Vui lòng thử lại sau.", "error");
+      Swal.fire(
+        "Lỗi",
+        "Không thể phê duyệt yêu cầu. Vui lòng thử lại sau.",
+        "error"
+      );
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   };
-  
 
   if (isLoading) {
     return <Loading />;
@@ -146,15 +156,17 @@ function ManageRequest() {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
               />
-              <button
-                className="btn cancel"
-                onClick={() => setShowPopupReject(false)}
-              >
-                Cancel
-              </button>
-              <button className="btn submit" onClick={submitReject}>
-                Submit
-              </button>
+              <div className="btn-request" style={{ display: "flex" }}>
+                <button
+                  className="btn cancel"
+                  onClick={() => setShowPopupReject(false)}
+                >
+                  Hủy
+                </button>
+                <button className="btn submit" onClick={submitReject}>
+                  Xác nhận
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -167,19 +179,21 @@ function ManageRequest() {
                 value={approveReason}
                 onChange={(e) => setApproveReason(e.target.value)}
               />
-              <button
-                className="btn cancel"
-                onClick={() => setShowPopupApprove(false)}
-              >
-                Cancel
-              </button>
-              <button
-                style={{ backgroundColor: "green" }}
-                className="btn submit"
-                onClick={submitApprove}
-              >
-                Submit
-              </button>
+              <div className="btn-request" style={{ display: "flex" }}>
+                <button
+                  className="btn cancel"
+                  onClick={() => setShowPopupApprove(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  style={{ backgroundColor: "green" }}
+                  className="btn submit"
+                  onClick={submitApprove}
+                >
+                  Xác nhận
+                </button>
+              </div>
             </div>
           </div>
         )}

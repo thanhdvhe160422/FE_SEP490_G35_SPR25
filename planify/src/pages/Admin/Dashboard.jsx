@@ -240,7 +240,7 @@ export default function Dashboard() {
                     <FaUsers
                       style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
-                    Danh sách Users
+                    Quản lý người dùng
                   </a>
                 </li>
                 <li>
@@ -266,7 +266,7 @@ export default function Dashboard() {
                     <CiLogout
                       style={{ marginRight: "10px", fontSize: "20px" }}
                     />{" "}
-                    Logout
+                    Đăng xuất
                   </a>
                 </li>
                 {/* <li>
