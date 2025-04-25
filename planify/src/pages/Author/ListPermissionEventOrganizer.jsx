@@ -119,11 +119,6 @@ export default function ListPermissionEventOrganizer() {
       <div style={{ padding: "20px" }} className="user-container">
         <div className="user-table-container">
           <h2>Danh sách người có thể cấp quyền</h2>
-          <div>
-            <Button className="m-2" onClick={() => navigate("/manage-eog")}>
-              Quay về danh sách người tổ chức sự kiện
-            </Button>
-          </div>
           <Table
             columns={columns}
             dataSource={listUsers}
