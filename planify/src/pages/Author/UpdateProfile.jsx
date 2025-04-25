@@ -238,13 +238,13 @@ const UpdateProfile = () => {
     if (file) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        alert("Please upload a valid image file (JPEG, PNG).");
+        alert("Định dạng ảnh phải là JPEG, PNG, JPG.");
         return;
       }
 
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        alert("File size should be less than 5MB.");
+        alert("Ảnh phải nhỏ hơn 5MB.");
         return;
       }
 
