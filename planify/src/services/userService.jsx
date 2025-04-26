@@ -119,7 +119,7 @@ export const getListEOG = async (page, pageSize) => {
     }
 
     console.error("Error get list eog:", error);
-    return null;
+    return error?.response;
   }
 };
 export const updateEventOrganizer = async (userId) => {

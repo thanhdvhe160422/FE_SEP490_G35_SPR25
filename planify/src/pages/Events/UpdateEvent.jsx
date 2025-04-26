@@ -245,14 +245,16 @@ const UpdateEventForm = () => {
       targetAudience: event?.targetAudience || "",
       sloganEvent: event?.sloganEvent || "",
     };
-    const hasError = Object.values(errors).some((err) => err && err !== "");
-    if (hasError) {
-      Swal.fire({
-        title: "Thông tin không hợp lệ",
-        icon: "error",
-        timer: 2000,
-      });
-      return;
+    if (errors) {
+      const hasError = Object.values(errors).some((err) => err && err !== "");
+      if (hasError) {
+        Swal.fire({
+          title: "Thông tin không hợp lệ",
+          icon: "error",
+          timer: 2000,
+        });
+        return;
+      }
     }
     try {
       setIsLoad(true);
@@ -612,7 +614,6 @@ const UpdateEventForm = () => {
                 <span className="text-danger">{errors?.sloganEvent}</span>
               )}
               <label className="floating-label">Khẩu hiệu</label>
-
             </div>
             <div className="form-floating-group">
               <textarea

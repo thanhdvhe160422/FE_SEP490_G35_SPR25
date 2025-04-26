@@ -65,7 +65,7 @@ export default function CreateEventOrganizer() {
         pagination.pageSize
       );
       console.log("Danh sách người tổ chức sự kiện: ", response.items);
-      setEventOrganizers(response.items);
+      setEventOrganizers(response?.items);
       setPagination({
         ...pagination,
         totalCount: response.totalCount,
