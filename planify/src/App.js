@@ -152,7 +152,13 @@ function App() {
         <Route
           path="/event-detail-EOG/:eventId"
           element={
-            <PrivateRoute allowedRoles={["Campus Manager", "Event Organizer"]}>
+            <PrivateRoute
+              allowedRoles={[
+                "Campus Manager",
+                "Event Organizer",
+                "Implementer",
+              ]}
+            >
               <EventDetailEOG />
             </PrivateRoute>
           }
