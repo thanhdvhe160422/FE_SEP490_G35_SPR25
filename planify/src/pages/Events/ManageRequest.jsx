@@ -68,7 +68,7 @@ function ManageRequest() {
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: response.total || prev.pagination.total,
+          total: response.totalPages,
         },
       }));
     } catch (error) {

@@ -61,7 +61,7 @@ function MyRequest(props) {
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: response.total || 0,
+          total: response.totalPage || 0,
         },
       }));
     } catch (error) {
