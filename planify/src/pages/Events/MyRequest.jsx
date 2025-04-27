@@ -123,10 +123,10 @@ function MyRequest(props) {
       title: "Lý do",
       dataIndex: "reason",
       key: "reason",
-      render: (reason) => reason || "Không có",
+      render: (reason) => (!reason || reason === "N/A" ? "Không có" : reason),
     },
     {
-      title: "Ngày tạo",
+      title: "Thời gian tạo",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date) => formatDateTime(date),

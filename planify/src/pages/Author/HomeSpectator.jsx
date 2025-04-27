@@ -40,7 +40,12 @@ export default function HomeSpectator() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
-
+  const isImplementer = () => {
+    const role = localStorage.getItem("role");
+    if (role === "Implementer") {
+      return true;
+    }
+  };
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
       return "https://placehold.co/600x400?text=Không+có+hình+ảnh";
@@ -405,9 +410,13 @@ export default function HomeSpectator() {
                         <Col key={event.id}>
                           <Card
                             className="h-100 shadow-sm event-card"
-                            onClick={() =>
-                              navigate(`/event-detail-spec/${event.id}`)
-                            }
+                            onClick={() => {
+                              if (isImplementer) {
+                                navigate(`/event-detail-EOG/${event.id}`);
+                              } else {
+                                navigate(`/event-detail-spec/${event.id}`);
+                              }
+                            }}
                             style={{ cursor: "pointer", position: "relative" }}
                           >
                             <Card.Img
