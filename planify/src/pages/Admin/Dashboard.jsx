@@ -27,6 +27,7 @@ import {
   getNewEventByCampus,
 } from "../../services/adminService";
 import { getCampuses } from "../../services/campusService";
+import logo from "../../assets/logo-fptu.png";
 
 export default function Dashboard() {
   const [eventOganized, setEventOganized] = useState(true);
@@ -34,8 +35,9 @@ export default function Dashboard() {
   const [maxYAxisValue, setMaxYAxisValue] = useState(0);
   const [pieDatas, setPieDatas] = useState([]);
   const [data, setData] = useState([]);
+  const yearNow = new Date().getFullYear();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+  const years = Array.from({ length: 10 }, (_, i) => yearNow - i);
   const [topEvent, setTopEvent] = useState([]);
   const [currentCampus, setCurrentCampus] = useState("Hòa Lạc");
   const [newEvent, setNewEvent] = useState([]);
@@ -219,8 +221,7 @@ export default function Dashboard() {
           <div class="sidebar-start">
             <div class="sidebar-head">
               <a href="/dashboard" class="logo-wrapper" title="Home">
-                <span class="sr-only">Home</span>
-                <span class="icon logo" aria-hidden="true"></span>
+                <img src={logo} alt="" style={{ width: "150px" }} />
                 <div class="logo-text">
                   <span class="logo-title">Planify</span>
                   <span class="logo-subtitle">Dashboard</span>
@@ -309,27 +310,38 @@ export default function Dashboard() {
               <div className="dashboard-main-grid">
                 <div className="left-column">
                   <div style={{ height: "46%" }} className="chart-card">
-                    <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
-                      Thống kê sự kiện
-                    </h3>
-                    <div className="select-year"></div>
-                    <label htmlFor="year-select">Năm:</label>
-                    <select
-                      id="year-select"
-                      value={currentYear}
-                      onChange={handleYearChange}
+                    <div
+                      className="header-chart"
                       style={{
-                        marginLeft: "10px",
-                        padding: "5px",
-                        borderRadius: "4px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "20px",
                       }}
                     >
-                      {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
+                      <h3 style={{ fontWeight: "600", marginBottom: "20px" }}>
+                        Thống kê sự kiện
+                      </h3>
+                      <div className="select-year">
+                        <label htmlFor="year-select">Năm:</label>
+                        <select
+                          id="year-select"
+                          value={currentYear}
+                          onChange={handleYearChange}
+                          style={{
+                            marginLeft: "10px",
+                            padding: "5px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {years.map((year) => (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
                     <div
                       style={{ fontSize: "small", width: "100%", height: 400 }}
                     >
@@ -360,7 +372,17 @@ export default function Dashboard() {
                             tickLine={false}
                             tickMargin={10}
                           />
-                          <Tooltip />
+                          <Tooltip
+                            formatter={(value, name) => {
+                              if (name === "eventsOrganized") {
+                                return [value, "Sự kiện đã tổ chức"];
+                              }
+                              if (name === "eventRegistrations") {
+                                return [value, "Đăng ký sự kiện"];
+                              }
+                              return [value, name];
+                            }}
+                          />
                           <Legend
                             verticalAlign="top"
                             align="right"
@@ -666,7 +688,7 @@ export default function Dashboard() {
                 </div>
                 <div className="card-admin full-width">
                   <h3 className="card-title">
-                    Top sự kiện có số lượng tham gia nhiều nhất
+                    Top 10 sự kiện có số lượng tham gia nhiều nhất
                   </h3>
                   <table className="product-table">
                     <thead>

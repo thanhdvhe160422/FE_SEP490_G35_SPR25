@@ -744,6 +744,7 @@ export default function ManageUser() {
                 Nhập Users
               </Button>
               <select
+                style={{ width: "200px", height: "32px" }}
                 name="roleName"
                 id="roleName"
                 onChange={(e) => fetchUserByRole(e.target.value)}
