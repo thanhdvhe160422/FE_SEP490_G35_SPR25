@@ -81,7 +81,7 @@ function ManageCampus(props) {
       render: (text, record) => (
         <span>
           <Button onClick={() => handleDelete(record.id)} danger>
-            Delete
+            Xóa
           </Button>
         </span>
       ),
@@ -116,7 +116,7 @@ function ManageCampus(props) {
               <li>
                 <a className="show-cat-btn" href="/manage-user">
                   <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Danh sách Users
+                  Quản lý người dùng
                 </a>
               </li>
               <li>
@@ -140,7 +140,7 @@ function ManageCampus(props) {
               <li>
                 <a href="/loginAdmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Logout
+                  Đăng xuất
                 </a>
               </li>
               {/* <li>
@@ -179,7 +179,7 @@ function ManageCampus(props) {
           }}
           onClick={() => setIsModalVisible(true)}
         >
-          Create Campus
+          Tạo Campus
         </button>
 
         <Table

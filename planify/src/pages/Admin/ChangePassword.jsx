@@ -163,7 +163,7 @@ const ChangePassword = () => {
               <li>
                 <a className="show-cat-btn" href="/manage-user">
                   <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Danh sách Users
+                  Quản lý người dùng
                 </a>
               </li>
               <li>
@@ -187,7 +187,7 @@ const ChangePassword = () => {
               <li>
                 <a href="/loginadmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Logout
+                  Đăng xuất
                 </a>
               </li>
             </ul>
