@@ -101,10 +101,6 @@ function ListCost({ eventId, data }) {
     }
   };
 
-  const fetchCosts = () => {
-    fetchCostsFromAPI();
-  };
-
   const handleDelete = async (costId) => {
     try {
       const token = localStorage.getItem("token");

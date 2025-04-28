@@ -165,6 +165,13 @@ export default function ManageCampusManager() {
   };
 
   const columns = [
+    {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) =>
+        (pagination.currentPage - 1) * pagination.pageSize + index + 1,
+    },
     { title: "Email", dataIndex: "email", key: "email" },
     {
       title: "Họ Tên",
@@ -173,10 +180,9 @@ export default function ManageCampusManager() {
       render: (_, record) => `${record.firstName} ${record.lastName}`,
     },
     {
-      title: "Ngày sinh",
-      dataIndex: "dateOfBirth",
-      key: "dateOfBirth",
-      render: (text) => new Date(text).toLocaleDateString(),
+      title: "Campus",
+      dataIndex: "campusName",
+      key: "campusName",
     },
     {
       title: "Giới tính",
@@ -234,7 +240,7 @@ export default function ManageCampusManager() {
               <li>
                 <a className="show-cat-btn" href="/manage-user">
                   <FaUsers style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Danh sách Users
+                  Quản lý người dùng
                 </a>
               </li>
               <li>
@@ -258,7 +264,7 @@ export default function ManageCampusManager() {
               <li>
                 <a href="loginadmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Logout
+                  Đăng xuất
                 </a>
               </li>
               {/* <li>

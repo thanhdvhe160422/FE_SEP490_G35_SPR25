@@ -56,6 +56,7 @@ export default function ManageUser() {
   const [fileList, setFileList] = useState([]);
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedCampus, setSelectedCampus] = useState("");
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -687,7 +688,7 @@ export default function ManageUser() {
               <li>
                 <a href="/loginadmin" onClick={handleLogout}>
                   <CiLogout style={{ marginRight: "10px", fontSize: "20px" }} />{" "}
-                  Logout
+                  Đăng xuất
                 </a>
               </li>
             </ul>
@@ -727,7 +728,11 @@ export default function ManageUser() {
                     }
                   }}
                 />
-                <button className="btn btn-primary" onClick={getSearchUsers}>
+                <button
+                  style={{ width: "150px" }}
+                  className="btn btn-primary"
+                  onClick={getSearchUsers}
+                >
                   Tìm kiếm
                 </button>
               </div>
@@ -739,6 +744,7 @@ export default function ManageUser() {
                 Nhập Users
               </Button>
               <select
+                style={{ width: "200px", height: "32px" }}
                 name="roleName"
                 id="roleName"
                 onChange={(e) => fetchUserByRole(e.target.value)}
@@ -751,8 +757,11 @@ export default function ManageUser() {
               </select>
 
               <select
-                value={""}
-                onChange={(e) => fetchUserByCampus(e.target.value)}
+                value={selectedCampus}
+                onChange={(e) => {
+                  setSelectedCampus(e.target.value);
+                  fetchUserByCampus(e.target.value);
+                }}
                 style={{ width: "200px", height: "32px" }}
               >
                 <option value="">Tất cả campus</option>

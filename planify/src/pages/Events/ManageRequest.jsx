@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from "react";
-import "../../styles/Events/ManageRequest.css";
 import {
+  getRequest,
   approveRequest,
   rejectRequest,
-  getRequest,
+  searchRequest,
 } from "../../services/EventRequestService";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router";
-import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
+import { useNavigate } from "react-router";
+import { Table, Typography, Button } from "antd";
+import Swal from "sweetalert2";
+import "../../styles/Events/ManageRequest.css";
 import Loading from "../../components/Loading";
+
+const { Text } = Typography;
 
 function ManageRequest() {
   const [requests, setRequests] = useState([]);
+  const [tableProps, setTableProps] = useState({
+    pagination: { current: 1, pageSize: 10 },
+  });
   const [showPopupReject, setShowPopupReject] = useState(false);
   const [showPopupApprove, setShowPopupApprove] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -20,21 +26,70 @@ function ManageRequest() {
   const [approveReason, setApproveReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectStatus, setSelectStatus] = useState("");
+  const navigate = useNavigate();
 
   const fetchRequests = async () => {
+    setIsLoading(true);
     try {
       const data = await getRequest();
       console.log("Fetched Requests: ", data);
-      setRequests(data.result);
+      setRequests(data.result || []);
+      setTableProps((prev) => ({
+        ...prev,
+        pagination: {
+          ...prev.pagination,
+          total: data.total || data.result.length,
+        },
+      }));
     } catch (error) {
       console.error("Error fetching requests:", error);
-      Swal.fire("Error", "Unable to fetch requests.", "error");
+      setRequests([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSearchRequest = async () => {
+    setIsLoading(true);
+    try {
+      const response = await searchRequest(
+        tableProps.pagination.current,
+        tableProps.pagination.pageSize,
+        selectStatus
+      );
+      console.log("Fetched Search Requests: ", {
+        status: selectStatus,
+        result: response.items,
+        total: response.total,
+      });
+      setRequests(response.items || []);
+      setTableProps((prev) => ({
+        ...prev,
+        pagination: {
+          ...prev.pagination,
+          total: response.totalPages,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching search requests:", error);
+      setRequests([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    if (selectStatus === "") {
+      fetchRequests();
+    } else {
+      fetchSearchRequest();
+    }
+  }, [
+    selectStatus,
+    tableProps.pagination.current,
+    tableProps.pagination.pageSize,
+  ]);
 
   const handleApprove = (request) => {
     setSelectedRequest(request);
@@ -54,34 +109,43 @@ function ManageRequest() {
     setIsLoading(true);
     try {
       await rejectRequest(selectedRequest.id, rejectReason);
-      setIsLoading(false);
-      await fetchRequests();
-  
+      if (selectStatus === "") {
+        await fetchRequests();
+      } else {
+        await fetchSearchRequest();
+      }
       setShowPopupReject(false);
       setRejectReason("");
-  
-      Swal.fire("Từ chối thành công", "Yêu cầu đã được xử lý và từ chối thành công.", "success");
+      Swal.fire(
+        "Từ chối thành công",
+        "Yêu cầu đã được xử lý và từ chối thành công.",
+        "success"
+      );
     } catch (error) {
       console.error("Lỗi khi từ chối yêu cầu:", error);
-      Swal.fire("Lỗi", "Không thể xử lý từ chối yêu cầu. Vui lòng thử lại sau.", "error");
+      Swal.fire(
+        "Lỗi",
+        "Không thể xử lý từ chối yêu cầu. Vui lòng thử lại sau.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
-  
 
   const submitApprove = async () => {
     if (isSubmitting) return;
-  
     setIsSubmitting(true);
     setIsLoading(true);
     try {
-      console.log("Phê duyệt yêu cầu với ID:", selectedRequest.id);
       await approveRequest(selectedRequest.id, approveReason);
-      setIsLoading(false);
-      await fetchRequests();
-  
+      if (selectStatus === "") {
+        await fetchRequests();
+      } else {
+        await fetchSearchRequest();
+      }
       setShowPopupApprove(false);
       setApproveReason("");
-  
       Swal.fire({
         title: "Phê duyệt thành công",
         text: "Yêu cầu đã được xử lý và phê duyệt thành công.",
@@ -91,52 +155,153 @@ function ManageRequest() {
       });
     } catch (error) {
       console.error("Lỗi khi phê duyệt yêu cầu:", error);
-      Swal.fire("Lỗi", "Không thể phê duyệt yêu cầu. Vui lòng thử lại sau.", "error");
+      Swal.fire(
+        "Lỗi",
+        "Không thể phê duyệt yêu cầu. Vui lòng thử lại sau.",
+        "error"
+      );
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-  
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return "Chưa được duyệt";
+      case 2:
+        return "Đã duyệt";
+      case -1:
+        return "Đã từ chối";
+      default:
+        return "Không xác định";
+    }
+  };
+
+  const columns = [
+    {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) => {
+        const { current, pageSize } = tableProps.pagination;
+        return (current - 1) * pageSize + index + 1;
+      },
+    },
+    {
+      title: "Tiêu đề sự kiện",
+      dataIndex: "eventTitle",
+      key: "eventTitle",
+      render: (text, record) => (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(`/event-detail-EOG/${record.eventId}`)}
+        >
+          {text}
+        </Text>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => getStatusText(status),
+    },
+    {
+      title: "Lý do",
+      dataIndex: "reason",
+      key: "reason",
+      render: (reason) => reason || "Không có",
+    },
+    {
+      title: "Từ",
+      dataIndex: "eventStartTime",
+      key: "eventStartTime",
+      render: (date) => formatDateTime(date),
+    },
+    {
+      title: "Đến",
+      dataIndex: "eventEndTime",
+      key: "eventEndTime",
+      render: (date) => formatDateTime(date),
+    },
+    {
+      title: "Hành động",
+      key: "action",
+      render: (_, record) =>
+        record.status === 1 ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              type="primary"
+              onClick={() => handleApprove(record)}
+              style
+              hadron={{ backgroundColor: "green", borderColor: "green" }}
+            >
+              Phê duyệt
+            </Button>
+            <Button type="primary" danger onClick={() => handleReject(record)}>
+              Từ chối
+            </Button>
+          </div>
+        ) : null,
+    },
+  ];
+
+  const handleTableChange = (pagination) => {
+    setTableProps({ pagination });
+  };
+
+  const handleStatusChange = (e) => {
+    setSelectStatus(e.target.value);
+    setTableProps((prev) => ({
+      ...prev,
+      pagination: { ...prev.pagination, current: 1 },
+    }));
+  };
 
   if (isLoading) {
     return <Loading />;
   }
-  const pendingRequests = requests.filter((req) => req.status === 1);
-  const approvedRequests = requests.filter((req) => req.status === 2);
-  const rejectedRequests = requests.filter((req) => req.status === -1);
 
   return (
-    <>
+    <div
+      className="manage-request-page"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        width: "100%",
+      }}
+    >
       <Header />
-      <div className="manager-container">
-        <h2>Dánh sách yêu cầu</h2>
-        <div className="requests-grid">
-          <RequestColumn
-            title="Chưa được chấp thuận"
-            requests={pendingRequests}
-          >
-            {(req) => (
-              <div className="d-flex justify-content-between">
-                <button
-                  className="btn approve"
-                  onClick={() => handleApprove(req)}
-                >
-                  Phê duyệt
-                </button>
-                <button
-                  className="btn reject"
-                  onClick={() => handleReject(req)}
-                >
-                  Từ chối
-                </button>
-              </div>
-            )}
-          </RequestColumn>
-
-          <RequestColumn title="Đã chấp thuận" requests={approvedRequests} />
-          <RequestColumn title="Đã từ chối" requests={rejectedRequests} />
-        </div>
-
+      <div
+        className="manage-request-content"
+        style={{ marginTop: "100px", padding: "20px" }}
+      >
+        <h2>Danh sách yêu cầu</h2>
+        <select
+          name="status"
+          id="status"
+          style={{ width: "200px", height: "32px", marginBottom: "10px" }}
+          value={selectStatus}
+          onChange={handleStatusChange}
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="1">Chưa duyệt</option>
+          <option value="2">Đã duyệt</option>
+          <option value="-1">Đã từ chối</option>
+        </select>
+        <Table
+          columns={columns}
+          dataSource={requests.map((req) => ({ ...req, key: req.id }))}
+          pagination={tableProps.pagination}
+          locale={{ emptyText: "Không có yêu cầu nào" }}
+          rowClassName="manage-request-row"
+          onChange={handleTableChange}
+          loading={isLoading}
+        />
         {showPopupReject && (
           <div className="popup">
             <div className="popup-content">
@@ -146,15 +311,15 @@ function ManageRequest() {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
               />
-              <button
-                className="btn cancel"
-                onClick={() => setShowPopupReject(false)}
+              <div
+                className="btn-request"
+                style={{ display: "flex", gap: "10px" }}
               >
-                Cancel
-              </button>
-              <button className="btn submit" onClick={submitReject}>
-                Submit
-              </button>
+                <Button onClick={() => setShowPopupReject(false)}>Hủy</Button>
+                <Button type="primary" danger onClick={submitReject}>
+                  Xác nhận
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -167,62 +332,24 @@ function ManageRequest() {
                 value={approveReason}
                 onChange={(e) => setApproveReason(e.target.value)}
               />
-              <button
-                className="btn cancel"
-                onClick={() => setShowPopupApprove(false)}
+              <div
+                className="btn-request"
+                style={{ display: "flex", gap: "10px" }}
               >
-                Cancel
-              </button>
-              <button
-                style={{ backgroundColor: "green" }}
-                className="btn submit"
-                onClick={submitApprove}
-              >
-                Submit
-              </button>
+                <Button onClick={() => setShowPopupApprove(false)}>Hủy</Button>
+                <Button
+                  type="primary"
+                  style={{ backgroundColor: "green", borderColor: "green" }}
+                  onClick={submitApprove}
+                >
+                  Xác nhận
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
       {/* <Footer /> */}
-    </>
-  );
-}
-
-function RequestColumn({ title, requests, children }) {
-  const navigate = useNavigate();
-  return (
-    <div className="request-column">
-      <h3>{title}</h3>
-      {requests.length === 0 ? (
-        <p>Không có yêu cầu nào</p>
-      ) : (
-        requests.map((req) => (
-          <div key={req.id} className="request-card">
-            <h4
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                navigate(`/event-detail-EOG/${req.eventId}`);
-              }}
-            >
-              {req.eventTitle}
-            </h4>
-            {req.reason && (
-              <p>
-                <strong>Lý do:</strong> {req.reason}
-              </p>
-            )}
-
-            <p>
-              <strong>Từ:</strong> {formatDateTime(req.eventStartTime)}
-            </p>
-            <p>
-              <strong>Đến:</strong> {formatDateTime(req.eventEndTime)}
-            </p>
-            {children && children(req)}
-          </div>
-        ))
-      )}
     </div>
   );
 }
