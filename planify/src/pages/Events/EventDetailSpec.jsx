@@ -79,11 +79,11 @@ function EventDetailSpec() {
     const startDateTime = new Date(start);
     const endDateTime = new Date(end);
     if (startDateTime <= now && now <= endDateTime) {
-      return "running";
+      return "Đang diễn ra";
     } else if (now > endDateTime) {
-      return "closed";
+      return "Đã kết thúc";
     } else {
-      return "not started yet";
+      return "Chưa diễn ra";
     }
   };
   if (!event) return <Loading />;
@@ -181,18 +181,17 @@ function EventDetailSpec() {
 
           {openLightbox && (
             <Lightbox
-  open={openLightbox}
-  close={() => setOpenLightbox(false)}
-  index={currentIndex}
-  on={{
-    view: ({ index }) => setCurrentIndex(index), 
-  }}
-  slides={bannerImages.map((url) => ({
-    src: fixDriveUrl(url),
-  }))}
-  plugins={[Thumbnails]}
-/>
-
+              open={openLightbox}
+              close={() => setOpenLightbox(false)}
+              index={currentIndex}
+              on={{
+                view: ({ index }) => setCurrentIndex(index),
+              }}
+              slides={bannerImages.map((url) => ({
+                src: fixDriveUrl(url),
+              }))}
+              plugins={[Thumbnails]}
+            />
           )}
         </div>
         <div style={{ marginRight: "70%" }}>
@@ -233,10 +232,10 @@ function EventDetailSpec() {
             </h1>
             <div
               className={`status_tag ${
-                statusEvent(event.startTime, event.endTime) === "running"
+                statusEvent(event.startTime, event.endTime) === "Đang diễn ra"
                   ? "running_status"
                   : statusEvent(event.startTime, event.endTime) ===
-                    "not started yet"
+                    "Chưa diễn ra"
                   ? "not_started_status"
                   : "ended_status"
               }`}
