@@ -5,7 +5,7 @@ import {
 } from "../../services/EventRequestService";
 import Header from "../../components/Header/Header";
 import { useNavigate } from "react-router";
-import { Table, Typography } from "antd";
+import { Table, Tag, Typography } from "antd";
 import Swal from "sweetalert2";
 import "../../styles/Events/MyRequest.css";
 
@@ -96,6 +96,18 @@ function MyRequest(props) {
         return "Không xác định";
     }
   };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 2:
+        return "green";
+      case -1:
+        return "red";
+      case 1:
+        return "orange";
+      default:
+        return "default";
+    }
+  };
 
   const columns = [
     {
@@ -113,12 +125,7 @@ function MyRequest(props) {
       key: "eventTitle",
       render: (text) => <Text strong>{text}</Text>,
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => getStatusText(status),
-    },
+
     {
       title: "Lý do",
       dataIndex: "reason",
@@ -130,6 +137,14 @@ function MyRequest(props) {
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date) => formatDateTime(date),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+      ),
     },
   ];
 
