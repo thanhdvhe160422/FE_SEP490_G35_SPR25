@@ -65,6 +65,7 @@ function ListTask({ eventId, data }) {
   const [isEditSubTaskModalVisible, setIsEditSubTaskModalVisible] =
     useState(false);
   const [editSubTaskForm] = Form.useForm();
+  const [createBy, setCreateBy] = useState();
   const [selectedSubTask, setSelectedSubTask] = useState(null);
   const [isEditSubTaskSubmitting, setIsEditSubTaskSubmitting] = useState(false);
   const [eventUsers, setEventUsers] = useState([]);
@@ -413,7 +414,7 @@ function ListTask({ eventId, data }) {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      setCreateBy(response.data.result?.createBy?.id);
       const tasks = response.data.result?.tasks || [];
       setDisplayedTasks(tasks);
       setError(null);
@@ -1383,13 +1384,16 @@ function ListTask({ eventId, data }) {
                       }
                     >
                       <div className="sub-task-item">
-                        <Checkbox
-                          checked={item.status === 1}
-                          onChange={(e) =>
-                            toggleSubTaskStatus(item.id, e.target.checked)
-                          }
-                          style={{ marginRight: "8px" }}
-                        />
+                        {userId === createBy && (
+                          <Checkbox
+                            checked={item.status === 1}
+                            onChange={(e) =>
+                              toggleSubTaskStatus(item.id, e.target.checked)
+                            }
+                            style={{ marginRight: "8px" }}
+                          />
+                        )}
+
                         <div
                           className={`sub-task-content ${
                             item.status === 1 ? "completed" : ""

@@ -204,13 +204,13 @@ const UpdateProfile = () => {
       const response = await updateProfile(updatedUser, token);
 
       if (response && response.status === 200) {
-        enqueueSnackbar("Update profile successfully", {
+        enqueueSnackbar("Cập nhật hồ sơ thành công.", {
           variant: "success",
           autoHideDuration: 2000,
         });
         navigate("/profile");
       } else {
-        enqueueSnackbar("Failed to update profile", {
+        enqueueSnackbar("Lỗi cập nhật hồ sơ.", {
           variant: "error",
           autoHideDuration: 2000,
         });
@@ -218,8 +218,7 @@ const UpdateProfile = () => {
     } catch (error) {
       console.error("Error updating profile:", error);
       enqueueSnackbar(
-        "Error updating profile: " +
-          (error.response?.data?.message || error.message),
+        "Lỗi cập nhật: " + (error.response?.data?.message || error.message),
         {
           variant: "error",
           autoHideDuration: 2500,
@@ -238,7 +237,13 @@ const UpdateProfile = () => {
     if (file) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        alert("Định dạng ảnh phải là JPEG, PNG, JPG.");
+        enqueueSnackbar(
+          "Lỗi định dạng ảnh. Vui lòng chọn định dạng JPG hoặc PNG",
+          {
+            variant: "error",
+            autoHideDuration: 2000,
+          }
+        );
         return;
       }
 

@@ -5,7 +5,7 @@ import {
 } from "../../services/EventRequestService";
 import Header from "../../components/Header/Header";
 import { useNavigate } from "react-router";
-import { Table, Typography } from "antd";
+import { Table, Tag, Typography } from "antd";
 import Swal from "sweetalert2";
 import "../../styles/Events/MyRequest.css";
 
@@ -61,7 +61,7 @@ function MyRequest(props) {
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: response.total || 0,
+          total: response.totalPage || 0,
         },
       }));
     } catch (error) {
@@ -96,6 +96,18 @@ function MyRequest(props) {
         return "Không xác định";
     }
   };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 2:
+        return "green";
+      case -1:
+        return "red";
+      case 1:
+        return "orange";
+      default:
+        return "default";
+    }
+  };
 
   const columns = [
     {
@@ -113,23 +125,26 @@ function MyRequest(props) {
       key: "eventTitle",
       render: (text) => <Text strong>{text}</Text>,
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => getStatusText(status),
-    },
+
     {
       title: "Lý do",
       dataIndex: "reason",
       key: "reason",
-      render: (reason) => reason || "Không có",
+      render: (reason) => (!reason || reason === "N/A" ? "Không có" : reason),
     },
     {
-      title: "Ngày tạo",
+      title: "Thời gian tạo",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date) => formatDateTime(date),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+      ),
     },
   ];
 

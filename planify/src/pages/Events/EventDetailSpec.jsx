@@ -79,11 +79,11 @@ function EventDetailSpec() {
     const startDateTime = new Date(start);
     const endDateTime = new Date(end);
     if (startDateTime <= now && now <= endDateTime) {
-      return "running";
+      return "Đang diễn ra";
     } else if (now > endDateTime) {
-      return "closed";
+      return "Đã kết thúc";
     } else {
-      return "not started yet";
+      return "Chưa diễn ra";
     }
   };
   if (!event) return <Loading />;
@@ -136,65 +136,96 @@ function EventDetailSpec() {
       <Breadcrumb />
       <div className="event-container">
         <div className="event-banner-gallery">
-          <div className="gallery-left" onClick={() => setOpenLightbox(true)}>
-            {bannerImages[0] && (
+          {bannerImages.length === 1 || bannerImages.length === 2 ? (
+            <div className="single-banner" style={{ position: "relative" }}>
               <img
                 src={fixDriveUrl(bannerImages[0])}
                 alt="Main Event"
-                className="main-banner-img"
+                className="single-banner-img"
+                onClick={() => {
+                  setCurrentIndex(0);
+                  setOpenLightbox(true);
+                }}
               />
-            )}
-          </div>
-          <div className="gallery-right">
-            {bannerImages.slice(1, 3).map((img, index) => (
-              <div className="thumbnail-wrapper" key={index}>
-                <img
-                  src={fixDriveUrl(img)}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="thumbnail-img"
+              {bannerImages.length === 2 && (
+                <button
+                  className="view-all-btn-single"
                   onClick={() => {
-                    setCurrentIndex(index + 1);
+                    setCurrentIndex(0);
                     setOpenLightbox(true);
                   }}
-                />
-                {index === 1 && bannerImages.length > 3 && (
-                  <button
-                    className="view-all-btn"
-                    onClick={() => {
-                      setCurrentIndex(0);
-                      setOpenLightbox(true);
-                    }}
-                  >
-                    <BiGridAlt
-                      style={{
-                        marginRight: "6px",
-                        fontSize: "17px",
-                        marginBottom: "5px",
-                      }}
-                    />
-                    <strong>Tất cả ảnh</strong>
-                  </button>
+                >
+                  <BiGridAlt style={{ marginRight: "6px", fontSize: "17px" }} />
+                  <strong>Xem tất cả ảnh</strong>
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <div
+                className="gallery-left"
+                onClick={() => setOpenLightbox(true)}
+              >
+                {bannerImages[0] && (
+                  <img
+                    src={fixDriveUrl(bannerImages[0])}
+                    alt="Main Event"
+                    className="main-banner-img"
+                  />
                 )}
               </div>
-            ))}
-          </div>
+              <div className="gallery-right">
+                {bannerImages.slice(1, 3).map((img, index) => (
+                  <div className="thumbnail-wrapper" key={index}>
+                    <img
+                      src={fixDriveUrl(img)}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="thumbnail-img"
+                      onClick={() => {
+                        setCurrentIndex(index + 1);
+                        setOpenLightbox(true);
+                      }}
+                    />
+                    {index === 1 && bannerImages.length > 3 && (
+                      <button
+                        className="view-all-btn"
+                        onClick={() => {
+                          setCurrentIndex(0);
+                          setOpenLightbox(true);
+                        }}
+                      >
+                        <BiGridAlt
+                          style={{
+                            marginRight: "6px",
+                            fontSize: "17px",
+                            marginBottom: "5px",
+                          }}
+                        />
+                        <strong>Tất cả ảnh</strong>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           {openLightbox && (
             <Lightbox
-  open={openLightbox}
-  close={() => setOpenLightbox(false)}
-  index={currentIndex}
-  on={{
-    view: ({ index }) => setCurrentIndex(index), 
-  }}
-  slides={bannerImages.map((url) => ({
-    src: fixDriveUrl(url),
-  }))}
-  plugins={[Thumbnails]}
-/>
-
+              open={openLightbox}
+              close={() => setOpenLightbox(false)}
+              index={currentIndex}
+              on={{
+                view: ({ index }) => setCurrentIndex(index),
+              }}
+              slides={bannerImages.map((url) => ({
+                src: fixDriveUrl(url),
+              }))}
+              plugins={[Thumbnails]}
+            />
           )}
         </div>
+
         <div style={{ marginRight: "70%" }}>
           {new Date(event.endTime) <= currentTime ? (
             <button
@@ -233,10 +264,10 @@ function EventDetailSpec() {
             </h1>
             <div
               className={`status_tag ${
-                statusEvent(event.startTime, event.endTime) === "running"
+                statusEvent(event.startTime, event.endTime) === "Đang diễn ra"
                   ? "running_status"
                   : statusEvent(event.startTime, event.endTime) ===
-                    "not started yet"
+                    "Chưa diễn ra"
                   ? "not_started_status"
                   : "ended_status"
               }`}
