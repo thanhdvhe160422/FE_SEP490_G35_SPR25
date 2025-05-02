@@ -40,11 +40,8 @@ export default function HomeSpectator() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
-  const [isImple, setImple] = useState(false);
   const role = localStorage.getItem("role");
-  if (role === "Implementer") {
-    setImple(true);
-  }
+  const [isImple, setImple] = useState(role === "Implementer" ? true : false);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")

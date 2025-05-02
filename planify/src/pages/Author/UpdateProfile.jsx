@@ -218,8 +218,7 @@ const UpdateProfile = () => {
     } catch (error) {
       console.error("Error updating profile:", error);
       enqueueSnackbar(
-        "Lỗi cập nhật: " +
-          (error.response?.data?.message || error.message),
+        "Lỗi cập nhật: " + (error.response?.data?.message || error.message),
         {
           variant: "error",
           autoHideDuration: 2500,
@@ -238,16 +237,19 @@ const UpdateProfile = () => {
     if (file) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        enqueueSnackbar("Lỗi định dạng ảnh. Vui lòng chọn định dạng JPG hoặc PNG", {
-          variant: "error",
-          autoHideDuration: 2000,
-        });
+        enqueueSnackbar(
+          "Lỗi định dạng ảnh. Vui lòng chọn định dạng JPG hoặc PNG",
+          {
+            variant: "error",
+            autoHideDuration: 2000,
+          }
+        );
         return;
       }
 
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        alert("File size should be less than 5MB.");
+        alert("Ảnh phải nhỏ hơn 5MB.");
         return;
       }
 

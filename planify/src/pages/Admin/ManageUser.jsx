@@ -308,7 +308,11 @@ export default function ManageUser() {
       key: "avatar",
       render: (text, record) => (
         <img
-          src={fixDriveUrl(record.avatar.mediaUrl)}
+          src={
+            record
+              ? "https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg"
+              : fixDriveUrl(record.avatar.mediaUrl)
+          }
           alt="avatar"
           style={{ width: "50px", height: "50px", borderRadius: "50%" }}
         />
@@ -824,7 +828,11 @@ export default function ManageUser() {
               <p>
                 <strong>Ảnh đại diện:</strong>{" "}
                 <img
-                  src={fixDriveUrl(selectedUser.avatar?.mediaUrl)}
+                  src={
+                    selectedUser
+                      ? "https://static.vecteezy.com/system/resources/previews/009/734/564/original/default-avatar-profile-icon-of-social-media-user-vector.jpg"
+                      : fixDriveUrl(selectedUser.avatar?.mediaUrl)
+                  }
                   alt="avatar"
                   style={{
                     width: "100px",
