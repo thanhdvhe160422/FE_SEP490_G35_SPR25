@@ -5,6 +5,7 @@ import { FaEdit, FaHome, FaLock, FaUsers } from "react-icons/fa";
 import "../../styles/Admin/manageCampus.css";
 import { Button, Modal, Table } from "antd";
 import axios from "axios";
+import { useSnackbar } from "notistack";
 
 function ManageCampus(props) {
   const token = localStorage.getItem("token");
@@ -12,6 +13,7 @@ function ManageCampus(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newCampusName, setNewCampusName] = useState("");
+  const { enqueueSnackbar } = useSnackbar();
   const fetchCampuses = async () => {
     setIsLoading(true);
     try {
@@ -205,6 +207,11 @@ function ManageCampus(props) {
               setNewCampusName("");
               fetchCampuses(); // gọi lại danh sách
             } catch (error) {
+              if (error?.response?.data?.message === "Cơ sở đã tồn tại!")
+                enqueueSnackbar("Campus đã tồn tại", {
+                  variant: "error",
+                  autoHideDuration: 3000,
+                });
               console.error("Lỗi khi tạo campus:", error);
             }
           }}
