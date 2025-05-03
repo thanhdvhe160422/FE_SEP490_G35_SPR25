@@ -620,7 +620,7 @@ const EventDetailEOG = () => {
         <div className="event-actions">
           {event &&
             event.createdBy &&
-            event.status === 0 &&
+            (event.status === 0 || event.status === -1) &&
             localStorage.getItem("userId") === String(event.createdBy.id) && (
               <>
                 <button
