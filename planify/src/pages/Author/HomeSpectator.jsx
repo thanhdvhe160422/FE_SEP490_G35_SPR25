@@ -40,6 +40,8 @@ export default function HomeSpectator() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isSearchMode, setIsSearchMode] = useState(false);
+  const role = localStorage.getItem("role");
+  const [isImple, setImple] = useState(role === "Implementer" ? true : false);
 
   const fixDriveUrl = (url) => {
     if (!url || typeof url !== "string")
@@ -405,9 +407,13 @@ export default function HomeSpectator() {
                         <Col key={event.id}>
                           <Card
                             className="h-100 shadow-sm event-card"
-                            onClick={() =>
-                              navigate(`/event-detail-spec/${event.id}`)
-                            }
+                            onClick={() => {
+                              if (isImple) {
+                                navigate(`/event-detail-EOG/${event.id}`);
+                              } else {
+                                navigate(`/event-detail-spec/${event.id}`);
+                              }
+                            }}
                             style={{ cursor: "pointer", position: "relative" }}
                           >
                             <Card.Img

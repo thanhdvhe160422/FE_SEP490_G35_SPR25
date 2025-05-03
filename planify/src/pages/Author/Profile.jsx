@@ -128,7 +128,13 @@ const Profile = () => {
               <tr>
                 <td>Địa chỉ</td>
                 <td>
-                  {address}, {wards}, {districts}, {provinces}
+                  {address ? (
+                    `${address}, ${wards}, ${districts}, ${provinces}`
+                  ) : (
+                    <span className="text-danger fst-italic">
+                      Chưa có địa chỉ
+                    </span>
+                  )}
                 </td>
               </tr>
               <tr>
