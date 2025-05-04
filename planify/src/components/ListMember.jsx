@@ -290,7 +290,7 @@ const ListMember = ({ eventId, data }) => {
     },
   ];
   const userIdx = localStorage.getItem("userId");
-  if (userIdx === data.createdBy.id && data.status === 0) {
+  if (userIdx === data.createdBy.id && (data.status === 0||data.status === -1)) {
     participantColumns.push({
       title: "Hành động",
       key: "action",
@@ -370,7 +370,7 @@ const ListMember = ({ eventId, data }) => {
           <Title level={3} className="event-participants-title">
             <TeamOutlined /> Quản lý người tham gia sự kiện ({totalCount})
           </Title>
-          {userId === data.createdBy.id && data.status === 0 && (
+          {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
             <Button
               type="primary"
               icon={<UserAddOutlined />}
