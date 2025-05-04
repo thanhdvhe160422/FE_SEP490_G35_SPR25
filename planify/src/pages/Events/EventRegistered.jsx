@@ -331,9 +331,9 @@ export default function EventRegistered() {
                             <Card.Body>
                               <span
                                 className={`status-badge ${
-                                  event.statusMessage === "Running"
+                                  event.statusMessage === "Đang diễn ra"
                                     ? "status-running"
-                                    : event.statusMessage === "Closed"
+                                    : event.statusMessage === "Đã kết thúc"
                                     ? "status-closed"
                                     : "status-notyet"
                                 }`}

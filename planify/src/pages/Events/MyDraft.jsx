@@ -218,16 +218,16 @@ export default function MyDraft() {
                             <Card.Body>
                               <span
                                 className={`status-badge ${
-                                  event.statusMessage === "Running"
+                                  event.statusMessage === "Đang diễn ra"
                                     ? "status-running"
-                                    : event.statusMessage === "Closed"
+                                    : event.statusMessage === "Đã kết thúc"
                                     ? "status-closed"
                                     : "status-notyet"
                                 }`}
                               >
-                                {event.statusMessage === "Running"
+                                {event.statusMessage === "Đang diễn ra"
                                   ? "Đang diễn ra"
-                                  : event.statusMessage === "Closed"
+                                  : event.statusMessage === "Đã kết thúc"
                                   ? "Đã kết thúc"
                                   : "Chưa bắt đầu"}
                               </span>
