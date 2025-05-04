@@ -1005,7 +1005,7 @@ function ListTask({ eventId, data }) {
               }}
               onChange={handleTableChange}
               locale={{
-                emptyText: "No tasks available",
+                emptyText: "Không có nhiệm vụ nào",
               }}
               rowClassName={(record) =>
                 record.deadline && new Date(record.deadline) < new Date()
