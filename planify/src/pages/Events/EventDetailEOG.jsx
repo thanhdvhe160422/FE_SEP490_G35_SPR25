@@ -349,82 +349,86 @@ const EventDetailEOG = () => {
       <div className="event-container">
         {event && (
           <>
-          <div className="event-banner-gallery">
-  {(images.length === 1 || images.length === 2) ? (
-    <div className="single-banner" style={{ position: "relative" }}>
-      <img
-        src={fixDriveUrl(images[0] || defaultImage)}
-        alt="Main Event"
-        className="single-banner-img"
-        style={{ cursor: "pointer" }}
-        onClick={() => {
-          setLightboxIndex(0);
-          setLightboxOpen(true);
-        }}
-      />
-      {images.length === 2 && (
-        <button
-          className="view-all-btn-single"
-          onClick={() => {
-            setLightboxIndex(0);
-            setLightboxOpen(true);
-          }}
-        >
-          <BiGridAlt style={{ marginRight: "6px", fontSize: "17px" }} />
-          <strong>Xem tất cả</strong>
-        </button>
-      )}
-    </div>
-  ) : (
-    <>
-      <div className="gallery-left" onClick={() => setLightboxOpen(true)}>
-        {images[0] ? (
-          <img
-            src={fixDriveUrl(images[0])}
-            alt="Main Event"
-            className="main-banner-img"
-            style={{ cursor: "pointer" }}
-          />
-        ) : (
-          <img
-            src={defaultImage}
-            alt="Default"
-            className="main-banner-img"
-            style={{ cursor: "pointer" }}
-          />
-        )}
-      </div>
-      <div className="gallery-right">
-        {images.slice(1, 3).map((img, index) => (
-          <div className="thumbnail-wrapper" key={index}>
-            <img
-              src={fixDriveUrl(img)}
-              alt={`Thumbnail ${index + 1}`}
-              className="thumbnail-img"
-              onClick={() => {
-                setLightboxIndex(index + 1);
-                setLightboxOpen(true);
-              }}
-            />
-            {index === 1 && images.length > 3 && (
-              <button
-                className="view-all-btn"
-                onClick={() => {
-                  setLightboxIndex(0);
-                  setLightboxOpen(true);
-                }}
-              >
-                <BiGridAlt style={{ marginRight: 6 }} />
-                <strong>Xem tất cả</strong>
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </>
-  )}
-</div>
-
+            <div className="event-banner-gallery">
+              {images.length === 1 || images.length === 2 ? (
+                <div className="single-banner" style={{ position: "relative" }}>
+                  <img
+                    src={fixDriveUrl(images[0] || defaultImage)}
+                    alt="Main Event"
+                    className="single-banner-img"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setLightboxIndex(0);
+                      setLightboxOpen(true);
+                    }}
+                  />
+                  {images.length === 2 && (
+                    <button
+                      className="view-all-btn-single"
+                      onClick={() => {
+                        setLightboxIndex(0);
+                        setLightboxOpen(true);
+                      }}
+                    >
+                      <BiGridAlt
+                        style={{ marginRight: "6px", fontSize: "17px" }}
+                      />
+                      <strong>Xem tất cả</strong>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="gallery-left"
+                    onClick={() => setLightboxOpen(true)}
+                  >
+                    {images[0] ? (
+                      <img
+                        src={fixDriveUrl(images[0])}
+                        alt="Main Event"
+                        className="main-banner-img"
+                        style={{ cursor: "pointer" }}
+                      />
+                    ) : (
+                      <img
+                        src={defaultImage}
+                        alt="Default"
+                        className="main-banner-img"
+                        style={{ cursor: "pointer" }}
+                      />
+                    )}
+                  </div>
+                  <div className="gallery-right">
+                    {images.slice(1, 3).map((img, index) => (
+                      <div className="thumbnail-wrapper" key={index}>
+                        <img
+                          src={fixDriveUrl(img)}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="thumbnail-img"
+                          onClick={() => {
+                            setLightboxIndex(index + 1);
+                            setLightboxOpen(true);
+                          }}
+                        />
+                        {index === 1 && images.length > 3 && (
+                          <button
+                            className="view-all-btn"
+                            onClick={() => {
+                              setLightboxIndex(0);
+                              setLightboxOpen(true);
+                            }}
+                          >
+                            <BiGridAlt style={{ marginRight: 6 }} />
+                            <strong>Xem tất cả</strong>
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="event-details">
               <div className="event-title-container">
