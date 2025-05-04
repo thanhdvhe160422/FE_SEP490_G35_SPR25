@@ -174,15 +174,15 @@ function EventSection() {
       minute: "2-digit",
     });
   };
-  const statusEvent = (start, end) => {
-    const now = new Date();
-    const startTime = new Date(start);
-    const endTime = new Date(end);
+  // const statusEvent = (start, end) => {
+  //   const now = new Date();
+  //   const startTime = new Date(start);
+  //   const endTime = new Date(end);
 
-    if (now >= startTime && now <= endTime) return "running";
-    if (now < startTime) return "not started yet";
-    return "closed";
-  };
+  //   if (now >= startTime && now <= endTime) return "running";
+  //   if (now < startTime) return "not started yet";
+  //   return "closed";
+  // };
 
   useEffect(() => {
     setCurrentPage(currentPage);
@@ -519,18 +519,14 @@ function EventSection() {
 
                           <div
                             className={`status_tag ${
-                              statusEvent(event.startTime, event.endTime) ===
-                              "running"
+                              event.statusMessage === "Đang diễn ra"
                                 ? "running_status"
-                                : statusEvent(
-                                    event.startTime,
-                                    event.endTime
-                                  ) === "not started yet"
+                                : event.statusMessage === "Chưa bắt đầu"
                                 ? "not_started_status"
                                 : "ended_status"
                             }`}
                           >
-                            {statusEvent(event.startTime, event.endTime)}
+                            {event.statusMessage}
                           </div>
                           <div
                             className="favorite-button"
@@ -723,18 +719,14 @@ function EventSection() {
                             </p>
                             <div
                               className={`status_tag ${
-                                statusEvent(event.startTime, event.endTime) ===
-                                "running"
+                                event.statusMessage === "Đang diễn ra"
                                   ? "running_status"
-                                  : statusEvent(
-                                      event.startTime,
-                                      event.endTime
-                                    ) === "not started yet"
+                                  : event.statusMessage === "Chưa bắt đầu"
                                   ? "not_started_status"
                                   : "ended_status"
                               }`}
                             >
-                              {statusEvent(event.startTime, event.endTime)}
+                              {event.statusMessage}
                             </div>
                             <div
                               className="favorite-button"
@@ -869,18 +861,14 @@ function EventSection() {
                           </p>
                           <div
                             className={`status_tag ${
-                              statusEvent(event.startTime, event.endTime) ===
-                              "running"
+                              event.statusMessage === "Đang diễn ra"
                                 ? "running_status"
-                                : statusEvent(
-                                    event.startTime,
-                                    event.endTime
-                                  ) === "not started yet"
+                                : event.statusMessage === "Chưa bắt đầu"
                                 ? "not_started_status"
                                 : "ended_status"
                             }`}
                           >
-                            {statusEvent(event.startTime, event.endTime)}
+                            {event.statusMessage}
                           </div>
                           <div
                             className="favorite-button"
