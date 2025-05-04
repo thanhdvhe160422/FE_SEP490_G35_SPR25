@@ -36,12 +36,12 @@ function ManageCampus(props) {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://localhost:44320" + "/css/style.min.css";
+    link.href = "https://fptu-planify.com" + "/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "https://localhost:44320" + "/css/style.css";
+    link2.href = "https://fptu-planify.com" + "/css/style.css";
     document.head.appendChild(link2);
 
     if (window.feather) {
@@ -55,9 +55,13 @@ function ManageCampus(props) {
   const handleDelete = async (id) => {
     setIsLoading(true);
     try {
-      await axios.put(`https://localhost:44320/api/Campus/delete/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(
+        `https://fptu-planify.com/api/Campus/delete/${id}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       await fetchCampuses();
       // Sau khi xóa thành công, có thể cập nhật lại danh sách
       setCampuses((prev) => prev.filter((c) => c.id !== id));
@@ -100,9 +104,7 @@ function ManageCampus(props) {
         <div class="sidebar-start">
           <div class="sidebar-head">
             <a href="/dashboard" class="logo-wrapper" title="Home">
-              <img src={logo} alt="" style={{width: "150px"}}/>
-              <span class="sr-only">Home</span>
-              <span class="icon logo" aria-hidden="true"></span>
+              <img src={logo} alt="" style={{ width: "150px" }} />
               <div class="logo-text">
                 <span class="logo-title">Planify</span>
                 <span class="logo-subtitle">Dashboard</span>
@@ -199,7 +201,7 @@ function ManageCampus(props) {
           onOk={async () => {
             try {
               await axios.post(
-                "https://localhost:44320/api/Campus",
+                "https://fptu-planify.com/api/Campus",
                 { campusName: newCampusName, status: "1" },
                 {
                   headers: { Authorization: `Bearer ${token}` },

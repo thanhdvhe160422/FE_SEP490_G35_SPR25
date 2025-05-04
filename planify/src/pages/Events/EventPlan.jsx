@@ -1054,13 +1054,13 @@ export default function EventPlan() {
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     const newImages = files.filter(
-        (file) =>
-            !selectedImages.some(
-                (existingFile) =>
-                    existingFile.name === file.name &&
-                    existingFile.size === file.size &&
-                    existingFile.lastModified === file.lastModified
-            )
+      (file) =>
+        !selectedImages.some(
+          (existingFile) =>
+            existingFile.name === file.name &&
+            existingFile.size === file.size &&
+            existingFile.lastModified === file.lastModified
+        )
     );
     const updatedImages = [...selectedImages, ...newImages];
     setSelectedImages(updatedImages);
@@ -1961,50 +1961,50 @@ export default function EventPlan() {
                 <Row>
                   <Col xs={3} className="mb-3">
                     <label
-                        className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-                        style={{
-                          cursor: "pointer",
-                          aspectRatio: "16/9",
-                          minHeight: "120px",
-                        }}
+                      className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                      style={{
+                        cursor: "pointer",
+                        aspectRatio: "16/9",
+                        minHeight: "120px",
+                      }}
                     >
-                      <FaPlus/>
+                      <FaPlus />
                       <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          key={selectedImages.length} // Đảm bảo input được làm mới
-                          onChange={handleImageUpload}
-                          style={{display: "none"}}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        key={selectedImages.length} // Đảm bảo input được làm mới
+                        onChange={handleImageUpload}
+                        style={{ display: "none" }}
                       />
                     </label>
                   </Col>
 
                   {selectedImages.map((file, index) => (
-                      <Col
-                          xs={3}
-                          key={`${file.name}-${file.size}-${file.lastModified}`}
-                          className="position-relative mb-3"
+                    <Col
+                      xs={3}
+                      key={`${file.name}-${file.size}-${file.lastModified}`}
+                      className="position-relative mb-3"
+                    >
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="uploaded"
+                        className="img-fluid rounded w-100 h-100 object-fit-cover"
+                        style={{
+                          aspectRatio: "16/9",
+                          minHeight: "120px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        className="position-absolute top-0 end-0 p-1"
+                        onClick={() => handleDeleteImage(index)}
                       >
-                        <img
-                            src={URL.createObjectURL(file)}
-                            alt="uploaded"
-                            className="img-fluid rounded w-100 h-100 object-fit-cover"
-                            style={{
-                              aspectRatio: "16/9",
-                              minHeight: "120px",
-                              objectFit: "cover",
-                            }}
-                        />
-                        <Button
-                            variant="danger"
-                            size="sm"
-                            className="position-absolute top-0 end-0 p-1"
-                            onClick={() => handleDeleteImage(index)}
-                        >
-                          ✕
-                        </Button>
-                      </Col>
+                        ✕
+                      </Button>
+                    </Col>
                   ))}
                 </Row>
               </Form.Group>

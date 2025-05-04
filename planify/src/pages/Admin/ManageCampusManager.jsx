@@ -222,9 +222,7 @@ export default function ManageCampusManager() {
         <div class="sidebar-start">
           <div class="sidebar-head">
             <a href="/dashboard" class="logo-wrapper" title="Home">
-              <img src={logo} alt="" style={{width: "150px"}}/>
-              <span class="sr-only">Home</span>
-              <span class="icon logo" aria-hidden="true"></span>
+              <img src={logo} alt="" style={{ width: "150px" }} />
               <div class="logo-text">
                 <span class="logo-title">Planify</span>
                 <span class="logo-subtitle">Dashboard</span>
