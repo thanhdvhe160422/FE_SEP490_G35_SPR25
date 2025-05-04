@@ -86,9 +86,9 @@ function MyRequest(props) {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 1:
+      case 0:
         return "Chưa được duyệt";
-      case 2:
+      case 1:
         return "Đã duyệt";
       case -1:
         return "Đã từ chối";
@@ -140,7 +140,7 @@ function MyRequest(props) {
     },
     {
       title: "Trạng thái",
-      dataIndex: "status",
+      dataIndex: "requestStatus",
       key: "status",
       render: (status) => (
         <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
@@ -181,8 +181,8 @@ function MyRequest(props) {
           onChange={handleStatusChange}
         >
           <option value="">Tất cả trạng thái</option>
-          <option value="1">Chưa duyệt</option>
-          <option value="2">Đã duyệt</option>
+          <option value="0">Chưa duyệt</option>
+          <option value="1">Đã duyệt</option>
           <option value="-1">Đã từ chối</option>
         </select>
         <Table

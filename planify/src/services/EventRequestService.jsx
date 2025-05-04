@@ -240,7 +240,7 @@ export const searchMyRequest = async (page, pageSize, status, userId) => {
 
   try {
     const response = await axios.get(
-      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&status=${status}&userId=${userId}`,
+      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -255,7 +255,7 @@ export const searchMyRequest = async (page, pageSize, status, userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&status=${status}&userId=${userId}`,
+            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -280,7 +280,7 @@ export const searchRequest = async (page, pageSize, status) => {
 
   try {
     const response = await axios.get(
-      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&status=${status}`,
+      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -295,7 +295,7 @@ export const searchRequest = async (page, pageSize, status) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&status=${status}`,
+            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
