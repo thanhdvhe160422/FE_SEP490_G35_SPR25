@@ -83,7 +83,7 @@ export default function CreateEvent() {
     const campusId = getCampusIdFromToken();
     try {
       const response = await axios.get(
-        `https://fptu-planify.com/api/Categories/${campusId}`,
+        `https://localhost:44320/api/Categories/${campusId}`,
         {
           headers: {
             Accept: "*/*",
@@ -143,7 +143,7 @@ export default function CreateEvent() {
       if (selectedCategory) {
         try {
           const response = await axios.post(
-            "https://fptu-planify.com/api/EventSuggestion/get-full-event-suggestion",
+            "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
             {
               prompt: pendingPrompt,
               categoryEventId: selectedCategory.id,
@@ -568,7 +568,7 @@ export default function CreateEvent() {
 
     try {
       const response = await axios.get(
-        `https://fptu-planify.com/api/Users/search?input=${value}`,
+        `https://localhost:44320/api/Users/search?input=${value}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -593,7 +593,7 @@ export default function CreateEvent() {
           localStorage.setItem("token", newToken);
           try {
             const retryResponse = await axios.get(
-              `https://fptu-planify.com/api/Users/search?input=${value}`,
+              `https://localhost:44320/api/Users/search?input=${value}`,
               {
                 headers: {
                   Authorization: `Bearer ${newToken}`,
@@ -800,7 +800,7 @@ export default function CreateEvent() {
 
           try {
             const createResponse = await axios.post(
-              "https://fptu-planify.com/api/Events/create",
+              "https://localhost:44320/api/Events/create",
               eventData,
               {
                 headers: {
@@ -828,7 +828,7 @@ export default function CreateEvent() {
               if (newToken) {
                 try {
                   let retryResponse = await axios.post(
-                    "https://fptu-planify.com/api/Events/create",
+                    "https://localhost:44320/api/Events/create",
                     eventData,
                     {
                       headers: {
@@ -895,7 +895,7 @@ export default function CreateEvent() {
     formData.append("eventId", eventId);
     try {
       await axios.post(
-        "https://fptu-planify.com/api/Events/upload-image",
+        "https://localhost:44320/api/Events/upload-image",
         formData,
         {
           headers: {

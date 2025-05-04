@@ -41,7 +41,7 @@ export default function Header() {
     setMessages(savedMessages);
 
     const newConnection = new HubConnectionBuilder()
-      .withUrl("https://fptu-planify.com/notificationHub", {
+      .withUrl("https://localhost:44320/notificationHub", {
         accessTokenFactory: () => token,
       })
       .build();

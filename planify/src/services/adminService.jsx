@@ -5,7 +5,7 @@ export const getCategoryAdmin = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Dashboard/used-categories`,
+      `https://localhost:44320/api/Dashboard/used-categories`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -20,7 +20,7 @@ export const getCategoryAdmin = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Dashboard/used-categories`,
+            `https://localhost:44320/api/Dashboard/used-categories`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -45,7 +45,7 @@ export const getEventByYear = async (year) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Dashboard/monthly-stats?year=${year}`,
+      `https://localhost:44320/api/Dashboard/monthly-stats?year=${year}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -60,7 +60,7 @@ export const getEventByYear = async (year) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Dashboard/monthly-stats?year=${year}`,
+            `https://localhost:44320/api/Dashboard/monthly-stats?year=${year}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -85,7 +85,7 @@ export const getEventByParticipant = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Dashboard/top-events-by-participants`,
+      `https://localhost:44320/api/Dashboard/top-events-by-participants`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -100,7 +100,7 @@ export const getEventByParticipant = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Dashboard/top-events-by-participants`,
+            `https://localhost:44320/api/Dashboard/top-events-by-participants`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -125,7 +125,7 @@ export const getNewEventByCampus = async (campusName) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Dashboard/latest-events?campusName=${campusName}`,
+      `https://localhost:44320/api/Dashboard/latest-events?campusName=${campusName}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -140,7 +140,7 @@ export const getNewEventByCampus = async (campusName) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Dashboard/latest-events?campusName=${campusName}`,
+            `https://localhost:44320/api/Dashboard/latest-events?campusName=${campusName}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -165,7 +165,7 @@ export const getEventByCampus = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Dashboard/percent-events`,
+      `https://localhost:44320/api/Dashboard/percent-events`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -180,7 +180,7 @@ export const getEventByCampus = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Dashboard/percent-events`,
+            `https://localhost:44320/api/Dashboard/percent-events`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -205,7 +205,7 @@ export const searchUsers = async (params) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Users/search/v2`,
+      `https://localhost:44320/api/Users/search/v2`,
       {
         params: {
           page: params.page || undefined,
@@ -227,7 +227,7 @@ export const searchUsers = async (params) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Users/search/v2`,
+            `https://localhost:44320/api/Users/search/v2`,
             {
               params: {
                 page: params.page || undefined,

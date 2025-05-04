@@ -2,14 +2,14 @@ import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 import Swal from "sweetalert2";
 
-const API_TASK_URL = "https://fptu-planify.com/api/Tasks";
+const API_TASK_URL = "https://localhost:44320/api/Tasks";
 
 export const createTaskAPI = async (taskData) => {
   let token = localStorage.getItem("token");
 
   try {
     const response = await axios.post(
-      `https://fptu-planify.com/api/Tasks/create`,
+      `https://localhost:44320/api/Tasks/create`,
       taskData,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -25,7 +25,7 @@ export const createTaskAPI = async (taskData) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.post(
-            `https://fptu-planify.com/api/Tasks/create`,
+            `https://localhost:44320/api/Tasks/create`,
             taskData,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -53,7 +53,7 @@ const getListTask = async (eventId, page, pageSize) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Tasks/list/${eventId}?page=${page}&pageSize=${pageSize}`,
+      `https://localhost:44320/api/Tasks/list/${eventId}?page=${page}&pageSize=${pageSize}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -68,7 +68,7 @@ const getListTask = async (eventId, page, pageSize) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Tasks/list/${eventId}`,
+            `https://localhost:44320/api/Tasks/list/${eventId}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -122,7 +122,7 @@ export const updateTask = async (taskId, data) => {
 
   try {
     const response = await axios.put(
-      `https://fptu-planify.com/api/Tasks/update/${taskId}`,
+      `https://localhost:44320/api/Tasks/update/${taskId}`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -138,7 +138,7 @@ export const updateTask = async (taskId, data) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/Tasks/update/${taskId}`,
+            `https://localhost:44320/api/Tasks/update/${taskId}`,
             data,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -166,7 +166,7 @@ export const deleteTask = async (taskId, status) => {
 
   const updateTaskStatus = async (authToken) => {
     return await axios.put(
-      `https://fptu-planify.com/api/Tasks/${taskId}/status/${status}`,
+      `https://localhost:44320/api/Tasks/${taskId}/status/${status}`,
       {},
       {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -228,7 +228,7 @@ export const getTaskListByImplementer = async (idImplementer, start, end) => {
   const token = localStorage.getItem("token");
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
+      `https://localhost:44320/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -243,7 +243,7 @@ export const getTaskListByImplementer = async (idImplementer, start, end) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
+            `https://localhost:44320/api/Tasks/search/v2?implementerId=${idImplementer}&startDate=${start}&endDate=${end}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }

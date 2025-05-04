@@ -152,12 +152,12 @@ export default function Dashboard() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fptu-planify.com" + "/css/style.min.css";
+    link.href = "https://localhost:44320" + "/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "https://fptu-planify.com" + "/css/style.css";
+    link2.href = "https://localhost:44320" + "/css/style.css";
     document.head.appendChild(link2);
 
     if (window.feather) {

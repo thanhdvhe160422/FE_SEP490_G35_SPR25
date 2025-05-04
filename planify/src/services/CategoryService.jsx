@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://fptu-planify.com/api/Categories";
+const API_URL = "https://localhost:44320/api/Categories";
 
 const getCategories = async () => {
   try {

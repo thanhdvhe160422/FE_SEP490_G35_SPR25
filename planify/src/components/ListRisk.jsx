@@ -50,7 +50,7 @@ function ListRisk({ eventId, data }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
+        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -70,7 +70,7 @@ function ListRisk({ eventId, data }) {
   const handleDelete = async (riskId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://fptu-planify.com/api/Risk/${riskId}`, {
+      await axios.delete(`https://localhost:44320/api/Risk/${riskId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -103,7 +103,7 @@ function ListRisk({ eventId, data }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `https://fptu-planify.com/api/Risk/${selectedRisk.id}`,
+        `https://localhost:44320/api/Risk/${selectedRisk.id}`,
         {
           ...values,
           eventId: eventId,
@@ -129,7 +129,7 @@ function ListRisk({ eventId, data }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://fptu-planify.com/api/Risk`,
+        `https://localhost:44320/api/Risk`,
         {
           ...values,
           eventId: eventId,

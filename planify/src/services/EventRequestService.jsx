@@ -8,7 +8,7 @@ export const approveRequest = async (id, reason) => {
   console.log("🚀 Sending request with payload:", payload);
   try {
     const response = await axios.put(
-      `https://fptu-planify.com/api/SendRequest/${id}/approve`,
+      `https://localhost:44320/api/SendRequest/${id}/approve`,
       { id, reason },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -24,7 +24,7 @@ export const approveRequest = async (id, reason) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest/${id}/approve`,
+            `https://localhost:44320/api/SendRequest/${id}/approve`,
             { id, reason },
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -55,7 +55,7 @@ export const rejectRequest = async (id, reason) => {
 
   try {
     const response = await axios.put(
-      `https://fptu-planify.com/api/SendRequest/${id}/reject`,
+      `https://localhost:44320/api/SendRequest/${id}/reject`,
       {
         id,
         reason,
@@ -74,7 +74,7 @@ export const rejectRequest = async (id, reason) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest/${id}/reject`,
+            `https://localhost:44320/api/SendRequest/${id}/reject`,
             { id, reason },
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -104,7 +104,7 @@ export const getRequest = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/SendRequest`,
+      `https://localhost:44320/api/SendRequest`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -119,7 +119,7 @@ export const getRequest = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest`,
+            `https://localhost:44320/api/SendRequest`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -155,7 +155,7 @@ export const getMyRequest = async (userId) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/SendRequest/MyRequests/${userId}`,
+      `https://localhost:44320/api/SendRequest/MyRequests/${userId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -170,7 +170,7 @@ export const getMyRequest = async (userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest/MyRequests/${userId}`,
+            `https://localhost:44320/api/SendRequest/MyRequests/${userId}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -194,7 +194,7 @@ export const sendRequest = async (eventId) => {
   let token = localStorage.getItem("token");
   try {
     const response = await axios.post(
-      `https://fptu-planify.com/api/SendRequest`,
+      `https://localhost:44320/api/SendRequest`,
       { eventId },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -210,7 +210,7 @@ export const sendRequest = async (eventId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest`,
+            `https://localhost:44320/api/SendRequest`,
             { eventId },
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -240,7 +240,7 @@ export const searchMyRequest = async (page, pageSize, status, userId) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
+      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -255,7 +255,7 @@ export const searchMyRequest = async (page, pageSize, status, userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
+            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}&userId=${userId}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -280,7 +280,7 @@ export const searchRequest = async (page, pageSize, status) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
+      `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -295,7 +295,7 @@ export const searchRequest = async (page, pageSize, status) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
+            `https://localhost:44320/api/SendRequest/search?page=${page}&pageSize=${pageSize}&requestStatus=${status}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }

@@ -73,7 +73,7 @@ const Chatbot = ({ onApplyEventData, token }) => {
 
     try {
       const response = await axios.get(
-        `https://fptu-planify.com/api/Categories/${campusId}`,
+        `https://localhost:44320/api/Categories/${campusId}`,
         {
           headers: { Authorization: `Bearer ${token}`, Accept: "*/*" },
         }
@@ -148,7 +148,7 @@ const Chatbot = ({ onApplyEventData, token }) => {
 
     try {
       const response = await axios.post(
-        "https://fptu-planify.com/api/EventSuggestion/get-full-event-suggestion",
+        "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
         { prompt: pendingPrompt, categoryEventId: category.id },
         {
           headers: {
@@ -537,7 +537,7 @@ const useCategories = () => {
       }
       try {
         const response = await axios.get(
-          `https://fptu-planify.com/api/Categories/${campusId}`,
+          `https://localhost:44320/api/Categories/${campusId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -1085,7 +1085,7 @@ export default function EventPlan() {
     formData.append("eventId", eventId);
     try {
       await axios.post(
-        "https://fptu-planify.com/api/Events/upload-image",
+        "https://localhost:44320/api/Events/upload-image",
         formData,
         {
           headers: {
@@ -1190,7 +1190,7 @@ export default function EventPlan() {
     try {
       const eventData = prepareEventData();
       const response = await axios.post(
-        "https://fptu-planify.com/api/Events/create",
+        "https://localhost:44320/api/Events/create",
         eventData,
         {
           headers: {
@@ -1205,7 +1205,7 @@ export default function EventPlan() {
 
       if (response.status === 201) {
         await axios.post(
-          "https://fptu-planify.com/api/SendRequest",
+          "https://localhost:44320/api/SendRequest",
           { eventId },
           {
             headers: {
@@ -1259,7 +1259,7 @@ export default function EventPlan() {
         try {
           const eventData = prepareEventData();
           const response = await axios.post(
-            "https://fptu-planify.com/api/Events/create",
+            "https://localhost:44320/api/Events/create",
             eventData,
             {
               headers: {

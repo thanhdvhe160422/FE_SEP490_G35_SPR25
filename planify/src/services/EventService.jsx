@@ -5,9 +5,9 @@ import Swal from "sweetalert2";
 const getPosts = async (page, pageSize, role) => {
   let API_URL = "";
   if (role === "Spectator") {
-    API_URL = "https://fptu-planify.com/api/EventForSpectators";
+    API_URL = "https://localhost:44320/api/EventForSpectators";
   } else {
-    API_URL = "https://fptu-planify.com/api/Events/List";
+    API_URL = "https://localhost:44320/api/Events/List";
   }
   try {
     let hasMore = true;
@@ -68,7 +68,7 @@ export default getPosts;
 export const getEventById = async (eventId) => {
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/EventForSpectators/${eventId}`,
+      `https://localhost:44320/api/EventForSpectators/${eventId}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("reToken")}`,
@@ -87,7 +87,7 @@ export const updateEvent = async (id, data) => {
   console.log("data call api: ", data);
   try {
     const response = await axios.put(
-      `https://fptu-planify.com/api/Events/${id}`,
+      `https://localhost:44320/api/Events/${id}`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +103,7 @@ export const updateEvent = async (id, data) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/Events/${id}`,
+            `https://localhost:44320/api/Events/${id}`,
             data,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -135,7 +135,7 @@ export const getEventEOGById = async (id) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Events/get-event-detail/?eventId=${id}`,
+      `https://localhost:44320/api/Events/get-event-detail/?eventId=${id}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -150,7 +150,7 @@ export const getEventEOGById = async (id) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Events/get-event-detail/?eventId=${id}`,
+            `https://localhost:44320/api/Events/get-event-detail/?eventId=${id}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -181,7 +181,7 @@ export const getEventSpecById = async (id) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/EventForSpectators/${id}`,
+      `https://localhost:44320/api/EventForSpectators/${id}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -196,7 +196,7 @@ export const getEventSpecById = async (id) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/EventForSpectators/${id}`,
+            `https://localhost:44320/api/EventForSpectators/${id}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -221,7 +221,7 @@ export const searchEvents = async (params) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Events/search`,
+      `https://localhost:44320/api/Events/search`,
       {
         params: {
           createBy: params.createBy || undefined,
@@ -247,7 +247,7 @@ export const searchEvents = async (params) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Events/search`,
+            `https://localhost:44320/api/Events/search`,
             {
               params: {
                 page: params.page || 1,
@@ -284,7 +284,7 @@ export const updateMedia = async (data) => {
 
   try {
     const response = await axios.put(
-      `https://fptu-planify.com/api/Events/update-event-media`,
+      `https://localhost:44320/api/Events/update-event-media`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -300,7 +300,7 @@ export const updateMedia = async (data) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.put(
-            `https://fptu-planify.com/api/Events/delete-event-media`,
+            `https://localhost:44320/api/Events/delete-event-media`,
             data,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -332,7 +332,7 @@ export const searchEventsSpec = async (params) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/EventForSpectators/search`,
+      `https://localhost:44320/api/EventForSpectators/search`,
       {
         params: {
           name: params.name || undefined,
@@ -356,7 +356,7 @@ export const searchEventsSpec = async (params) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/EventForSpectators/search`,
+            `https://localhost:44320/api/EventForSpectators/search`,
             {
               params: {
                 name: params.name || undefined,
@@ -391,7 +391,7 @@ export const createFavoriteEvent = async (eventId) => {
 
   try {
     const response = await axios.post(
-      `https://fptu-planify.com/api/FavouriteEvent/create/${eventId}`,
+      `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
       null,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -406,7 +406,7 @@ export const createFavoriteEvent = async (eventId) => {
       if (newToken) {
         try {
           const retryResponse = await axios.post(
-            `https://fptu-planify.com/api/FavouriteEvent/create/${eventId}`,
+            `https://localhost:44320/api/FavouriteEvent/create/${eventId}`,
             null,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -433,7 +433,7 @@ export const deleteFavouriteEvent = async (id) => {
 
   try {
     const response = await axios.delete(
-      `https://fptu-planify.com/api/FavouriteEvent/delete/${id}`,
+      `https://localhost:44320/api/FavouriteEvent/delete/${id}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -448,7 +448,7 @@ export const deleteFavouriteEvent = async (id) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.delete(
-            `https://fptu-planify.com/api/FavouriteEvent/delete/${id}`,
+            `https://localhost:44320/api/FavouriteEvent/delete/${id}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -473,7 +473,7 @@ export const getFavouriteEvents = async (page, pageSize) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
+      `https://localhost:44320/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -488,7 +488,7 @@ export const getFavouriteEvents = async (page, pageSize) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
+            `https://localhost:44320/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -514,7 +514,7 @@ export const getNotification = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Events/notification`,
+      `https://localhost:44320/api/Events/notification`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -529,7 +529,7 @@ export const getNotification = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Events/notification`,
+            `https://localhost:44320/api/Events/notification`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -558,7 +558,7 @@ export const RegisterParticipant = async (eventId, userId) => {
 
   try {
     const response = await axios.post(
-      `https://fptu-planify.com/api/Participant/register`,
+      `https://localhost:44320/api/Participant/register`,
       formData,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -574,7 +574,7 @@ export const RegisterParticipant = async (eventId, userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.post(
-            `https://fptu-planify.com/api/Participant/register`,
+            `https://localhost:44320/api/Participant/register`,
             formData,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -611,7 +611,7 @@ export const IsRegisterParticipant = async (eventId) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Participant/is-register/${eventId}`,
+      `https://localhost:44320/api/Participant/is-register/${eventId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -626,7 +626,7 @@ export const IsRegisterParticipant = async (eventId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Participant/is-register/${eventId}`,
+            `https://localhost:44320/api/Participant/is-register/${eventId}`,
             eventId,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -657,7 +657,7 @@ export const DeleteRegisterParticipant = async (eventId, userId) => {
 
   try {
     const response = await axios.post(
-      `https://fptu-planify.com/api/Participant/unregister`,
+      `https://localhost:44320/api/Participant/unregister`,
       formData,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -673,7 +673,7 @@ export const DeleteRegisterParticipant = async (eventId, userId) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.post(
-            `https://fptu-planify.com/api/Participant/unregister`,
+            `https://localhost:44320/api/Participant/unregister`,
             formData,
             {
               headers: { Authorization: `Bearer ${newToken}` },
@@ -710,7 +710,7 @@ export const getMyFavouriteEvents = async (page, pageSize) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/FavouriteEvent/get-list/v2?page=${page}&pageSize=${pageSize}`,
+      `https://localhost:44320/api/FavouriteEvent/get-list/v2?page=${page}&pageSize=${pageSize}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -725,7 +725,7 @@ export const getMyFavouriteEvents = async (page, pageSize) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
+            `https://localhost:44320/api/FavouriteEvent/get-list?page=${page}&pageSize=${pageSize}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -751,7 +751,7 @@ export const GetRegisterdByUserId = async () => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Participant/registered/${userId}`,
+      `https://localhost:44320/api/Participant/registered/${userId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -766,7 +766,7 @@ export const GetRegisterdByUserId = async () => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Participant/registered/${userId}`,
+            `https://localhost:44320/api/Participant/registered/${userId}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -792,7 +792,7 @@ export const getMyEvents = async (page, pageSize) => {
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
+      `https://localhost:44320/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -807,7 +807,7 @@ export const getMyEvents = async (page, pageSize) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
+            `https://localhost:44320/api/Events/my-event?page=${page}&pageSize=${pageSize}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }

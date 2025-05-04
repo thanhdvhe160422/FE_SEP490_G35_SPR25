@@ -1,7 +1,7 @@
 import axios from "axios";
 import refreshAccessToken from "./refreshToken";
 
-const API_URL = "https://fptu-planify.com/api/SubTasks";
+const API_URL = "https://localhost:44320/api/SubTasks";
 
 export const createSubTask = async (subTaskData, token) => {
   try {
@@ -64,7 +64,7 @@ export const getSubtaskByImplementer = async (
 
   try {
     const response = await axios.get(
-      `https://fptu-planify.com/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
+      `https://localhost:44320/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -79,7 +79,7 @@ export const getSubtaskByImplementer = async (
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://fptu-planify.com/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
+            `https://localhost:44320/api/SubTasks/search/v2?implementerId=${implementerId}&startDate=${startDate}&endDate=${endDate}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }

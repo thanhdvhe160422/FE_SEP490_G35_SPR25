@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/Events/EventDetailSpec.css";
 import Header from "../../components/Header/Header";
@@ -6,7 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import { getEventSpecById } from "../../services/EventService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import {FaClock, FaMapMarkerAlt, FaMinus, FaPlus} from "react-icons/fa";
 import { parseISO } from "date-fns";
 import { MdOutlineCategory } from "react-icons/md";
 import { BiGridAlt } from "react-icons/bi";
@@ -32,6 +32,8 @@ function EventDetailSpec() {
   const [isRegistered, setIsRegistered] = useState(false);
   const currentTime = new Date();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [openActivityIds, setOpenActivityIds] = useState([]);
+
 
   useEffect(() => {
     const fetchEventDetail = async () => {
@@ -54,6 +56,7 @@ function EventDetailSpec() {
 
         setBannerImages(imageUrls);
 
+        setOpenActivityIds(data.activities)
         setEvent(data);
       } catch (error) {
         console.error("Failed to fetch event details:", error);
@@ -137,159 +140,159 @@ function EventDetailSpec() {
       <div className="event-container">
         <div className="event-banner-gallery">
           {bannerImages.length === 1 || bannerImages.length === 2 ? (
-            <div className="single-banner" style={{ position: "relative" }}>
-              <img
-                src={fixDriveUrl(bannerImages[0])}
-                alt="Main Event"
-                className="single-banner-img"
-                onClick={() => {
-                  setCurrentIndex(0);
-                  setOpenLightbox(true);
-                }}
-              />
-              {bannerImages.length === 2 && (
-                <button
-                  className="view-all-btn-single"
-                  onClick={() => {
-                    setCurrentIndex(0);
-                    setOpenLightbox(true);
-                  }}
-                >
-                  <BiGridAlt style={{ marginRight: "6px", fontSize: "17px" }} />
-                  <strong>Xem tất cả ảnh</strong>
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
-              <div
-                className="gallery-left"
-                onClick={() => setOpenLightbox(true)}
-              >
-                {bannerImages[0] && (
-                  <img
+              <div className="single-banner" style={{position: "relative"}}>
+                <img
                     src={fixDriveUrl(bannerImages[0])}
                     alt="Main Event"
-                    className="main-banner-img"
-                  />
-                )}
-              </div>
-              <div className="gallery-right">
-                {bannerImages.slice(1, 3).map((img, index) => (
-                  <div className="thumbnail-wrapper" key={index}>
-                    <img
-                      src={fixDriveUrl(img)}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="thumbnail-img"
-                      onClick={() => {
-                        setCurrentIndex(index + 1);
-                        setOpenLightbox(true);
-                      }}
-                    />
-                    {index === 1 && bannerImages.length > 3 && (
-                      <button
-                        className="view-all-btn"
+                    className="single-banner-img"
+                    onClick={() => {
+                      setCurrentIndex(0);
+                      setOpenLightbox(true);
+                    }}
+                />
+                {bannerImages.length === 2 && (
+                    <button
+                        className="view-all-btn-single"
                         onClick={() => {
                           setCurrentIndex(0);
                           setOpenLightbox(true);
                         }}
-                      >
-                        <BiGridAlt
-                          style={{
-                            marginRight: "6px",
-                            fontSize: "17px",
-                            marginBottom: "5px",
-                          }}
-                        />
-                        <strong>Tất cả ảnh</strong>
-                      </button>
-                    )}
-                  </div>
-                ))}
+                    >
+                      <BiGridAlt style={{marginRight: "6px", fontSize: "17px"}}/>
+                      <strong>Xem tất cả ảnh</strong>
+                    </button>
+                )}
               </div>
-            </>
+          ) : (
+              <>
+                <div
+                    className="gallery-left"
+                    onClick={() => setOpenLightbox(true)}
+                >
+                  {bannerImages[0] && (
+                      <img
+                          src={fixDriveUrl(bannerImages[0])}
+                          alt="Main Event"
+                          className="main-banner-img"
+                      />
+                  )}
+                </div>
+                <div className="gallery-right">
+                  {bannerImages.slice(1, 3).map((img, index) => (
+                      <div className="thumbnail-wrapper" key={index}>
+                        <img
+                            src={fixDriveUrl(img)}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="thumbnail-img"
+                            onClick={() => {
+                              setCurrentIndex(index + 1);
+                              setOpenLightbox(true);
+                            }}
+                        />
+                        {index === 1 && bannerImages.length > 3 && (
+                            <button
+                                className="view-all-btn"
+                                onClick={() => {
+                                  setCurrentIndex(0);
+                                  setOpenLightbox(true);
+                                }}
+                            >
+                              <BiGridAlt
+                                  style={{
+                                    marginRight: "6px",
+                                    fontSize: "17px",
+                                    marginBottom: "5px",
+                                  }}
+                              />
+                              <strong>Tất cả ảnh</strong>
+                            </button>
+                        )}
+                      </div>
+                  ))}
+                </div>
+              </>
           )}
 
           {openLightbox && (
-            <Lightbox
-              open={openLightbox}
-              close={() => setOpenLightbox(false)}
-              index={currentIndex}
-              on={{
-                view: ({ index }) => setCurrentIndex(index),
-              }}
-              slides={bannerImages.map((url) => ({
-                src: fixDriveUrl(url),
-              }))}
-              plugins={[Thumbnails]}
-            />
+              <Lightbox
+                  open={openLightbox}
+                  close={() => setOpenLightbox(false)}
+                  index={currentIndex}
+                  on={{
+                    view: ({index}) => setCurrentIndex(index),
+                  }}
+                  slides={bannerImages.map((url) => ({
+                    src: fixDriveUrl(url),
+                  }))}
+                  plugins={[Thumbnails]}
+              />
           )}
         </div>
 
-        <div style={{ marginRight: "70%" }}>
+        <div style={{marginRight: "70%"}}>
           {new Date(event.endTime) <= currentTime ? (
-            <button
-              className="btn btn-secondary"
-              style={{ height: "50px" }}
-              id="btn-disabled"
-              disabled
-            >
-              Sự kiện đã đóng, không thể đăng ký
-            </button>
+              <button
+                  className="btn btn-secondary"
+                  style={{height: "50px"}}
+                  id="btn-disabled"
+                  disabled
+              >
+                Sự kiện đã đóng, không thể đăng ký
+              </button>
           ) : isRegistered ? (
-            <button
-              className="btn btn-danger"
-              style={{ height: "50px" }}
-              id="btn-cancel-register"
-              onClick={handleCancelRegisterParticipant}
-            >
-              Hủy tham gia
-            </button>
+              <button
+                  className="btn btn-danger"
+                  style={{height: "50px"}}
+                  id="btn-cancel-register"
+                  onClick={handleCancelRegisterParticipant}
+              >
+                Hủy tham gia
+              </button>
           ) : (
-            <button
-              className="btn btn-warning"
-              style={{ height: "50px" }}
-              id="btn-register"
-              onClick={HandleRegisterParticipant}
-            >
-              Đăng ký tham gia
-            </button>
+              <button
+                  className="btn btn-warning"
+                  style={{height: "50px"}}
+                  id="btn-register"
+                  onClick={HandleRegisterParticipant}
+              >
+                Đăng ký tham gia
+              </button>
           )}
         </div>
 
         <div className="event-details">
           <div className="event-title-container">
-            <h1 style={{ color: "purple", fontWeight: "bold" }}>
+            <h1 style={{color: "purple", fontWeight: "bold"}}>
               {event.eventTitle}
             </h1>
             <div
-              className={`status_tag ${
-                statusEvent(event.startTime, event.endTime) === "Đang diễn ra"
-                  ? "running_status"
-                  : statusEvent(event.startTime, event.endTime) ===
-                    "Chưa diễn ra"
-                  ? "not_started_status"
-                  : "ended_status"
-              }`}
+                className={`status_tag ${
+                    statusEvent(event.startTime, event.endTime) === "Đang diễn ra"
+                        ? "running_status"
+                        : statusEvent(event.startTime, event.endTime) ===
+                        "Chưa diễn ra"
+                            ? "not_started_status"
+                            : "ended_status"
+                }`}
             >
               {statusEvent(event.startTime, event.endTime)}
             </div>
           </div>
 
           <div className="event-time">
-            <FaClock className="icon-time" />
+            <FaClock className="icon-time"/>
             <span>
               <strong> Từ:</strong>{" "}
               {event?.startTime
-                ? formatDateTime(event.startTime)
-                : "Not updated yet"}
+                  ? formatDateTime(event.startTime)
+                  : "Not updated yet"}
             </span>
           </div>
 
           <div className="event-location">
             <FaMapMarkerAlt
-              style={{ color: "green" }}
-              className="icon-location"
+                style={{color: "green"}}
+                className="icon-location"
             />
             <span>
               <strong> Địa điểm:</strong>{" "}
@@ -298,21 +301,21 @@ function EventDetailSpec() {
           </div>
 
           <div className="event-time">
-            <FaClock className="icon-time" />
+            <FaClock className="icon-time"/>
             <span>
               <strong>Đến:</strong>{" "}
               {event?.endTime
-                ? formatDateTime(event.endTime)
-                : "Not updated yet"}
+                  ? formatDateTime(event.endTime)
+                  : "Not updated yet"}
             </span>
           </div>
 
           <div className="event-time">
             <MdOutlineCategory
-              style={{ color: "orange" }}
-              className="icon-time"
+                style={{color: "orange"}}
+                className="icon-time"
             />
-            <span style={{ fontWeight: "bold" }} className="event-info-span">
+            <span style={{fontWeight: "bold"}} className="event-info-span">
               Kiểu sự kiện:{" "}
             </span>
             {event?.categoryViewModel?.categoryEventName || "Not determined"}
@@ -332,8 +335,46 @@ function EventDetailSpec() {
             <span>{event.eventDescription}</span>
           </div>
         </div>
+
+        <div className="event-activities">
+          <div className="activities-title">Hoạt động:</div>
+          <div className="activities-list">
+            {event.activities && event.activities.length > 0 ? (
+                event.activities.map((activity) => (
+                    <div key={activity.id} className="activity-item">
+                      <div
+                          className="activity-header"
+                          onClick={() =>
+                              setOpenActivityIds((prev) =>
+                                  prev.includes(activity.id)
+                                      ? prev.filter((id) => id !== activity.id)
+                                      : [...prev, activity.id]
+                              )
+                          }
+                      >
+                        <strong>{activity.name}</strong>
+                        <span className="toggle-icon">
+                          {openActivityIds.includes(activity.id) ? (
+                              <FaMinus/>
+                          ) : (
+                              <FaPlus/>
+                          )}
+                        </span>
+                      </div>
+                      {openActivityIds.includes(activity.id) && (
+                          <div className="activity-content">
+                            {activity.content}
+                          </div>
+                      )}
+                    </div>
+                ))
+            ) : (
+                <span>Chưa có hoạt động nào</span>
+            )}
+          </div>
+        </div>
       </div>
-      <Footer />
+      <Footer/>
     </>
   );
 }

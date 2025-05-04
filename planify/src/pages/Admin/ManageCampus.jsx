@@ -36,12 +36,12 @@ function ManageCampus(props) {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://fptu-planify.com" + "/css/style.min.css";
+    link.href = "https://localhost:44320" + "/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "https://fptu-planify.com" + "/css/style.css";
+    link2.href = "https://localhost:44320" + "/css/style.css";
     document.head.appendChild(link2);
 
     if (window.feather) {
@@ -55,7 +55,7 @@ function ManageCampus(props) {
   const handleDelete = async (id) => {
     setIsLoading(true);
     try {
-      await axios.put(`https://fptu-planify.com/api/Campus/delete/${id}`, null, {
+      await axios.put(`https://localhost:44320/api/Campus/delete/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchCampuses();
@@ -199,7 +199,7 @@ function ManageCampus(props) {
           onOk={async () => {
             try {
               await axios.post(
-                "https://fptu-planify.com/api/Campus",
+                "https://localhost:44320/api/Campus",
                 { campusName: newCampusName, status: "1" },
                 {
                   headers: { Authorization: `Bearer ${token}` },

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://fptu-planify.com/api/Campus/List";
+const API_URL = "https://localhost:44320/api/Campus/List";
 
 export const getCampuses = async () => {
   try {
@@ -13,7 +13,7 @@ export const getCampuses = async () => {
 };
 export const getCampusIdByName = async (name)=>{
   try{
-    const response = await axios.get(`https://fptu-planify.com/api/Campus/${name}`);
+    const response = await axios.get(`https://localhost:44320/api/Campus/${name}`);
     return response.data;
   }catch(error){
     console.error("Lỗi tìm campus theo tên: ",error);

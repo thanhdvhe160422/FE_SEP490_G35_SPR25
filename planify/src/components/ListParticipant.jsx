@@ -33,7 +33,7 @@ function ListParticipant({ eventId }) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://fptu-planify.com/api/Participant/count/${eventId}?pageNumber=${currentPage}&pageSize=10`
+        `https://localhost:44320/api/Participant/count/${eventId}?pageNumber=${currentPage}&pageSize=10`
       );
       console.log("Response participants:", response.data.result);
       if (response.data.result) {

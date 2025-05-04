@@ -174,7 +174,7 @@ function ListTask({ eventId, data }) {
 
       const fetchData = async (authToken) => {
         const response = await axios.get(
-          `https://fptu-planify.com/api/Users/search?${params.toString()}`,
+          `https://localhost:44320/api/Users/search?${params.toString()}`,
           {
             headers: { Authorization: `Bearer ${authToken}` },
           }
@@ -252,7 +252,7 @@ function ListTask({ eventId, data }) {
 
       const assign = async (authToken) => {
         return await axios.post(
-          `https://fptu-planify.com/api/SubTasks/assign-subtask?userId=${userId}&subtaskId=${subtaskId}`,
+          `https://localhost:44320/api/SubTasks/assign-subtask?userId=${userId}&subtaskId=${subtaskId}`,
           {},
           {
             headers: { Authorization: `Bearer ${authToken}` },
@@ -345,7 +345,7 @@ function ListTask({ eventId, data }) {
 
       const update = async (authToken) => {
         const response = await axios.put(
-          `https://fptu-planify.com/api/SubTasks/update/${selectedSubTask.id}`,
+          `https://localhost:44320/api/SubTasks/update/${selectedSubTask.id}`,
           updatedSubTaskData,
           {
             headers: { Authorization: `Bearer ${authToken}` },
@@ -409,7 +409,7 @@ function ListTask({ eventId, data }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
+        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -462,7 +462,7 @@ function ListTask({ eventId, data }) {
 
       const create = async (authToken) => {
         return await axios.post(
-          "https://fptu-planify.com/api/SubTasks/create",
+          "https://localhost:44320/api/SubTasks/create",
           newSubTaskData,
           {
             headers: { Authorization: `Bearer ${authToken}` },
@@ -573,7 +573,7 @@ function ListTask({ eventId, data }) {
 
       const token = localStorage.getItem("token");
       await axios.post(
-        "https://fptu-planify.com/api/Tasks/create",
+        "https://localhost:44320/api/Tasks/create",
         newTaskData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -698,7 +698,7 @@ function ListTask({ eventId, data }) {
 
       const updateStatus = async (authToken) => {
         return await axios.put(
-          `https://fptu-planify.com/api/SubTasks/update-status/${subTaskId}`,
+          `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
           { status },
           {
             headers: { Authorization: `Bearer ${authToken}` },
@@ -760,7 +760,7 @@ function ListTask({ eventId, data }) {
 
       const deleteSubtask = async (authToken) => {
         return await axios.put(
-          `https://fptu-planify.com/api/SubTasks/update-status/${subTaskId}`,
+          `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
           { status: -1 },
           {
             headers: { Authorization: `Bearer ${authToken}` },
