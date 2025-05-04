@@ -181,7 +181,7 @@ function ListRisk({ eventId, data }) {
       ellipsis: true,
     },
   ];
-  if (userId === data.createdBy.id && data.status === 0) {
+  if (userId === data.createdBy.id && (data.status === 0||data.status === -1)) {
     columns.push({
       title: "Hành động",
       key: "action",
@@ -222,7 +222,7 @@ function ListRisk({ eventId, data }) {
           <Title level={3} className="risk-title">
             Danh sách rủi ro ({riskList.length})
           </Title>
-          {userId === data.createdBy.id && data.status === 0 && (
+          {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
             <Button
               type="primary"
               icon={<PlusOutlined />}

@@ -358,7 +358,7 @@ function ListCost({ eventId, data }) {
   };
 
   const getColumns = () => {
-    const showActionColumn = userId === data.createdBy.id && data.status === 0;
+    const showActionColumn = userId === data.createdBy.id && (data.status === 0||data.status === -1);
 
     const indexWidth = showActionColumn ? "5%" : "5%";
     const nameWidth = showActionColumn ? "25%" : "30%";
@@ -485,7 +485,7 @@ function ListCost({ eventId, data }) {
                 Export to Excel
               </Button>
             </Tooltip>
-            {userId === data.createdBy.id && data.status === 0 && (
+            {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}

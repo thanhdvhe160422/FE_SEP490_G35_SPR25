@@ -143,11 +143,11 @@ function ListTask({ eventId, data }) {
           onClick={() => showEditSubTaskModal(item)}
         />,
         <Popconfirm
-          title="Confirm deletion"
-          description="Are you sure you want to delete this subtask?"
+          title="Xác nhận xóa nhiệm vụ con"
+          description="Bạn có chắc chắn muốn xóa nhiệm vụ con này không ?"
           onConfirm={() => deleteSubTask(item.id)}
-          okText="Delete"
-          cancelText="Cancel"
+          okText="Xóa"
+          cancelText="Hủy"
           icon={<ExclamationCircleOutlined style={{ color: "red" }} />}
         >
           <Button type="text" danger icon={<DeleteOutlined />} size="small" />
@@ -878,7 +878,7 @@ function ListTask({ eventId, data }) {
             />
           </Tooltip>
 
-          {userId === data.createdBy.id && data.status === 0 && (
+          {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
             <>
               <Button
                 type="primary"
@@ -957,7 +957,7 @@ function ListTask({ eventId, data }) {
 
           <div className="task-actions">
             <Space>
-              {userId === data.createdBy.id && data.status === 0 && (
+              {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -978,7 +978,7 @@ function ListTask({ eventId, data }) {
               imageStyle={{ height: 120 }}
               description="No tasks yet"
             >
-              {userId === data.createdBy.id && data.status === 0 && (
+              {userId === data.createdBy.id && (data.status === 0||data.status === -1) && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
@@ -1193,7 +1193,7 @@ function ListTask({ eventId, data }) {
           open={subTasksVisible}
           extra={
             userId === data.createdBy.id &&
-            data.status === 0 && (
+            (data.status === 0 || data.status === -1) && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
