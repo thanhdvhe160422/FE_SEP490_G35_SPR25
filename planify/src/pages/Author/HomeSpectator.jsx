@@ -239,13 +239,13 @@ export default function HomeSpectator() {
             <div className="sidebar-content">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 className="mb-0">Bộ lọc</h5>
-                <Button
+                {/* <Button
                   variant="outline-secondary"
                   size="sm"
                   onClick={handleResetFilters}
                 >
                   Đặt lại
-                </Button>
+                </Button> */}
               </div>
 
               <Form.Group className="mb-3">
