@@ -191,18 +191,18 @@ export default function MyFarvourite() {
                             <Card.Body>
                               <span
                                 className={`status-badge ${
-                                  event.statusMessage === "Running"
+                                  event.statusMessage === "Đang diễn ra"
                                     ? "status-running"
-                                    : event.statusMessage === "Closed"
+                                    : event.statusMessage === "Đã kết thúc"
                                     ? "status-closed"
                                     : "status-notyet"
                                 }`}
                               >
-                                {event.statusMessage === "Running"
+                                {event.statusMessage === "Đang diễn ra"
                                   ? "Đang diễn ra"
-                                  : event.statusMessage === "Closed"
-                                  ? "Đã kết thúc"
-                                  : "Chưa bắt đầu"}
+                                  : event.statusMessage === "Đã kết thúc"
+                                  ? "Đã đóng"
+                                  : "Chưa diễn ra"}
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
