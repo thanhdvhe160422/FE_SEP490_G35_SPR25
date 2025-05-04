@@ -11,11 +11,13 @@ export const getCampuses = async () => {
     return [];
   }
 };
-export const getCampusIdByName = async (name)=>{
-  try{
-    const response = await axios.get(`https://fptu-planify.com/api/Campus/${name}`);
+export const getCampusIdByName = async (name) => {
+  try {
+    const response = await axios.get(
+      `https://fptu-planify.com/api/Campus/${name}`
+    );
     return response.data;
-  }catch(error){
-    console.error("Lỗi tìm campus theo tên: ",error);
+  } catch (error) {
+    console.error("Lỗi tìm campus theo tên: ", error);
   }
-}
+};

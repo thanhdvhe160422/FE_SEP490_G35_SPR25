@@ -55,9 +55,13 @@ function ManageCampus(props) {
   const handleDelete = async (id) => {
     setIsLoading(true);
     try {
-      await axios.put(`https://fptu-planify.com/api/Campus/delete/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(
+        `https://fptu-planify.com/api/Campus/delete/${id}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       await fetchCampuses();
       // Sau khi xóa thành công, có thể cập nhật lại danh sách
       setCampuses((prev) => prev.filter((c) => c.id !== id));
@@ -100,9 +104,7 @@ function ManageCampus(props) {
         <div class="sidebar-start">
           <div class="sidebar-head">
             <a href="/dashboard" class="logo-wrapper" title="Home">
-              <img src={logo} alt="" style={{width: "150px"}}/>
-              <span class="sr-only">Home</span>
-              <span class="icon logo" aria-hidden="true"></span>
+              <img src={logo} alt="" style={{ width: "150px" }} />
               <div class="logo-text">
                 <span class="logo-title">Planify</span>
                 <span class="logo-subtitle">Dashboard</span>

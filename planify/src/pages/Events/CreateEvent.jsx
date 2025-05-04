@@ -472,13 +472,13 @@ export default function CreateEvent() {
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     const newFiles = files.filter(
-        (file) =>
-            !selectedImages.some(
-                (existingFile) =>
-                    existingFile.name === file.name &&
-                    existingFile.size === file.size &&
-                    existingFile.lastModified === file.lastModified
-            )
+      (file) =>
+        !selectedImages.some(
+          (existingFile) =>
+            existingFile.name === file.name &&
+            existingFile.size === file.size &&
+            existingFile.lastModified === file.lastModified
+        )
     );
     setSelectedImages([...selectedImages, ...newFiles]);
     event.target.value = null;
@@ -508,7 +508,6 @@ export default function CreateEvent() {
       )
     );
   };
-
 
   const handleAddTask = () => {
     const newGroup = {
@@ -1581,61 +1580,61 @@ export default function CreateEvent() {
             </Card.Body>
           </Card>
 
-    <Form.Group className="mt-3">
-      <Form.Label style={{ fontWeight: "bold", color: "black" }}>
-        Image <span style={{ color: "red" }}>*</span>{" "}
-        <span
-            style={{
-              fontWeight: "initial",
-              color: "red",
-              fontStyle: "italic",
-            }}
-        >
-        (The first photo will be the background photo of the event.)
-    </span>
+          <Form.Group className="mt-3">
+            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+              Image <span style={{ color: "red" }}>*</span>{" "}
+              <span
+                style={{
+                  fontWeight: "initial",
+                  color: "red",
+                  fontStyle: "italic",
+                }}
+              >
+                (The first photo will be the background photo of the event.)
+              </span>
             </Form.Label>
             <Row>
               <Col xs={3}>
                 <label
-                    className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-                    style={{
-                      cursor: "pointer",
-                      aspectRatio: "1/1",
-                      minHeight: "100px",
-                    }}
+                  className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                  style={{
+                    cursor: "pointer",
+                    aspectRatio: "1/1",
+                    minHeight: "100px",
+                  }}
                 >
                   <FaPlus />
                   <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      key={selectedImages.length}
-                      onChange={handleImageUpload}
-                      style={{ display: "none" }}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    key={selectedImages.length}
+                    onChange={handleImageUpload}
+                    style={{ display: "none" }}
                   />
                 </label>
               </Col>
               {selectedImages.map((file, index) => (
-                  <Col
-                      xs={3}
-                      key={`${file.name}-${file.size}-${file.lastModified}`}
-                      className="position-relative"
+                <Col
+                  xs={3}
+                  key={`${file.name}-${file.size}-${file.lastModified}`}
+                  className="position-relative"
+                >
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="uploaded"
+                    className="img-fluid rounded w-100 h-100 object-fit-cover"
+                    style={{ aspectRatio: "1/1", minHeight: "100px" }}
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="position-absolute top-0 end-0 p-1"
+                    onClick={() => handleDeleteImage(index)}
                   >
-                    <img
-                        src={URL.createObjectURL(file)}
-                        alt="uploaded"
-                        className="img-fluid rounded w-100 h-100 object-fit-cover"
-                        style={{ aspectRatio: "1/1", minHeight: "100px" }}
-                    />
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        className="position-absolute top-0 end-0 p-1"
-                        onClick={() => handleDeleteImage(index)}
-                    >
-                      ✕
-                    </Button>
-                  </Col>
+                    ✕
+                  </Button>
+                </Col>
               ))}
             </Row>
           </Form.Group>

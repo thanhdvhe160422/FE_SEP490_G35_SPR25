@@ -648,14 +648,12 @@ export default function ManageUser() {
     <div className="page-flex">
       <aside className="sidebar" style={{ width: "350px" }}>
         <div className="sidebar-start">
-          <div className="sidebar-head">
-            <a href="/dashboard" className="logo-wrapper" title="Home">
-              <img src={logo} alt="" style={{width: "150px"}}/>
-              <span className="sr-only">Home</span>
-              <span className="icon logo" aria-hidden="true"></span>
-              <div className="logo-text">
-                <span className="logo-title">Planify</span>
-                <span className="logo-subtitle">Dashboard</span>
+          <div class="sidebar-head">
+            <a href="/dashboard" class="logo-wrapper" title="Home">
+              <img src={logo} alt="" style={{ width: "150px" }} />
+              <div class="logo-text">
+                <span class="logo-title">Planify</span>
+                <span class="logo-subtitle">Dashboard</span>
               </div>
             </a>
           </div>
