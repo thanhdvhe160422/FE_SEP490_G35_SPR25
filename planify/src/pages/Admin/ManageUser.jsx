@@ -106,12 +106,12 @@ export default function ManageUser() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://localhost:44320/css/style.min.css";
+    link.href = "http://localhost:3000/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "https://localhost:44320/css/style.css";
+    link2.href = "http://localhost:3000/css/style.css";
     document.head.appendChild(link2);
 
     if (window.feather) {
