@@ -168,9 +168,9 @@ function ManageRequest() {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 1:
+      case 0:
         return "Chưa được duyệt";
-      case 2:
+      case 1:
         return "Đã duyệt";
       case -1:
         return "Đã từ chối";
@@ -236,7 +236,7 @@ function ManageRequest() {
     },
     {
       title: "Trạng thái",
-      dataIndex: "status",
+      dataIndex: "requestStatus",
       key: "status",
       render: (status) => (
         <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
@@ -246,7 +246,7 @@ function ManageRequest() {
       title: "Hành động",
       key: "action",
       render: (_, record) =>
-        record.status === 1 ? (
+        record.requestStatus === 0 ? (
           <div style={{ display: "flex", gap: "10px" }}>
             <Button
               type="primary"
@@ -304,8 +304,8 @@ function ManageRequest() {
           onChange={handleStatusChange}
         >
           <option value="">Tất cả trạng thái</option>
-          <option value="1">Chưa duyệt</option>
-          <option value="2">Đã duyệt</option>
+          <option value="0">Chưa duyệt</option>
+          <option value="1">Đã duyệt</option>
           <option value="-1">Đã từ chối</option>
         </select>
         <Table
