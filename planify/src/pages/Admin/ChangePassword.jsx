@@ -5,6 +5,7 @@ import { Button, Form, Input } from "antd";
 import { FaEdit, FaHome, FaLock, FaUsers } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import "../../styles/Author/CreateEOG.css";
+import logo from "../../assets/logo-fptu.png";
 
 // CSS tùy chỉnh cho form đổi mật khẩu
 const customStyles = `
@@ -59,12 +60,12 @@ const ChangePassword = () => {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "http://fptu-planify.com/css/style.min.css";
+    link.href = "https://fptu-planify.com/css/style.min.css";
     document.head.appendChild(link);
 
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "http://fptu-planify.com/css/style.css";
+    link2.href = "https://fptu-planify.com/css/style.css";
     document.head.appendChild(link2);
 
     const styleSheet = document.createElement("style");
@@ -144,6 +145,7 @@ const ChangePassword = () => {
         <div className="sidebar-start">
           <div className="sidebar-head">
             <a href="/dashboard" className="logo-wrapper" title="Home">
+              <img src={logo} alt="" style={{width: "150px"}}/>
               <span className="sr-only">Home</span>
               <span className="icon logo" aria-hidden="true"></span>
               <div className="logo-text">

@@ -12,6 +12,7 @@ import "../../styles/Author/CreateEOG.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { CiLogout } from "react-icons/ci";
 import { FaEdit, FaHome, FaLock, FaUsers } from "react-icons/fa";
+import logo from "../../assets/logo-fptu.png";
 
 export default function ManageCampusManager() {
   const [campuses, setCampuses] = useState([]);
@@ -195,11 +196,11 @@ export default function ManageCampusManager() {
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "http://fptu-planify.com" + "/css/style.min.css";
+    link.href = "https://fptu-planify.com" + "/css/style.min.css";
     document.head.appendChild(link);
     const link2 = document.createElement("link");
     link2.rel = "stylesheet";
-    link2.href = "http://fptu-planify.com" + "/css/style.css";
+    link2.href = "https://fptu-planify.com" + "/css/style.css";
     document.head.appendChild(link2);
     if (window.feather) {
       window.feather.replace();
@@ -221,6 +222,7 @@ export default function ManageCampusManager() {
         <div class="sidebar-start">
           <div class="sidebar-head">
             <a href="/dashboard" class="logo-wrapper" title="Home">
+              <img src={logo} alt="" style={{width: "150px"}}/>
               <span class="sr-only">Home</span>
               <span class="icon logo" aria-hidden="true"></span>
               <div class="logo-text">
