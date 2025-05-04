@@ -142,7 +142,7 @@ const EventDetailEOG = () => {
     console.log(token);
     try {
       let response = await fetch(
-        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+        `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
         {
           method: "GET",
           headers: {
@@ -160,7 +160,7 @@ const EventDetailEOG = () => {
 
         if (newToken) {
           response = await fetch(
-            `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+            `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
             {
               method: "GET",
               headers: {
@@ -232,7 +232,7 @@ const EventDetailEOG = () => {
         let token = localStorage.getItem("token");
 
         let response = await fetch(
-          `https://localhost:44320/api/Events/delete/${eventId}`,
+          `https://fptu-planify.com/api/Events/delete/${eventId}`,
           {
             method: "PUT",
             headers: {
@@ -247,7 +247,7 @@ const EventDetailEOG = () => {
 
           if (newToken) {
             response = await fetch(
-              `https://localhost:44320/api/Events/delete/${eventId}`,
+              `https://fptu-planify.com/api/Events/delete/${eventId}`,
               {
                 method: "DELETE",
                 headers: {

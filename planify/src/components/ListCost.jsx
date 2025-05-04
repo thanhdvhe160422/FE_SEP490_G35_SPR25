@@ -70,7 +70,7 @@ function ListCost({ eventId, data }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+        `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -104,7 +104,7 @@ function ListCost({ eventId, data }) {
   const handleDelete = async (costId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://localhost:44320/api/Cost/${costId}`, {
+      await axios.delete(`https://fptu-planify.com/api/Cost/${costId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -162,7 +162,7 @@ function ListCost({ eventId, data }) {
         eventId: eventId,
       };
 
-      await axios.post(`https://localhost:44320/api/Cost`, newCostData, {
+      await axios.post(`https://fptu-planify.com/api/Cost`, newCostData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -187,7 +187,7 @@ function ListCost({ eventId, data }) {
       };
 
       await axios.put(
-        `https://localhost:44320/api/Cost/${selectedCost.id}`,
+        `https://fptu-planify.com/api/Cost/${selectedCost.id}`,
         updatedCostData,
         {
           headers: { Authorization: `Bearer ${token}` },

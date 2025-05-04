@@ -39,7 +39,7 @@ export default function Login() {
       console.log(decoded.picture);
 
       const res = await axios.post(
-        "https://localhost:44320/api/Auth/google-login",
+        "https://fptu-planify.com/api/Auth/google-login",
         { CampusName: campus, GoogleToken: credential }
       );
       console.log("API Response:", res.data);

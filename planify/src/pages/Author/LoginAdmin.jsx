@@ -46,7 +46,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "https://localhost:44320/api/Auth/admin-login",
+        "https://fptu-planify.com/api/Auth/admin-login",
         {
           username: inputUsername,
           password: inputPassword,

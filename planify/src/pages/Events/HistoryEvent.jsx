@@ -20,7 +20,7 @@ const EventHistory = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `https://localhost:44320/api/JoinProject/view-attended-events-history?page=${currentPage}&pageSize=${pageSize}`,
+        `https://fptu-planify.com/api/JoinProject/view-attended-events-history?page=${currentPage}&pageSize=${pageSize}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

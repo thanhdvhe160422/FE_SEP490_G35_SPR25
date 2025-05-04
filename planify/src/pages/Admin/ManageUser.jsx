@@ -452,7 +452,7 @@ export default function ManageUser() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://localhost:44320/api/Users/import?campusId=${selectedCampusId}`,
+        `https://fptu-planify.com/api/Users/import?campusId=${selectedCampusId}`,
         {
           method: "POST",
           headers: {

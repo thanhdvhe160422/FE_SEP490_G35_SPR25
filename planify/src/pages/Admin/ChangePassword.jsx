@@ -100,7 +100,7 @@ const ChangePassword = () => {
       }
 
       const response = await fetch(
-        "https://localhost:44320/api/Users/change-password",
+        "https://fptu-planify.com/api/Users/change-password",
         {
           method: "POST",
           headers: {

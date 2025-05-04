@@ -83,7 +83,7 @@ export default function CreateEvent() {
     const campusId = getCampusIdFromToken();
     try {
       const response = await axios.get(
-        `https://localhost:44320/api/Categories/${campusId}`,
+        `https://fptu-planify.com/api/Categories/${campusId}`,
         {
           headers: {
             Accept: "*/*",
@@ -143,7 +143,7 @@ export default function CreateEvent() {
       if (selectedCategory) {
         try {
           const response = await axios.post(
-            "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
+            "https://fptu-planify.com/api/EventSuggestion/get-full-event-suggestion",
             {
               prompt: pendingPrompt,
               categoryEventId: selectedCategory.id,
@@ -471,8 +471,23 @@ export default function CreateEvent() {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    setSelectedImages([...selectedImages, ...files]);
+    const newFiles = files.filter(
+        (file) =>
+            !selectedImages.some(
+                (existingFile) =>
+                    existingFile.name === file.name &&
+                    existingFile.size === file.size &&
+                    existingFile.lastModified === file.lastModified
+            )
+    );
+    setSelectedImages([...selectedImages, ...newFiles]);
     event.target.value = null;
+  };
+
+  const handleDeleteImage = (index) => {
+    const imageToDelete = selectedImages[index];
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    URL.revokeObjectURL(imageToDelete);
   };
 
   const toggleEditGroup = (index) => {
@@ -553,7 +568,7 @@ export default function CreateEvent() {
 
     try {
       const response = await axios.get(
-        `https://localhost:44320/api/Users/search?input=${value}`,
+        `https://fptu-planify.com/api/Users/search?input=${value}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -578,7 +593,7 @@ export default function CreateEvent() {
           localStorage.setItem("token", newToken);
           try {
             const retryResponse = await axios.get(
-              `https://localhost:44320/api/Users/search?input=${value}`,
+              `https://fptu-planify.com/api/Users/search?input=${value}`,
               {
                 headers: {
                   Authorization: `Bearer ${newToken}`,
@@ -785,7 +800,7 @@ export default function CreateEvent() {
 
           try {
             const createResponse = await axios.post(
-              "https://localhost:44320/api/Events/create",
+              "https://fptu-planify.com/api/Events/create",
               eventData,
               {
                 headers: {
@@ -813,7 +828,7 @@ export default function CreateEvent() {
               if (newToken) {
                 try {
                   let retryResponse = await axios.post(
-                    "https://localhost:44320/api/Events/create",
+                    "https://fptu-planify.com/api/Events/create",
                     eventData,
                     {
                       headers: {
@@ -880,7 +895,7 @@ export default function CreateEvent() {
     formData.append("eventId", eventId);
     try {
       await axios.post(
-        "https://localhost:44320/api/Events/upload-image",
+        "https://fptu-planify.com/api/Events/upload-image",
         formData,
         {
           headers: {
@@ -1566,60 +1581,61 @@ export default function CreateEvent() {
             </Card.Body>
           </Card>
 
-          <Form.Group className="mt-3">
-            <Form.Label style={{ fontWeight: "bold", color: "black" }}>
-              Image <span style={{ color: "red" }}>*</span>{" "}
-              <span
-                style={{
-                  fontWeight: "initial",
-                  color: "red",
-                  fontStyle: "italic",
-                }}
-              >
-                (The first photo will be the background photo of the event.)
-              </span>
+    <Form.Group className="mt-3">
+      <Form.Label style={{ fontWeight: "bold", color: "black" }}>
+        Image <span style={{ color: "red" }}>*</span>{" "}
+        <span
+            style={{
+              fontWeight: "initial",
+              color: "red",
+              fontStyle: "italic",
+            }}
+        >
+        (The first photo will be the background photo of the event.)
+    </span>
             </Form.Label>
             <Row>
               <Col xs={3}>
                 <label
-                  className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-                  style={{
-                    cursor: "pointer",
-                    aspectRatio: "1/1",
-                    minHeight: "100px",
-                  }}
+                    className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                    style={{
+                      cursor: "pointer",
+                      aspectRatio: "1/1",
+                      minHeight: "100px",
+                    }}
                 >
                   <FaPlus />
                   <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageUpload}
-                    style={{ display: "none" }}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      key={selectedImages.length}
+                      onChange={handleImageUpload}
+                      style={{ display: "none" }}
                   />
                 </label>
               </Col>
               {selectedImages.map((file, index) => (
-                <Col xs={3} key={index} className="position-relative">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="uploaded"
-                    className="img-fluid rounded w-100 h-100 object-fit-cover"
-                    style={{ aspectRatio: "1/1", minHeight: "100px" }}
-                  />
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="position-absolute top-0 end-0 p-1"
-                    onClick={() =>
-                      setSelectedImages(
-                        selectedImages.filter((_, i) => i !== index)
-                      )
-                    }
+                  <Col
+                      xs={3}
+                      key={`${file.name}-${file.size}-${file.lastModified}`}
+                      className="position-relative"
                   >
-                    ✕
-                  </Button>
-                </Col>
+                    <img
+                        src={URL.createObjectURL(file)}
+                        alt="uploaded"
+                        className="img-fluid rounded w-100 h-100 object-fit-cover"
+                        style={{ aspectRatio: "1/1", minHeight: "100px" }}
+                    />
+                    <Button
+                        variant="danger"
+                        size="sm"
+                        className="position-absolute top-0 end-0 p-1"
+                        onClick={() => handleDeleteImage(index)}
+                    >
+                      ✕
+                    </Button>
+                  </Col>
               ))}
             </Row>
           </Form.Group>

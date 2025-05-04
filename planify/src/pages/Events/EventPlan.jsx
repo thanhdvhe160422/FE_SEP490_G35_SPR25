@@ -73,7 +73,7 @@ const Chatbot = ({ onApplyEventData, token }) => {
 
     try {
       const response = await axios.get(
-        `https://localhost:44320/api/Categories/${campusId}`,
+        `https://fptu-planify.com/api/Categories/${campusId}`,
         {
           headers: { Authorization: `Bearer ${token}`, Accept: "*/*" },
         }
@@ -148,7 +148,7 @@ const Chatbot = ({ onApplyEventData, token }) => {
 
     try {
       const response = await axios.post(
-        "https://localhost:44320/api/EventSuggestion/get-full-event-suggestion",
+        "https://fptu-planify.com/api/EventSuggestion/get-full-event-suggestion",
         { prompt: pendingPrompt, categoryEventId: category.id },
         {
           headers: {
@@ -537,7 +537,7 @@ const useCategories = () => {
       }
       try {
         const response = await axios.get(
-          `https://localhost:44320/api/Categories/${campusId}`,
+          `https://fptu-planify.com/api/Categories/${campusId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -1053,10 +1053,27 @@ export default function EventPlan() {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    const newImages = [...selectedImagesRef.current, ...files];
-    setSelectedImages(newImages);
-    selectedImagesRef.current = newImages;
+    const newImages = files.filter(
+        (file) =>
+            !selectedImages.some(
+                (existingFile) =>
+                    existingFile.name === file.name &&
+                    existingFile.size === file.size &&
+                    existingFile.lastModified === file.lastModified
+            )
+    );
+    const updatedImages = [...selectedImages, ...newImages];
+    setSelectedImages(updatedImages);
+    selectedImagesRef.current = updatedImages;
     event.target.value = null;
+  };
+
+  const handleDeleteImage = (index) => {
+    const imageToDelete = selectedImages[index];
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedImages);
+    selectedImagesRef.current = updatedImages;
+    URL.revokeObjectURL(URL.createObjectURL(imageToDelete));
   };
 
   const handleUploadImages = async (eventId, token) => {
@@ -1068,7 +1085,7 @@ export default function EventPlan() {
     formData.append("eventId", eventId);
     try {
       await axios.post(
-        "https://localhost:44320/api/Events/upload-image",
+        "https://fptu-planify.com/api/Events/upload-image",
         formData,
         {
           headers: {
@@ -1173,7 +1190,7 @@ export default function EventPlan() {
     try {
       const eventData = prepareEventData();
       const response = await axios.post(
-        "https://localhost:44320/api/Events/create",
+        "https://fptu-planify.com/api/Events/create",
         eventData,
         {
           headers: {
@@ -1188,7 +1205,7 @@ export default function EventPlan() {
 
       if (response.status === 201) {
         await axios.post(
-          "https://localhost:44320/api/SendRequest",
+          "https://fptu-planify.com/api/SendRequest",
           { eventId },
           {
             headers: {
@@ -1242,7 +1259,7 @@ export default function EventPlan() {
         try {
           const eventData = prepareEventData();
           const response = await axios.post(
-            "https://localhost:44320/api/Events/create",
+            "https://fptu-planify.com/api/Events/create",
             eventData,
             {
               headers: {
@@ -1944,49 +1961,50 @@ export default function EventPlan() {
                 <Row>
                   <Col xs={3} className="mb-3">
                     <label
-                      className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
-                      style={{
-                        cursor: "pointer",
-                        aspectRatio: "16/9",
-                        minHeight: "120px",
-                      }}
+                        className="w-100 h-100 d-flex align-items-center justify-content-center border rounded"
+                        style={{
+                          cursor: "pointer",
+                          aspectRatio: "16/9",
+                          minHeight: "120px",
+                        }}
                     >
-                      <FaPlus />
+                      <FaPlus/>
                       <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageUpload}
-                        style={{ display: "none" }}
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          key={selectedImages.length} // Đảm bảo input được làm mới
+                          onChange={handleImageUpload}
+                          style={{display: "none"}}
                       />
                     </label>
                   </Col>
 
                   {selectedImages.map((file, index) => (
-                    <Col xs={3} key={index} className="position-relative mb-3">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt="uploaded"
-                        className="img-fluid rounded w-100 h-100 object-fit-cover"
-                        style={{
-                          aspectRatio: "16/9",
-                          minHeight: "120px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="position-absolute top-0 end-0 p-1"
-                        onClick={() =>
-                          setSelectedImages(
-                            selectedImages.filter((_, i) => i !== index)
-                          )
-                        }
+                      <Col
+                          xs={3}
+                          key={`${file.name}-${file.size}-${file.lastModified}`}
+                          className="position-relative mb-3"
                       >
-                        ✕
-                      </Button>
-                    </Col>
+                        <img
+                            src={URL.createObjectURL(file)}
+                            alt="uploaded"
+                            className="img-fluid rounded w-100 h-100 object-fit-cover"
+                            style={{
+                              aspectRatio: "16/9",
+                              minHeight: "120px",
+                              objectFit: "cover",
+                            }}
+                        />
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            className="position-absolute top-0 end-0 p-1"
+                            onClick={() => handleDeleteImage(index)}
+                        >
+                          ✕
+                        </Button>
+                      </Col>
                   ))}
                 </Row>
               </Form.Group>

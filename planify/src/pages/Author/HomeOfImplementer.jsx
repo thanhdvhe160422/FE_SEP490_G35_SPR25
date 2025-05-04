@@ -475,7 +475,7 @@ const WeekCalendar = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `https://localhost:44320/api/SubTasks/update-status/${subTaskId}`,
+        `https://fptu-planify.com/api/SubTasks/update-status/${subTaskId}`,
         {
           method: "PUT",
           headers: {

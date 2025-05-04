@@ -54,7 +54,7 @@ function ManageCampus(props) {
   const handleDelete = async (id) => {
     setIsLoading(true);
     try {
-      await axios.put(`https://localhost:44320/api/Campus/delete/${id}`, null, {
+      await axios.put(`https://fptu-planify.com/api/Campus/delete/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchCampuses();
@@ -197,7 +197,7 @@ function ManageCampus(props) {
           onOk={async () => {
             try {
               await axios.post(
-                "https://localhost:44320/api/Campus",
+                "https://fptu-planify.com/api/Campus",
                 { campusName: newCampusName, status: "1" },
                 {
                   headers: { Authorization: `Bearer ${token}` },

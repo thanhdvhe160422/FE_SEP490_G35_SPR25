@@ -33,7 +33,7 @@ export const searchUsers = async (searchTerm) => {
 
   try {
     const response = await axios.get(
-      `https://localhost:44320/api/Users/search?input=${searchTerm}`,
+      `https://fptu-planify.com/api/Users/search?input=${searchTerm}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -46,7 +46,7 @@ export const searchUsers = async (searchTerm) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.get(
-            `https://localhost:44320/api/Users/search?input=${searchTerm}`,
+            `https://fptu-planify.com/api/Users/search?input=${searchTerm}`,
             {
               headers: { Authorization: `Bearer ${newToken}` },
             }
@@ -70,7 +70,7 @@ export const addUserToEvent = async (eventId, userIds) => {
 
   try {
     const response = await axios.post(
-      `https://localhost:44320/api/JoinProject/add-implementers`,
+      `https://fptu-planify.com/api/JoinProject/add-implementers`,
       {
         eventId: eventId,
         UserIds: userIds,
@@ -87,7 +87,7 @@ export const addUserToEvent = async (eventId, userIds) => {
         localStorage.setItem("token", newToken);
         try {
           const retryResponse = await axios.post(
-            `https://localhost:44320/api/JoinProject/add-implementers`,
+            `https://fptu-planify.com/api/JoinProject/add-implementers`,
             {
               eventId: eventId,
               UserIds: userIds,
@@ -128,7 +128,7 @@ const ListMember = ({ eventId, data }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://localhost:44320/api/Events/get-event-detail?eventId=${eventId}`,
+        `https://fptu-planify.com/api/Events/get-event-detail?eventId=${eventId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -212,7 +212,7 @@ const ListMember = ({ eventId, data }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const url = `https://localhost:44320/api/JoinProject/delete-from-project/${eventId}/${userId}`;
+      const url = `https://fptu-planify.com/api/JoinProject/delete-from-project/${eventId}/${userId}`;
 
       console.log("Calling API:", url);
 

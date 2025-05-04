@@ -5,7 +5,7 @@ const refreshAccessToken = async () => {
   const accessToken = localStorage.getItem("token");
   try {
     const response = await axios.post(
-      "https://localhost:44320/api/Auth/refresh-token",
+      "https://fptu-planify.com/api/Auth/refresh-token",
       {
         refreshToken: refreshToken,
         accessToken: accessToken,

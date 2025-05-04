@@ -20,7 +20,7 @@ const Profile = () => {
       try {
         const userId = localStorage.getItem("userId");
         const userRes = await fetch(
-          "https://localhost:44320/api/Profiles/" + userId
+          "https://fptu-planify.com/api/Profiles/" + userId
         );
         const userData = await userRes.json();
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_ADDRESS_URL = 'https://localhost:44320/api/Address';
+const API_ADDRESS_URL = 'https://fptu-planify.com/api/Address';
 
 export const getProvinces = async() => {
     try{
