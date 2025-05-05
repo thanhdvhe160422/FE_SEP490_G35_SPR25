@@ -462,7 +462,7 @@ export default function HomeSpectator() {
                                     : "status-notyet"
                                 }`}
                               >
-                                event.statusMessage
+                                {event.statusMessage}
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
