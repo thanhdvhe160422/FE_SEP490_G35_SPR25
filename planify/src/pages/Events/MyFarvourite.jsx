@@ -198,11 +198,7 @@ export default function MyFarvourite() {
                                     : "status-notyet"
                                 }`}
                               >
-                                {event.statusMessage === "Đang diễn ra"
-                                  ? "Đang diễn ra"
-                                  : event.statusMessage === "Đã kết thúc"
-                                  ? "Đã đóng"
-                                  : "Chưa diễn ra"}
+                                event.statusMessage
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
