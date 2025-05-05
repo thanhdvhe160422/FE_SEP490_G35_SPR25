@@ -198,7 +198,7 @@ export default function MyFarvourite() {
                                     : "status-notyet"
                                 }`}
                               >
-                                event.statusMessage
+                                {event.statusMessage}
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
