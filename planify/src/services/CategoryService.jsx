@@ -13,13 +13,13 @@ const getCategories = async () => {
       case "Hồ Chí Minh":
         campusId = 2;
         break;
-      case "Đà Nẵng":
+      case "Cần Thơ":
         campusId = 3;
         break;
-      case "Cần Thơ":
+      case "Quy Nhơn":
         campusId = 4;
         break;
-      case "Quy Nhơn":
+      case "Đà Nẵng":
         campusId = 5;
         break;
       default:
