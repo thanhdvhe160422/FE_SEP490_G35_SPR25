@@ -362,10 +362,10 @@ export default function HomeSpectator() {
                 {statusFilter !== "All" && (
                   <Badge bg="info" className="me-2">
                     Trạng thái:{" "}
-                    {statusFilter === "Running"
+                    {statusFilter === "Đang diễn ra"
                       ? "Đang diễn ra"
-                      : statusFilter === "Closed"
-                      ? "Đã đóng"
+                      : statusFilter === "Đã kết thúc"
+                      ? "Đã kết thúc"
                       : "Chưa diễn ra"}
                   </Badge>
                 )}
@@ -462,11 +462,7 @@ export default function HomeSpectator() {
                                     : "status-notyet"
                                 }`}
                               >
-                                {event.statusMessage === "Đang diễn ra"
-                                  ? "Đang diễn ra"
-                                  : event.statusMessage === "Đã kết thúc"
-                                  ? "Đã đóng"
-                                  : "Chưa diễn ra"}
+                                event.statusMessage
                               </span>
                               <Card.Title
                                 style={{ fontSize: "100%" }}
