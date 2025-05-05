@@ -409,7 +409,7 @@ export default function HomeSpectator() {
                             className="h-100 shadow-sm event-card"
                             onClick={() => {
                               if (isImple) {
-                                navigate(`/event-detail-EOG/${event.id}`);
+                                navigate(`/event-detail-spec/${event.id}`);
                               } else {
                                 navigate(`/event-detail-spec/${event.id}`);
                               }
