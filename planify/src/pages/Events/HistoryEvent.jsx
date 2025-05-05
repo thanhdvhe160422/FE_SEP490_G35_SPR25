@@ -62,7 +62,7 @@ const EventHistory = () => {
           className="event-title-link"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/event-detail-spec/${record.eventId}`, {
+            navigate(`/event-detail-EOG/${record.eventId}`, {
               state: { from: "history-event" },
             });
           }}
